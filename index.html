@@ -1610,9 +1610,9 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     .id-xp { position: relative; z-index: 1; margin-top: 16px; }
     .id-xp-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; font-weight: 700; color: rgba(30,28,26,.6); margin-bottom: 6px; }
     .id-xp-head b { color: var(--neutral-900, #2e2620); font-weight: 800; }
-    .id-xp-track { height: 9px; border-radius: 999px; background: rgba(255,255,255,.45); overflow: hidden; }
-    .id-xp-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #fdd832, #f6c200); box-shadow: 0 0 8px rgba(246,194,0,.6); position: relative; transition: width .6s ease; }
-    .id-xp-fill::after { content: ""; position: absolute; right: 0; top: 0; width: 14px; height: 100%; background: rgba(255,255,255,.6); border-radius: 0 999px 999px 0; }
+    .id-xp-track { height: 8px; border-radius: 999px; background: rgba(122,63,214,.18); overflow: hidden; }
+    .id-xp-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #7a3fd6, #ac87ff); box-shadow: 0 0 8px rgba(122,63,214,.35); position: relative; transition: width .6s ease; }
+    .id-xp-fill::after { content: ""; position: absolute; right: 0; top: 0; width: 8px; height: 100%; background: rgba(255,255,255,.4); border-radius: 0 999px 999px 0; }
     /* ── 成长之路（等级只出现一次 · 无重复 · 一眼看到下一级） ── */
     .id-journey { position: relative; z-index: 1; margin-top: 16px; }
     .ij-label { font-size: 11px; font-weight: 800; color: rgba(30,28,26,.55); margin-bottom: 9px; letter-spacing: .02em; }
@@ -1630,6 +1630,7 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     .ij-node.done .ij-name { color: var(--lav-600, #7a3fd6); }
     .ij-node.cur .ij-name { color: var(--neutral-900, #2e2620); }
     .ij-lv { font-size: 8px; font-weight: 700; color: #b0a89e; }
+    .ij-lv:empty { display: none; }
     .ij-node.cur .ij-lv { color: var(--lav-600, #7a3fd6); }
     .ij-node.fut .ij-lv { color: #c6bfb5; }
     .ij-line { position: absolute; top: 13px; left: calc(50% + 13px); right: calc(50% + 13px); height: 3px; border-radius: 999px; background: #e5e0da; z-index: 0; }
@@ -1836,35 +1837,134 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     }
     .lm-link:hover { background: rgba(146,85,245,.18); }
     .lm-link:active { transform: scale(.96); }
-    /* 当前等级 + 当前总积分 · 全宽醒目主数值（等级置顶为主） */
-    .lm-total {
+    /* ═══ 成长之路时间轴（3节点） ═══ */
+    .lm-journey {
+      display: flex;
+      align-items: flex-start;
+      padding: 0 6px;
+      margin-bottom: 16px;
+    }
+    .lm-jn-wrap {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
-      padding: 34px 8px 28px;
-      margin-bottom: 18px;
-      border-bottom: 1px dashed rgba(146,85,245,.20);
+      gap: 6px;
+      position: relative;
+      min-width: 0;
+    }
+    .lm-jn-dot {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,.12);
+      position: relative;
+      z-index: 1;
+      flex: none;
+    }
+    .lm-jn-dot.done { background: var(--lav-600,#7a3fd6); color: #fff; }
+    .lm-jn-dot.current {
+      background: linear-gradient(135deg, var(--lav-600,#7a3fd6), var(--lav-400,#ac87ff));
+      color: #fff;
+      width: 42px; height: 42px;
+      font-size: 16px;
+      box-shadow: 0 0 0 4px rgba(146,85,245,.15);
+      transform: scale(1.1);
+    }
+    .lm-jn-dot.future { background: #e5e0da; color: #8a8178; }
+    .lm-jn-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neutral-600,#736c63);
       text-align: center;
     }
-    .lm-level-main { display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .lm-level-big {
-      font: 800 52px/1 var(--font-display, "PingFang SC", system-ui);
-      color: var(--lav-600,#7a3fd6);
-      letter-spacing:-.02em;
-      background: linear-gradient(120deg, #7a3fd6, #ac87ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .lm-jn-name.current { font-size: 13px; font-weight: 800; color: var(--neutral-900,#2e2620); }
+    .lm-jn-name.done { color: var(--lav-600,#7a3fd6); }
+    .lm-jn-tag {
+      font-size: 9px;
+      font-weight: 700;
+      color: #8a8178;
+      text-align: center;
     }
-    .lm-total-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
-    .lm-total-num { font: 800 36px/1 var(--font-display, "PingFang SC", system-ui); color: var(--neutral-900,#2e2620); letter-spacing:-.03em; }
-    .lm-total-unit { font-size: 15px; font-weight: 800; color: var(--neutral-500,#8a8178); }
-    .lm-total-gap { font-size: 14px; font-weight: 700; color: var(--neutral-600,#736c63); }
-    .lm-total-gap b { color: var(--coral-600,#e04a15); font-weight: 800; }
-    .level-module .id-xp { margin-top: 0; }
-    .level-module .id-journey { margin-top: 16px; }
-    .level-module .id-priv { margin-top: 16px; }
+    .lm-jn-tag:empty { display: none; }
+    .lm-jn-tag.current { color: var(--lav-600,#7a3fd6); font-weight: 800; }
+    .lm-jn-score {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--neutral-900,#2e2620);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+    .lm-jn-score .unit {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neutral-500,#8a8178);
+      margin-left: 1px;
+    }
+    .lm-jn-line {
+      position: absolute;
+      top: 17px;
+      left: calc(50% + 17px);
+      right: calc(50% + 17px);
+      height: 3px;
+      border-radius: 999px;
+      background: #e5e0da;
+      z-index: 0;
+    }
+    .lm-jn-line.on { background: linear-gradient(90deg, var(--lav-600,#7a3fd6), var(--lav-400,#ac87ff)); }
+    /* ═══ 进度条 + 本等级进度 ═══ */
+    .lm-progress-section {
+      padding: 14px 0 0;
+      margin-bottom: 14px;
+      border-top: 1px solid rgba(146,85,245,.12);
+    }
+    .lm-progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(122,63,214,.15);
+      overflow: hidden;
+    }
+    .lm-progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--lav-600,#7a3fd6), var(--lav-400,#ac87ff));
+      box-shadow: 0 0 8px rgba(122,63,214,.25);
+      position: relative;
+      transition: width .6s ease;
+    }
+    .lm-progress-fill::after {
+      content: "";
+      position: absolute;
+      right: 0; top: 0;
+      width: 10px; height: 100%;
+      background: rgba(255,255,255,.35);
+      border-radius: 0 999px 999px 0;
+    }
+    .lm-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+      padding: 0 1px;
+    }
+    .lm-pl-earned,
+    .lm-pl-target {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--neutral-900,#2e2620);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+    .lm-pl-earned { text-align: left; }
+    .lm-pl-target { text-align: right; }
+    .level-module .id-priv { margin-top: 0; }
 
     /* ════════ 1.6 独立等级卡（阳光珊瑚 + 糖果粉） ════════ */
     .level-card {
@@ -8460,36 +8560,28 @@ if (typeof window !== 'undefined') {
         </div>
       </section>
 
-      <!-- ════════ 2. 等级模块（升级进度 + 成长之路 + 当前权益，独立模块） ════════ -->
+      <!-- ════════ 2. 等级模块（成长之路 + 进度条 + 权益） ════════ -->
       <section class="level-module">
         <div class="lm-head">
           <span class="lm-title">我的等级</span>
           <span class="lm-link" onclick="switchView('level')">完整等级 →</span>
         </div>
 
-        <!-- 当前等级 + 当前总积分（扩展为全宽醒目主数值，等级置顶为主） -->
-        <div class="lm-total">
-          <div class="lm-level-main">
-            <span class="lm-level-big" id="homeTotalLevel">--</span>
+        <!-- 时间轴：上一级 · 当前级（含等级+分数）· 下一级 -->
+        <div class="lm-journey" id="lmJourney"></div>
+
+        <!-- 进度条 + 左已获得/右目标 -->
+        <div class="lm-progress-section">
+          <div class="lm-progress-track">
+            <div class="lm-progress-fill" id="lmProgressFill" style="width:0%"></div>
           </div>
-          <div class="lm-total-row">
-            <span class="lm-total-num" id="homeTotalXp">--</span><span class="lm-total-unit">分</span>
-            <span class="lm-total-gap">距下一级还差 <b id="homeTotalNext">--</b> XP</span>
+          <div class="lm-progress-labels">
+            <span class="lm-pl-earned" id="lmProgressEarned">--</span>
+            <span class="lm-pl-target" id="lmProgressTarget">--</span>
           </div>
         </div>
 
-        <!-- 升级进度（仅可视化进度条，不重复数字/图标） -->
-        <div class="id-xp">
-          <div class="id-xp-track"><div class="id-xp-fill" id="idXpFill" style="width:0%"></div></div>
-        </div>
-
-        <!-- 等级时间轴 -->
-        <div class="id-journey">
-          <div class="ij-label">你的成长之路</div>
-          <div class="ij-track" id="idJourneyTrack"></div>
-        </div>
-
-        <!-- 当前等级权益行（三态：已兑换/立即兑换/未解锁） -->
+        <!-- 当前等级权益行 -->
         <div class="id-priv">
           <div class="id-priv-label"><span>当前等级可享权益</span></div>
           <div class="priv-row" id="idPrivRow"></div>
@@ -11563,10 +11655,39 @@ async function renderHome() {
   const totalXpAll = verifiedXp.reduce((s, r) => s + (Number(r.xp) || 0), 0);
   const sharePct = (v) => totalXpAll > 0 ? Math.round((v / totalXpAll) * 100) : 0;
 
-  // 当前总积分（醒目主数值）
-  setText("homeTotalXp", xp.current);
-  setText("homeTotalLevel", ((xp.currentLevel?.levelNum || "") + " " + (xp.currentLevel?.name || "")).trim());
-  setText("homeTotalNext", nextGap);
+  // ═══ 成长之路时间轴：上一级 · 当前级 · 下一级 ═══
+  const levels = cfg.levels || [];
+  const currentLevelIdx = xp.currentLevel && levels.length ? levels.findIndex(l => l.name === (xp.currentLevel.name || "")) : -1;
+  const journeyEl = document.getElementById("lmJourney");
+  if (journeyEl && levels.length > 0) {
+    const startIdx = currentLevelIdx >= 0 ? Math.max(0, currentLevelIdx - 1) : 0;
+    const windowLevels = levels.slice(startIdx, startIdx + 3);
+    if (windowLevels.length === 0) windowLevels.push(levels[levels.length - 1]);
+    const ins = windowLevels.map((lv, i) => {
+      const idx = levels.indexOf(lv);
+      const isCur = idx === currentLevelIdx;
+      const isPast = idx < currentLevelIdx;
+      const cls = isCur ? "cur" : (isPast ? "done" : "fut");
+      const dotTxt = isPast ? "✓" : (idx + 1);
+      const lvTxt = isCur ? "当前" : (isPast ? "" : "下一级");
+      const line = i < windowLevels.length - 1 ? `<div class="lm-jn-line ${isCur || isPast ? "on" : ""}"></div>` : "";
+      const scoreHtml = isCur ? `<div class="lm-jn-score">${xp.current}<span class="unit">分</span></div>` : "";
+      const nameHtml = isCur ? ((xp.currentLevel?.levelNum || "") + " " + lv.name) : lv.name;
+      return `<div class="lm-jn-wrap ${cls}"><div class="lm-jn-dot ${cls}">${dotTxt}</div><div class="lm-jn-name ${cls}">${nameHtml}</div><div class="lm-jn-tag ${cls}">${lvTxt}</div>${scoreHtml}</div>${line}`;
+    }).join("");
+    journeyEl.innerHTML = ins;
+  }
+
+  // ═══ 本等级进度 ═══
+  const prevLevelXp = currentLevelIdx > 0 ? (levels[currentLevelIdx].xp || 0) : 0;
+  const nextLevelXp = levels[currentLevelIdx + 1] ? (levels[currentLevelIdx + 1].xp || 0) : (xp.nextLevel?.xp || xp.current);
+  const earnedInLevel = Math.max(0, xp.current - prevLevelXp);
+  const targetInLevel = nextLevelXp - prevLevelXp;
+  const progressPct = targetInLevel > 0 ? Math.min(100, Math.round((earnedInLevel / targetInLevel) * 100)) : 0;
+  setText("lmProgressEarned", earnedInLevel);
+  setText("lmProgressTarget", targetInLevel);
+  const fillEl = document.getElementById("lmProgressFill");
+  if (fillEl) fillEl.style.width = progressPct + "%";
 
   // ═══ 能量星球右侧 ═══
   setText("homeXp", planetXp.energy);
@@ -11641,37 +11762,7 @@ async function renderHome() {
   setText("idGrade", [schoolPart, gradeNow, classShow].filter(Boolean).join(" · "));
   // 个性签名（个人信息）
   setText("idSign", (child.motto || "").trim() ? child.motto : "每天进步一点点");
-  // 等级身份卡：等级信息通过成长之路时间线凸显，进度头部标注本学期升级（去重）
-  setText("lvLevelNum", xp.currentLevel?.levelNum || "Lv.1");
-  setText("lvLevelName", xp.currentLevel?.name || "萌新");
-  setText("lvTitleText", "成长进行时");
-  const xpFillEl = document.getElementById("idXpFill");
-  if (xpFillEl) xpFillEl.style.width = xp.progress + "%";
-  setText("idXpToNext", "距 " + (xp.nextLevel?.name || "下一级") + " 还差 " + nextGap + " XP");
-  setText("idXpProgressLabel", Math.round(xp.progress) + "%");
-
-  // ── 等级身份卡：等级旅程 + 当前权益 ──
-  const levels = cfg.levels || [];
-  const currentLevelIdx = xp.currentLevel && levels.length ? levels.findIndex(l => l.name === (xp.currentLevel.name || "")) : -1;
-  const journeyEl = document.getElementById("idJourneyTrack");
-  if (journeyEl && levels.length > 0) {
-    const startIdx = currentLevelIdx >= 0 ? Math.max(0, currentLevelIdx - 1) : 0;
-    const windowLevels = levels.slice(startIdx, startIdx + 3);
-    if (windowLevels.length === 0) windowLevels.push(levels[levels.length - 1]);
-    const ins = windowLevels.map((lv, i) => {
-      const idx = levels.indexOf(lv);
-      const isCur = idx === currentLevelIdx;
-      const isPast = idx < currentLevelIdx;
-      const cls = isCur ? "cur" : (isPast ? "done" : "fut");
-      const dotTxt = isPast ? "✓" : (lv.levelNum || idx + 1);
-      const lvTxt = isPast
-        ? (lv.levelNum || `Lv.${idx + 1}`)
-        : (isCur ? "当前" : "下一级");
-      const line = i < windowLevels.length - 1 ? `<div class="ij-line ${isCur || isPast ? "on" : ""}"></div>` : "";
-      return `<div class="ij-node ${cls}"><span class="ij-dot">${dotTxt}</span><span class="ij-name">${lv.name}</span><span class="ij-lv">${lvTxt}</span></div>${line}`;
-    }).join("");
-    journeyEl.innerHTML = ins;
-  }
+  // 角色面板：等级进度由成长之路时间轴展示
 
   // ── 当前等级权益行（三态：已兑换/立即兑换/未解锁） ──
   const privRowEl = document.getElementById("idPrivRow");
