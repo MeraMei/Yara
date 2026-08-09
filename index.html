@@ -8696,21 +8696,6 @@ if (typeof window !== 'undefined') {
         </div>
       </section>
 
-      <!-- 增长趋势 -->
-      <section class="trend-section">
-        <div class="section-head">
-          <div class="section-title"><i data-lucide="trending-up"></i>能量增长趋势</div>
-          <div class="trend-tabs">
-            <button class="trend-tab active" data-range="7">近7天</button>
-            <button class="trend-tab" data-range="30">近30天</button>
-            <button class="trend-tab" data-range="all">全部</button>
-          </div>
-        </div>
-        <div class="trend-chart-wrap" id="trendChartArea">
-          <!-- JS 渲染趋势折线图 -->
-        </div>
-      </section>
-
       <!-- ════════ 最近做过的事：整屏横排 ════════ -->
       <section class="recent-strip-section">
         <div class="recent-strip-header">
@@ -10104,7 +10089,7 @@ async function openSettingsDrawer() {
     }
   } catch (e) { /* 拉取失败时回退到当前缓存 */ }
   populateSettingsForm();
-  setTimeout(() => lucide.createIcons(), 50);
+  refreshIcons(50);
 }
 
 function closeSettingsDrawer() {
@@ -10154,7 +10139,7 @@ function updateTokenStatus() {
     statusEl.className = "token-status missing";
     statusEl.innerHTML = '<i data-lucide="alert-circle"></i><span>未设置，请添加 Token</span>';
   }
-  setTimeout(() => lucide.createIcons(), 20);
+  refreshIcons(20);
 }
 
 async function testGithubToken() {
@@ -10324,7 +10309,7 @@ function saveSettings() {
   if (typeof layoutShell === "function") {
     layoutShell("home");
   }
-  setTimeout(() => lucide.createIcons(), 50);
+  refreshIcons(50);
 }
 
 function saveCalendarSettings() {
@@ -10468,7 +10453,7 @@ if (typeof window !== "undefined") {
     function openXpModal() {
       populateXpTaskSelectPage().then(() => {
         document.getElementById("addXpModalPage").style.display = "flex";
-        setTimeout(() => lucide.createIcons(), 50);
+        refreshIcons(50);
       });
     }
     function closeXpModal() {
@@ -10482,7 +10467,7 @@ if (typeof window !== "undefined") {
       document.getElementById("newTaskDescPage").value = "";
       closeXpModal();
       document.getElementById("addXpRuleModalPage").style.display = "flex";
-      setTimeout(() => lucide.createIcons(), 50);
+      refreshIcons(50);
     }
     function closeNewTaskModalPage() {
       document.getElementById("addXpRuleModalPage").style.display = "none";
@@ -10547,7 +10532,7 @@ if (typeof window !== "undefined") {
         showToast(`✅ 已提交，待确认 ${pending} 条`, true);
         return renderXp();
       }).then(() => {
-        setTimeout(() => lucide.createIcons(), 50);
+        refreshIcons(50);
       }).catch(e => {
         console.error("添加XP失败:", e);
         btn.textContent = originalText;
@@ -10602,7 +10587,7 @@ if (typeof window !== "undefined") {
     });
 
     document.getElementById("reconcileModal").classList.add("active");
-    if (window.lucide) setTimeout(() => lucide.createIcons(), 30);
+    if (window.lucide) refreshIcons(30);
   }
 
   // 关闭弹窗
@@ -10728,7 +10713,7 @@ if (typeof window !== "undefined") {
           已记 ${fmtMoney(filledSoFar)} / ${fmtMoney(totalAbs)} · ${remainingStr}
         </div>
       </div>`;
-    if (window.lucide) setTimeout(() => lucide.createIcons(), 20);
+    if (window.lucide) refreshIcons(20);
   }
 
   // 添加一笔
@@ -10848,7 +10833,7 @@ if (typeof window !== "undefined") {
       // 刷新页面数据
       if (window.refreshData) refreshData();
       await renderMoney();
-      if (window.lucide) setTimeout(() => lucide.createIcons(), 50);
+      if (window.lucide) refreshIcons(50);
       alert(`已记录 ${entries.length} 笔财务流水，完成一次财务复盘，+10 XP 🎉`);
     } catch (e) {
       console.error("提交失败:", e);
@@ -10962,7 +10947,7 @@ function renderEnergySourceDetail(cfg, srcId, motId) {
           <div class="op-src-val"><b>${m.xp}</b> · ${pct}%</div>
         </div>`;
     }).join("");
-    if (window.lucide) window.lucide.createIcons();
+    refreshIcons(0);
   }
   // 激励文案（聚焦三大板块贡献，避免与首页等级卡的"距X还差XP"重复）
   let motivationText = "";
@@ -11032,9 +11017,16 @@ function getDateStr(record) {
 // ── UI 刷新工具 ──
 
 // 统一刷新 lucide 图标
+// 防抖刷新 lucide 图标：同一帧内多次调用只执行一次，避免重复扫描 DOM
+let __iconRefreshTimer = null;
 function refreshIcons(delay) {
-  const d = delay != null ? delay : 30;
-  if (window.lucide) setTimeout(() => lucide.createIcons(), d);
+  const d = delay != null ? delay : 20;
+  if (!window.lucide) return;
+  if (__iconRefreshTimer) clearTimeout(__iconRefreshTimer);
+  __iconRefreshTimer = setTimeout(() => {
+    __iconRefreshTimer = null;
+    lucide.createIcons();
+  }, d);
 }
 
 // ── 交互工具 ──
@@ -11733,7 +11725,7 @@ async function renderHome() {
 
   // ═══ 能量获取细节已并入三大星球（移除独立冗余卡片） ═══
 
-  if (window.lucide) window.lucide.createIcons();
+  refreshIcons(0);
 
   // ═══ 角色面板 + 今日状态 ═══
   const today = new Date();
@@ -12015,7 +12007,6 @@ async function renderHome() {
 // ═══════════════════════════════════════════════════════════════
 
 let pendingRedeemPriv = null;
-let currentTrendRange = 7;
 let homeTrendRange = 7;
 
 async function renderXp() {
@@ -12108,9 +12099,6 @@ async function renderXp() {
       }).join("");
     }
   }
-
-  // ════════ 增长趋势图 ════════
-  renderTrendChart(verifiedXp, currentTrendRange);
 
   // ════════ 最近做过的事 ════════
   const pcEl = document.getElementById("pendingCount");
@@ -12299,9 +12287,6 @@ async function renderXp() {
     xpRulesEl.innerHTML = cards;
   }
   setText("earnXpTotal", `${totalAvailableTasks} 个可用任务`);
-
-  // 绑定趋势图标签切换
-  bindTrendTabs();
 }
 
 // ══════════════════════════════════════
@@ -14205,7 +14190,7 @@ async function refreshXpRecent() {
       <div class="value">${r.value}</div>
     </div>
   `).join("");
-  lucide.createIcons();
+  refreshIcons(0);
 }
 
 async function refreshStudyRecent() {
@@ -14219,7 +14204,7 @@ async function refreshStudyRecent() {
       </div>
     </div>
   `).join("");
-  lucide.createIcons();
+  refreshIcons(0);
 }
 
 async function refreshReviewList() {
@@ -14280,7 +14265,7 @@ async function refreshMoneyRecent() {
       <div class="value" style="color:${t.type === "income" ? "var(--mint-700)" : "var(--pink-650)"}">${t.type === "income" ? "+" : "-"}¥${(t.amount || 0).toFixed(2)}</div>
     </div>
   `).join("");
-  lucide.createIcons();
+  refreshIcons(0);
 }
 
 // ── 作业智能拆分 ──
@@ -15038,7 +15023,7 @@ async function saveEdit() {
   closeEditModal();
   window.DataStore && window.DataStore.refreshData();
   await renderStudy();
-  setTimeout(() => lucide.createIcons(), 50);
+  refreshIcons(50);
   showToast("✅ 作业已更新", true);
 }
 
@@ -15168,7 +15153,7 @@ function initEditModal() {
         const cfgSubjects = cfg.config?.subjects || null;
         renderAbilityRadar(doneAsm, undefined, cfgModules, cfgSubjects);
       }
-      setTimeout(() => lucide.createIcons(), 50);
+      refreshIcons(50);
       showToast(newDone ? "✅ 已标记为完成" : "已改回待完成", newDone);
       return;
     }
@@ -15221,7 +15206,7 @@ function initEditModal() {
       if (window.DataStore && window.DataStore.refreshData) {
         window.DataStore.refreshData().catch(() => {});
       }
-      setTimeout(() => lucide.createIcons(), 50);
+      refreshIcons(50);
       showToast(newSubmitted ? "✅ 已标记为已提交" : "已取消提交", newSubmitted);
       return;
     }
@@ -15291,13 +15276,15 @@ async function boot(page) {
     // 统一数据变更监听：后台刷新完成后，直接用 cachedData 重绘当前视图
     // 注意：不在这里调用 refreshData()，避免触发新的 _backgroundRefresh() 导致无限循环
     window.addEventListener("yara-data-refreshed", async () => {
+      // 如果用户正在切换页面，跳过重渲染避免卡顿
+      if (window.__switchingView) return;
       const p = window.__currentView || "home";
       if (typeof layoutShell === "function") layoutShell(p);
-      if (p === "home") { if (typeof renderHome === "function") renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
-      else if (p === "xp" && typeof renderXp === "function") renderXp();
-      else if (p === "study" && typeof renderStudy === "function") renderStudy();
-      else if (p === "money" && typeof renderMoney === "function") renderMoney();
-      try { setTimeout(() => lucide.createIcons(), 50); } catch (e) {}
+      if (p === "home") { if (typeof renderHome === "function") await renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
+      else if (p === "xp" && typeof renderXp === "function") await renderXp();
+      else if (p === "study" && typeof renderStudy === "function") await renderStudy();
+      else if (p === "money" && typeof renderMoney === "function") await renderMoney();
+      refreshIcons(20);
     });
   }
   layoutShell(page);
@@ -15317,15 +15304,18 @@ async function boot(page) {
   } catch (e) {
     console.error("渲染失败:", e);
   }
-  // 数据加载完成后，重新渲染侧边栏（确保姓名/年龄显示正确）
-  if (typeof layoutShell === "function") layoutShell(page);
-  initEditModal();
-  setTimeout(() => lucide.createIcons(), 50);
+  // 数据加载完成后，刷新侧边栏（确保姓名/年龄显示正确）
+  // 合并到第一次 layoutShell 调用（上面已调用），不再重复执行
+  if (!window.__editModalInit) {
+    window.__editModalInit = true;
+    initEditModal();
+  }
+  if (window.lucide) refreshIcons(20);
   // 隐藏启动加载动画
   const loader = document.getElementById("bootLoader");
   if (loader) loader.classList.add("hidden");
   // 首次加载完成后，后台静默拉取 GitHub 最新数据（只执行一次）
-  setTimeout(() => _backgroundRefresh(), 100);
+  setTimeout(() => _backgroundRefresh(), 300);
 }
 
 
@@ -15424,31 +15414,38 @@ async function renderLevelLadder() {
   refreshIcons();
 }
 
-function switchView(page) {
-  // 0. 每次切换先回到页面顶部，避免停留在上一页的滚动位置
-  window.scrollTo({ top: 0, behavior: "auto" });
-  const scroller = document.querySelector(".main") || document.querySelector(".wrap");
-  if (scroller) scroller.scrollTop = 0;
-  // 1. 隐藏所有视图，显示目标视图
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  const target = document.getElementById("view-" + page);
-  if (target) target.classList.add("active");
-  // 2. 更新侧边栏菜单 active 高亮
-  document.querySelectorAll("[data-sidebar] .nav a").forEach(a => a.classList.toggle("active", a.getAttribute("data-page") === page));
-  // 3. 更新底部 tab 栏 active 高亮
-  document.querySelectorAll(".bottom-tab-item").forEach(t => t.classList.toggle("active", t.getAttribute("data-page") === page));
-  document.body.setAttribute("data-view", page);
-  // 4. 调用对应渲染函数
-  if (page === "home") { renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
-  else if (page === "xp") renderXp();
-  else if (page === "study") renderStudy();
-  else if (page === "money") renderMoney();
-  else if (page === "data-entry") initDataEntryGuarded();
-  else if (page === "level") renderLevelLadder();
-  // 5. 移动端关闭侧边栏
-  closeSidebar();
-  // 6. 刷新 lucide 图标
-  setTimeout(() => lucide.createIcons(), 50);
+async function switchView(page) {
+  // 上次切换仍在进行中则跳过，防止快速连点导致并行渲染
+  if (window.__switchingView) return;
+  window.__switchingView = true;
+  try {
+    // 0. 每次切换先回到页面顶部，避免停留在上一页的滚动位置
+    window.scrollTo({ top: 0, behavior: "auto" });
+    const scroller = document.querySelector(".main") || document.querySelector(".wrap");
+    if (scroller) scroller.scrollTop = 0;
+    // 1. 隐藏所有视图，显示目标视图
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    const target = document.getElementById("view-" + page);
+    if (target) target.classList.add("active");
+    // 2. 更新侧边栏菜单 active 高亮
+    document.querySelectorAll("[data-sidebar] .nav a").forEach(a => a.classList.toggle("active", a.getAttribute("data-page") === page));
+    // 3. 更新底部 tab 栏 active 高亮
+    document.querySelectorAll(".bottom-tab-item").forEach(t => t.classList.toggle("active", t.getAttribute("data-page") === page));
+    document.body.setAttribute("data-view", page);
+    // 4. 调用对应渲染函数（await 确保顺序执行，避免并行渲染导致卡顿）
+    if (page === "home") { await renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
+    else if (page === "xp") await renderXp();
+    else if (page === "study") await renderStudy();
+    else if (page === "money") await renderMoney();
+    else if (page === "data-entry") { initDataEntryGuarded(); }
+    else if (page === "level") { renderLevelLadder(); }
+    // 5. 移动端关闭侧边栏
+    closeSidebar();
+    // 6. 刷新 lucide 图标（延迟短一点，感受更跟手）
+    if (window.lucide) refreshIcons(20);
+  } finally {
+    window.__switchingView = false;
+  }
 }
 
 // 启动：渲染首页
