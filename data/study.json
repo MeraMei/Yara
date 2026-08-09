@@ -1149,16 +1149,16 @@
         {
           "id": "recvrd7AIv5DKs",
           "subject": "语文",
-          "title": "背诵并默写四上古诗和日积月累。",
+          "title": "抄写并背诵并默写四上古诗和日积月累。",
           "cleanTitle": "背诵并默写四上古诗和日积月累。",
           "shortTitle": "背诵并默写四上古诗和日积月累。",
           "homeworkType": "日常作业",
-          "module": "阅读",
+          "module": "汉字",
           "modules": [
-            "阅读",
-            "汉字"
+            "汉字",
+            "阅读"
           ],
-          "dueDate": "2026-08-30",
+          "dueDate": "2026-08-26",
           "deadline": "2026-08-30",
           "status": "pending",
           "submitted": false,
