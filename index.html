@@ -7092,14 +7092,29 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       color: var(--neutral-600);
       flex: 1;
     }
-    .rec-entry-auto {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--mint-700);
-      background: var(--mint-100);
-      padding: 2px 8px;
+    .rec-entry-progress {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .rec-entry-progress-bar {
+      height: 6px;
+      background: var(--neutral-200);
       border-radius: 999px;
-      flex-shrink: 0;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .rec-entry-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--mint-400), var(--mint-600));
+      border-radius: 999px;
+      transition: width .3s ease;
+    }
+    .rec-entry-progress-text {
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
     }
     .rec-entry-del {
       width: 26px;
@@ -7133,10 +7148,6 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       border: 1px solid var(--neutral-200);
       border-radius: 11px;
       background: rgba(255,255,255,.8);
-    }
-    .rec-entry-amount-box.auto {
-      border-color: var(--mint-200);
-      background: rgba(240,253,249,.7);
     }
     .rec-entry-amount-box .cur { font-size: 13px; font-weight: 700; color: var(--neutral-500); }
     .rec-entry-amount-box input {
@@ -7205,13 +7216,6 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       box-sizing: border-box;
     }
     .rec-entry-reason:focus { outline: none; border-color: var(--mint-400); box-shadow: 0 0 0 3px rgba(16,185,129,.1); }
-    .rec-entry-hint {
-      font-size: 11px;
-      color: var(--neutral-400);
-      margin-top: 8px;
-      line-height: 1.5;
-    }
-
     @media (max-width: 920px) {
       .hero.compact h1 { font-size: 32px; }
       .total-card .total-amount { font-size: 32px; }
@@ -7298,6 +7302,35 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 .view.active{display:block}
 
   </style>
+  <!-- 启动加载动画 -->
+  <style>
+    #bootLoader {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #fff9f0;
+      transition: opacity .4s ease, visibility .4s ease;
+    }
+    #bootLoader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .bootLoader-cat {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--colourful-butter-yellow-300), var(--colourful-candy-pink-300));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; animation: bootPulse 1.2s ease-in-out infinite;
+      box-shadow: 0 4px 20px rgba(253,216,50,.3);
+    }
+    @keyframes bootPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: .85; }
+    }
+    .bootLoader-text {
+      margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--neutral-500);
+      animation: bootPulse 1.2s ease-in-out infinite;
+    }
+  </style>
+  <div id="bootLoader">
+    <div class="bootLoader-cat">🐱</div>
+    <div class="bootLoader-text">Yara 的小宇宙正在加载…</div>
+  </div>
   <script>
 
 /**
@@ -10407,15 +10440,28 @@ if (typeof window !== "undefined") {
     return { amount: "", content: "", worthIt: "", reason: "", suggestion: "" };
   }
 
-  // 计算剩余差额（最后一条自动填充 = 总差额 - 前面各条手填金额）
+  // 计算剩余未记金额（所有条目手动填写，返回还剩多少没记完）
   function remainingDiff() {
-    const filled = recEntries.slice(0, -1).reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-    return recTotalDiff - filled;
+    const filled = recEntries.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    return Math.abs(recTotalDiff) - filled;
   }
 
   // 更新余额预览 + 重算差额 + 重渲明细
   function updateBalancePreview() {
-    const nowBalance = Number(document.getElementById("recCurrentBalance").value) || 0;
+    const nowBalanceInput = document.getElementById("recCurrentBalance");
+    const nowBalance = Number(nowBalanceInput.value) || 0;
+
+    // 还没填余额时，不显示差额
+    if (!nowBalanceInput.value || nowBalanceInput.value === "") {
+      document.getElementById("previewBegin").textContent = fmtMoney(currentFreeBalance);
+      document.getElementById("previewExpense").textContent = "等待输入…";
+      document.getElementById("previewExpense").style.color = "var(--neutral-400)";
+      document.getElementById("previewEnd").textContent = "--";
+      recTotalDiff = 0;
+      renderRecEntries();
+      return;
+    }
+
     // 差额 = 现在余额 - 当前余额；正数=存入（收入），负数=支出
     recTotalDiff = nowBalance - currentFreeBalance;
 
@@ -10423,10 +10469,10 @@ if (typeof window !== "undefined") {
 
     const diffEl = document.getElementById("previewExpense");
     if (recTotalDiff >= 0) {
-      diffEl.textContent = "+" + fmtMoney(recTotalDiff);
+      diffEl.textContent = "存入 " + fmtMoney(recTotalDiff);
       diffEl.style.color = "var(--mint-600)";
     } else {
-      diffEl.textContent = "-" + fmtMoney(Math.abs(recTotalDiff));
+      diffEl.textContent = "花出去 " + fmtMoney(Math.abs(recTotalDiff));
       diffEl.style.color = "var(--pink-600)";
     }
 
@@ -10434,39 +10480,39 @@ if (typeof window !== "undefined") {
     renderRecEntries();
   }
 
-  // 渲染全部明细
+  // 渲染全部明细（所有条目手动填写，显示剩余差额进度）
   function renderRecEntries() {
     const list = document.getElementById("recEntryList");
     if (!list) return;
     if (recEntries.length === 0) recEntries = [newEntry()];
 
     const isSpend = recTotalDiff < 0;
-    const remaining = remainingDiff();
+    const totalAbs = Math.abs(recTotalDiff);
+    const filledSoFar = recEntries.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
+    const remaining = totalAbs - filledSoFar;
+    const allDone = totalAbs <= 0 || remaining <= 0.009;
 
     list.innerHTML = recEntries.map((e, idx) => {
-      const isLast = idx === recEntries.length - 1;
-      const autoAmt = isLast ? remaining : (Number(e.amount) || 0);
-      const inputVal = isLast && remaining !== 0 ? Math.abs(remaining) : (e.amount === "" ? "" : Math.abs(Number(e.amount) || ""));
+      const inputVal = e.amount === "" ? "" : Math.abs(Number(e.amount) || "");
       return `
         <div class="rec-entry" data-idx="${idx}">
           <div class="rec-entry-head">
             <span class="rec-entry-index">${idx + 1}</span>
             <span class="rec-entry-title">${isSpend ? "这笔花了什么" : "这笔存了多少"}</span>
-            ${isLast ? '<span class="rec-entry-auto">自动算差额</span>' : ""}
             ${recEntries.length > 1 ? `<button type="button" class="rec-entry-del" onclick="removeRecEntry(${idx})"><i data-lucide="x" style="width:13px;height:13px"></i></button>` : ""}
           </div>
 
           <div class="rec-entry-amount-row">
-            <div class="rec-entry-amount-box ${isLast ? "auto" : ""}">
+            <div class="rec-entry-amount-box">
               <span class="cur">¥</span>
               <input type="number" min="0" step="0.01" placeholder="0.00"
                 value="${inputVal}"
-                ${isLast ? "disabled" : `onblur="onRecAmountChange(${idx}, this.value)"`} />
+                onblur="onRecAmountChange(${idx}, this.value)" />
             </div>
           </div>
 
           <input class="rec-entry-content" placeholder="${isSpend ? "买了什么？" : "存了什么？"}" value="${(e.content || "").replace(/"/g, "&quot;")}"
-            ${isLast ? `oninput="onRecContentChange(${idx}, this.value)"` : `oninput="onRecContentChange(${idx}, this.value)"`} />
+            oninput="onRecContentChange(${idx}, this.value)" />
 
           <div class="rec-entry-worth-row">
             ${["值得", "一般", "不值得"].map((w, wi) => `
@@ -10478,8 +10524,18 @@ if (typeof window !== "undefined") {
         </div>`;
     }).join("");
 
-    const lastWorth = recEntries.length ? recEntries[recEntries.length - 1].worthIt : "";
-    list.innerHTML += `<div class="rec-entry-hint">最后一笔自动填剩余差额，请补齐说明和是否值得。共 ${recEntries.length} 笔，合计 ${fmtMoney(Math.abs(remainingDiff()))} / ${fmtMoney(Math.abs(recTotalDiff))}</div>`;
+    // 剩余差额进度条
+    const pct = totalAbs > 0 ? Math.min(100, Math.round(filledSoFar / totalAbs * 100)) : 0;
+    const remainingStr = totalAbs <= 0 ? "请先输入现在余额" : (!allDone ? `还差 ${fmtMoney(remaining)} 没记完` : "全部记完 ✓");
+    list.innerHTML += `
+      <div class="rec-entry-progress">
+        <div class="rec-entry-progress-bar">
+          <div class="rec-entry-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="rec-entry-progress-text" style="color:${totalAbs <= 0 ? 'var(--neutral-400)' : allDone ? 'var(--mint-600)' : 'var(--coral-600)'}">
+          已记 ${fmtMoney(filledSoFar)} / ${fmtMoney(totalAbs)} · ${remainingStr}
+        </div>
+      </div>`;
     if (window.lucide) setTimeout(() => lucide.createIcons(), 20);
   }
 
@@ -10496,9 +10552,10 @@ if (typeof window !== "undefined") {
     renderRecEntries();
   }
 
-  // 明细金额变化（非最后一条手填）
+  // 明细金额变化
   function onRecAmountChange(idx, val) {
-    recEntries[idx].amount = val;
+    const num = Math.max(0, Number(val) || 0);
+    recEntries[idx].amount = num > 0 ? num : "";
     renderRecEntries();
   }
 
@@ -10531,20 +10588,24 @@ if (typeof window !== "undefined") {
     const remaining = remainingDiff();
 
     // 校验：差额必须完整覆盖
-    if (Math.abs(remaining) > 0.009) {
+    if (remaining > 0.009) {
       submitBtn.disabled = false;
       submitBtn.textContent = "确认记录";
-      alert("各笔金额还没记全，最后一笔会自动补上剩余差额哦。");
+      alert(`还有 ${fmtMoney(remaining)} 没记完，请继续添加明细或修改金额。`);
       return;
     }
-    // 校验：每条明细必须有说明 + 是否值得
-    const entries = recEntries.map((e, idx) => {
-      const isLast = idx === recEntries.length - 1;
-      const amt = isLast ? remaining : (Number(e.amount) || 0);
-      return { ...e, amount: amt };
+    // 校验：每条明细必须有金额 + 说明 + 是否值得
+    const entries = recEntries.map((e) => {
+      return { ...e, amount: Number(e.amount) || 0 };
     });
     for (let i = 0; i < entries.length; i++) {
       const e = entries[i];
+      if (!e.amount || e.amount <= 0) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "确认记录";
+        alert(`第 ${i + 1} 笔还没填金额`);
+        return;
+      }
       if (!e.content || !e.content.trim()) {
         submitBtn.disabled = false;
         submitBtn.textContent = "确认记录";
@@ -15022,6 +15083,9 @@ async function boot(page) {
   }
   initEditModal();
   setTimeout(() => lucide.createIcons(), 50);
+  // 隐藏启动加载动画
+  const loader = document.getElementById("bootLoader");
+  if (loader) loader.classList.add("hidden");
   // 首次加载完成后，后台静默拉取 GitHub 最新数据（只执行一次）
   setTimeout(() => _backgroundRefresh(), 100);
 }
