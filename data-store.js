@@ -866,6 +866,214 @@
     });
   };
 
+  // 追加一条财务流水（对账/零花钱/花销等），并同步更新对应账户余额与总资产
+  DataStore.prototype.addFinanceRecord = function (record) {
+    var self = this;
+    var finance = self._rawData.finance || {
+      totalAssets: 0,
+      accounts: [
+        { key: 'wealth', name: '财富增值账户', balance: 0, goal: null, goalTarget: null },
+        { key: 'free', name: '自由基金账户', balance: 0, goal: null, goalTarget: null },
+      ],
+      recentTransactions: [],
+    };
+
+    // 生成与现有流水一致的 id（recv 开头）
+    var txId = 'recv' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var rawAmount = Number(record.rawAmount);
+    if (isNaN(rawAmount)) {
+      rawAmount = record.type === 'expense' ? -Math.abs(Number(record.amount) || 0) : Math.abs(Number(record.amount) || 0);
+    }
+
+    // 追加流水
+    var tx = {
+      id: record.id || txId,
+      date: record.date || '',
+      type: record.type || (rawAmount >= 0 ? 'income' : 'expense'),
+      amount: Math.abs(Number(record.amount) || rawAmount || 0),
+      rawAmount: rawAmount,
+      category: record.category || record.description || '',
+      account: record.account || (record.accountType === '自由基金账户' ? 'free' : 'wealth'),
+      accountType: record.accountType || '财富增值账户',
+      description: record.description || '',
+      worthIt: record.worthIt || '',
+      reason: record.reason || '',
+      suggestion: record.suggestion || '',
+    };
+    var transactions = (finance.recentTransactions || []).slice();
+    transactions.unshift(tx);
+
+    // 更新对应账户余额
+    var accounts = (finance.accounts || []).map(function (acc) {
+      if (acc.key === tx.account) {
+        var bal = Number(acc.balance) || 0;
+        bal = Math.round((bal + rawAmount) * 100) / 100;
+        return Object.assign({}, acc, { balance: bal });
+      }
+      return acc;
+    });
+
+    // 重算总资产
+    var totalAssets = accounts.reduce(function (sum, acc) { return sum + (Number(acc.balance) || 0); }, 0);
+    totalAssets = Math.round(totalAssets * 100) / 100;
+
+    var newFinance = {
+      totalAssets: totalAssets,
+      accounts: accounts,
+      recentTransactions: transactions,
+    };
+
+    return self.saveFinance(newFinance);
+  };
+
+  // 保存个人信息（兼容页面调用的 saveChildData）
+  DataStore.prototype.saveChildData = function (childData) {
+    return this.saveChild(childData);
+  };
+
+  // 保存校历数据（数组结构）
+  DataStore.prototype.saveCalendarData = function (calendarData) {
+    var self = this;
+    return self._writeFile('data/calendar.json', calendarData, '更新校历数据').then(function () {
+      self._rawData.calendar = calendarData;
+      return self._rebuildDashboard();
+    });
+  };
+
+  // 新增一条 XP 规则（写入 config.json 的 xpRuleList 和 xpRules）
+  DataStore.prototype.addXpRule = function (rule) {
+    var self = this;
+    var config = self._rawData.config || { subjects: [], xpRules: {}, xpRuleList: [], abilityModules: {} };
+    var newRule = {
+      name: rule.name || '',
+      category: rule.category || '学习成长',
+      xp: Number(rule.xp) || 0,
+      method: rule.method || '按次',
+      description: rule.description || '',
+    };
+    var list = (config.xpRuleList || []).slice();
+    list.push(newRule);
+    var rules = Object.assign({}, config.xpRules || {});
+    rules[newRule.category] = (rules[newRule.category] || []).concat([newRule]);
+    return self.saveConfig(Object.assign({}, config, { xpRuleList: list, xpRules: rules }));
+  };
+
+  // 新增一条学习（作业）记录：写入 allHomework（按日期分组）与 recentAssignments
+  DataStore.prototype.addStudyRecord = function (rec) {
+    var self = this;
+    var study = self._rawData.study || { subjects: [], homework: {}, recentAssignments: [], allHomework: [], examRecords: [], evaluations: [] };
+    var id = 'rec' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var title = rec.title || rec.description || '';
+    var modules = Array.isArray(rec.modules) ? (rec.modules || []).slice() : (rec.modules ? [rec.modules] : []);
+    var module = modules[0] || rec.module || '';
+    var status = rec.status || 'pending';
+    var item = {
+      id: id,
+      subject: rec.subject || '',
+      title: title,
+      cleanTitle: title,
+      shortTitle: title,
+      homeworkType: rec.homeworkType || '作业·日常作业',
+      module: module,
+      modules: modules,
+      dueDate: rec.date || '',
+      deadline: rec.date || '',
+      status: status,
+      submitted: !!rec.submitted,
+      reviewStatus: status === 'done' ? '已通过' : '',
+      returnReason: '',
+      description: rec.description || title,
+      details: [],
+      tags: status === 'done' ? [{ text: '已完成', type: 'good' }] : [],
+      progress: status === 'done' ? 100 : 0,
+    };
+    var allHomework = (study.allHomework || []).slice();
+    var date = rec.date || '';
+    var group = null;
+    for (var gi = 0; gi < allHomework.length; gi++) {
+      if (allHomework[gi].date === date) { group = allHomework[gi]; break; }
+    }
+    if (!group) {
+      group = { date: date, items: [] };
+      allHomework.push(group);
+    }
+    group.items = (group.items || []).slice();
+    group.items.push(item);
+    var recent = (study.recentAssignments || []).slice();
+    recent.unshift(item);
+    return self.saveStudy(Object.assign({}, study, {
+      allHomework: allHomework,
+      recentAssignments: recent.slice(0, 10),
+    }));
+  };
+
+  // 新增一条考试成绩记录：写入 examRecords 并更新 subjects 对应学科
+  DataStore.prototype.addScoreRecord = function (rec) {
+    var self = this;
+    var study = self._rawData.study || { subjects: [], examRecords: [] };
+    var id = 'rec' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var errorModules = rec.errorModule
+      ? String(rec.errorModule).split(/[、,，;\n]+/).map(function (s) { return s.trim(); }).filter(Boolean)
+      : [];
+    var examRec = {
+      id: id,
+      subject: rec.subject || '',
+      grade: rec.grade || '',
+      examType: rec.examType || '考试',
+      date: rec.date || '',
+      year: '',
+      semester: '',
+      semesterLabel: rec.semesterLabel || '',
+      errorModule: rec.errorModule || '',
+      errorModules: errorModules,
+      description: (rec.title || '') + (rec.grade ? ' 等级：' + rec.grade : ''),
+    };
+    var examRecords = (study.examRecords || []).slice();
+    examRecords.unshift(examRec);
+
+    var order = { 'A+': 12, 'A': 11, 'B+': 10, 'B': 9, 'C+': 8, 'C': 7, 'D+': 6, 'D': 5, 'E': 4, 'F': 3 };
+    var curW = order[rec.grade || ''] || 0;
+    var subjects = (study.subjects || []).slice().map(function (s) {
+      if (s.name !== rec.subject) return s;
+      var prevGrade = s.grade || '';
+      var prevW = order[prevGrade] || 0;
+      var trend = curW > prevW ? 'up' : (curW < prevW ? 'down' : (s.trend || 'stable'));
+      var history = (s.history || []).slice();
+      history.unshift({ date: rec.date || '', grade: rec.grade || '', examType: rec.examType || '', errorModules: errorModules });
+      return Object.assign({}, s, {
+        grade: rec.grade || s.grade,
+        date: rec.date || s.date,
+        examType: rec.examType || s.examType,
+        previousGrade: prevGrade,
+        trend: trend,
+        errorModules: errorModules,
+        history: history,
+      });
+    });
+    return self.saveStudy(Object.assign({}, study, { examRecords: examRecords, subjects: subjects }));
+  };
+
+  // 新增一条期末评语记录：写入 study.evaluations
+  DataStore.prototype.addEvaluationRecord = function (rec) {
+    var self = this;
+    var study = self._rawData.study || { evaluations: [] };
+    var id = 'rec' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    var semesterLabel = rec.semester || '';
+    var evalRec = {
+      id: id,
+      year: '',
+      semester: '',
+      semesterLabel: semesterLabel,
+      teacherComment: rec.teacherComment || '',
+      parentComment: rec.parentComment || '',
+      date: rec.date || '',
+      title: semesterLabel,
+    };
+    var evaluations = (study.evaluations || []).slice();
+    evaluations.unshift(evalRec);
+    return self.saveStudy(Object.assign({}, study, { evaluations: evaluations }));
+  };
+
   // 写入等级数据
   DataStore.prototype.saveLevels = function (levels) {
     var self = this;

@@ -1673,6 +1673,26 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       padding: 26px 24px 22px;
     }
     .id-card.home-head .id-top { z-index: 1; }
+    .id-settings-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 5;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 12px;
+      border: 1px solid rgba(255,255,255,.75);
+      background: rgba(255,255,255,.6);
+      border-radius: 999px;
+      font: 700 12.5px var(--font-display);
+      color: var(--neutral-700);
+      cursor: pointer;
+      box-shadow: 0 1px 6px rgba(0,0,0,.06);
+      transition: background .15s, transform .1s;
+    }
+    .id-settings-btn:hover { background: rgba(255,255,255,.9); transform: translateY(-1px); }
+    .id-settings-btn i { width: 14px; height: 14px; }
     .id-sem {
       position: relative;
       z-index: 1;
@@ -1730,6 +1750,7 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       flex-direction: column;
       gap: 12px;
       min-width: 0;
+      padding-top: 30px;
     }
     /* 兴趣爱好 + 个性签名（个人信息 · 左侧） */
     .id-profile { margin-top: 12px; }
@@ -2654,7 +2675,8 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       .id-card { padding: 18px 16px 16px; border-radius: 22px; }
       .id-card.home-head { grid-template-columns: 1fr; gap: 14px; padding: 18px 16px 16px; }
       .hero.sub-hero { grid-template-columns: 1fr; gap: 16px; }
-      .id-top { gap: 14px; }
+      .id-top { gap: 14px; padding-top: 30px; }
+      .id-side { padding-top: 0; }
       .level-card { padding: 18px 16px; border-radius: 22px; }
       .lv-rank { gap: 8px; }
       .lv-level { font-size: 38px; }
@@ -8356,6 +8378,9 @@ if (typeof window !== 'undefined') {
           <span class="id-star"></span><span class="id-star"></span><span class="id-star"></span>
         </div>
 
+        <!-- 设置入口（右上角齿轮） -->
+        <button class="id-settings-btn" onclick="openSettingsDrawer()" aria-label="设置"><i data-lucide="settings"></i> 设置</button>
+
         <!-- 左：个人信息 + 兴趣爱好/个性签名（个人信息集中展示） -->
         <div class="id-top">
           <div class="id-ava" id="idAvatar"><img src="assets/cat-avatar.jpg" alt="Yara"></div>
@@ -10387,7 +10412,7 @@ if (typeof window !== "undefined") {
         console.error("添加XP失败:", e);
         btn.textContent = originalText;
         btn.disabled = false;
-        alert("❌ 添加失败: " + (e.message || "未知错误"));
+        handleWriteError(e, "添加失败: " + (e.message || "未知错误"));
       });
     }
   
@@ -10654,6 +10679,8 @@ if (typeof window !== "undefined") {
         const signedAmt = isSpend ? -Math.abs(e.amount) : Math.abs(e.amount);
         await window.DataStore.addFinanceRecord({
           date,
+          type: isSpend ? 'expense' : 'income',
+          amount: Math.abs(e.amount),
           rawAmount: signedAmt,
           account: "free",
           accountType: "自由基金账户",
@@ -10682,10 +10709,10 @@ if (typeof window !== "undefined") {
       if (window.refreshData) refreshData();
       await renderMoney();
       if (window.lucide) setTimeout(() => lucide.createIcons(), 50);
-      alert(`已记录 ${entries.length} 笔，完成一次财务复盘，+10 XP 🎉`);
+      alert(`已记录 ${entries.length} 笔财务流水，完成一次财务复盘，+10 XP 🎉`);
     } catch (e) {
       console.error("提交失败:", e);
-      alert("提交失败，请稍后重试");
+      handleWriteError(e, "提交失败，请稍后重试");
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "确认记录";
@@ -11448,10 +11475,10 @@ function getWeekStars(cfg) {
   return count;
 }
 
-// 距离下次零花钱发放还差几天（按每周一发放估算）
+// 距离下次零花钱发放还差几天（按每周五发放）
 function getDaysToAllowance() {
-  const day = (new Date().getDay() + 6) % 7; // 周一=0
-  return day === 0 ? 0 : 7 - day;
+  const day = new Date().getDay(); // 周日=0, 周一=1, ..., 周五=5, 周六=6
+  return day === 5 ? 0 : (5 - day + 7) % 7;
 }
 
 async function renderHome() {
@@ -14599,6 +14626,18 @@ function showToast(msg, ok) {
   toast.className = "toast show " + (ok ? "ok" : "err");
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => { toast.className = "toast"; }, 2600);
+}
+
+// 统一写库错误处理：Token 缺失时引导去设置，其余错误给出明确定位
+function handleWriteError(err, fallbackMsg) {
+  const msg = (err && err.message) || "";
+  if (msg.indexOf("Token") >= 0 || msg.indexOf("token") >= 0) {
+    showTokenRequiredToast();
+    return;
+  }
+  if (fallbackMsg) {
+    alert(fallbackMsg || "操作失败，请稍后重试");
+  }
 }
 
 function showTokenRequiredToast() {
