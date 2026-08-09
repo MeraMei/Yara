@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yara的小宇宙中心</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23fdd832'/%3E%3C/svg%3E" />
+  <script src="data-store.js"></script>
+  <style>
+/* ═══════════════════════════════════════════════════════════════
+   workstation.css — Yara 成长工作台
+   基于 Colourful 设计系统 (butter-yellow 主色 + 柔和马卡龙)
+   特性：毛玻璃效果、猫咪可爱元素、PC/移动端全适配
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ════════ 第一层：原始色板 (Colourful 马卡龙色系) ════════ */
+:root {
+  /* candy-pink */
+  --colourful-candy-pink-50: #fef5f8; --colourful-candy-pink-100: #fde8f0; --colourful-candy-pink-200: #fbd0de; --colourful-candy-pink-300: #f7a7c3; --colourful-candy-pink-400: #f178a3;
+  --colourful-candy-pink-500: #ea4d85; --colourful-candy-pink-600: #d63068; --colourful-candy-pink-700: #b32254; --colourful-candy-pink-800: #921e47; --colourful-candy-pink-900: #781c3f;
+  /* mint-green */
+  --colourful-mint-green-50: #f2fdf9; --colourful-mint-green-100: #e0faf0; --colourful-mint-green-200: #c4f4de; --colourful-mint-green-300: #96e8c5; --colourful-mint-green-400: #5ed4a6;
+  --colourful-mint-green-500: #36b98b; --colourful-mint-green-600: #289371; --colourful-mint-green-700: #21755b; --colourful-mint-green-800: #1e5d4a; --colourful-mint-green-900: #1a4d3f;
+  /* sunny-coral */
+  --colourful-sunny-coral-50: #fff7f2; --colourful-sunny-coral-100: #ffeadb; --colourful-sunny-coral-200: #ffd0b4; --colourful-sunny-coral-300: #ffab81; --colourful-sunny-coral-400: #ff7d4d;
+  --colourful-sunny-coral-500: #f96024; --colourful-sunny-coral-600: #e04a15; --colourful-sunny-coral-700: #b93a13; --colourful-sunny-coral-800: #953217; --colourful-sunny-coral-900: #7a2c17;
+  /* lavender */
+  --colourful-lavender-50: #f8f5ff; --colourful-lavender-100: #efe9ff; --colourful-lavender-200: #dfd5ff; --colourful-lavender-300: #c8b4ff; --colourful-lavender-400: #ac87ff;
+  --colourful-lavender-500: #9255f5; --colourful-lavender-600: #7e34e0; --colourful-lavender-700: #6928ba; --colourful-lavender-800: #58249a; --colourful-lavender-900: #4a2380;
+  /* sky-blue */
+  --colourful-sky-blue-50: #f3f9ff; --colourful-sky-blue-100: #e6f2ff; --colourful-sky-blue-200: #cce5ff; --colourful-sky-blue-300: #a3d1ff; --colourful-sky-blue-400: #6ab5ff;
+  --colourful-sky-blue-500: #3e94f5; --colourful-sky-blue-600: #2b75e0; --colourful-sky-blue-700: #245fba; --colourful-sky-blue-800: #234e99; --colourful-sky-blue-900: #21427e;
+  /* butter-yellow */
+  --colourful-butter-yellow-50: #fffef8; --colourful-butter-yellow-100: #fffde8; --colourful-butter-yellow-200: #fff9c4; --colourful-butter-yellow-300: #fff292; --colourful-butter-yellow-400: #ffe760;
+  --colourful-butter-yellow-500: #fdd832; --colourful-butter-yellow-600: #e0bc18; --colourful-butter-yellow-700: #b89812; --colourful-butter-yellow-800: #957a14; --colourful-butter-yellow-900: #7a6516;
+  /* lime-pop */
+  --colourful-lime-pop-50: #f8fef2; --colourful-lime-pop-100: #eefdd9; --colourful-lime-pop-200: #dcfab6; --colourful-lime-pop-300: #c0f488; --colourful-lime-pop-400: #a0e756;
+  --colourful-lime-pop-500: #82d632; --colourful-lime-pop-600: #66b522; --colourful-lime-pop-700: #508e1c; --colourful-lime-pop-800: #41711c; --colourful-lime-pop-900: #385e1c;
+  /* neutral */
+  --colourful-neutral-50: #faf9f7; --colourful-neutral-100: #f3f2ef; --colourful-neutral-200: #e7e5e1; --colourful-neutral-300: #d5d2cc; --colourful-neutral-400: #b0aba3;
+  --colourful-neutral-500: #8f8880; --colourful-neutral-600: #736c63; --colourful-neutral-700: #5c5650; --colourful-neutral-800: #3d3936; --colourful-neutral-900: #1e1c1a;
+  /* semantic */
+  --colourful-success-50: #f0fdf4; --colourful-success-100: #dcfce7; --colourful-success-200: #bbf7d0; --colourful-success-300: #86efac; --colourful-success-400: #4ade80;
+  --colourful-success-500: #22c55e; --colourful-success-600: #16a34a; --colourful-success-700: #15803d;
+  --colourful-warning-50: #fffbeb; --colourful-warning-100: #fef3c7; --colourful-warning-200: #fde68a; --colourful-warning-300: #fcd34d;
+  --colourful-warning-500: #f59e0b; --colourful-warning-600: #d97706; --colourful-warning-700: #b45309;
+  --colourful-error-50: #fff5f5; --colourful-error-100: #fee2e2; --colourful-error-200: #fecaca; --colourful-error-300: #fca5a5;
+  --colourful-error-500: #ef4444; --colourful-error-600: #dc2626; --colourful-error-700: #b91c1c;
+
+  --primary: var(--colourful-sky-blue-500);
+  --primary-light: var(--colourful-sky-blue-100);
+  --primary-lighter: var(--colourful-sky-blue-50);
+  --primary-dark: var(--colourful-sky-blue-700);
+  --primary-foreground: var(--colourful-neutral-900);
+  --accent: var(--colourful-candy-pink-400);
+  --accent-light: var(--colourful-candy-pink-100);
+  --accent-dark: var(--colourful-candy-pink-600);
+  --background: var(--colourful-neutral-50);
+  --foreground: var(--colourful-neutral-900);
+  --muted: var(--colourful-neutral-100);
+  --muted-foreground: var(--colourful-neutral-500);
+  --border: var(--colourful-neutral-200);
+  --ring: var(--colourful-butter-yellow-400);
+  --surface: #ffffff;
+  --surface-dim: var(--colourful-neutral-100);
+  --surface-glass: rgba(255,255,255,.72);
+  --font-display: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px; --radius-full: 9999px;
+  --shadow-1: 0 1px 3px rgba(30,28,26,.04), 0 1px 2px rgba(30,28,26,.03);
+  --shadow-2: 0 4px 12px -2px rgba(30,28,26,.06);
+  --shadow-3: 0 8px 24px -4px rgba(30,28,26,.08);
+  --shadow-4: 0 16px 40px -8px rgba(30,28,26,.12);
+  --shadow: var(--shadow-2);
+  --duration-fast: 150ms; --duration-normal: 250ms; --duration-slow: 400ms;
+  --easing-default: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar: 260px;
+  --max-content: 1200px;
+  --gutter: 32px;
+  --nav-height: 64px;
+
+  --pink-50: var(--colourful-candy-pink-50); --pink-100: var(--colourful-candy-pink-100);
+  --pink-200: var(--colourful-candy-pink-200); --pink-300: var(--colourful-candy-pink-300);
+  --pink-400: var(--colourful-candy-pink-400); --pink-500: var(--colourful-candy-pink-500);
+  --pink-600: var(--colourful-candy-pink-600); --pink-650: var(--colourful-candy-pink-600);
+  --pink-700: var(--colourful-candy-pink-700);
+  --mint-50: var(--colourful-mint-green-50); --mint-100: var(--colourful-mint-green-100);
+  --mint-200: var(--colourful-mint-green-200); --mint-300: var(--colourful-mint-green-300);
+  --mint-400: var(--colourful-mint-green-400); --mint-500: var(--colourful-mint-green-500);
+  --mint-600: var(--colourful-mint-green-600); --mint-700: var(--colourful-mint-green-700);
+  --yellow-50: var(--colourful-butter-yellow-50); --yellow-100: var(--colourful-butter-yellow-100);
+  --yellow-200: var(--colourful-butter-yellow-200); --yellow-300: var(--colourful-butter-yellow-300);
+  --yellow-400: var(--colourful-butter-yellow-400); --yellow-500: var(--colourful-butter-yellow-500);
+  --yellow-600: var(--colourful-butter-yellow-600); --yellow-700: var(--colourful-butter-yellow-700);
+  --coral-50: var(--colourful-sunny-coral-50); --coral-100: var(--colourful-sunny-coral-100);
+  --coral-200: var(--colourful-sunny-coral-200); --coral-400: var(--colourful-sunny-coral-400);
+  --coral-500: var(--colourful-sunny-coral-500); --coral-600: var(--colourful-sunny-coral-600);
+  --coral-700: var(--colourful-sunny-coral-700);
+  --blue-50: var(--colourful-sky-blue-50); --blue-100: var(--colourful-sky-blue-100);
+  --blue-500: var(--colourful-sky-blue-500); --blue-700: var(--colourful-sky-blue-700);
+  --blue-800: var(--colourful-sky-blue-800);
+  --lav-50: var(--colourful-lavender-50); --lav-100: var(--colourful-lavender-100);
+  --lav-200: var(--colourful-lavender-200); --lav-300: var(--colourful-lavender-300);
+  --lav-400: var(--colourful-lavender-400); --lav-500: var(--colourful-lavender-500);
+  --lav-600: var(--colourful-lavender-600); --lav-700: var(--colourful-lavender-700);
+  --lav-800: var(--colourful-lavender-800);
+  --lime-50: var(--colourful-lime-pop-50); --lime-100: var(--colourful-lime-pop-100);
+  --lime-500: var(--colourful-lime-pop-500);
+  --neutral-50: var(--colourful-neutral-50); --neutral-100: var(--colourful-neutral-100);
+  --neutral-200: var(--colourful-neutral-200); --neutral-300: var(--colourful-neutral-300);
+  --neutral-400: var(--colourful-neutral-400); --neutral-500: var(--colourful-neutral-500);
+  --neutral-600: var(--colourful-neutral-600); --neutral-700: var(--colourful-neutral-700);
+  --neutral-800: var(--colourful-neutral-800); --neutral-900: var(--colourful-neutral-900);
+  --orange-50: var(--colourful-sunny-coral-50); --orange-800: var(--colourful-sunny-coral-800);
+  --card-bg: var(--surface-glass); --bg: var(--background);
+  --text-primary: var(--foreground); --text-secondary: var(--colourful-neutral-700);
+  --text-tertiary: var(--muted-foreground);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--colourful-neutral-800);
+  background: linear-gradient(135deg, var(--colourful-butter-yellow-50) 0%, var(--colourful-neutral-50) 38%, var(--colourful-candy-pink-50) 72%, var(--colourful-mint-green-50) 100%);
+  background-attachment: fixed;
+  font-size: 14px;
+  line-height: 1.55;
+  padding-bottom: 80px;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; border: 0; cursor: pointer; }
+
+/* Cat ears */
+.cat-ears { position: relative; }
+.cat-ears::before, .cat-ears::after {
+  content: ""; position: absolute; top: -8px;
+  width: 0; height: 0;
+  border-left: 8px solid transparent; border-right: 8px solid transparent;
+  border-bottom: 14px solid var(--colourful-butter-yellow-400);
+}
+.cat-ears::before { left: 6px; transform: rotate(-15deg); }
+.cat-ears::after { right: 6px; transform: rotate(15deg); }
+
+/* Sidebar */
+.sidebar {
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar);
+  padding: 24px 16px; display: flex; flex-direction: column;
+  background: rgba(255,255,255,.78);
+  border-right: 1px solid rgba(255,255,255,.6);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  z-index: 20; overflow: hidden;
+}
+.sidebar::after { content: "🐾"; position: absolute; bottom: 12px; right: 16px; font-size: 18px; opacity: .25; pointer-events: none; }
+.profile {
+  display: flex; gap: 12px; align-items: center; padding: 14px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--colourful-butter-yellow-100), var(--colourful-sunny-coral-50));
+  margin-bottom: 24px; position: relative;
+}
+.cat {
+  width: 56px; height: 56px; border-radius: 50%; position: relative;
+  flex: 0 0 auto; overflow: hidden;
+  background: var(--colourful-butter-yellow-300);
+  border: 2px solid rgba(255,255,255,.6);
+  box-shadow: 0 1px 8px -1px rgba(249,96,36,.2);
+}
+.cat .cat-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cat span { display: none; }
+.profile strong { display: block; font: 700 17px var(--font-display); color: var(--colourful-neutral-900); }
+.profile small { display: block; color: var(--colourful-neutral-600); font-weight: 700; line-height: 1.35; }
+.nav-label { padding: 14px 14px 7px; font-size: 11px; font-weight: 800; letter-spacing: .08em; color: var(--colourful-neutral-400); }
+.nav { display: grid; gap: 6px; flex: 1; align-content: start; }
+.nav a {
+  display: flex; align-items: center; gap: 11px; padding: 12px 14px;
+  border-radius: 16px; color: var(--colourful-neutral-600); font-weight: 800;
+  transition: .18s ease; cursor: pointer; position: relative; z-index: 1;
+}
+.nav a:hover, .nav a.active { background: white; color: var(--colourful-neutral-900); box-shadow: 0 8px 22px -14px rgba(30,28,26,.3); transform: translateX(2px); }
+.nav a.active { background: linear-gradient(135deg, var(--colourful-butter-yellow-100), white); }
+.constraint {
+  margin-top: auto; padding: 14px; border-radius: 18px;
+  background: var(--colourful-mint-green-50); color: var(--colourful-mint-green-700);
+  font-weight: 700; font-size: 12px;
+}
+
+/* Main */
+.main { margin-left: var(--sidebar); padding: 34px; position: relative; }
+.main::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 460px;
+  background:
+    radial-gradient(58% 55% at 16% 16%, rgba(253,216,50,.30) 0%, transparent 62%),
+    radial-gradient(52% 55% at 48% 10%, rgba(241,120,163,.20) 0%, transparent 62%),
+    radial-gradient(55% 55% at 82% 16%, rgba(172,135,255,.24) 0%, transparent 62%),
+    radial-gradient(70% 60% at 100% 45%, rgba(106,181,255,.20) 0%, transparent 66%);
+  filter: blur(34px); pointer-events: none; z-index: 0;
+}
+.wrap { max-width: 1360px; margin: 0 auto; position: relative; z-index: 1; }
+
+/* Hero */
+.hero {
+  display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; align-items: stretch;
+  padding: 30px; border-radius: 32px;
+  background: linear-gradient(135deg, rgba(255,253,232,.88), rgba(255,255,255,.82) 48%, rgba(224,250,240,.85));
+  box-shadow: var(--shadow-2); border: 1px solid rgba(255,255,255,.7);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.hero.compact { grid-template-columns: minmax(0, 1fr); }
+#view-xp .hero, #view-study .hero, #view-money .hero { margin-bottom: 28px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 7px; color: var(--colourful-mint-green-700); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 900; }
+h1 { margin: 10px 0 12px; font: 700 46px/1.08 var(--font-display); color: var(--colourful-neutral-900); letter-spacing: -.03em; }
+.lead { max-width: 760px; color: var(--colourful-neutral-600); font-size: 16px; }
+.hero-live { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 9px 16px; border-radius: 999px; background: rgba(255,255,255,.74); border: 1px solid rgba(255,255,255,.85); box-shadow: 0 1px 2px rgba(30,28,26,.04), 0 4px 14px -8px rgba(30,28,26,.12); font-size: 13px; font-weight: 600; color: var(--colourful-neutral-800); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.hero-live strong { color: var(--colourful-neutral-900); font-weight: 900; }
+.hero-note { display: grid; gap: 12px; align-content: center; padding: 22px; border-radius: 24px; background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.hero-note strong { font: 700 22px var(--font-display); color: var(--colourful-neutral-900); }
+.hero-note p { color: var(--colourful-neutral-600); }
+
+.hero.sub-hero {
+  position: relative; overflow: hidden; grid-template-columns: minmax(0, 1fr) 380px; align-items: center;
+  background:
+    radial-gradient(120% 110% at 6% 0%, rgba(253,216,50,.18) 0%, transparent 55%),
+    radial-gradient(110% 110% at 50% 0%, rgba(255,255,255,.2) 0%, transparent 55%),
+    radial-gradient(120% 110% at 94% 0%, rgba(193,244,222,.35) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(255,254,240,.82) 0%, rgba(255,255,255,.66) 55%, rgba(242,253,249,.70) 100%);
+  border: 1px solid rgba(255,255,255,.6); box-shadow: 0 4px 24px -8px rgba(30,28,26,.12);
+}
+#view-xp .hero.sub-hero { background: radial-gradient(120% 110% at 6% 0%, rgba(253,216,50,.30) 0%, transparent 55%), radial-gradient(110% 110% at 50% 0%, rgba(130,214,50,.16) 0%, transparent 55%), radial-gradient(120% 110% at 94% 0%, rgba(54,185,139,.22) 0%, transparent 55%), linear-gradient(165deg, rgba(255,254,240,.82) 0%, rgba(255,255,255,.66) 55%, rgba(242,253,249,.70) 100%); box-shadow: 0 4px 24px -8px rgba(54,185,139,.22); }
+#view-study .hero.sub-hero { background: radial-gradient(120% 110% at 6% 0%, rgba(62,148,245,.22) 0%, transparent 55%), radial-gradient(110% 110% at 50% 0%, rgba(146,85,245,.16) 0%, transparent 55%), radial-gradient(120% 110% at 94% 0%, rgba(234,77,133,.16) 0%, transparent 55%), linear-gradient(165deg, rgba(240,248,255,.82) 0%, rgba(255,255,255,.66) 55%, rgba(248,245,255,.70) 100%); box-shadow: 0 4px 24px -8px rgba(62,148,245,.2); }
+#view-money .hero.sub-hero { background: radial-gradient(120% 110% at 6% 0%, rgba(249,96,36,.24) 0%, transparent 55%), radial-gradient(110% 110% at 50% 0%, rgba(253,216,50,.26) 0%, transparent 55%), radial-gradient(120% 110% at 94% 0%, rgba(130,214,50,.18) 0%, transparent 55%), linear-gradient(165deg, rgba(255,250,240,.84) 0%, rgba(255,255,255,.66) 55%, rgba(248,254,242,.70) 100%); box-shadow: 0 4px 24px -8px rgba(249,96,36,.2); }
+#view-xp .ss-fill { background: linear-gradient(90deg, var(--colourful-mint-green-300), var(--colourful-lime-pop-500)); box-shadow: 0 0 8px rgba(54,185,139,.4); }
+#view-xp .ss-head i { color: var(--colourful-mint-green-600); }
+#view-study .ss-fill { background: linear-gradient(90deg, var(--colourful-sky-blue-300), var(--colourful-sky-blue-500)); box-shadow: 0 0 8px rgba(62,148,245,.4); }
+#view-study .ss-head i { color: var(--colourful-sky-blue-600); }
+#view-money .ss-fill { background: linear-gradient(90deg, var(--colourful-butter-yellow-300), var(--colourful-sunny-coral-400)); box-shadow: 0 0 8px rgba(249,96,36,.4); }
+#view-money .ss-head i { color: var(--colourful-sunny-coral-600); }
+.sub-status { display: grid; gap: 12px; padding: 22px; border-radius: 24px; background: rgba(255,255,255,.72); border: 1px solid rgba(255,255,255,.7); backdrop-filter: blur(8px); box-shadow: 0 1px 3px rgba(30,28,26,.04), 0 6px 16px -8px rgba(30,28,26,.1); position: relative; z-index: 1; }
+.ss-head { display: flex; align-items: center; gap: 7px; font: 700 14px var(--font-display); color: var(--colourful-neutral-900); }
+.ss-head i { width: 16px; height: 16px; color: var(--colourful-mint-green-600); }
+.ss-main { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ss-lv { font: 800 30px/1 var(--font-display); color: var(--colourful-neutral-900); letter-spacing: -.02em; }
+.ss-xp { font-size: 13px; font-weight: 700; color: var(--colourful-neutral-600); }
+.ss-track { height: 8px; border-radius: 999px; background: var(--colourful-neutral-100); overflow: hidden; }
+.ss-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--colourful-butter-yellow-300), var(--colourful-butter-yellow-500)); box-shadow: 0 0 8px rgba(253,216,50,.4); transition: width .8s cubic-bezier(.4,0,.2,1); position: relative; }
+.ss-fill::after { content: ""; position: absolute; right: 0; top: 0; width: 14px; height: 100%; background: rgba(255,255,255,.5); border-radius: 0 999px 999px 0; }
+.ss-foot { font-size: 12px; font-weight: 700; color: var(--colourful-neutral-600); }
+
+/* Section */
+.section { margin-top: 20px; }
+.section-head { display: flex; justify-content: space-between; align-items: end; gap: 14px; margin-bottom: 12px; }
+.section-title { font: 700 20px var(--font-display); color: var(--colourful-neutral-900); letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+.section-sub { margin-top: 3px; color: var(--colourful-neutral-500); }
+.grid { display: grid; gap: 16px; }
+.home-grid { grid-template-columns: 1.08fr 1fr 1fr; }
+.two-col { grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr); }
+.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.four-col { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Card */
+.card { position: relative; padding: 20px; border-radius: 20px; background: rgba(255,255,255,.78); border: 1px solid rgba(231,229,225,.5); box-shadow: var(--shadow-1); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: box-shadow var(--duration-normal) var(--easing-default), transform var(--duration-normal) var(--easing-bounce), border-color var(--duration-fast) var(--easing-default); }
+.card:hover { box-shadow: 0 12px 30px -12px rgba(30,28,26,.18); transform: translateY(-3px); border-color: rgba(255,255,255,.9); }
+.mint { color: var(--colourful-mint-green-500); }
+.lav { color: var(--colourful-lavender-500); }
+.pink { color: var(--colourful-candy-pink-500); }
+.blue { color: var(--colourful-sky-blue-500); }
+.coral { color: var(--colourful-sunny-coral-500); }
+.lime { color: var(--colourful-lime-pop-500); }
+.card-label { color: var(--colourful-neutral-500); font-size: 12px; font-weight: 900; letter-spacing: .02em; }
+.metric { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; }
+.metric strong { display: block; margin-top: 8px; font: 700 36px/1 var(--font-display); color: var(--colourful-neutral-900); }
+.metric p { margin-top: 8px; color: var(--colourful-neutral-600); }
+.icon-box { width: 48px; height: 48px; border-radius: 17px; display: grid; place-items: center; background: currentColor; color: white; flex: 0 0 auto; }
+.progress { margin-top: 14px; height: 10px; border-radius: 999px; background: var(--colourful-neutral-100); overflow: hidden; }
+.progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--colourful-butter-yellow-400), var(--colourful-butter-yellow-500)); transition: width .6s var(--easing-bounce); }
+.row { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--colourful-neutral-100); }
+.row:last-child { border-bottom: 0; }
+.dot { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: var(--colourful-neutral-100); color: var(--colourful-neutral-700); }
+.row-title { font-weight: 900; color: var(--colourful-neutral-900); }
+.row-meta { margin-top: 3px; color: var(--colourful-neutral-500); font-size: 12px; }
+.value { font: 700 18px var(--font-display); color: var(--colourful-neutral-900); text-align: right; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 999px; font-size: 12px; font-weight: 900; background: var(--colourful-neutral-100); color: var(--colourful-neutral-600); white-space: nowrap; }
+.pill.good { background: var(--colourful-mint-green-100); color: var(--colourful-mint-green-700); }
+.pill.warn { background: var(--colourful-sunny-coral-100); color: var(--colourful-sunny-coral-700); }
+.pill.info { background: var(--colourful-sky-blue-100); color: var(--colourful-sky-blue-700); }
+.pill.lav { background: var(--colourful-lavender-100); color: var(--colourful-lavender-700); }
+.stack { display: grid; gap: 12px; }
+.mini-card { padding: 15px; border-radius: 18px; background: white; border: 1px solid var(--colourful-neutral-100); }
+.mini-title { font-weight: 900; color: var(--colourful-neutral-900); }
+.mini-copy { margin-top: 5px; color: var(--colourful-neutral-600); }
+.account { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.amount { font: 700 32px var(--font-display); color: var(--colourful-neutral-900); }
+.page-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+/* Button */
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 14px; border-radius: 14px; background: var(--colourful-neutral-900); color: white; font-weight: 900; font-size: 14px; transition: filter var(--duration-fast), transform var(--duration-fast); }
+.btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn:active { filter: brightness(.95); transform: translateY(0); }
+.btn.light { background: white; color: var(--colourful-neutral-800); border: 1px solid var(--colourful-neutral-100); }
+.footer-note { margin-top: 22px; color: var(--colourful-neutral-500); font-size: 12px; text-align: center; }
+
+/* Level badge */
+.level-hero { display: flex; align-items: center; gap: 16px; }
+.level-badge { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--colourful-butter-yellow-400), var(--colourful-butter-yellow-500)); color: var(--colourful-neutral-900); font-family: var(--font-display); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px -2px rgba(253,216,50,.4); flex-shrink: 0; }
+
+/* XP task row */
+.xp-task-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--colourful-neutral-100); }
+.xp-task-row:last-child { border-bottom: none; }
+.xp-task-icon { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+.xp-task-title { font-weight: 700; color: var(--colourful-neutral-900); }
+.xp-task-meta { font-size: 12px; color: var(--colourful-neutral-500); margin-top: 2px; }
+
+/* Subject score */
+.subject-score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.subject-card { border-radius: 18px; padding: 18px; background: linear-gradient(135deg, var(--colourful-lavender-50), var(--colourful-lavender-100)); border: 1px solid var(--colourful-lavender-100); }
+.subject-card--blue { background: linear-gradient(135deg, var(--colourful-sky-blue-50), var(--colourful-sky-blue-100)); border-color: var(--colourful-sky-blue-100); }
+.subject-card--mint { background: linear-gradient(135deg, var(--colourful-mint-green-50), var(--colourful-mint-green-100)); border-color: var(--colourful-mint-green-100); }
+.subject-card--coral { background: linear-gradient(135deg, var(--colourful-sunny-coral-50), var(--colourful-sunny-coral-100)); border-color: var(--colourful-sunny-coral-100); }
+.subject-score { font: 700 28px/1 var(--font-display); color: var(--colourful-neutral-900); margin-top: 8px; }
+
+/* Assignment */
+.assignment-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; background: var(--colourful-neutral-50); margin-bottom: 10px; }
+.assignment-row:last-child { margin-bottom: 0; }
+.subject-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* Bottom tab bar */
+.bottom-tab-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; padding-bottom: env(safe-area-inset-bottom, 0); background: rgba(255,255,255,.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,.06); display: flex; align-items: stretch; justify-content: space-around; z-index: 100; box-shadow: 0 -2px 20px rgba(0,0,0,.04); }
+.bottom-tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--colourful-neutral-400); text-decoration: none; font-size: 10px; font-weight: 600; transition: color .2s; cursor: pointer; }
+.bottom-tab-item i { width: 22px; height: 22px; }
+.bottom-tab-item.active { color: var(--colourful-butter-yellow-600); }
+body[data-view="home"] .bottom-tab-item.active { color: var(--colourful-sunny-coral-600); }
+body[data-view="xp"] .bottom-tab-item.active { color: var(--colourful-mint-green-600); }
+body[data-view="study"] .bottom-tab-item.active { color: var(--colourful-sky-blue-600); }
+body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-coral-600); }
+
+/* Hamburger */
+.hamburger-btn { display: none; position: fixed; top: 16px; left: 16px; width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,.9); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.6); box-shadow: 0 4px 12px rgba(30,28,26,.08); z-index: 30; align-items: center; justify-content: center; cursor: pointer; }
+.hamburger-btn:active { transform: scale(.95); }
+.sidebar.show { display: flex !important; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(30,28,26,.4); z-index: 15; opacity: 0; transition: opacity var(--duration-normal) var(--easing-default); pointer-events: none; }
+.sidebar-overlay.show { display: block; opacity: 1; pointer-events: auto; }
+
+/* Choice group */
+.choice-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice-pill { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--colourful-neutral-200); background: var(--colourful-neutral-50); font-size: 13px; font-weight: 600; color: var(--colourful-neutral-700); cursor: pointer; transition: all .15s ease; user-select: none; }
+.choice-pill:hover { border-color: var(--colourful-butter-yellow-300); background: var(--colourful-butter-yellow-50); }
+.choice-pill input { display: none; }
+.choice-pill.checked { background: var(--colourful-butter-yellow-50); border-color: var(--colourful-butter-yellow-400); color: var(--colourful-butter-yellow-800); font-weight: 700; }
+.choice-pill.checked::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--colourful-butter-yellow-500); flex-shrink: 0; }
+
+/* Overview card */
+.overview-card { background: linear-gradient(135deg, var(--colourful-mint-green-50) 0%, var(--colourful-lime-pop-50) 100%); border-radius: 20px; padding: 24px; display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 20px; }
+.ov-left { display: flex; align-items: center; gap: 20px; }
+.ov-ring { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+.ov-ring svg { width: 100%; height: 100%; }
+.ov-ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ov-xp-num { font-size: 28px; font-weight: 800; color: var(--neutral-800); line-height: 1.1; }
+.ov-xp-label { font-size: 11px; color: var(--neutral-400); letter-spacing: 0.5px; margin-top: 2px; }
+.ov-info { display: flex; flex-direction: column; gap: 6px; }
+.ov-level-row { display: flex; align-items: center; gap: 8px; }
+.ov-level-badge { background: var(--colourful-mint-green-500); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 12px; border-radius: 12px; }
+.ov-level-name { font-size: 24px; font-weight: 800; color: var(--neutral-800); }
+.ov-level-sub { font-size: 13px; color: var(--neutral-400); }
+.ov-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.ov-stat { text-align: right; }
+.ov-stat-label { font-size: 12px; color: var(--neutral-400); display: block; }
+.ov-stat-value { font-size: 22px; font-weight: 800; color: var(--neutral-800); }
+.ov-actions { display: flex; gap: 8px; margin-top: 4px; }
+.btn-primary-sm { background: var(--colourful-mint-green-500); color: #fff; border: none; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: opacity 0.2s; }
+.btn-primary-sm:hover { opacity: 0.88; }
+.btn-outline-sm { background: #fff; color: var(--neutral-600); border: 1px solid var(--neutral-200); padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: border-color 0.2s; }
+.btn-outline-sm:hover { border-color: var(--neutral-300); }
+
+/* Transaction */
+.tx-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,.04); }
+.tx-row:last-child { border-bottom: none; }
+.tx-icon { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-name { font-size: 13px; font-weight: 700; color: var(--colourful-neutral-900); }
+.tx-meta { font-size: 11px; color: var(--colourful-neutral-500); margin-top: 2px; }
+.tx-amount { font: 700 15px var(--font-display); flex-shrink: 0; }
+
+/* Character panel */
+.character-panel { position: relative; background: radial-gradient(120% 110% at 6% 0%, rgba(249,96,36,.30) 0%, transparent 55%), radial-gradient(110% 110% at 50% 0%, rgba(241,120,163,.22) 0%, transparent 55%), radial-gradient(120% 110% at 94% 0%, rgba(253,216,50,.26) 0%, transparent 55%), linear-gradient(165deg, rgba(255,250,240,.78) 0%, rgba(255,255,255,.62) 55%, rgba(255,245,248,.66) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.6); border-radius: 28px; padding: 32px 28px 24px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 4px 24px -8px rgba(249,96,36,.18); }
+.char-main { position: relative; z-index: 1; display: flex; align-items: center; gap: 24px; }
+.char-avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--colourful-butter-yellow-300); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 42px; border: 3px solid rgba(255,255,255,.6); box-shadow: 0 2px 12px -2px rgba(249,96,36,.25); flex-shrink: 0; position: relative; z-index: 1; overflow: hidden; }
+.char-avatar .char-avatar-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.char-avatar::before, .char-avatar::after { content: ""; position: absolute; top: -10px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 16px solid var(--colourful-butter-yellow-400); z-index: 2; }
+.char-avatar::before { left: 10px; transform: rotate(-18deg); }
+.char-avatar::after { right: 10px; transform: rotate(18deg); }
+.char-info { flex: 1; min-width: 0; }
+.char-name { font: 800 28px/1.1 var(--font-display); color: var(--colourful-neutral-900); letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+.char-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 13px; font-weight: 700; color: rgba(30,28,26,.65); }
+.char-badges { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.char-level-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; background: rgba(255,255,255,.35); backdrop-filter: blur(4px); color: var(--colourful-neutral-800); border: 1px solid rgba(255,255,255,.4); }
+.char-xp-bar { position: relative; z-index: 1; margin-top: 18px; }
+.char-xp-bar-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 11px; font-weight: 700; color: rgba(30,28,26,.6); }
+.char-xp-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.35); overflow: hidden; }
+.char-xp-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, rgba(255,255,255,.9), rgba(255,255,255,1)); box-shadow: 0 0 8px rgba(255,255,255,.5); transition: width 1s cubic-bezier(.4,0,.2,1); position: relative; }
+.char-stats { position: relative; z-index: 1; display: flex; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.25); }
+.char-stat-item { flex: 1; text-align: center; }
+.char-stat-num { font: 800 22px/1 var(--font-display); color: var(--colourful-neutral-900); }
+.char-stat-label { font-size: 10px; font-weight: 700; color: rgba(30,28,26,.55); margin-top: 3px; letter-spacing: .02em; }
+
+/* ID card */
+.id-card { position: relative; margin-top: 14px; border-radius: 26px; padding: 20px 18px 16px; overflow: hidden; background: radial-gradient(120% 110% at 6% 0%, rgba(253,216,50,.34) 0%, transparent 55%), radial-gradient(110% 110% at 50% 0%, rgba(241,120,163,.22) 0%, transparent 55%), radial-gradient(120% 110% at 94% 0%, rgba(172,135,255,.30) 0%, transparent 55%), linear-gradient(165deg, rgba(255,254,240,.78) 0%, rgba(255,255,255,.62) 55%, rgba(239,250,247,.66) 100%); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.6); box-shadow: 0 4px 24px -8px rgba(146,85,245,.18); }
+.id-top { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+.id-ava { width: 62px; height: 62px; border-radius: 50%; flex: none; background: linear-gradient(135deg, #ffd76a, #f6c200); border: 3px solid rgba(255,255,255,.6); box-shadow: 0 2px 12px -2px rgba(146,85,245,.25); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 800; position: relative; overflow: visible; }
+.id-ava img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.id-ava::before, .id-ava::after { content: ""; position: absolute; top: -9px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 14px solid #f6c200; }
+.id-ava::before { left: 9px; transform: rotate(-18deg); }
+.id-ava::after { right: 9px; transform: rotate(18deg); }
+.id-name { font-size: 24px; font-weight: 800; letter-spacing: -.02em; display: flex; align-items: center; gap: 6px; }
+.id-meta { font-size: 12px; font-weight: 700; color: rgba(30,28,26,.65); margin-top: 3px; }
+.id-badges { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.badge-lv { background: rgba(255,255,255,.4); border: 1px solid rgba(255,255,255,.5); color: var(--neutral-900); }
+.badge-lv b { color: #7a3fd6; }
+.id-xp { position: relative; z-index: 1; margin-top: 16px; }
+.id-xp-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; font-weight: 700; color: rgba(30,28,26,.6); margin-bottom: 6px; }
+.id-xp-head b { color: var(--neutral-900); font-weight: 800; }
+.id-xp-track { height: 9px; border-radius: 999px; background: rgba(255,255,255,.45); overflow: hidden; }
+.id-xp-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #fdd832, #f6c200); box-shadow: 0 0 8px rgba(246,194,0,.6); position: relative; transition: width .6s ease; }
+.id-xp-fill::after { content: ""; position: absolute; right: 0; top: 0; width: 14px; height: 100%; background: rgba(255,255,255,.6); border-radius: 0 999px 999px 0; }
+
+/* Level card */
+.level-card { position: relative; border-radius: 26px; padding: 24px; margin-bottom: 20px; overflow: hidden; color: var(--neutral-900); background: radial-gradient(120% 130% at 8% 0%, rgba(253,216,50,.30) 0%, transparent 50%), radial-gradient(90% 90% at 95% 100%, rgba(241,120,163,.22) 0%, transparent 55%), radial-gradient(80% 80% at 100% 0%, rgba(146,85,245,.16) 0%, transparent 50%), radial-gradient(70% 70% at 88% 88%, rgba(94,212,166,.16) 0%, transparent 45%), linear-gradient(160deg, rgba(255,250,240,.84) 0%, rgba(255,255,255,.66) 48%, rgba(255,245,250,.74) 100%); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.68); box-shadow: 0 6px 26px -10px rgba(249,96,36,.18); }
+.lv-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.lv-rank { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.lv-level { font: 800 46px/1 var(--font-display); color: var(--neutral-900); letter-spacing: -.03em; }
+.lv-name { font: 800 20px/1 var(--font-display); color: var(--neutral-700); }
+.lv-title { display: inline-flex; align-items: center; gap: 6px; flex: none; font-size: 12px; font-weight: 800; color: var(--coral-600); background: rgba(255,255,255,.55); border: 1px solid rgba(255,123,77,.22); padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+
+/* Today status */
+.today-status { background: rgba(255,255,255,.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.7); border-radius: 22px; padding: 20px 22px; box-shadow: 0 1px 3px rgba(30,28,26,.04), 0 6px 16px -8px rgba(30,28,26,.1); }
+.today-status-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.today-status-title { font: 700 15px var(--font-display); color: var(--neutral-900); display: flex; align-items: center; gap: 6px; }
+.today-status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.ts-card { background: var(--neutral-50); border-radius: 16px; padding: 14px; text-align: center; }
+.ts-card .ts-value { font: 800 22px/1 var(--font-display); color: var(--neutral-900); letter-spacing: -.02em; }
+.ts-card .ts-label { font-size: 10px; font-weight: 700; color: var(--neutral-400); margin-top: 3px; }
+
+/* Data grid */
+.data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.data-item { padding: 14px 10px; border-radius: 14px; background: var(--neutral-50); text-align: center; }
+.data-item-label { font-size: 10px; font-weight: 700; color: var(--neutral-400); margin-bottom: 4px; }
+.data-item-value { font: 800 20px/1 var(--font-display); color: var(--neutral-900); }
+
+/* Summary card */
+.summary-card { cursor: pointer; min-height: 130px; display: flex; flex-direction: column; }
+.summary-card .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.summary-card .big-num { font: 700 36px/1 var(--font-display); color: var(--neutral-900); margin-top: 12px; letter-spacing: -.02em; }
+.summary-card .note { font-size: 13px; color: var(--neutral-500); margin-top: 10px; font-weight: 600; }
+.summary-card.lime { background: radial-gradient(130% 130% at 8% 0%, rgba(253,216,50,.22) 0%, transparent 55%), radial-gradient(120% 120% at 96% 100%, rgba(130,214,50,.16) 0%, transparent 55%), linear-gradient(160deg, #fbfef0 0%, #ffffff 55%, #f0fdf6 100%); border-color: rgba(130,214,50,.28); }
+.summary-card.lime .icon-box { background: linear-gradient(135deg, var(--colourful-mint-green-400), var(--colourful-lime-pop-500)); box-shadow: 0 6px 14px -6px rgba(54,185,139,.5); }
+.summary-card.lime .big-num { color: var(--colourful-mint-green-700); }
+.summary-card.blue { background: radial-gradient(130% 130% at 8% 0%, rgba(62,148,245,.18) 0%, transparent 55%), radial-gradient(120% 120% at 96% 100%, rgba(234,77,133,.12) 0%, transparent 55%), linear-gradient(160deg, #f2f9ff 0%, #ffffff 55%, #faf6ff 100%); border-color: rgba(62,148,245,.26); }
+.summary-card.blue .icon-box { background: linear-gradient(135deg, var(--colourful-sky-blue-400), var(--colourful-sky-blue-600)); box-shadow: 0 6px 14px -6px rgba(62,148,245,.5); }
+.summary-card.blue .big-num { color: var(--colourful-sky-blue-700); }
+.summary-card.coral { background: radial-gradient(130% 130% at 8% 0%, rgba(253,216,50,.24) 0%, transparent 55%), radial-gradient(120% 120% at 96% 100%, rgba(249,96,36,.16) 0%, transparent 55%), linear-gradient(160deg, #fff6ef 0%, #ffffff 55%, #fffdf2 100%); border-color: rgba(249,96,36,.26); }
+.summary-card.coral .icon-box { background: linear-gradient(135deg, var(--colourful-sunny-coral-400), var(--colourful-butter-yellow-500)); box-shadow: 0 6px 14px -6px rgba(249,96,36,.5); }
+.summary-card.coral .big-num { color: var(--colourful-sunny-coral-700); }
+
+/* Settings drawer */
+.settings-drawer { position: fixed; inset: 0; z-index: 100; pointer-events: none; }
+.settings-drawer.open { pointer-events: auto; }
+.settings-drawer-overlay { position: absolute; inset: 0; background: rgba(30,28,26,.4); opacity: 0; transition: opacity var(--duration-normal) var(--easing-default); }
+.settings-drawer.open .settings-drawer-overlay { opacity: 1; }
+.settings-drawer-panel { position: absolute; top: 0; right: 0; bottom: 0; width: min(420px, 90vw); background: var(--colourful-neutral-50); box-shadow: -8px 0 32px rgba(30,28,26,.12); transform: translateX(100%); transition: transform var(--duration-normal) var(--easing-default); display: flex; flex-direction: column; }
+.settings-drawer.open .settings-drawer-panel { transform: translateX(0); }
+.settings-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--neutral-200); background: white; }
+.settings-drawer-head h3 { font: 800 18px var(--font-display); color: var(--neutral-900); }
+.settings-drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+.settings-section { margin-bottom: 28px; }
+.settings-section h4 { font: 700 14px var(--font-display); color: var(--neutral-800); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.settings-section h4::before { content: ""; width: 3px; height: 16px; border-radius: 2px; background: var(--colourful-butter-yellow-400); }
+.form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.form-field label { font-size: 12px; font-weight: 600; color: var(--neutral-500); }
+.form-field input { padding: 9px 12px; border: 1px solid var(--neutral-200); border-radius: 10px; background: white; font-size: 13px; font-weight: 600; color: var(--neutral-800); transition: all .15s; outline: none; }
+.form-field input:focus { border-color: var(--colourful-butter-yellow-400); box-shadow: 0 0 0 3px rgba(253,216,50,.2); }
+.form-field input::placeholder { color: var(--neutral-400); font-weight: 500; }
+.form-field .token-status { font-size: 11px; font-weight: 600; margin-top: 4px; }
+.form-field .token-status.ok { color: var(--colourful-mint-green-600); }
+.form-field .token-status.err { color: var(--colourful-error-500); }
+.settings-drawer-foot { display: flex; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--neutral-200); background: white; }
+.settings-drawer-foot .btn { flex: 1; justify-content: center; }
+.btn-secondary { background: var(--neutral-100); color: var(--neutral-700); }
+.btn-secondary:hover { background: var(--neutral-200); }
+.btn-primary { background: var(--colourful-butter-yellow-500); color: var(--colourful-neutral-900); }
+.btn-primary:hover { filter: brightness(1.05); }
+.icon-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--neutral-100); color: var(--neutral-600); display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.icon-btn:hover { background: var(--neutral-200); color: var(--neutral-800); }
+
+/* Loading */
+.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 20px; color: var(--neutral-500); }
+.loading-spinner { width: 48px; height: 48px; border: 4px solid var(--neutral-200); border-top-color: var(--colourful-butter-yellow-500); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Error message */
+.error-message { text-align: center; padding: 40px 20px; color: var(--neutral-500); }
+.error-message h3 { font-size: 18px; color: var(--neutral-800); margin-bottom: 10px; }
+.error-message p { font-size: 14px; line-height: 1.6; }
+.error-message .btn { margin-top: 16px; }
+
+/* Responsive */
+@media (max-width: 1180px) {
+  .home-grid, .three, .two-col, .hero { grid-template-columns: 1fr; }
+  .subject-score-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 920px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 22px; }
+  h1 { font-size: 32px; }
+  .hero { padding: 22px; border-radius: 24px; }
+  .hero-note { padding: 16px; }
+  .subject-score-grid { grid-template-columns: 1fr; }
+  .four-col { grid-template-columns: repeat(2, 1fr); }
+  .card { padding: 16px; }
+  .hamburger-btn { display: flex; }
+  .main { padding-top: 72px; }
+}
+@media (min-width: 921px) {
+  .bottom-tab-bar { display: none; }
+  body { padding-bottom: 0; }
+}
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+  h1 { font-size: 26px; }
+  .hero { padding: 18px; border-radius: 20px; }
+  .four-col { grid-template-columns: 1fr; }
+  .page-actions { flex-direction: column; }
+}
+  </style>
+</head>
+<body>
+  <!-- Hamburger -->
+  <div class="hamburger-btn" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="profile">
+      <div class="cat cat-ears cat-ears-inner" id="sidebarAvatar">
+        <span>🐱</span>
+      </div>
+      <div>
+        <strong id="sidebarName">Yara</strong>
+        <small id="sidebarGrade">四年级</small>
+      </div>
+    </div>
+    <div class="nav-label">探索</div>
+    <div class="nav">
+      <a class="active" data-page="home" onclick="switchPage('home')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        首页
+      </a>
+      <a data-page="xp" onclick="switchPage('xp')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        能量星球
+      </a>
+      <a data-page="study" onclick="switchPage('study')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+        知识星球
+      </a>
+      <a data-page="money" onclick="switchPage('money')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 12h8"/></svg>
+        财富星球
+      </a>
+    </div>
+    <div class="nav-label">账户</div>
+    <div class="nav">
+      <a onclick="openSettings()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        设置
+      </a>
+    </div>
+    <div class="constraint" id="sidebarConstraint">
+      <span id="sidebarTokenStatus">Token 未设置</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="wrap">
+      <!-- Loading -->
+      <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>正在加载数据...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="errorScreen" class="error-message" style="display:none">
+        <h3>数据加载失败</h3>
+        <p id="errorText">无法从 GitHub 加载数据，请检查网络连接或 Token 设置。</p>
+        <button class="btn" onclick="loadAppData()">重新加载</button>
+        <button class="btn light" onclick="openSettings()" style="margin-left:10px;">设置 Token</button>
+      </div>
+
+      <!-- Content -->
+      <div id="appContent" style="display:none">
+
+        <!-- Home View -->
+        <div id="view-home" class="page-view">
+          <div class="character-panel" id="homeCharacterPanel">
+            <div class="char-main">
+              <div class="char-avatar" id="homeAvatar">
+                <img class="char-avatar-img" id="homeAvatarImg" src="" alt="" style="display:none">
+                <span id="homeAvatarFallback">🐱</span>
+              </div>
+              <div class="char-info">
+                <div class="char-name" id="homeName">Yara <span class="gender-tag" id="homeGenderTag"></span></div>
+                <div class="char-meta" id="homeMeta"></div>
+                <div class="char-badges" id="homeBadges"></div>
+              </div>
+            </div>
+            <div class="char-xp-bar" id="homeXpBar">
+              <div class="char-xp-bar-head">
+                <span id="homeXpLevel">Lv.1</span>
+                <span class="next-label" id="homeXpNext">下一级: 100 XP</span>
+              </div>
+              <div class="char-xp-track">
+                <div class="char-xp-fill" id="homeXpFill" style="width:0%"></div>
+              </div>
+            </div>
+            <div class="char-stats" id="homeStats">
+              <div class="char-stat-item">
+                <div class="char-stat-num" id="homeStatXp">0</div>
+                <div class="char-stat-label">总 XP</div>
+              </div>
+              <div class="char-stat-item">
+                <div class="char-stat-num" id="homeStatPending">0</div>
+                <div class="char-stat-label">待确认</div>
+              </div>
+              <div class="char-stat-item">
+                <div class="char-stat-num" id="homeStatDone">0</div>
+                <div class="char-stat-label">已完成</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">今日状态</div>
+            </div>
+            <div class="today-status">
+              <div class="today-status-head">
+                <div class="today-status-title">Yara 的一天</div>
+                <div class="today-status-date" id="todayDate"></div>
+              </div>
+              <div class="today-status-grid" id="todayStatusGrid">
+                <div class="ts-card accent">
+                  <div class="ts-value" id="todayXpValue">0</div>
+                  <div class="ts-label">今日 XP</div>
+                </div>
+                <div class="ts-card">
+                  <div class="ts-value" id="todayHomeworkValue">0</div>
+                  <div class="ts-label">今日作业</div>
+                </div>
+                <div class="ts-card">
+                  <div class="ts-value" id="todayHomeworkDone">0</div>
+                  <div class="ts-label">已完成</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">三大星球</div>
+            </div>
+            <div class="grid" id="planetGrid">
+              <div class="planet energy" onclick="switchPage('xp')" style="cursor:pointer">
+                <div class="planet-left">
+                  <div class="p-eyebrow">能量星球</div>
+                  <div class="p-title" id="planetXpTitle">Lv.1</div>
+                  <div class="p-lead" id="planetXpLead">总能量 0 XP</div>
+                </div>
+                <div class="planet-right">
+                  <div class="pr-head">下一级</div>
+                  <div class="pr-main">
+                    <span class="pr-num" id="planetXpNext">0</span>
+                    <span class="pr-xp">XP</span>
+                  </div>
+                  <div class="pr-track"><div class="pr-fill" id="planetXpBar" style="width:0%"></div></div>
+                </div>
+              </div>
+              <div class="planet study" onclick="switchPage('study')" style="cursor:pointer">
+                <div class="planet-left">
+                  <div class="p-eyebrow">知识星球</div>
+                  <div class="p-title" id="planetStudyTitle">3 科</div>
+                  <div class="p-lead" id="planetStudyLead">最近成绩 A+</div>
+                </div>
+                <div class="planet-right">
+                  <div class="pr-head">作业</div>
+                  <div class="pr-main">
+                    <span class="pr-num" id="planetStudyDone">0</span>
+                    <span class="pr-xp">/ 已完成</span>
+                  </div>
+                  <div class="pr-track"><div class="pr-fill" id="planetStudyBar" style="width:0%"></div></div>
+                </div>
+              </div>
+              <div class="planet money" onclick="switchPage('money')" style="cursor:pointer">
+                <div class="planet-left">
+                  <div class="p-eyebrow">财富星球</div>
+                  <div class="p-title" id="planetMoneyTitle">¥0</div>
+                  <div class="p-lead" id="planetMoneyLead">两个账户</div>
+                </div>
+                <div class="planet-right">
+                  <div class="pr-head">自由基金</div>
+                  <div class="pr-main">
+                    <span class="pr-num" id="planetMoneyFree">¥0</span>
+                  </div>
+                  <div class="pr-track"><div class="pr-fill" id="planetMoneyBar" style="width:0%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- XP View -->
+        <div id="view-xp" class="page-view" style="display:none">
+          <div class="hero sub-hero" id="xpHero">
+            <div>
+              <div class="eyebrow">能量星球</div>
+              <h1 id="xpLevelTitle">Lv.1</h1>
+              <p class="lead" id="xpLevelDesc">当前等级</p>
+            </div>
+            <div class="sub-status" id="xpSubStatus">
+              <div class="ss-head">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                能量进度
+              </div>
+              <div class="ss-main">
+                <span class="ss-lv" id="xpHeroLevel">Lv.1</span>
+                <span class="ss-xp" id="xpHeroXp">0 XP</span>
+              </div>
+              <div class="ss-track">
+                <div class="ss-fill" id="xpHeroFill" style="width:0%"></div>
+              </div>
+              <div class="ss-foot" id="xpHeroNext">下一级: 100 XP</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">能量来源</div>
+            </div>
+            <div class="grid" id="xpSourcesGrid"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">最近记录</div>
+              <span class="section-count" id="xpRecordCount">0</span>
+            </div>
+            <div class="card" id="xpRecordsList"></div>
+          </div>
+        </div>
+
+        <!-- Study View -->
+        <div id="view-study" class="page-view" style="display:none">
+          <div class="hero sub-hero" id="studyHero">
+            <div>
+              <div class="eyebrow">知识星球</div>
+              <h1 id="studyTitle">成绩概览</h1>
+              <p class="lead" id="studyDesc">最近考试成绩</p>
+            </div>
+            <div class="sub-status" id="studySubStatus">
+              <div class="ss-head">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                学习进度
+              </div>
+              <div class="ss-main">
+                <span class="ss-lv" id="studyProgressLabel">0%</span>
+                <span class="ss-xp" id="studyProgressDetail">0/0 已完成</span>
+              </div>
+              <div class="ss-track">
+                <div class="ss-fill" id="studyProgressFill" style="width:0%"></div>
+              </div>
+              <div class="ss-foot" id="studyProgressFoot">保持学习节奏</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">科目成绩</div>
+            </div>
+            <div class="subject-score-grid" id="subjectScoresGrid"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">最近作业</div>
+            </div>
+            <div class="card" id="recentHomeworkList"></div>
+          </div>
+        </div>
+
+        <!-- Money View -->
+        <div id="view-money" class="page-view" style="display:none">
+          <div class="hero sub-hero" id="moneyHero">
+            <div>
+              <div class="eyebrow">财富星球</div>
+              <h1 id="moneyTitle">¥0</h1>
+              <p class="lead" id="moneyDesc">总资产</p>
+            </div>
+            <div class="sub-status" id="moneySubStatus">
+              <div class="ss-head">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 12h8"/></svg>
+                账户概览
+              </div>
+              <div class="ss-main">
+                <span class="ss-lv" id="moneyWealthLabel">¥0</span>
+                <span class="ss-xp" id="moneyFreeLabel">¥0</span>
+              </div>
+              <div class="ss-track">
+                <div class="ss-fill" id="moneyWealthFill" style="width:0%"></div>
+              </div>
+              <div class="ss-foot" id="moneyAccountFoot">财富增值 / 自由基金</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">账户余额</div>
+            </div>
+            <div class="grid two-col" id="accountCards"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="section-title">最近流水</div>
+              <span class="section-count" id="txCount">0</span>
+            </div>
+            <div class="card" id="transactionList"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Tab Bar -->
+  <div class="bottom-tab-bar">
+    <a class="bottom-tab-item active" data-page="home" onclick="switchPage('home')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      首页
+    </a>
+    <a class="bottom-tab-item" data-page="xp" onclick="switchPage('xp')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      能量
+    </a>
+    <a class="bottom-tab-item" data-page="study" onclick="switchPage('study')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      学习
+    </a>
+    <a class="bottom-tab-item" data-page="money" onclick="switchPage('money')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 12h8"/></svg>
+      财富
+    </a>
+  </div>
+
+  <!-- Settings Drawer -->
+  <div class="settings-drawer" id="settingsDrawer">
+    <div class="settings-drawer-overlay" onclick="closeSettings()"></div>
+    <div class="settings-drawer-panel">
+      <div class="settings-drawer-head">
+        <h3>设置</h3>
+        <button class="icon-btn" onclick="closeSettings()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="settings-drawer-body">
+        <div class="settings-section">
+          <h4>GitHub 连接</h4>
+          <div class="form-field">
+            <label>GitHub Token</label>
+            <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" />
+            <div class="token-status" id="tokenStatus">请输入 Token 以启用数据写入功能</div>
+          </div>
+          <div class="form-field">
+            <label>仓库</label>
+            <input type="text" id="repoInfo" value="meramei/yara-growth-workstation" disabled />
+          </div>
+          <div class="form-field">
+            <label>数据分支</label>
+            <input type="text" id="branchInfo" value="main" disabled />
+          </div>
+          <p style="font-size:12px;color:var(--neutral-400);line-height:1.6;margin-top:8px;">
+            Token 仅存储在浏览器 localStorage 中，不会发送到第三方。
+            需要 <b>repo</b> 权限才能读写仓库数据文件。
+          </p>
+        </div>
+      </div>
+      <div class="settings-drawer-foot">
+        <button class="btn btn-secondary" onclick="closeSettings()">取消</button>
+        <button class="btn btn-primary" onclick="saveToken()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── 全局状态 ──
+    var dataStore = new DataStore();
+    var appData = null;
+
+    // 暴露到全局
+    window.dataStore = dataStore;
+    window.appData = appData;
+
+    // ── 数据加载 ──
+
+    window.loadAppData = function () {
+      var loadingEl = document.getElementById('loadingScreen');
+      var errorEl = document.getElementById('errorScreen');
+      var contentEl = document.getElementById('appContent');
+      var errorText = document.getElementById('errorText');
+
+      loadingEl.style.display = 'flex';
+      errorEl.style.display = 'none';
+      contentEl.style.display = 'none';
+
+      // 尝试从 localStorage 读取 token
+      try {
+        var savedToken = localStorage.getItem('github_token');
+        if (savedToken) {
+          document.getElementById('githubTokenInput').value = savedToken;
+          dataStore.setToken(savedToken);
+        }
+      } catch (e) {}
+
+      dataStore.load().then(function (data) {
+        appData = data;
+        window.appData = data;
+        loadingEl.style.display = 'none';
+        contentEl.style.display = 'block';
+        renderAll();
+        updateTokenStatus();
+      }).catch(function (err) {
+        console.error('数据加载失败:', err);
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorText.textContent = '加载失败: ' + (err.message || '未知错误');
+      });
+    };
+
+    // ── 渲染 ──
+
+    function renderAll() {
+      if (!appData) return;
+      renderHome();
+      renderXpView();
+      renderStudyView();
+      renderMoneyView();
+      renderSidebar();
+    }
+
+    function renderSidebar() {
+      var child = appData.child || {};
+      document.getElementById('sidebarName').textContent = child.name || 'Yara';
+      document.getElementById('sidebarGrade').textContent = child.grade || '';
+      var avatarEl = document.getElementById('sidebarAvatar');
+      if (child.avatar) {
+        avatarEl.innerHTML = '<img class="cat-img" src="' + child.avatar + '" alt="avatar">';
+      } else {
+        avatarEl.innerHTML = '<span>🐱</span>';
+      }
+      updateTokenStatus();
+    }
+
+    function updateTokenStatus() {
+      var el = document.getElementById('sidebarTokenStatus');
+      if (dataStore.hasToken()) {
+        el.textContent = 'Token 已设置';
+        el.style.color = 'var(--colourful-mint-green-600)';
+      } else {
+        el.textContent = 'Token 未设置';
+        el.style.color = '';
+      }
+      var statusEl = document.getElementById('tokenStatus');
+      if (statusEl) {
+        if (dataStore.hasToken()) {
+          statusEl.textContent = 'Token 已设置，可读写数据';
+          statusEl.className = 'token-status ok';
+        } else {
+          statusEl.textContent = '请输入 Token 以启用数据写入功能';
+          statusEl.className = 'token-status err';
+        }
+      }
+    }
+
+    // ── 首页渲染 ──
+
+    function renderHome() {
+      var child = appData.child || {};
+      var cl = appData.currentLevel || {};
+      var nl = appData.nextLevel;
+      var study = appData.study || {};
+
+      // 角色面板
+      var nameEl = document.getElementById('homeName');
+      nameEl.innerHTML = (child.name || 'Yara') + ' <span class="gender-tag">' + (child.gender || '') + '</span>';
+
+      var metaEl = document.getElementById('homeMeta');
+      var metaParts = [];
+      if (child.grade) metaParts.push(child.grade);
+      if (child.school) metaParts.push(child.school);
+      if (child.className) metaParts.push(child.className);
+      metaEl.textContent = metaParts.join(' · ');
+
+      var badgesEl = document.getElementById('homeBadges');
+      badgesEl.innerHTML = '<span class="char-level-badge">' + (cl.levelNum || 'Lv.1') + ' ' + (cl.name || '') + '</span>';
+
+      // 头像
+      var avatarEl = document.getElementById('homeAvatar');
+      var imgEl = document.getElementById('homeAvatarImg');
+      var fallbackEl = document.getElementById('homeAvatarFallback');
+      if (child.avatar) {
+        imgEl.src = child.avatar;
+        imgEl.style.display = 'block';
+        fallbackEl.style.display = 'none';
+      } else {
+        imgEl.style.display = 'none';
+        fallbackEl.style.display = 'inline';
+      }
+
+      // XP 条
+      document.getElementById('homeXpLevel').textContent = cl.levelNum || 'Lv.1';
+      document.getElementById('homeXpNext').textContent = nl ? '下一级: ' + nl.xp + ' XP' : '已达最高级';
+      document.getElementById('homeXpFill').style.width = (appData.levelProgress || 0) + '%';
+
+      // 统计
+      document.getElementById('homeStatXp').textContent = appData.currentXP || 0;
+      document.getElementById('homeStatPending').textContent = appData.pendingCount || 0;
+      var totalDone = study.homework ? study.homework.done : 0;
+      document.getElementById('homeStatDone').textContent = totalDone;
+
+      // 今日状态
+      document.getElementById('todayDate').textContent = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+      document.getElementById('todayXpValue').textContent = appData.currentXP || 0;
+      document.getElementById('todayHomeworkValue').textContent = study.homework ? study.homework.todayTotal : 0;
+      document.getElementById('todayHomeworkDone').textContent = study.homework ? study.homework.todayDone : 0;
+
+      // 三大星球
+      document.getElementById('planetXpTitle').textContent = cl.levelNum || 'Lv.1';
+      document.getElementById('planetXpLead').textContent = '总能量 ' + (appData.currentXP || 0) + ' XP';
+      document.getElementById('planetXpNext').textContent = nl ? (nl.xpToNext || 0) : 0;
+      document.getElementById('planetXpBar').style.width = (appData.levelProgress || 0) + '%';
+
+      var subjects = study.subjects || [];
+      var bestGrade = 'A+';
+      for (var i = 0; i < subjects.length; i++) {
+        if (subjects[i].grade && subjects[i].grade < bestGrade) {
+          bestGrade = subjects[i].grade;
+        }
+      }
+      document.getElementById('planetStudyTitle').textContent = subjects.length + ' 科';
+      document.getElementById('planetStudyLead').textContent = '最近成绩 ' + bestGrade;
+      document.getElementById('planetStudyDone').textContent = study.homework ? (study.homework.done || 0) : 0;
+      var hwTotal = study.homework ? study.homework.total || 1 : 1;
+      document.getElementById('planetStudyBar').style.width = (study.homework ? Math.round((study.homework.done / Math.max(study.homework.total, 1)) * 100) : 0) + '%';
+
+      var finance = appData.finance || {};
+      var totalAssets = finance.totalAssets || 0;
+      document.getElementById('planetMoneyTitle').textContent = '¥' + totalAssets.toFixed(2);
+      document.getElementById('planetMoneyLead').textContent = '两个账户';
+      var freeBalance = 0;
+      if (finance.accounts && finance.accounts.length > 1) {
+        freeBalance = finance.accounts[1].balance || 0;
+      }
+      document.getElementById('planetMoneyFree').textContent = '¥' + freeBalance.toFixed(2);
+      var wealthBalance = 0;
+      if (finance.accounts && finance.accounts.length > 0) {
+        wealthBalance = finance.accounts[0].balance || 0;
+      }
+      var maxVal = Math.max(wealthBalance, freeBalance, 1);
+      document.getElementById('planetMoneyBar').style.width = Math.round((freeBalance / maxVal) * 100) + '%';
+    }
+
+    // ── XP 视图渲染 ──
+
+    function renderXpView() {
+      var cl = appData.currentLevel || {};
+      var nl = appData.nextLevel;
+
+      document.getElementById('xpLevelTitle').textContent = (cl.levelNum || 'Lv.1') + ' ' + (cl.name || '');
+      document.getElementById('xpLevelDesc').textContent = '当前等级 · ' + (appData.currentXP || 0) + ' XP';
+      document.getElementById('xpHeroLevel').textContent = cl.levelNum || 'Lv.1';
+      document.getElementById('xpHeroXp').textContent = (appData.currentXP || 0) + ' XP';
+      document.getElementById('xpHeroFill').style.width = (appData.levelProgress || 0) + '%';
+      document.getElementById('xpHeroNext').textContent = nl ? '下一级: ' + nl.xp + ' XP（还需 ' + (nl.xpToNext || 0) + ' XP）' : '已达最高级';
+
+      // 能量来源
+      var sources = appData.xpSources || [];
+      var grid = document.getElementById('xpSourcesGrid');
+      grid.innerHTML = '';
+      if (sources.length === 0) {
+        grid.innerHTML = '<div class="card"><p style="color:var(--neutral-400);text-align:center;padding:20px;">暂无能量来源数据</p></div>';
+      } else {
+        for (var s = 0; s < sources.length; s++) {
+          var src = sources[s];
+          var tasks = src.tasks || [];
+          var totalXp = tasks.reduce(function (sum, t) { return sum + (Number(t.xp) || 0); }, 0);
+          var card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = '<div class="section-head" style="margin-bottom:8px;">' +
+            '<div class="section-title" style="font-size:16px;">' + (src.type || src.category || '') + '</div>' +
+            '<span style="font-size:13px;font-weight:700;color:var(--mint-600);">' + totalXp + ' XP</span></div>';
+          var list = document.createElement('div');
+          for (var t = 0; t < tasks.length; t++) {
+            var task = tasks[t];
+            var row = document.createElement('div');
+            row.className = 'xp-task-row';
+            row.innerHTML = '<div class="xp-task-icon" style="background:var(--mint-100);color:var(--mint-600);font-size:14px;font-weight:700;">' +
+              (task.xp || '') + '</div>' +
+              '<div><div class="xp-task-title">' + (task.name || '') + '</div>' +
+              '<div class="xp-task-meta">' + (task.description || (task.method || '')) + '</div></div>' +
+              '<div style="font-weight:700;color:var(--mint-600);">+' + (task.xp || 0) + ' XP</div>';
+            list.appendChild(row);
+          }
+          card.appendChild(list);
+          grid.appendChild(card);
+        }
+      }
+
+      // XP 记录
+      var records = appData.recentRecords || [];
+      document.getElementById('xpRecordCount').textContent = records.length;
+      var listEl = document.getElementById('xpRecordsList');
+      listEl.innerHTML = '';
+      if (records.length === 0) {
+        listEl.innerHTML = '<p style="color:var(--neutral-400);text-align:center;padding:20px;">暂无记录</p>';
+      } else {
+        var shown = records.slice(0, 20);
+        for (var r = 0; r < shown.length; r++) {
+          var rec = shown[r];
+          var statusClass = rec.status === 'verified' ? 'good' : rec.status === 'pending' ? 'warn' : 'info';
+          var statusText = rec.status === 'verified' ? '已通过' : rec.status === 'pending' ? '待确认' : '已退回';
+          var row = document.createElement('div');
+          row.className = 'row';
+          row.innerHTML = '<div class="dot" style="background:var(--mint-100);color:var(--mint-600);">' + (rec.xp || '') + '</div>' +
+            '<div><div class="row-title">' + (rec.title || '') + '</div>' +
+            '<div class="row-meta">' + (rec.time || '') + (rec.taskCategory ? ' · ' + rec.taskCategory : '') + '</div></div>' +
+            '<div style="text-align:right;"><div class="value" style="font-size:15px;color:var(--mint-600);">+' + (rec.xp || 0) + ' XP</div>' +
+            '<span class="pill ' + statusClass + '" style="margin-top:4px;display:inline-block;">' + statusText + '</span></div>';
+          listEl.appendChild(row);
+        }
+      }
+    }
+
+    // ── 学习视图渲染 ──
+
+    function renderStudyView() {
+      var study = appData.study || {};
+      var subjects = study.subjects || [];
+      var homework = study.homework || {};
+
+      document.getElementById('studyTitle').textContent = subjects.length + ' 科成绩';
+      document.getElementById('studyDesc').textContent = '最近考试成绩概览';
+
+      var progress = homework.total > 0 ? Math.round((homework.done / homework.total) * 100) : 0;
+      document.getElementById('studyProgressLabel').textContent = progress + '%';
+      document.getElementById('studyProgressDetail').textContent = homework.done + '/' + homework.total + ' 已完成';
+      document.getElementById('studyProgressFill').style.width = progress + '%';
+      document.getElementById('studyProgressFoot').textContent = '共 ' + homework.total + ' 项作业';
+
+      // 科目成绩
+      var grid = document.getElementById('subjectScoresGrid');
+      grid.innerHTML = '';
+      if (subjects.length === 0) {
+        grid.innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:30px;color:var(--neutral-400);">暂无成绩数据</div>';
+      } else {
+        var colorClasses = ['subject-card', 'subject-card--blue', 'subject-card--mint', 'subject-card--coral'];
+        for (var i = 0; i < subjects.length; i++) {
+          var subj = subjects[i];
+          var cc = colorClasses[i % colorClasses.length];
+          var trendIcon = subj.trend === 'up' ? '↑' : subj.trend === 'down' ? '↓' : '→';
+          var trendColor = subj.trend === 'up' ? 'var(--mint-500)' : subj.trend === 'down' ? 'var(--coral-500)' : 'var(--neutral-400)';
+          var card = document.createElement('div');
+          card.className = cc;
+          card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+            '<span style="font-weight:700;font-size:14px;">' + (subj.name || '') + '</span>' +
+            '<span style="font-size:16px;font-weight:800;color:' + trendColor + ';">' + trendIcon + '</span></div>' +
+            '<div class="subject-score">' + (subj.grade || '-') + '</div>' +
+            '<div style="font-size:12px;color:var(--neutral-500);margin-top:4px;">' +
+            (subj.examType || '') + ' · ' + (subj.date || '') + '</div>';
+          grid.appendChild(card);
+        }
+      }
+
+      // 最近作业
+      var assignments = study.recentAssignments || [];
+      var listEl = document.getElementById('recentHomeworkList');
+      listEl.innerHTML = '';
+      if (assignments.length === 0) {
+        listEl.innerHTML = '<p style="color:var(--neutral-400);text-align:center;padding:20px;">暂无作业</p>';
+      } else {
+        var subjectColors = { '语文': '#ec4899', '数学': '#3b82f6', '英语': '#10b981', '科学': '#f59e0b' };
+        for (var a = 0; a < assignments.length; a++) {
+          var as = assignments[a];
+          var color = subjectColors[as.subject] || '#999';
+          var statusText = as.status === 'done' ? '已完成' : '待完成';
+          var statusClass = as.status === 'done' ? 'good' : 'warn';
+          var row = document.createElement('div');
+          row.className = 'assignment-row';
+          row.innerHTML = '<div class="subject-dot" style="background:' + color + ';"></div>' +
+            '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">' + (as.cleanTitle || as.title || '') + '</div>' +
+            '<div style="font-size:11px;color:var(--neutral-500);margin-top:2px;">' + (as.subject || '') + ' · ' + (as.dueDate || '') + '</div></div>' +
+            '<span class="pill ' + statusClass + '">' + statusText + '</span>';
+          listEl.appendChild(row);
+        }
+      }
+    }
+
+    // ── 财富视图渲染 ──
+
+    function renderMoneyView() {
+      var finance = appData.finance || {};
+      var totalAssets = finance.totalAssets || 0;
+      var accounts = finance.accounts || [];
+      var transactions = finance.recentTransactions || [];
+
+      document.getElementById('moneyTitle').textContent = '¥' + totalAssets.toFixed(2);
+      document.getElementById('moneyDesc').textContent = '总资产 · ' + accounts.length + ' 个账户';
+
+      var wealthBalance = 0, freeBalance = 0;
+      for (var i = 0; i < accounts.length; i++) {
+        if (accounts[i].key === 'wealth') wealthBalance = accounts[i].balance || 0;
+        if (accounts[i].key === 'free') freeBalance = accounts[i].balance || 0;
+      }
+      document.getElementById('moneyWealthLabel').textContent = '¥' + wealthBalance.toFixed(2);
+      document.getElementById('moneyFreeLabel').textContent = '¥' + freeBalance.toFixed(2);
+      var maxBal = Math.max(wealthBalance, freeBalance, 1);
+      document.getElementById('moneyWealthFill').style.width = Math.round((wealthBalance / maxBal) * 100) + '%';
+      document.getElementById('moneyAccountFoot').textContent = '财富增值 / 自由基金';
+
+      // 账户卡片
+      var accountGrid = document.getElementById('accountCards');
+      accountGrid.innerHTML = '';
+      var accountColors = ['var(--colourful-sunny-coral-400)', 'var(--colourful-mint-green-400)'];
+      for (var a = 0; a < accounts.length; a++) {
+        var acct = accounts[a];
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = '<div class="account"><div><div class="card-label">' + (acct.name || '') + '</div>' +
+          '<div class="amount" style="color:' + (accountColors[a] || 'var(--neutral-900)') + ';">¥' + ((acct.balance || 0)).toFixed(2) + '</div></div>' +
+          '<div class="icon-box" style="background:' + (accountColors[a] || 'var(--neutral-100)') + ';width:40px;height:40px;border-radius:12px;">' +
+          (a === 0 ? '💰' : '🎯') + '</div></div>';
+        accountGrid.appendChild(card);
+      }
+
+      // 交易列表
+      document.getElementById('txCount').textContent = transactions.length;
+      var txList = document.getElementById('transactionList');
+      txList.innerHTML = '';
+      if (transactions.length === 0) {
+        txList.innerHTML = '<p style="color:var(--neutral-400);text-align:center;padding:20px;">暂无流水</p>';
+      } else {
+        var shown = transactions.slice(0, 15);
+        for (var t = 0; t < shown.length; t++) {
+          var tx = shown[t];
+          var isIncome = tx.type === 'income';
+          var sign = isIncome ? '+' : '-';
+          var color = isIncome ? 'var(--mint-600)' : 'var(--coral-500)';
+          var iconBg = isIncome ? 'var(--mint-100)' : 'var(--coral-100)';
+          var row = document.createElement('div');
+          row.className = 'tx-row';
+          row.innerHTML = '<div class="tx-icon" style="background:' + iconBg + ';color:' + color + ';">' +
+            (isIncome ? '💰' : '💸') + '</div>' +
+            '<div class="tx-info"><div class="tx-name">' + (tx.description || tx.category || '') + '</div>' +
+            '<div class="tx-meta">' + (tx.date || '') + ' · ' + (tx.accountType || '') + '</div></div>' +
+            '<div class="tx-amount" style="color:' + color + ';">' + sign + '¥' + (tx.amount || 0).toFixed(2) + '</div>';
+          txList.appendChild(row);
+        }
+      }
+    }
+
+    // ── 页面切换 ──
+
+    var currentPage = 'home';
+
+    window.switchPage = function (page) {
+      currentPage = page;
+      var views = document.querySelectorAll('.page-view');
+      for (var i = 0; i < views.length; i++) {
+        views[i].style.display = 'none';
+      }
+      var target = document.getElementById('view-' + page);
+      if (target) target.style.display = 'block';
+
+      document.body.setAttribute('data-view', page);
+
+      var navLinks = document.querySelectorAll('.nav a[data-page], .bottom-tab-item[data-page]');
+      for (var j = 0; j < navLinks.length; j++) {
+        navLinks[j].classList.toggle('active', navLinks[j].getAttribute('data-page') === page);
+      }
+
+      // 重新渲染当前页面
+      if (page === 'home') renderHome();
+      else if (page === 'xp') renderXpView();
+      else if (page === 'study') renderStudyView();
+      else if (page === 'money') renderMoneyView();
+    };
+
+    // ── 侧边栏 ──
+
+    window.toggleSidebar = function () {
+      var sidebar = document.getElementById('sidebar');
+      var overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+    };
+
+    // ── 设置 ──
+
+    window.openSettings = function () {
+      document.getElementById('settingsDrawer').classList.add('open');
+      // 关闭移动端侧边栏
+      document.getElementById('sidebar').classList.remove('show');
+      document.getElementById('sidebarOverlay').classList.remove('show');
+    };
+
+    window.closeSettings = function () {
+      document.getElementById('settingsDrawer').classList.remove('open');
+    };
+
+    window.saveToken = function () {
+      var token = document.getElementById('githubTokenInput').value.trim();
+      if (token) {
+        dataStore.setToken(token);
+        updateTokenStatus();
+        closeSettings();
+        // 重新加载数据
+        dataStore.refresh().then(function (data) {
+          appData = data;
+          window.appData = data;
+          renderAll();
+        }).catch(function (err) {
+          console.error('刷新数据失败:', err);
+        });
+      } else {
+        dataStore.clearToken();
+        updateTokenStatus();
+        closeSettings();
+      }
+    };
+
+    // ── 初始化 ──
+
+    window.addEventListener('DOMContentLoaded', function () {
+      loadAppData();
+    });
+
+  })();
+  </script>
+</body>
+</html>

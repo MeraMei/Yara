@@ -1,0 +1,527 @@
+{
+  "subjects": [
+    {
+      "name": "语文",
+      "category": "主科",
+      "description": "",
+      "color": "#ec4899",
+      "icon": "book-open"
+    },
+    {
+      "name": "数学",
+      "category": "主科",
+      "description": "",
+      "color": "#3b82f6",
+      "icon": "calculator"
+    },
+    {
+      "name": "英语",
+      "category": "主科",
+      "description": "",
+      "color": "#10b981",
+      "icon": "languages"
+    },
+    {
+      "name": "科学",
+      "category": "副科",
+      "description": "",
+      "color": "#f59e0b",
+      "icon": "flask-conical"
+    },
+    {
+      "name": "道德与法治",
+      "category": "副科",
+      "description": "",
+      "color": "#8b5cf6",
+      "icon": "scale"
+    },
+    {
+      "name": "信息科技",
+      "category": "副科",
+      "description": "",
+      "color": "#06b6d4",
+      "icon": "monitor"
+    },
+    {
+      "name": "体育",
+      "category": "副科",
+      "description": "",
+      "color": "#ef4444",
+      "icon": "dumbbell"
+    },
+    {
+      "name": "音乐",
+      "category": "副科",
+      "description": "",
+      "color": "#f43f5e",
+      "icon": "music"
+    },
+    {
+      "name": "美术",
+      "category": "副科",
+      "description": "",
+      "color": "#ec4899",
+      "icon": "palette"
+    },
+    {
+      "name": "书法",
+      "category": "副科",
+      "description": "",
+      "color": "#a855f7",
+      "icon": "pen-tool"
+    },
+    {
+      "name": "心理健康",
+      "category": "副科",
+      "description": "",
+      "color": "#f97316",
+      "icon": "heart"
+    },
+    {
+      "name": "综合实践活动",
+      "category": "副科",
+      "description": "",
+      "color": "#14b8a6",
+      "icon": "users"
+    },
+    {
+      "name": "劳动",
+      "category": "副科",
+      "description": "",
+      "color": "#78716c",
+      "icon": "hammer"
+    }
+  ],
+  "xpRules": {
+    "学习成长": [
+      {
+        "name": "60分钟内 完成作业",
+        "category": "学习成长",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "学习进步 - 金牌学生",
+        "category": "学习成长",
+        "xp": 50,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "每天阅读30分钟",
+        "category": "学习成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "做语数英科的额外练习",
+        "category": "学习成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "练字 20分钟以上",
+        "category": "学习成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "作业·日常作业",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·暑假作业",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·假期作业",
+        "category": "学习成长",
+        "xp": 3,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·家庭作业",
+        "category": "学习成长",
+        "xp": 4,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      }
+    ],
+    "兴趣爱好": [
+      {
+        "name": "将自己的精美作品发布至线上",
+        "category": "兴趣爱好",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "画画、手工作品",
+        "category": "兴趣爱好",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      }
+    ],
+    "身体成长": [
+      {
+        "name": "照顾好自己（营养均衡、午休）",
+        "category": "身体成长",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "每天跳绳 200个或3分钟",
+        "category": "身体成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "每天10点前关灯睡觉",
+        "category": "身体成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "做锻炼身体/户外 30分钟",
+        "category": "身体成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      }
+    ],
+    "能力成长": [
+      {
+        "name": "主动做家务（力所能及）",
+        "category": "能力成长",
+        "xp": 3,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "收拾自己的卧室（床和书桌）",
+        "category": "能力成长",
+        "xp": 3,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "洗自己的小内裤或袜子",
+        "category": "能力成长",
+        "xp": 4,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "独立完成洗澡和吹头发",
+        "category": "能力成长",
+        "xp": 4,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "与父母沟通自己近期成长",
+        "category": "能力成长",
+        "xp": 6,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "财务能力分析",
+        "category": "能力成长",
+        "xp": 5,
+        "method": "按次",
+        "description": "完成一次财务对账与反思，培养财商思维"
+      },
+      {
+        "name": "说到做到、遵守约定",
+        "category": "能力成长",
+        "xp": 8,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "写日记：写作四要素+感受",
+        "category": "能力成长",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      }
+    ]
+  },
+  "xpRuleList": [
+    {
+      "name": "60分钟内 完成作业",
+      "category": "学习成长",
+      "xp": 10,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "学习进步 - 金牌学生",
+      "category": "学习成长",
+      "xp": 50,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "每天阅读30分钟",
+      "category": "学习成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "做语数英科的额外练习",
+      "category": "学习成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "练字 20分钟以上",
+      "category": "学习成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "将自己的精美作品发布至线上",
+      "category": "兴趣爱好",
+      "xp": 10,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "画画、手工作品",
+      "category": "兴趣爱好",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "照顾好自己（营养均衡、午休）",
+      "category": "身体成长",
+      "xp": 10,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "每天跳绳 200个或3分钟",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "每天10点前关灯睡觉",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "做锻炼身体/户外 30分钟",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "主动做家务（力所能及）",
+      "category": "能力成长",
+      "xp": 3,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "收拾自己的卧室（床和书桌）",
+      "category": "能力成长",
+      "xp": 3,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "洗自己的小内裤或袜子",
+      "category": "能力成长",
+      "xp": 4,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "独立完成洗澡和吹头发",
+      "category": "能力成长",
+      "xp": 4,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "与父母沟通自己近期成长",
+      "category": "能力成长",
+      "xp": 6,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "作业·日常作业",
+      "category": "学习成长",
+      "xp": 2,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "作业·暑假作业",
+      "category": "学习成长",
+      "xp": 2,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "财务能力分析",
+      "category": "能力成长",
+      "xp": 5,
+      "method": "按次",
+      "description": "完成一次财务对账与反思，培养财商思维"
+    },
+    {
+      "name": "作业·假期作业",
+      "category": "学习成长",
+      "xp": 3,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "作业·家庭作业",
+      "category": "学习成长",
+      "xp": 4,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "说到做到、遵守约定",
+      "category": "能力成长",
+      "xp": 8,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "写日记：写作四要素+感受",
+      "category": "能力成长",
+      "xp": 10,
+      "method": "按次",
+      "description": ""
+    }
+  ],
+  "abilityModules": {
+    "语文": [
+      {
+        "id": "recvrdg8fp85Xl",
+        "name": "拼音",
+        "description": "【拼音】是起点，字音牢牢记",
+        "order": 1
+      },
+      {
+        "id": "recvrdg8fpJqPA",
+        "name": "汉字",
+        "description": "【汉字】如砖石，积累筑地基",
+        "order": 2
+      },
+      {
+        "id": "recvrdg8fp8T9e",
+        "name": "组词",
+        "description": "【组词】又造句，句段连成理",
+        "order": 3
+      },
+      {
+        "id": "recvrdg8fpuxfj",
+        "name": "阅读",
+        "description": "【阅读】拓视野，理解藏真意",
+        "order": 4
+      },
+      {
+        "id": "recvrdg8fp5QIv",
+        "name": "作文",
+        "description": "【作文】即表达，从容书心里",
+        "order": 5
+      }
+    ],
+    "数学": [
+      {
+        "id": "recvrdg8fpgYIb",
+        "name": "概念",
+        "description": "【概念】是地基，理解才牢靠",
+        "order": 6
+      },
+      {
+        "id": "recvrdg8fpF79T",
+        "name": "公式定理",
+        "description": "【公式定理】熟，解题如用钥",
+        "order": 7
+      },
+      {
+        "id": "recvrdg8fp7sce",
+        "name": "计算",
+        "description": "【计算】练百遍，手中出精妙",
+        "order": 8
+      },
+      {
+        "id": "recvrdg8fptmvo",
+        "name": "推理",
+        "description": "【推理】层层推，思路清晰道",
+        "order": 9
+      },
+      {
+        "id": "recvrdg8fpf6AJ",
+        "name": "直觉",
+        "description": "【直觉】靠积累，巧思自闪耀",
+        "order": 10
+      }
+    ],
+    "英语": [
+      {
+        "id": "recvrdg8fpsn1v",
+        "name": "听说",
+        "description": "【听说】先开路，耳熟则口顺",
+        "order": 11
+      },
+      {
+        "id": "recvrdg8fpIGXd",
+        "name": "单词",
+        "description": "【单词】是基石，积累无捷径",
+        "order": 12
+      },
+      {
+        "id": "recvrdg8fpPFVW",
+        "name": "语感",
+        "description": "【语感】在浸润，结构自然明",
+        "order": 13
+      },
+      {
+        "id": "recvrdg8fppzuT",
+        "name": "阅读",
+        "description": "【阅读】拓视野，见多思路清",
+        "order": 14
+      },
+      {
+        "id": "recvrdg8fpY7hf",
+        "name": "写作",
+        "description": "【写作】终成果，笔下有回音",
+        "order": 15
+      }
+    ]
+  }
+}

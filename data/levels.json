@@ -1,0 +1,317 @@
+[
+  {
+    "id": "level_0",
+    "name": "萌新",
+    "levelNum": "Lv.1",
+    "level": 1,
+    "xp": 0,
+    "badgeClass": "bronze",
+    "themeColor": "#CD7F32",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "自由享受每周零花钱",
+        "description": "",
+        "unlocked": true,
+        "id": "priv_0",
+        "redeemed": true,
+        "redeemedAt": "",
+        "redeemedDate": ""
+      }
+    ],
+    "privilegeCount": 1,
+    "description": "自由享受每周零花钱"
+  },
+  {
+    "id": "level_1",
+    "name": "青铜",
+    "levelNum": "Lv.2",
+    "level": 2,
+    "xp": 100,
+    "badgeClass": "silver",
+    "themeColor": "#C0C0C0",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "自由享受每周零花钱",
+        "description": "",
+        "unlocked": true,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "60分钟自由安排时间",
+        "description": "",
+        "unlocked": true,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 2,
+    "description": "自由享受每周零花钱"
+  },
+  {
+    "id": "level_2",
+    "name": "白银",
+    "levelNum": "Lv.3",
+    "level": 3,
+    "xp": 300,
+    "badgeClass": "gold",
+    "themeColor": "#FFD700",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "自由享受每周零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "60分钟自由安排时间",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "猫咖时间1次",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 3,
+    "description": "自由享受每周零花钱"
+  },
+  {
+    "id": "level_3",
+    "name": "黄金",
+    "levelNum": "Lv.4",
+    "level": 4,
+    "xp": 500,
+    "badgeClass": "platinum",
+    "themeColor": "#E5E4E2",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "自由享受每周零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "100分钟自由安排时间",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "猫咖时间1次",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "零食/文具大礼包1套（100元以内）",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "可提取自己的财富基金 5‰ 作为零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 5,
+    "description": "自由享受每周零花钱"
+  },
+  {
+    "id": "level_4",
+    "name": "铂金",
+    "levelNum": "Lv.5",
+    "level": 5,
+    "xp": 1000,
+    "badgeClass": "diamond",
+    "themeColor": "#B9F2FF",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "自由享受每周零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "100分钟自由安排时间",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "猫咖时间1次",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "零食/文具大礼包1套（100元以内）",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "可提取自己的财富基金 5‰ 作为零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 5,
+    "description": "自由享受每周零花钱"
+  },
+  {
+    "id": "level_5",
+    "name": "钻石",
+    "levelNum": "Lv.6",
+    "level": 6,
+    "xp": 3000,
+    "badgeClass": "master",
+    "themeColor": "#9966CC",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "自由享受每周零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "100分钟自由安排时间",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "猫咖时间1次",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "零食/文具大礼包1套（100元以内）",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "可提取自己的财富基金 1% 作为零花钱",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      },
+      {
+        "icon": "gift",
+        "name": "要求爸爸妈妈满足你的一个小愿望",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 6,
+    "description": "自由享受每周零花钱"
+  },
+  {
+    "id": "level_6",
+    "name": "星耀",
+    "levelNum": "Lv.7",
+    "level": 7,
+    "xp": 6000,
+    "badgeClass": "legendary",
+    "themeColor": "#FF6B6B",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "待定",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 1,
+    "description": "待定"
+  },
+  {
+    "id": "level_7",
+    "name": "王者",
+    "levelNum": "Lv.8",
+    "level": 8,
+    "xp": 10000,
+    "badgeClass": "mythic",
+    "themeColor": "#FFD700",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "待定",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 1,
+    "description": "待定"
+  },
+  {
+    "id": "level_8",
+    "name": "大师",
+    "levelNum": "Lv.9",
+    "level": 9,
+    "xp": 20000,
+    "badgeClass": "divine",
+    "themeColor": "#FFE4B5",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "待定",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 1,
+    "description": "待定"
+  },
+  {
+    "id": "level_9",
+    "name": "至尊",
+    "levelNum": "Lv.10",
+    "level": 10,
+    "xp": 50000,
+    "badgeClass": "divine",
+    "themeColor": "#FFE4B5",
+    "privileges": [
+      {
+        "icon": "gift",
+        "name": "待定",
+        "description": "",
+        "unlocked": false,
+        "id": "priv_0"
+      }
+    ],
+    "privilegeCount": 1,
+    "description": "待定"
+  }
+]

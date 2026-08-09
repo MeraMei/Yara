@@ -1,0 +1,191 @@
+[
+  {
+    "type": "学习成长",
+    "color": "lavender",
+    "icon": "star",
+    "tasks": [
+      {
+        "name": "60分钟内 完成作业",
+        "category": "学习成长",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "学习进步 - 金牌学生",
+        "category": "学习成长",
+        "xp": 50,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "每天阅读30分钟",
+        "category": "学习成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "做语数英科的额外练习",
+        "category": "学习成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "练字 20分钟以上",
+        "category": "学习成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "作业·日常作业",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·暑假作业",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·假期作业",
+        "category": "学习成长",
+        "xp": 3,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·家庭作业",
+        "category": "学习成长",
+        "xp": 4,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      }
+    ]
+  },
+  {
+    "type": "兴趣爱好",
+    "color": "lavender",
+    "icon": "star",
+    "tasks": [
+      {
+        "name": "将自己的精美作品发布至线上",
+        "category": "兴趣爱好",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "画画、手工作品",
+        "category": "兴趣爱好",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "type": "身体成长",
+    "color": "lavender",
+    "icon": "star",
+    "tasks": [
+      {
+        "name": "照顾好自己（营养均衡、午休）",
+        "category": "身体成长",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "每天跳绳 200个或3分钟",
+        "category": "身体成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "每天10点前关灯睡觉",
+        "category": "身体成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "做锻炼身体/户外 30分钟",
+        "category": "身体成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "type": "能力成长",
+    "color": "lavender",
+    "icon": "star",
+    "tasks": [
+      {
+        "name": "主动做家务（力所能及）",
+        "category": "能力成长",
+        "xp": 3,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "收拾自己的卧室（床和书桌）",
+        "category": "能力成长",
+        "xp": 3,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "洗自己的小内裤或袜子",
+        "category": "能力成长",
+        "xp": 4,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "独立完成洗澡和吹头发",
+        "category": "能力成长",
+        "xp": 4,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "与父母沟通自己近期成长",
+        "category": "能力成长",
+        "xp": 6,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "财务能力分析",
+        "category": "能力成长",
+        "xp": 5,
+        "method": "按次",
+        "description": "完成一次财务对账与反思，培养财商思维"
+      },
+      {
+        "name": "说到做到、遵守约定",
+        "category": "能力成长",
+        "xp": 8,
+        "method": "按次",
+        "description": ""
+      },
+      {
+        "name": "写日记：写作四要素+感受",
+        "category": "能力成长",
+        "xp": 10,
+        "method": "按次",
+        "description": ""
+      }
+    ]
+  }
+]

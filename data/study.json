@@ -1,0 +1,2752 @@
+{
+  "subjects": [
+    {
+      "name": "语文",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-08-05",
+      "trend": "up",
+      "previousGrade": "B+",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-08-05",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "B+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "数学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "英语",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "科学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "道德与法治",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A+",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "信息科技",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "up",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "体育",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "up",
+      "previousGrade": "B",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "B",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "B",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "B",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "美术",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "书法",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A+",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-07-09",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2024-01-15",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "综合实践活动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-07-08",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2025-01-12",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    },
+    {
+      "name": "劳动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "trend": "stable",
+      "previousGrade": "A",
+      "errorModules": [],
+      "history": [
+        {
+          "date": "2026-07-06",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        },
+        {
+          "date": "2026-01-27",
+          "grade": "A",
+          "examType": "期末",
+          "errorModules": []
+        }
+      ]
+    }
+  ],
+  "homework": {
+    "total": 21,
+    "done": 8,
+    "todayTotal": 2,
+    "todayDone": 2
+  },
+  "recentAssignments": [
+    {
+      "id": "recvrd7AIvjkbE",
+      "subject": "数学",
+      "title": "暑假作业 P29-P30",
+      "cleanTitle": "暑假作业 P29-P30",
+      "shortTitle": "暑假作业 P29-P30",
+      "homeworkType": "作业·暑假作业",
+      "module": "概念",
+      "modules": [
+        "概念"
+      ],
+      "dueDate": "2026-07-14",
+      "deadline": "2026-07-14",
+      "status": "done",
+      "submitted": true,
+      "reviewStatus": "已通过",
+      "returnReason": "",
+      "description": "暑假作业 P29-P30",
+      "details": [],
+      "tags": [
+        {
+          "text": "已完成",
+          "type": "good"
+        }
+      ],
+      "progress": 100
+    },
+    {
+      "id": "recvrd7AIv0ER4",
+      "subject": "英语",
+      "title": "暑假作业 P48-P49",
+      "cleanTitle": "暑假作业 P48-P49",
+      "shortTitle": "暑假作业 P48-P49",
+      "homeworkType": "作业·暑假作业",
+      "module": "概念",
+      "modules": [
+        "概念"
+      ],
+      "dueDate": "2026-07-14",
+      "deadline": "2026-07-14",
+      "status": "done",
+      "submitted": true,
+      "reviewStatus": "已通过",
+      "returnReason": "",
+      "description": "暑假作业 P48-P49",
+      "details": [],
+      "tags": [
+        {
+          "text": "已完成",
+          "type": "good"
+        }
+      ],
+      "progress": 100
+    },
+    {
+      "id": "recvrd7AIvTKa5",
+      "subject": "数学",
+      "title": "数学计算题练习30题，做完拍照上传（已修改）",
+      "cleanTitle": "数学计算题练习30题，做完拍照上传（已修改）",
+      "shortTitle": "数学计算题练习30题，做完拍照上传（已修改）",
+      "homeworkType": "作业·假期作业",
+      "module": "计算",
+      "modules": [
+        "计算"
+      ],
+      "dueDate": "2026-07-17",
+      "deadline": "2026-07-17",
+      "status": "pending",
+      "submitted": false,
+      "reviewStatus": "",
+      "returnReason": "",
+      "description": "数学计算题练习30题，做完拍照上传",
+      "details": [],
+      "tags": [],
+      "progress": 0
+    }
+  ],
+  "allHomework": [
+    {
+      "date": "2026-07-14",
+      "items": [
+        {
+          "id": "recvrd7AIvjkbE",
+          "subject": "数学",
+          "title": "暑假作业 P29-P30",
+          "cleanTitle": "暑假作业 P29-P30",
+          "shortTitle": "暑假作业 P29-P30",
+          "homeworkType": "作业·暑假作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-07-14",
+          "deadline": "2026-07-14",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P29-P30",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        },
+        {
+          "id": "recvrd7AIv0ER4",
+          "subject": "英语",
+          "title": "暑假作业 P48-P49",
+          "cleanTitle": "暑假作业 P48-P49",
+          "shortTitle": "暑假作业 P48-P49",
+          "homeworkType": "作业·暑假作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-07-14",
+          "deadline": "2026-07-14",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P48-P49",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        }
+      ]
+    },
+    {
+      "date": "2026-07-17",
+      "items": [
+        {
+          "id": "recvrd7AIvTKa5",
+          "subject": "数学",
+          "title": "数学计算题练习30题，做完拍照上传（已修改）",
+          "cleanTitle": "数学计算题练习30题，做完拍照上传（已修改）",
+          "shortTitle": "数学计算题练习30题，做完拍照上传（已修改）",
+          "homeworkType": "作业·假期作业",
+          "module": "计算",
+          "modules": [
+            "计算"
+          ],
+          "dueDate": "2026-07-17",
+          "deadline": "2026-07-17",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "数学计算题练习30题，做完拍照上传",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-07-21",
+      "items": [
+        {
+          "id": "recvrd7AIvVAhf",
+          "subject": "英语",
+          "title": "暑假作业 P52-P53",
+          "cleanTitle": "暑假作业 P52-P53",
+          "shortTitle": "暑假作业 P52-P53",
+          "homeworkType": "作业·暑假作业",
+          "module": "单词",
+          "modules": [
+            "单词"
+          ],
+          "dueDate": "2026-07-21",
+          "deadline": "2026-07-21",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P52-P53",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        }
+      ]
+    },
+    {
+      "date": "2026-07-23",
+      "items": [
+        {
+          "id": "recvrd7AIv7Iqf",
+          "subject": "数学",
+          "title": "暑假作业 P31-P32",
+          "cleanTitle": "暑假作业 P31-P32",
+          "shortTitle": "暑假作业 P31-P32",
+          "homeworkType": "作业·暑假作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-07-23",
+          "deadline": "2026-07-23",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P31-P32",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        },
+        {
+          "id": "recvrd7AIvSuAa",
+          "subject": "数学",
+          "title": "数学计算题练习30题，做完拍照上传",
+          "cleanTitle": "数学计算题练习30题，做完拍照上传",
+          "shortTitle": "数学计算题练习30题，做完拍照上传",
+          "homeworkType": "作业·假期作业",
+          "module": "计算",
+          "modules": [
+            "计算"
+          ],
+          "dueDate": "2026-07-23",
+          "deadline": "2026-07-23",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "数学计算题练习30题，做完拍照上传",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-07-26",
+      "items": [
+        {
+          "id": "recvrd7AIvIggL",
+          "subject": "英语",
+          "title": "暑假作业 P55-P56",
+          "cleanTitle": "暑假作业 P55-P56",
+          "shortTitle": "暑假作业 P55-P56",
+          "homeworkType": "作业·暑假作业",
+          "module": "单词",
+          "modules": [
+            "单词"
+          ],
+          "dueDate": "2026-07-26",
+          "deadline": "2026-07-26",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P55-P56",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        }
+      ]
+    },
+    {
+      "date": "2026-07-30",
+      "items": [
+        {
+          "id": "recvrd7AIvR9SL",
+          "subject": "语文",
+          "title": "阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，每天半小",
+          "cleanTitle": "阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，每天半小",
+          "shortTitle": "阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，每天...",
+          "homeworkType": "作业·假期作业",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "dueDate": "2026-07-30",
+          "deadline": "2026-07-30",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，每天半小时。 ",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        },
+        {
+          "id": "recvrd7AIvVC5l",
+          "subject": "语文",
+          "title": "背诵并默写四上古诗（内容见微信群）。",
+          "cleanTitle": "背诵并默写四上古诗（内容见微信群）。",
+          "shortTitle": "背诵并默写四上古诗（内容见微信群）。",
+          "homeworkType": "作业·假期作业",
+          "module": "汉字",
+          "modules": [
+            "汉字"
+          ],
+          "dueDate": "2026-07-30",
+          "deadline": "2026-07-30",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "背诵并默写四上古诗（内容见微信群）。",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        },
+        {
+          "id": "recvrd7AIvO6n0",
+          "subject": "数学",
+          "title": "暑假作业 P33-P35",
+          "cleanTitle": "暑假作业 P33-P35",
+          "shortTitle": "暑假作业 P33-P35",
+          "homeworkType": "作业·暑假作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-07-30",
+          "deadline": "2026-07-30",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P33-P35",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        },
+        {
+          "id": "recvrd7AIvCmYM",
+          "subject": "数学",
+          "title": "数学计算题练习30题，做完拍照上传",
+          "cleanTitle": "数学计算题练习30题，做完拍照上传",
+          "shortTitle": "数学计算题练习30题，做完拍照上传",
+          "homeworkType": "作业·假期作业",
+          "module": "计算",
+          "modules": [
+            "计算"
+          ],
+          "dueDate": "2026-07-30",
+          "deadline": "2026-07-30",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "数学计算题练习30题，做完拍照上传",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-08-01",
+      "items": [
+        {
+          "id": "recvrd7AIvnnrb",
+          "subject": "英语",
+          "title": "暑假作业 P61-P62",
+          "cleanTitle": "暑假作业 P61-P62",
+          "shortTitle": "暑假作业 P61-P62",
+          "homeworkType": "作业·暑假作业",
+          "module": "单词",
+          "modules": [
+            "单词"
+          ],
+          "dueDate": "2026-08-01",
+          "deadline": "2026-08-01",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P61-P62",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        }
+      ]
+    },
+    {
+      "date": "2026-08-05",
+      "items": [
+        {
+          "id": "recvrd7AIvjz6L",
+          "subject": "英语",
+          "title": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
+          "cleanTitle": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
+          "shortTitle": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
+          "homeworkType": "作业·假期作业",
+          "module": "听说",
+          "modules": [
+            "听说"
+          ],
+          "dueDate": "2026-08-05",
+          "deadline": "2026-08-05",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-08-06",
+      "items": [
+        {
+          "id": "recvrd7AIvkIbo",
+          "subject": "数学",
+          "title": "数学计算题练习30题，做完拍照上传",
+          "cleanTitle": "数学计算题练习30题，做完拍照上传",
+          "shortTitle": "数学计算题练习30题，做完拍照上传",
+          "homeworkType": "作业·假期作业",
+          "module": "计算",
+          "modules": [
+            "计算"
+          ],
+          "dueDate": "2026-08-06",
+          "deadline": "2026-08-06",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "数学计算题练习30题，做完拍照上传",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-08-07",
+      "items": [
+        {
+          "id": "recvrd7AIvpTgx",
+          "subject": "数学",
+          "title": "暑假作业 P36-P38",
+          "cleanTitle": "暑假作业 P36-P38",
+          "shortTitle": "暑假作业 P36-P38",
+          "homeworkType": "作业·暑假作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-08-07",
+          "deadline": "2026-08-07",
+          "status": "done",
+          "submitted": true,
+          "reviewStatus": "已通过",
+          "returnReason": "",
+          "description": "暑假作业 P36-P38",
+          "details": [],
+          "tags": [
+            {
+              "text": "已完成",
+              "type": "good"
+            }
+          ],
+          "progress": 100
+        }
+      ]
+    },
+    {
+      "date": "2026-08-10",
+      "items": [
+        {
+          "id": "recvrd7AIv7hau",
+          "subject": "英语",
+          "title": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer ho",
+          "cleanTitle": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer ho",
+          "shortTitle": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer ...",
+          "homeworkType": "作业·假期作业",
+          "module": "写作",
+          "modules": [
+            "写作"
+          ],
+          "dueDate": "2026-08-10",
+          "deadline": "2026-08-10",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer holiday 来写一写暑假期间外出游玩的一篇小作文。以下句子可供参考： My Summer Holiday I have a great Summer Holiday.   I go to the ...  I play and eat .  I go to the ...  I ...   I have a lot of fun.  写好的作品拍照上传。",
+          "details": [],
+          "tags": [
+            {
+              "text": "即将截止",
+              "type": "hot"
+            }
+          ],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-08-13",
+      "items": [
+        {
+          "id": "recvrd7AIv7mDf",
+          "subject": "数学",
+          "title": "创造自己的分数小册子（参照视频） ",
+          "cleanTitle": "创造自己的分数小册子（参照视频）",
+          "shortTitle": "创造自己的分数小册子（参照视频）",
+          "homeworkType": "作业·假期作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-08-13",
+          "deadline": "2026-08-13",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "1.创造自己的分数小册子（参照视频） ",
+          "details": [
+            {
+              "num": "1",
+              "text": "创造自己的分数小册子（参照视频）"
+            }
+          ],
+          "tags": [],
+          "progress": 0
+        },
+        {
+          "id": "recvrd7AIvjQKm",
+          "subject": "数学",
+          "title": "构思一个完整的故事；画一组有顺序的图画；在故事中自然地呈现一个数学问题并解决；讲",
+          "cleanTitle": "构思一个完整的故事；画一组有顺序的图画；在故事中自然地呈现一个数学问题并解决；讲",
+          "shortTitle": "构思一个完整的故事；画一组有顺序的图画；在故事中自然地呈现一个数学问题并解决；讲",
+          "homeworkType": "作业·假期作业",
+          "module": "概念",
+          "modules": [
+            "概念"
+          ],
+          "dueDate": "2026-08-13",
+          "deadline": "2026-08-13",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "2.构思一个完整的故事；画一组有顺序的图画；在故事中自然地呈现一个数学问题并解决；讲一个有头有尾的故事。（参照步骤）",
+          "details": [
+            {
+              "num": "2",
+              "text": "构思一个完整的故事；画一组有顺序的图画；在故事中自然地呈现一个数学问题并解决；讲一个有头有尾的故事。（参照步骤）"
+            }
+          ],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    },
+    {
+      "date": "2026-08-29",
+      "items": [
+        {
+          "id": "recvrd7AIv5DKs",
+          "subject": "语文",
+          "title": "背诵并默写四上古诗和日积月累。",
+          "cleanTitle": "背诵并默写四上古诗和日积月累。",
+          "shortTitle": "背诵并默写四上古诗和日积月累。",
+          "homeworkType": "作业·假期作业",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "dueDate": "2026-08-29",
+          "deadline": "2026-08-29",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "背诵并默写四上古诗和日积月累。",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        },
+        {
+          "id": "recvrd7AIvfMRT",
+          "subject": "语文",
+          "title": "坚持每天练字，内容：四上的 课后词语",
+          "cleanTitle": "坚持每天练字，内容：四上的 课后词语",
+          "shortTitle": "坚持每天练字，内容：四上的 课后词语",
+          "homeworkType": "作业·假期作业",
+          "module": "汉字",
+          "modules": [
+            "汉字"
+          ],
+          "dueDate": "2026-08-29",
+          "deadline": "2026-08-29",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "坚持每天练字，内容：四上的 课后词语",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        },
+        {
+          "id": "recvrd7AIv0her",
+          "subject": "语文",
+          "title": "每天坚持阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，",
+          "cleanTitle": "每天坚持阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，",
+          "shortTitle": "每天坚持阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事...",
+          "homeworkType": "作业·假期作业",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "dueDate": "2026-08-29",
+          "deadline": "2026-08-29",
+          "status": "pending",
+          "submitted": false,
+          "reviewStatus": "",
+          "returnReason": "",
+          "description": "每天坚持阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，不少于30分钟： 圈画批注。（完成一份阅读笔记，见图）",
+          "details": [],
+          "tags": [],
+          "progress": 0
+        }
+      ]
+    }
+  ],
+  "examRecords": [
+    {
+      "id": "recvrpvnZIZnEh",
+      "subject": "语文",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-08-05",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjEzMg",
+      "subject": "数学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjglAP",
+      "subject": "英语",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjDczX",
+      "subject": "科学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjGXGu",
+      "subject": "道德与法治",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7Bnjv5KI",
+      "subject": "信息科技",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7Bnj6fRW",
+      "subject": "体育",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjOh8I",
+      "subject": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjdJz7",
+      "subject": "美术",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1GAe6T",
+      "subject": "书法",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1GMH8W",
+      "subject": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1G3WQ7",
+      "subject": "综合实践活动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1GvAih",
+      "subject": "劳动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-07-06",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjAimh",
+      "subject": "语文",
+      "grade": "B+",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：B+（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjdZgH",
+      "subject": "数学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnjkgrc",
+      "subject": "英语",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnjb5UA",
+      "subject": "科学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjqoqC",
+      "subject": "道德与法治",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjOIfa",
+      "subject": "信息科技",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjGn1x",
+      "subject": "体育",
+      "grade": "B",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：B（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnj6eTE",
+      "subject": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjDj6T",
+      "subject": "美术",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1GfYpN",
+      "subject": "书法",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1Gqrk8",
+      "subject": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1GShQ4",
+      "subject": "综合实践活动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1GekoR",
+      "subject": "劳动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2026-01-27",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（三年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjeUpz",
+      "subject": "语文",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjuzgH",
+      "subject": "数学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjVKT9",
+      "subject": "英语",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjvZS8",
+      "subject": "科学",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjGUqY",
+      "subject": "道德与法治",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjpvOa",
+      "subject": "体育",
+      "grade": "B",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：B（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjHl5C",
+      "subject": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7Bnjiv1V",
+      "subject": "美术",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1GS0me",
+      "subject": "书法",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1GDgEY",
+      "subject": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1G0bdR",
+      "subject": "综合实践活动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-07-08",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级下学期期末）"
+    },
+    {
+      "id": "recvrd7Bnj4Yo5",
+      "subject": "语文",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjhqAX",
+      "subject": "数学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjSNFL",
+      "subject": "英语",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjD6CS",
+      "subject": "科学",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjDfyx",
+      "subject": "道德与法治",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjZFv4",
+      "subject": "体育",
+      "grade": "B",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：B（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjzYsD",
+      "subject": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjrZgx",
+      "subject": "美术",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1GWtuG",
+      "subject": "书法",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1Gi95Y",
+      "subject": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1GoZLr",
+      "subject": "综合实践活动",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2025-01-12",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（二年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnju2Y6",
+      "subject": "语文",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjJq3x",
+      "subject": "数学",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjxyfB",
+      "subject": "英语",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjHAUz",
+      "subject": "科学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjWvKG",
+      "subject": "道德与法治",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7Bnj7zGB",
+      "subject": "体育",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjzMhu",
+      "subject": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7Bnjglj1",
+      "subject": "美术",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1GPIgY",
+      "subject": "书法",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7C1Gnn1O",
+      "subject": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-07-09",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级下学期期末）"
+    },
+    {
+      "id": "recvrd7BnjnwtD",
+      "subject": "语文",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjAJbg",
+      "subject": "数学",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnj5MOV",
+      "subject": "英语",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjXRt7",
+      "subject": "科学",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnj9ZwR",
+      "subject": "体育",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjNkYT",
+      "subject": "音乐",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7BnjxLpS",
+      "subject": "美术",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7Bnjcq8i",
+      "subject": "书法",
+      "grade": "A+",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A+（一年级上学期期末）"
+    },
+    {
+      "id": "recvrd7C1GpBcI",
+      "subject": "心理健康",
+      "grade": "A",
+      "examType": "期末",
+      "date": "2024-01-15",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "errorModule": "",
+      "errorModules": [],
+      "description": "等级：A（一年级上学期期末）"
+    }
+  ],
+  "evaluations": [
+    {
+      "id": "recvrdiJo3PAan",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(下)",
+      "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+      "parentComment": "",
+      "date": "2026-07-06",
+      "title": "三年级(下)"
+    },
+    {
+      "id": "recvrdiJo3JQPB",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "三年级(上)",
+      "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你能很好地遵守纪律，学习态度端正，有一颗向上的心，这很好。课堂上请再专注一些，紧紧跟上老师的思维节奏；作业完成后，多一份回味与检查，追求更优。学会主动思考，积极回应，你内在潜藏的能量就会喷涌而出，推动你更上一层楼。",
+      "parentComment": "",
+      "date": "2026-01-27",
+      "title": "三年级(上)"
+    },
+    {
+      "id": "recvrdiJo3JWWm",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(下)",
+      "teacherComment": "评价老师：吴淑婷\n康雅曦同学：懂事的你，纪律方面表现良好，学习较为努力。但学习时容易分心，导致效率不高。课堂上你认真听讲，却很少主动发言。老师建议你多和老师、同学交流学习方法，你会进步更快！",
+      "parentComment": "",
+      "date": "2025-07-08",
+      "title": "二年级(下)"
+    },
+    {
+      "id": "recvrdiJo3UIJs",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "二年级(上)",
+      "teacherComment": "评价老师：吴淑婷\n雅曦：你的聪慧老师看在眼里，喜在心里。只是你发觉没有，因为你的不够主动，态度懒散，丢三落四，所以在学习上很少有名列前茅的时候。这完全没有关系，因为从你的读书中，从你的做事中，老师已经明显地感到，你一定会学得更好。期待你下学期的每一次进步！",
+      "parentComment": "",
+      "date": "2025-01-12",
+      "title": "二年级(上)"
+    },
+    {
+      "id": "recvrdiJo3QdVw",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(下)",
+      "teacherComment": "评价老师：吴淑婷\n雅曦，你是个聪明活泼的女孩，学习积极主动，接受能力较强，如果能在上课的时候注意力更集中，不搞小动作，老师相信你一定会更棒的。",
+      "parentComment": "",
+      "date": "2024-07-09",
+      "title": "一年级(下)"
+    },
+    {
+      "id": "recvrdiJo3a4nM",
+      "year": "",
+      "semester": "",
+      "semesterLabel": "一年级(上)",
+      "teacherComment": "评价老师：聂欢\n雅曦，在老师的心目中，你是一位得力的小助手，也是一位爱学习，懂事的好孩子。你平时大胆，喜欢跟同学交朋友，语言表达能力较强。你是各个方面都特别优秀孩子。但是在写作业时，你又会犯一些很低级的错误，这主要就是你太躁了，静不下来。希你今后更加严格要求自己，戒骄戒躁，你会更优秀",
+      "parentComment": "",
+      "date": "2024-01-15",
+      "title": "一年级(上)"
+    }
+  ],
+  "strengthsAnalysis": {
+    "语文": {
+      "subject": "语文",
+      "moduleStats": [
+        {
+          "module": "拼音",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "汉字",
+          "practiceCount": 2,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "组词",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "阅读",
+          "practiceCount": 3,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "作文",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        }
+      ],
+      "weakModules": [
+        {
+          "module": "汉字",
+          "practiceCount": 2,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "阅读",
+          "practiceCount": 3,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        }
+      ],
+      "strongModules": [],
+      "latestScore": {
+        "grade": "A",
+        "examType": "期末",
+        "date": "2026-08-05"
+      },
+      "suggestions": [
+        "语文的汉字、阅读模块需要加强，建议针对性练习。",
+        "拼音、组词、作文模块练习较少，可以适当安排。",
+        "语文最近成绩优秀，继续保持。"
+      ]
+    },
+    "数学": {
+      "subject": "数学",
+      "moduleStats": [
+        {
+          "module": "概念",
+          "practiceCount": 6,
+          "doneCount": 4,
+          "completionRate": 67,
+          "errorCount": 0
+        },
+        {
+          "module": "公式定理",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "计算",
+          "practiceCount": 4,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "推理",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "直觉",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        }
+      ],
+      "weakModules": [
+        {
+          "module": "计算",
+          "practiceCount": 4,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        }
+      ],
+      "strongModules": [],
+      "latestScore": {
+        "grade": "A",
+        "examType": "期末",
+        "date": "2026-07-06"
+      },
+      "suggestions": [
+        "数学的计算模块需要加强，建议针对性练习。",
+        "公式定理、推理、直觉模块练习较少，可以适当安排。",
+        "数学最近成绩优秀，继续保持。"
+      ]
+    },
+    "英语": {
+      "subject": "英语",
+      "moduleStats": [
+        {
+          "module": "听说",
+          "practiceCount": 1,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "单词",
+          "practiceCount": 3,
+          "doneCount": 3,
+          "completionRate": 100,
+          "errorCount": 0
+        },
+        {
+          "module": "语感",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "阅读",
+          "practiceCount": 0,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "写作",
+          "practiceCount": 1,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        }
+      ],
+      "weakModules": [
+        {
+          "module": "听说",
+          "practiceCount": 1,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        },
+        {
+          "module": "写作",
+          "practiceCount": 1,
+          "doneCount": 0,
+          "completionRate": 0,
+          "errorCount": 0
+        }
+      ],
+      "strongModules": [
+        {
+          "module": "单词",
+          "practiceCount": 3,
+          "doneCount": 3,
+          "completionRate": 100,
+          "errorCount": 0
+        }
+      ],
+      "latestScore": {
+        "grade": "A",
+        "examType": "期末",
+        "date": "2026-07-06"
+      },
+      "suggestions": [
+        "英语的听说、写作模块需要加强，建议针对性练习。",
+        "语感、阅读模块练习较少，可以适当安排。",
+        "英语最近成绩优秀，继续保持。"
+      ]
+    }
+  },
+  "semesterAnalysis": {
+    "semesters": [
+      {
+        "semesterKey": "|",
+        "semesterLabel": "三年级(下)",
+        "year": "",
+        "semester": "",
+        "date": "2026-08-05",
+        "subjectCount": 13,
+        "gradeDistribution": {
+          "A": 11,
+          "A+": 2
+        },
+        "mainSubjects": [
+          {
+            "subject": "语文",
+            "grade": "A"
+          },
+          {
+            "subject": "数学",
+            "grade": "A"
+          },
+          {
+            "subject": "英语",
+            "grade": "A"
+          },
+          {
+            "subject": "科学",
+            "grade": "A"
+          }
+        ],
+        "aPlusSubjects": [
+          "道德与法治",
+          "信息科技"
+        ],
+        "progress": [
+          {
+            "subject": "语文",
+            "from": "B+",
+            "to": "A"
+          },
+          {
+            "subject": "信息科技",
+            "from": "A",
+            "to": "A+"
+          },
+          {
+            "subject": "体育",
+            "from": "B",
+            "to": "A"
+          }
+        ],
+        "regress": [],
+        "highlights": [
+          "道德与法治、信息科技 获得 A+，表现突出"
+        ],
+        "encouragement": "这个学期你进步了3科！语文从B+升到A、信息科技从A升到A+、体育从B升到A。看到你的努力一点点开花结果，真为你高兴。继续加油，你比自己想象的更厉害！",
+        "evaluation": {
+          "id": "recvrdiJo3PAan",
+          "year": "",
+          "semester": "",
+          "semesterLabel": "三年级(下)",
+          "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+          "parentComment": "",
+          "date": "2026-07-06",
+          "title": "三年级(下)"
+        },
+        "avgScore": 11.2
+      },
+      {
+        "semesterKey": "|",
+        "semesterLabel": "三年级(上)",
+        "year": "",
+        "semester": "",
+        "date": "2026-01-27",
+        "subjectCount": 13,
+        "gradeDistribution": {
+          "B+": 1,
+          "A": 10,
+          "A+": 1,
+          "B": 1
+        },
+        "mainSubjects": [
+          {
+            "subject": "语文",
+            "grade": "B+"
+          },
+          {
+            "subject": "数学",
+            "grade": "A"
+          },
+          {
+            "subject": "英语",
+            "grade": "A"
+          },
+          {
+            "subject": "科学",
+            "grade": "A"
+          }
+        ],
+        "aPlusSubjects": [
+          "道德与法治"
+        ],
+        "progress": [],
+        "regress": [
+          {
+            "subject": "语文",
+            "from": "A+",
+            "to": "B+"
+          },
+          {
+            "subject": "英语",
+            "from": "A+",
+            "to": "A"
+          },
+          {
+            "subject": "科学",
+            "from": "A+",
+            "to": "A"
+          },
+          {
+            "subject": "美术",
+            "from": "A+",
+            "to": "A"
+          }
+        ],
+        "highlights": [
+          "道德与法治 获得 A+，表现突出"
+        ],
+        "encouragement": "这个学期有些科目遇到了小挑战，别担心，这是成长路上的正常起伏。语文、英语、科学、美术 暂时落后了一点，我们一起找找原因，慢慢来，下一次一定可以追上来的！",
+        "evaluation": {
+          "id": "recvrdiJo3PAan",
+          "year": "",
+          "semester": "",
+          "semesterLabel": "三年级(下)",
+          "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+          "parentComment": "",
+          "date": "2026-07-06",
+          "title": "三年级(下)"
+        },
+        "avgScore": 10.8
+      },
+      {
+        "semesterKey": "|",
+        "semesterLabel": "二年级(下)",
+        "year": "",
+        "semester": "",
+        "date": "2025-07-08",
+        "subjectCount": 11,
+        "gradeDistribution": {
+          "A+": 5,
+          "A": 5,
+          "B": 1
+        },
+        "mainSubjects": [
+          {
+            "subject": "语文",
+            "grade": "A+"
+          },
+          {
+            "subject": "数学",
+            "grade": "A"
+          },
+          {
+            "subject": "英语",
+            "grade": "A+"
+          },
+          {
+            "subject": "科学",
+            "grade": "A+"
+          }
+        ],
+        "aPlusSubjects": [
+          "语文",
+          "英语",
+          "科学",
+          "道德与法治",
+          "美术"
+        ],
+        "progress": [
+          {
+            "subject": "语文",
+            "from": "A",
+            "to": "A+"
+          }
+        ],
+        "regress": [],
+        "highlights": [
+          "语文、英语、科学、道德与法治、美术 获得 A+，表现突出"
+        ],
+        "encouragement": "太棒了！这个学期有5科拿到 A+，你是怎么做到的？保持这份认真和专注，你会越来越棒的！",
+        "evaluation": {
+          "id": "recvrdiJo3PAan",
+          "year": "",
+          "semester": "",
+          "semesterLabel": "三年级(下)",
+          "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+          "parentComment": "",
+          "date": "2026-07-06",
+          "title": "三年级(下)"
+        },
+        "avgScore": 11.3
+      },
+      {
+        "semesterKey": "|",
+        "semesterLabel": "二年级(上)",
+        "year": "",
+        "semester": "",
+        "date": "2025-01-12",
+        "subjectCount": 11,
+        "gradeDistribution": {
+          "A": 6,
+          "A+": 4,
+          "B": 1
+        },
+        "mainSubjects": [
+          {
+            "subject": "语文",
+            "grade": "A"
+          },
+          {
+            "subject": "数学",
+            "grade": "A"
+          },
+          {
+            "subject": "英语",
+            "grade": "A+"
+          },
+          {
+            "subject": "科学",
+            "grade": "A+"
+          }
+        ],
+        "aPlusSubjects": [
+          "英语",
+          "科学",
+          "道德与法治",
+          "美术"
+        ],
+        "progress": [
+          {
+            "subject": "科学",
+            "from": "A",
+            "to": "A+"
+          }
+        ],
+        "regress": [
+          {
+            "subject": "语文",
+            "from": "A+",
+            "to": "A"
+          },
+          {
+            "subject": "数学",
+            "from": "A+",
+            "to": "A"
+          },
+          {
+            "subject": "体育",
+            "from": "A",
+            "to": "B"
+          },
+          {
+            "subject": "书法",
+            "from": "A+",
+            "to": "A"
+          }
+        ],
+        "highlights": [
+          "英语、科学、道德与法治、美术 获得 A+，表现突出"
+        ],
+        "encouragement": "这个学期有些科目遇到了小挑战，别担心，这是成长路上的正常起伏。语文、数学、体育、书法 暂时落后了一点，我们一起找找原因，慢慢来，下一次一定可以追上来的！",
+        "evaluation": {
+          "id": "recvrdiJo3PAan",
+          "year": "",
+          "semester": "",
+          "semesterLabel": "三年级(下)",
+          "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+          "parentComment": "",
+          "date": "2026-07-06",
+          "title": "三年级(下)"
+        },
+        "avgScore": 11.2
+      },
+      {
+        "semesterKey": "|",
+        "semesterLabel": "一年级(下)",
+        "year": "",
+        "semester": "",
+        "date": "2024-07-09",
+        "subjectCount": 10,
+        "gradeDistribution": {
+          "A+": 6,
+          "A": 4
+        },
+        "mainSubjects": [
+          {
+            "subject": "语文",
+            "grade": "A+"
+          },
+          {
+            "subject": "数学",
+            "grade": "A+"
+          },
+          {
+            "subject": "英语",
+            "grade": "A+"
+          },
+          {
+            "subject": "科学",
+            "grade": "A"
+          }
+        ],
+        "aPlusSubjects": [
+          "语文",
+          "数学",
+          "英语",
+          "道德与法治",
+          "美术",
+          "书法"
+        ],
+        "progress": [],
+        "regress": [],
+        "highlights": [
+          "语文、数学、英语、道德与法治、美术、书法 获得 A+，表现突出"
+        ],
+        "encouragement": "太棒了！这个学期有6科拿到 A+，你是怎么做到的？保持这份认真和专注，你会越来越棒的！",
+        "evaluation": {
+          "id": "recvrdiJo3PAan",
+          "year": "",
+          "semester": "",
+          "semesterLabel": "三年级(下)",
+          "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+          "parentComment": "",
+          "date": "2026-07-06",
+          "title": "三年级(下)"
+        },
+        "avgScore": 11.6
+      },
+      {
+        "semesterKey": "|",
+        "semesterLabel": "一年级(上)",
+        "year": "",
+        "semester": "",
+        "date": "2024-01-15",
+        "subjectCount": 9,
+        "gradeDistribution": {
+          "A+": 5,
+          "A": 4
+        },
+        "mainSubjects": [
+          {
+            "subject": "语文",
+            "grade": "A+"
+          },
+          {
+            "subject": "数学",
+            "grade": "A+"
+          },
+          {
+            "subject": "英语",
+            "grade": "A+"
+          },
+          {
+            "subject": "科学",
+            "grade": "A"
+          }
+        ],
+        "aPlusSubjects": [
+          "语文",
+          "数学",
+          "英语",
+          "美术",
+          "书法"
+        ],
+        "progress": [],
+        "regress": [],
+        "highlights": [
+          "语文、数学、英语、美术、书法 获得 A+，表现突出"
+        ],
+        "encouragement": "一年级的第一个学期，你已经迈出了小学学习的第一步。语文、数学、英语、美术、书法 拿到了 A+，这是很棒的起点！继续保持好奇心，每一步都算数。",
+        "evaluation": {
+          "id": "recvrdiJo3PAan",
+          "year": "",
+          "semester": "",
+          "semesterLabel": "三年级(下)",
+          "teacherComment": "评价老师：吴淑婷\n康雅曦同学：你头脑聪慧，本学期进步有目共睹。你并非偷懒懈怠，只是内心小心思格外多，思绪容易飘远，很难全身心专注在学习上。学习缺少内生主动性，大多时候需要老师督促推动，自主钻研的劲头不足。老师不在场时，总忍不住和同学小声交谈，满脑子天马行空的新奇想法，常常分散学习注意力。同时学习上偶尔抱有投机取巧的侥幸心理，没能沉下心踏实钻研。\n希望往后学会收拢杂念，把丰富的心思全部投入课业，主动自觉学习，摒弃走捷径的想法，依靠稳定专注，收获更扎实的提升。",
+          "parentComment": "",
+          "date": "2026-07-06",
+          "title": "三年级(下)"
+        },
+        "avgScore": 11.6
+      }
+    ],
+    "overallSummary": "相比上学期，语文、信息科技、体育 有进步。"
+  }
+}
