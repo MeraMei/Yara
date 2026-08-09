@@ -10,10 +10,11 @@
     "datetime": "2026-08-09",
     "xp": 5,
     "xpCategory": "兴趣爱好",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "小雨伞，小酸奶，小解压神器",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "recvrIcgFCgeGE",
