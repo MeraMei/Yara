@@ -7736,7 +7736,9 @@ async function _backgroundRefresh() {
       return;
     }
     cachedData = dashboard;
-    // 不覆盖 localStorage，避免 CDN 旧数据覆盖用户写入的最新数据
+    // 同步更新 localStorage，确保下次页面打开时缓存数据是最新的
+    // 此处的 _dataGen 守卫已确保写入操作期间不会覆盖（refresh 期间有写入则 return 了）
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
     // 通知 UI 更新
     window.dispatchEvent(new CustomEvent('yara-data-refreshed'));
   } catch (e) {
@@ -8429,6 +8431,27 @@ async function updateEvaluationRecord(recordId, fields) {
 // ── 缓存辅助函数 ──
 
 function _persistCache() {
+  if (!cachedData) return;
+  // 每次持久化前重新计算 totalXP 和等级数据，确保缓存一致性
+  if (cachedData.xpRecords && cachedData.levels) {
+    const verifiedXp = cachedData.xpRecords.filter(function(r) { return r.reviewStatus === '已通过'; });
+    const totalXP = verifiedXp.reduce(function(sum, r) { return sum + (Number(r.xp) || 0); }, 0);
+    cachedData.currentXP = totalXP;
+
+    // 同步重新计算等级数据
+    if (typeof processLevels === 'function') {
+      var processedLevels = processLevels(cachedData.levels, totalXP);
+      var currentLevelIndex = 0;
+      for (var i = processedLevels.length - 1; i >= 0; i--) {
+        if (totalXP >= processedLevels[i].xp) { currentLevelIndex = i; break; }
+      }
+      cachedData.currentLevel = processedLevels[currentLevelIndex] || processedLevels[0] || { name: '萌新', levelNum: 'Lv.1', badgeClass: 'bronze', themeColor: '#CD7F32', xp: 0 };
+      cachedData.nextLevel = processedLevels[currentLevelIndex + 1] || null;
+      cachedData.levelProgress = cachedData.nextLevel
+        ? Math.min(100, Math.round(((totalXP - cachedData.currentLevel.xp) / (cachedData.nextLevel.xp - cachedData.currentLevel.xp)) * 100))
+        : 100;
+    }
+  }
   try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
 }
 
@@ -11338,10 +11361,13 @@ function getLevelProgress(cfg) {
   // fallback：前端自己计算（当数据来自 localStorage/seed 等非服务端来源时）
   const levels = cfg.levels || [];
   const currentLevel = [...levels].reverse().find(level => current >= level.xp) || levels[0];
-  const nextLevel = levels.find(level => level.xp > current) || levels[levels.length - 1];
+  // 满级时 nextLevel 为 null，进度直接为 100%
+  const nextLevel = levels.find(level => level.xp > current) || null;
   const previousXp = currentLevel?.xp || 0;
   const nextXp = nextLevel?.xp || previousXp || 1;
-  const progress = Math.min(100, Math.max(0, ((current - previousXp) / (nextXp - previousXp || 1)) * 100));
+  const progress = nextLevel
+    ? Math.min(100, Math.round(Math.max(0, ((current - previousXp) / (nextXp - previousXp || 1)) * 100)))
+    : 100;
   return { current, currentLevel, nextLevel, progress };
 }
 
@@ -11670,16 +11696,15 @@ async function renderHome() {
     journeyEl.innerHTML = ins;
   }
 
-  // ═══ 本等级进度 ═══
+  // ═══ 本等级进度（使用 getLevelProgress 计算的统一进度值） ═══
   const prevLevelXp = currentLevelIdx > 0 ? (levels[currentLevelIdx].xp || 0) : 0;
   const nextLevelXp = levels[currentLevelIdx + 1] ? (levels[currentLevelIdx + 1].xp || 0) : (xp.nextLevel?.xp || xp.current);
   const earnedInLevel = Math.max(0, xp.current - prevLevelXp);
   const targetInLevel = nextLevelXp - prevLevelXp;
-  const progressPct = targetInLevel > 0 ? Math.min(100, Math.round((earnedInLevel / targetInLevel) * 100)) : 0;
   setText("lmProgressEarned", earnedInLevel);
   setText("lmProgressTarget", targetInLevel);
   const fillEl = document.getElementById("lmProgressFill");
-  if (fillEl) fillEl.style.width = progressPct + "%";
+  if (fillEl) fillEl.style.width = xp.progress + "%";
 
   // ═══ 能量星球右侧 ═══
   setText("homeXp", planetXp.energy);
