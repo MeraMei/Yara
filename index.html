@@ -10997,7 +10997,9 @@ function weekdayText(date) {
 }
 
 function formatAge(birthday) {
+  if (!birthday) return "";
   const birth = new Date(birthday + "T00:00:00");
+  if (isNaN(birth.getTime())) return "";
   const today = new Date();
   let years = today.getFullYear() - birth.getFullYear();
   let months = today.getMonth() - birth.getMonth();
@@ -15084,6 +15086,7 @@ async function boot(page) {
     // 注意：不在这里调用 refreshData()，避免触发新的 _backgroundRefresh() 导致无限循环
     window.addEventListener("yara-data-refreshed", async () => {
       const p = window.__currentView || "home";
+      if (typeof layoutShell === "function") layoutShell(p);
       if (p === "home") { if (typeof renderHome === "function") renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
       else if (p === "xp" && typeof renderXp === "function") renderXp();
       else if (p === "study" && typeof renderStudy === "function") renderStudy();
@@ -15108,6 +15111,8 @@ async function boot(page) {
   } catch (e) {
     console.error("渲染失败:", e);
   }
+  // 数据加载完成后，重新渲染侧边栏（确保姓名/年龄显示正确）
+  if (typeof layoutShell === "function") layoutShell(page);
   initEditModal();
   setTimeout(() => lucide.createIcons(), 50);
   // 隐藏启动加载动画
