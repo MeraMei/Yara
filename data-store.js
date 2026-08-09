@@ -4,7 +4,7 @@
  * 从 GitHub 仓库读取 JSON 数据文件，处理后返回与 server.js buildDashboard()
  * 完全一致的 dashboard 对象。可通过 GitHub REST API 写回数据。
  *
- * 仓库: meramei/yara-growth-workstation
+ * 仓库: meramei/Yara
  * 数据文件路径: data/*.json
  * Token 存储: localStorage['github_token']
  *
@@ -23,7 +23,7 @@
   // ═══════════════════════════════════════════════════════════════
 
   var GITHUB_OWNER = 'meramei';
-  var GITHUB_REPO = 'yara-growth-workstation';
+  var GITHUB_REPO = 'Yara';
   var GITHUB_BRANCH = 'main';
   var GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/' + GITHUB_BRANCH;
   var GITHUB_API_BASE = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO;
