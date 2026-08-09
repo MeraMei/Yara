@@ -7699,18 +7699,8 @@ async function loadData() {
 async function _backgroundRefresh() {
   const genAtStart = _dataGen;
   try {
-    // 没有 GitHub Token 时，本地 localStorage 是唯一数据源。
-    // 若存在本地缓存，说明用户可能已做本地写入；此时用 GitHub 旧种子数据覆盖会丢失最新修改，
-    // 因此无 Token 且有本地缓存时跳过后台刷新。
-    if (!hasGithubToken()) {
-      try {
-        const raw = localStorage.getItem(CACHE_KEY);
-        if (raw) {
-          console.log('后台刷新: 无 Token 且有本地缓存，保留本地数据');
-          return;
-        }
-      } catch (e) { /* ignore */ }
-    }
+    // 始终尝试从 GitHub 拉取最新数据，与本地缓存做比对
+    // 无变化时仅更新缓存不触发重渲染，有变化时自动更新 UI
     if (genAtStart !== _dataGen) return;
     const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords] =
       await Promise.all([
@@ -7737,8 +7727,8 @@ async function _backgroundRefresh() {
     }
     // 数据比对：只有关键数据真正变化时才触发重渲染，避免无谓的闪现
     if (cachedData) {
-      const oldKey = cachedData.currentXP + '|' + (cachedData.xpRecords||[]).length + '|' + JSON.stringify((cachedData.xpSources||[]).map(function(s){return s.name+':'+s.xp}).sort());
-      const newKey = dashboard.currentXP + '|' + (dashboard.xpRecords||[]).length + '|' + JSON.stringify((dashboard.xpSources||[]).map(function(s){return s.name+':'+s.xp}).sort());
+      const oldKey = cachedData.currentXP + '|' + (cachedData.xpRecords||[]).length + '|' + (cachedData.xpRecords||[]).reduce(function(s,r){return s+Number(r.xp||0)},0);
+      const newKey = dashboard.currentXP + '|' + (dashboard.xpRecords||[]).length + '|' + (dashboard.xpRecords||[]).reduce(function(s,r){return s+Number(r.xp||0)},0);
       if (oldKey === newKey) {
         console.log('后台刷新: 数据无变化，跳过重渲染');
         // 仅更新缓存，不触发 UI 重绘
