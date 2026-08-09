@@ -1,5 +1,21 @@
 [
   {
+    "id": "xp_mslofwzt2pingx",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "主动做家务（力所能及）",
+    "taskName": "主动做家务（力所能及）",
+    "taskCategory": "",
+    "date": "2026-08-09",
+    "datetime": "2026-08-09",
+    "xp": 3,
+    "xpCategory": "",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "主动丢垃圾",
+    "_hasValidName": true
+  },
+  {
     "id": "recvrLXIraOr1K",
     "domain": "XP",
     "type": "XP获得",
