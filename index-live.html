@@ -15762,15 +15762,17 @@ async function saveEdit() {
   const newTitle = document.getElementById("editTitle").value;
   const newSubject = getRadioValue("editSubjectGroup");
   const newModules = getCheckedEditModules();
-  const newModule = newModules.join("、");
+  const newModule = newModules[0] || "";
   const newDueDate = document.getElementById("editDueDate").value;
   const newStatus = getRadioValue("editStatusGroup");
   const newSubmitted = getRadioValue("editSubmittedGroup") === "true";
 
+  // 同步写入 modules 数组，保证多选能力模块在列表/雷达图中完整生效
   const payload = {
     title: newTitle,
     subject: newSubject,
     module: newModule,
+    modules: newModules,
     dueDate: newDueDate,
     status: newStatus === "done" ? "done" : "pending",
     submitted: newSubmitted,
