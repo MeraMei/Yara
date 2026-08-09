@@ -891,29 +891,30 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 
 /* 侧边栏展开 (移动端) */
 .sidebar.show {
-  display: flex !important;
+  opacity: 1; visibility: visible; pointer-events: auto; display: flex;
 }
 
 /* 侧边栏遮罩层 (移动端) */
 .sidebar-overlay {
-  display: none;
   position: fixed;
   inset: 0;
   background: rgba(30,28,26,.4);
   z-index: 15;
   opacity: 0;
-  transition: opacity var(--duration-normal) var(--easing-default);
+  visibility: hidden;
+  transition: opacity var(--duration-normal) var(--easing-default), visibility var(--duration-normal) var(--easing-default);
   pointer-events: none;
 }
 .sidebar-overlay.show {
-  display: block;
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
 @media (max-width: 920px) {
   .hamburger-btn { display: flex; }
   .main { padding-top: 72px; }
+  .sidebar { opacity: 0; visibility: hidden; pointer-events: none; transform: translateX(-100%); transition: transform .3s ease, opacity .3s ease, visibility .3s ease; }
 }
 
 /* ════════ 选择组 (Radio/Checkbox 胶囊) ════════ */
@@ -5496,18 +5497,22 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 
     /* 权益兑换确认弹窗 */
     .redeem-confirm-modal {
-      display: none;
       position: fixed;
       inset: 0;
       background: rgba(30,28,26,.35);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
+      display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility .3s ease;
+      pointer-events: none;
     }
-    .redeem-confirm-modal.show { display: flex; }
+    .redeem-confirm-modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
     .redeem-confirm-box {
       background: white;
       border-radius: 20px;
@@ -5780,17 +5785,22 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 
     /* ════════ Modal 弹窗 ════════ */
     .modal-overlay {
-      display: none;
       position: fixed;
       inset: 0;
       background: rgba(30,28,26,.35);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
+      display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
       padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility .3s ease;
+      pointer-events: none;
     }
+    .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
     .modal {
       background: white;
       border-radius: 24px;
@@ -6775,12 +6785,16 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       z-index: 1000;
-      display: none;
+      display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility .3s ease;
+      pointer-events: none;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
     .modal-card {
       background: rgba(255,255,255,.95);
       backdrop-filter: blur(12px);
@@ -7208,9 +7222,14 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       border-radius: 14px;
       font-weight: 900;
       font-size: 13px;
-      display: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility .3s ease;
     }
-    .toast.show { display: inline-flex; align-items: center; gap: 7px; }
+    .toast.show { opacity: 1; visibility: visible; }
     .toast.ok { background: var(--mint-100); color: var(--mint-700); }
     .toast.err { background: var(--coral-100); color: var(--coral-700); }
     #toast {
@@ -7254,8 +7273,8 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
   
 
 /* ════════ 单页视图切换 (SPA) ════════ */
-.view{display:none}
-.view.active{display:block}
+.view{display:block; opacity:0; visibility:hidden; position:absolute; top:0; left:0; right:0; transition:opacity .35s ease, visibility .35s ease; pointer-events:none}
+    .view.active{opacity:1; visibility:visible; position:relative; pointer-events:auto}
 
   </style>
 <!-- ═══ 飞书多维表格直连层（window.bitable SDK） ═══ -->
@@ -7309,7 +7328,7 @@ window.__BITABLE_LIVE__ = true;
     { badgeClass:"legendary", themeColor:"#FF6B6B" }, { badgeClass:"mythic", themeColor:"#FFD700" },
     { badgeClass:"divine", themeColor:"#FFE4B5" }, { badgeClass:"divine", themeColor:"#FFE4B5" },
   ];
-  var DEFAULT_HOMEWORK_XP = { "日常作业":5, "暑假作业":10, "假期作业":10, "家庭作业":5, "阅读作业":5, "练习作业":5 };
+  var DEFAULT_HOMEWORK_XP = { "日常作业":2, "暑假作业":2, "假期作业":3, "家庭作业":4, "阅读作业":2, "练习作业":3 };
   var VALID_RULE_CATEGORIES = ["学习成长", "兴趣爱好", "身体成长", "能力成长"];
   function sanitizeRuleCategory(c) { return VALID_RULE_CATEGORIES.indexOf(c) >= 0 ? c : "学习成长"; }
 
@@ -8667,7 +8686,7 @@ lucide.createIcons({icons});\``);if(typeof c>"u")throw new Error("`createIcons()
  *   记录表：记录-作业、记录-成绩、记录-XP获得、记录-财务流水、记录-阅读打卡、记录-期末评价
  */
 
-const CACHE_KEY = "yara_growth_data_v5";
+const CACHE_KEY = "yara_growth_data_v6";
 const API_BASE = window.location.origin;
 
 // 自包含模式：直接双击打开 HTML 时（file:// / data: / 无 host）没有后端 API，
@@ -9275,15 +9294,15 @@ function getEmptyData() {
     pendingCount: 0,
     levels: [
       { id:"level_0", name:"萌新", levelNum:"Lv.1", level:1, xp:0, badgeClass:"bronze", themeColor:"#CD7F32", privileges:[], privilegeCount:0 },
-      { id:"level_1", name:"青铜", levelNum:"Lv.2", level:2, xp:100, badgeClass:"silver", themeColor:"#C0C0C0", privileges:[], privilegeCount:0 },
-      { id:"level_2", name:"白银", levelNum:"Lv.3", level:3, xp:300, badgeClass:"gold", themeColor:"#FFD700", privileges:[], privilegeCount:0 },
-      { id:"level_3", name:"黄金", levelNum:"Lv.4", level:4, xp:500, badgeClass:"platinum", themeColor:"#E5E4E2", privileges:[], privilegeCount:0 },
-      { id:"level_4", name:"铂金", levelNum:"Lv.5", level:5, xp:1000, badgeClass:"diamond", themeColor:"#B9F2FF", privileges:[], privilegeCount:0 },
-      { id:"level_5", name:"钻石", levelNum:"Lv.6", level:6, xp:3000, badgeClass:"master", themeColor:"#9966CC", privileges:[], privilegeCount:0 },
-      { id:"level_6", name:"星耀", levelNum:"Lv.7", level:7, xp:6000, badgeClass:"legendary", themeColor:"#FF6B6B", privileges:[], privilegeCount:0 },
-      { id:"level_7", name:"王者", levelNum:"Lv.8", level:8, xp:10000, badgeClass:"mythic", themeColor:"#FFD700", privileges:[], privilegeCount:0 },
-      { id:"level_8", name:"大师", levelNum:"Lv.9", level:9, xp:20000, badgeClass:"divine", themeColor:"#FFE4B5", privileges:[], privilegeCount:0 },
-      { id:"level_9", name:"至尊", levelNum:"Lv.10", level:10, xp:50000, badgeClass:"divine", themeColor:"#FFE4B5", privileges:[], privilegeCount:0 },
+      { id:"level_1", name:"青铜", levelNum:"Lv.2", level:2, xp:800, badgeClass:"silver", themeColor:"#C0C0C0", privileges:[], privilegeCount:0 },
+      { id:"level_2", name:"白银", levelNum:"Lv.3", level:3, xp:1800, badgeClass:"gold", themeColor:"#FFD700", privileges:[], privilegeCount:0 },
+      { id:"level_3", name:"黄金", levelNum:"Lv.4", level:4, xp:3000, badgeClass:"platinum", themeColor:"#E5E4E2", privileges:[], privilegeCount:0 },
+      { id:"level_4", name:"铂金", levelNum:"Lv.5", level:5, xp:4500, badgeClass:"diamond", themeColor:"#B9F2FF", privileges:[], privilegeCount:0 },
+      { id:"level_5", name:"钻石", levelNum:"Lv.6", level:6, xp:6300, badgeClass:"master", themeColor:"#9966CC", privileges:[], privilegeCount:0 },
+      { id:"level_6", name:"星耀", levelNum:"Lv.7", level:7, xp:8500, badgeClass:"legendary", themeColor:"#FF6B6B", privileges:[], privilegeCount:0 },
+      { id:"level_7", name:"王者", levelNum:"Lv.8", level:8, xp:11200, badgeClass:"mythic", themeColor:"#FFD700", privileges:[], privilegeCount:0 },
+      { id:"level_8", name:"大师", levelNum:"Lv.9", level:9, xp:14500, badgeClass:"divine", themeColor:"#FFE4B5", privileges:[], privilegeCount:0 },
+      { id:"level_9", name:"至尊", levelNum:"Lv.10", level:10, xp:18500, badgeClass:"divine", themeColor:"#FFE4B5", privileges:[], privilegeCount:0 },
     ],
     xpSources: [],
     recentRecords: [],
@@ -11370,12 +11389,12 @@ if (typeof window !== "undefined") {
 
     function openXpModal() {
       populateXpTaskSelectPage().then(() => {
-        document.getElementById("addXpModalPage").style.display = "flex";
+        document.getElementById("addXpModalPage").classList.add("active");
         setTimeout(() => lucide.createIcons(), 50);
       });
     }
     function closeXpModal() {
-      document.getElementById("addXpModalPage").style.display = "none";
+      document.getElementById("addXpModalPage").classList.remove("active");
     }
     function openNewTaskModalPage() {
       document.getElementById("newTaskNamePage").value = "";
@@ -11384,11 +11403,11 @@ if (typeof window !== "undefined") {
       setRadioValue("newTaskMethodGroup", "按次");
       document.getElementById("newTaskDescPage").value = "";
       closeXpModal();
-      document.getElementById("addXpRuleModalPage").style.display = "flex";
+      document.getElementById("addXpRuleModalPage").classList.add("active");
       setTimeout(() => lucide.createIcons(), 50);
     }
     function closeNewTaskModalPage() {
-      document.getElementById("addXpRuleModalPage").style.display = "none";
+      document.getElementById("addXpRuleModalPage").classList.remove("active");
     }
 
     function submitNewTaskPage() {
@@ -11690,13 +11709,16 @@ if (typeof window !== "undefined") {
         });
       }
 
-      // 本次财务复盘 +10 XP
+      // 本次财务复盘（从配置规则中查找分值，支持动态调整）
+      const _cfg = window.__lastData || (cachedData || await loadAppData());
+      const _financeRule = (_cfg?.config?.xpRuleList || []).find(function(r){return r.name==="财务复盘"});
+      const _financeXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 10;
       await window.DataStore.addXpRecord({
         taskName: "财务复盘",
         description: `完成一次自由基金对账复盘（${entries.length} 笔明细）`,
         date,
         status: "verified",
-        xp: 10,
+        xp: _financeXp,
         xpCategory: "能力成长",
       });
 
@@ -11705,7 +11727,7 @@ if (typeof window !== "undefined") {
       if (window.refreshData) refreshData();
       await renderMoney();
       if (window.lucide) setTimeout(() => lucide.createIcons(), 50);
-      alert(`已记录 ${entries.length} 笔，完成一次财务复盘，+10 XP 🎉`);
+      alert(`已记录 ${entries.length} 笔，完成一次财务复盘，+${_financeXp} XP 🎉`);
     } catch (e) {
       console.error("提交失败:", e);
       alert("提交失败，请稍后重试");
@@ -15864,7 +15886,7 @@ function initEditModal() {
     const hwType = item.homeworkType || "日常作业";
     const ruleList = (cfg && cfg.config && cfg.config.xpRuleList) || [];
     const rule = ruleList.find(r => r.name === "作业·" + hwType);
-    const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : 5;
+    const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (DEFAULT_HOMEWORK_XP[hwType] || 2);
     const subject = item.subject || "其他";
     try {
       await window.DataStore.addXpRecord({

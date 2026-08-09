@@ -891,23 +891,26 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 
 /* 侧边栏展开 (移动端) */
 .sidebar.show {
-  display: flex !important;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
 }
 
 /* 侧边栏遮罩层 (移动端) */
 .sidebar-overlay {
-  display: none;
   position: fixed;
   inset: 0;
   background: rgba(30,28,26,.4);
   z-index: 15;
   opacity: 0;
-  transition: opacity var(--duration-normal) var(--easing-default);
+  visibility: hidden;
+  transition: opacity var(--duration-normal) var(--easing-default), visibility var(--duration-normal) var(--easing-default);
   pointer-events: none;
 }
 .sidebar-overlay.show {
-  display: block;
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
 }
 
@@ -971,7 +974,7 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 }
 
 @media (max-width: 920px) {
-  .sidebar { display: none; }
+  .sidebar { opacity: 0; visibility: hidden; pointer-events: none; position: fixed; transform: translateX(-100%); transition: transform .3s ease, opacity .3s ease, visibility .3s ease; }
   .main { margin-left: 0; padding: 22px; }
   h1 { font-size: 32px; }
   .hero { padding: 22px; border-radius: 24px; }
@@ -2187,7 +2190,7 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     .pc-trend{ font-size:9px; font-weight:800; color:var(--mint-600,#4a9b7b); background:rgba(74,155,123,.16); padding:1px 6px; border-radius:999px; margin-left:2px; white-space:nowrap; }
     .pc-meta{ font-size:9px; font-weight:700; color:var(--neutral-500,#8a8178); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pc-track{ height:6px; border-radius:999px; background:rgba(0,0,0,.06); overflow:hidden; }
-    .pc-fill{ height:100%; border-radius:inherit; will-change:width; }
+    .pc-fill{ height:100%; border-radius:inherit; will-change:width; transition: width .6s ease; }
     .pcard.energy{ background:
         radial-gradient(120% 110% at 0% 0%, rgba(253,216,50,.30) 0%, transparent 60%),
         radial-gradient(110% 110% at 100% 100%, rgba(74,155,123,.18) 0%, transparent 55%),
@@ -2227,7 +2230,7 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     .hm-xp{ margin-top:8px; }
     .hm-xp-head{ display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#8a8178;margin-bottom:4px;}
     .hm-xp-track{height:7px;border-radius:999px;background:rgba(255,255,255,.5);overflow:hidden;}
-    .hm-xp-fill{height:100%;width:33%;background:linear-gradient(90deg,#fdd832,#f6c200);border-radius:inherit;}
+    .hm-xp-fill{height:100%;width:33%;background:linear-gradient(90deg,#fdd832,#f6c200);border-radius:inherit;transition:width .6s ease;}
     .detail-section{ margin-top:16px; }
     .ds-head{ display:flex;align-items:center;justify-content:space-between;margin-bottom:10px; }
     .ds-title{ font-size:13px;font-weight:800;display:flex;align-items:center;gap:6px; }
@@ -6961,12 +6964,15 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       z-index: 1000;
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      transition: opacity .2s ease, visibility .2s ease;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
     .modal-card {
       background: rgba(255,255,255,.95);
       backdrop-filter: blur(12px);
@@ -7407,9 +7413,12 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       border-radius: 14px;
       font-weight: 900;
       font-size: 13px;
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease, visibility .2s ease;
     }
-    .toast.show { display: inline-flex; align-items: center; gap: 7px; }
+    .toast.show { opacity: 1; visibility: visible; pointer-events: auto; display: inline-flex; align-items: center; gap: 7px; }
     .toast.ok { background: var(--mint-100); color: var(--mint-700); }
     .toast.err { background: var(--coral-100); color: var(--coral-700); }
     #toast {
@@ -7981,7 +7990,7 @@ function getEmptyData() {
     currentXP: 0,
     pendingCount: 0,
     currentLevel: { name: '萌新', levelNum: 'Lv.1', badgeClass: 'bronze', themeColor: '#CD7F32', xp: 0 },
-    nextLevel: { name: '青铜', levelNum: 'Lv.2', xp: 100, xpToNext: 100 },
+    nextLevel: { name: '青铜', levelNum: 'Lv.2', xp: 800, xpToNext: 800 },
     levelProgress: 0,
     levels: [],
     redeemRecords: [],
@@ -10845,13 +10854,16 @@ if (typeof window !== "undefined") {
         });
       }
 
-      // 本次财务复盘 +10 XP
+      // 本次财务复盘（从配置规则中查找分值，支持动态调整）
+      const _cfg = window.__lastData || (cachedData || await loadAppData());
+      const _financeRule = (_cfg?.config?.xpRuleList || []).find(function(r){return r.name==="财务复盘"});
+      const _financeXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 10;
       await window.DataStore.addXpRecord({
         taskName: "财务复盘",
         description: `完成一次自由基金对账复盘（${entries.length} 笔明细）`,
         date,
         status: "verified",
-        xp: 10,
+        xp: _financeXp,
         xpCategory: "能力成长",
       });
 
@@ -15091,7 +15103,9 @@ function initEditModal() {
     const hwType = item.homeworkType || "日常作业";
     const ruleList = (cfg && cfg.config && cfg.config.xpRuleList) || [];
     const rule = ruleList.find(r => r.name === "作业·" + hwType);
-    const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : 5;
+    // 优先从规则表查找，其次从默认映射表查找，最后回退到合理值
+    const _defaultMap = {'日常作业':2,'暑假作业':2,'假期作业':3,'家庭作业':4,'阅读作业':2,'练习作业':3};
+    const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (_defaultMap[hwType] || 2);
     const subject = item.subject || "其他";
     try {
       await window.DataStore.addXpRecord({
