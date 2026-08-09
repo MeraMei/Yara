@@ -7332,7 +7332,7 @@ function setGithubToken(token) {
 // 从 GitHub raw 读取 JSON 文件
 function fetchRawJSON(filename) {
   const url = `${GITHUB_RAW_BASE}/${filename}`;
-  return fetch(url, { cache: 'no-cache' })
+  return fetch(url)
     .then(resp => {
       if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for ${url}`);
       return resp.json();
@@ -7398,6 +7398,19 @@ function writeGithubFile(path, content, message) {
 // 加载完整 dashboard 数据
 async function loadData() {
   if (cachedData) return cachedData;
+
+  // 快速路径：从 localStorage 读取缓存，让页面秒开
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      cachedData = JSON.parse(raw);
+      loadPromise = Promise.resolve(cachedData);
+      // 后台静默刷新，拉取 GitHub 最新数据
+      setTimeout(() => _backgroundRefresh(), 100);
+      return cachedData;
+    }
+  } catch (e) { /* ignore */ }
+
   if (loadPromise) return loadPromise;
 
   loadPromise = (async () => {
@@ -7449,6 +7462,35 @@ async function loadData() {
   })();
 
   return loadPromise;
+}
+
+// 后台静默刷新：从 GitHub 拉取最新数据，不阻塞 UI
+async function _backgroundRefresh() {
+  try {
+    const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords] =
+      await Promise.all([
+        fetchRawJSON('child.json').catch(() => null),
+        fetchRawJSON('calendar.json').catch(() => []),
+        fetchRawJSON('levels.json').catch(() => []),
+        fetchRawJSON('xpRecords.json').catch(() => []),
+        fetchRawJSON('finance.json').catch(() => null),
+        fetchRawJSON('study.json').catch(() => null),
+        fetchRawJSON('config.json').catch(() => null),
+        fetchRawJSON('xpSources.json').catch(() => []),
+        fetchRawJSON('redeemRecords.json').catch(() => []),
+      ]);
+    const dashboard = buildDashboard(
+      child || {}, calendar || [], levels || [],
+      xpRecords || [], finance || null, study || null,
+      config || null, xpSources || [], redeemRecords || []
+    );
+    cachedData = dashboard;
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
+    // 通知 UI 更新：用最新数据重绘当前页面
+    window.dispatchEvent(new CustomEvent('yara-data-refreshed'));
+  } catch (e) {
+    console.warn('后台刷新失败，继续使用缓存数据:', e.message);
+  }
 }
 
 function refreshData() {
@@ -10276,7 +10318,7 @@ if (typeof window !== "undefined") {
               <span class="cur">¥</span>
               <input type="number" min="0" step="0.01" placeholder="0.00"
                 value="${inputVal}"
-                ${isLast ? "disabled" : `oninput="onRecAmountChange(${idx}, this.value)"`} />
+                ${isLast ? "disabled" : `onblur="onRecAmountChange(${idx}, this.value)"`} />
             </div>
           </div>
 
