@@ -1301,6 +1301,15 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
   width: 100%;
   height: 100%;
 }
+/* 首页趋势图容器 · 与星球卡片风格统一 */
+.trend-section.home-trend {
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 22px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px -10px rgba(146,85,245,.14);
+  margin-top: 18px;
+}
 
 /* 移动端适配 */
 @media (max-width: 720px) {
@@ -1827,18 +1836,32 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     }
     .lm-link:hover { background: rgba(146,85,245,.18); }
     .lm-link:active { transform: scale(.96); }
-    /* 升级进度头部 · 本学期升级标注 */
-    .id-xp-sem {
-      margin-left: 8px;
-      font-size: 10px;
-      font-weight: 800;
-      color: var(--mint-600, #4a9b7b);
-      background: rgba(74,155,123,.14);
-      border: 1px solid rgba(74,155,123,.24);
-      padding: 2px 8px;
-      border-radius: 999px;
-      vertical-align: 1px;
+    /* 当前等级 + 当前总积分 · 全宽醒目主数值（等级置顶为主） */
+    .lm-total {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 34px 8px 28px;
+      margin-bottom: 18px;
+      border-bottom: 1px dashed rgba(146,85,245,.20);
+      text-align: center;
     }
+    .lm-level-main { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .lm-level-big {
+      font: 800 52px/1 var(--font-display, "PingFang SC", system-ui);
+      color: var(--lav-600,#7a3fd6);
+      letter-spacing:-.02em;
+      background: linear-gradient(120deg, #7a3fd6, #ac87ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .lm-total-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .lm-total-num { font: 800 36px/1 var(--font-display, "PingFang SC", system-ui); color: var(--neutral-900,#2e2620); letter-spacing:-.03em; }
+    .lm-total-unit { font-size: 15px; font-weight: 800; color: var(--neutral-500,#8a8178); }
+    .lm-total-gap { font-size: 14px; font-weight: 700; color: var(--neutral-600,#736c63); }
+    .lm-total-gap b { color: var(--coral-600,#e04a15); font-weight: 800; }
     .level-module .id-xp { margin-top: 0; }
     .level-module .id-journey { margin-top: 16px; }
     .level-module .id-priv { margin-top: 16px; }
@@ -2047,44 +2070,45 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     .sem-bar-fill::after{ content:""; position:absolute; right:-5px; top:50%; transform:translateY(-50%); width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid #7a3fd6;box-shadow:0 1px 5px rgba(146,85,245,.4);}
     .sem-bar-foot{ font-size:10px; font-weight:700; color:var(--neutral-500,#8a8178); margin-top:6px; display:flex; flex-wrap:wrap; gap:4px; }
 
-    /* ════════ 三大星球（左标题 + 右状态卡 · 以人为本） ════════ */
-    .planet{ display:flex; gap:12px; margin-top:14px; border-radius:22px; padding:16px 15px;
+    /* ════════ 三大板块 · 积分累计（图3 · 三列并排紧凑卡片） ════════ */
+    .planets-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+    .pcard{
+      border-radius:18px; padding:13px 12px;
       border:1px solid rgba(255,255,255,.6); backdrop-filter:blur(16px);
-      box-shadow:0 4px 20px -10px rgba(146,85,245,.14); }
-    .planet-left{ flex:1; min-width:0; }
-    .p-eyebrow{ font-size:10px; font-weight:900; letter-spacing:.06em; color:var(--neutral-500,#8a8178); display:flex; align-items:center; gap:4px; }
-    .p-title{ font-size:22px; font-weight:800; letter-spacing:-.02em; margin-top:3px; }
-    .p-lead{ font-size:11px; font-weight:600; color:#6b635a; line-height:1.6; margin-top:6px; }
-    .p-live{ font-size:10px; font-weight:800; color:var(--neutral-900); background:rgba(255,255,255,.65); border-radius:999px; padding:4px 9px; margin-top:9px; display:inline-flex; align-items:center; gap:4px; }
-    .p-live b{ color:var(--lav-600,#7a3fd6); }
-    .planet-right{ flex:0 0 118px; border-radius:16px; padding:12px 11px; align-self:center;
-      background:rgba(255,255,255,.6); border:1px solid rgba(255,255,255,.7); }
-    .pr-head{ font-size:10px; font-weight:800; color:var(--neutral-500,#8a8178); display:flex; align-items:center; gap:4px; }
-    .pr-main{ display:flex; align-items:baseline; gap:3px; margin-top:5px; }
-    .pr-num{ font-size:24px; font-weight:800; letter-spacing:-.03em; }
-    .pr-xp{ font-size:11px; font-weight:700; color:var(--neutral-500,#8a8178); }
-    .pr-track{ height:6px; border-radius:999px; background:rgba(0,0,0,.06); margin-top:8px; overflow:hidden; }
-    .pr-fill{ height:100%; border-radius:inherit; }
-    .pr-foot{ font-size:9px; font-weight:700; color:var(--neutral-500,#8a8178); margin-top:5px; line-height:1.4; }
-    .sem-tag{ font-size:9px; font-weight:800; color:var(--mint-600,#4a9b7b); background:rgba(74,155,123,.16); padding:1px 6px; border-radius:999px; margin-left:4px; }
-    .planet.energy{ background:
-        radial-gradient(120% 110% at 4% 0%, rgba(253,216,50,.34) 0%, transparent 55%),
-        radial-gradient(110% 110% at 96% 0%, rgba(74,155,123,.20) 0%, transparent 55%),
+      box-shadow:0 4px 16px -10px rgba(146,85,245,.14);
+      display:flex; flex-direction:column; gap:6px; min-width:0;
+    }
+    .pc-head{ display:flex; align-items:center; gap:5px; min-width:0; }
+    .pc-dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+    .pc-name{ font-size:10px; font-weight:800; color:var(--neutral-600,#736c63); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pc-score{ display:flex; align-items:baseline; gap:3px; }
+    .pc-num{ font-size:26px; font-weight:800; letter-spacing:-.03em; }
+    .pc-unit{ font-size:10px; font-weight:700; color:var(--neutral-500,#8a8178); }
+    .pc-trend{ font-size:9px; font-weight:800; color:var(--mint-600,#4a9b7b); background:rgba(74,155,123,.16); padding:1px 6px; border-radius:999px; margin-left:2px; white-space:nowrap; }
+    .pc-meta{ font-size:9px; font-weight:700; color:var(--neutral-500,#8a8178); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pc-track{ height:6px; border-radius:999px; background:rgba(0,0,0,.06); overflow:hidden; }
+    .pc-fill{ height:100%; border-radius:inherit; }
+    .pcard.energy{ background:
+        radial-gradient(120% 110% at 0% 0%, rgba(253,216,50,.30) 0%, transparent 60%),
+        radial-gradient(110% 110% at 100% 100%, rgba(74,155,123,.18) 0%, transparent 55%),
         linear-gradient(165deg, rgba(255,254,240,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .planet.energy .p-eyebrow{ color:#b8860b; }
-    .planet.energy .pr-fill{ background:linear-gradient(90deg,#fdd832,#f6c200); }
-    .planet.study{ background:
-        radial-gradient(120% 110% at 4% 0%, rgba(106,181,255,.30) 0%, transparent 55%),
-        radial-gradient(110% 110% at 96% 0%, rgba(172,135,255,.26) 0%, transparent 55%),
+    .pcard.energy .pc-dot{ background:#f6c200; }
+    .pcard.energy .pc-num{ color:#b8860b; }
+    .pcard.energy .pc-fill{ background:linear-gradient(90deg,#fdd832,#f6c200); }
+    .pcard.study{ background:
+        radial-gradient(120% 110% at 0% 0%, rgba(106,181,255,.28) 0%, transparent 60%),
+        radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.24) 0%, transparent 55%),
         linear-gradient(165deg, rgba(245,250,255,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .planet.study .p-eyebrow{ color:#3b8fe0; }
-    .planet.study .pr-fill{ background:linear-gradient(90deg,#6ab5ff,#3b8fe0); }
-    .planet.money{ background:
-        radial-gradient(120% 110% at 4% 0%, rgba(248,131,121,.28) 0%, transparent 55%),
-        radial-gradient(110% 110% at 96% 0%, rgba(253,216,50,.30) 0%, transparent 55%),
+    .pcard.study .pc-dot{ background:#3b8fe0; }
+    .pcard.study .pc-num{ color:#3b8fe0; }
+    .pcard.study .pc-fill{ background:linear-gradient(90deg,#6ab5ff,#3b8fe0); }
+    .pcard.money{ background:
+        radial-gradient(120% 110% at 0% 0%, rgba(248,131,121,.26) 0%, transparent 60%),
+        radial-gradient(110% 110% at 100% 100%, rgba(253,216,50,.28) 0%, transparent 55%),
         linear-gradient(165deg, rgba(255,247,244,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .planet.money .p-eyebrow{ color:#e04a7e; }
-    .planet.money .pr-fill{ background:linear-gradient(90deg,#f8a08a,#f88379); }
+    .pcard.money .pc-dot{ background:#f88379; }
+    .pcard.money .pc-num{ color:#e04a7e; }
+    .pcard.money .pc-fill{ background:linear-gradient(90deg,#f8a08a,#f88379); }
 
     /* ════════ 等级详情页 · 成长阶梯 ════════ */
     .detail-top{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
@@ -7575,6 +7599,19 @@ async function loadData() {
 async function _backgroundRefresh() {
   const genAtStart = _dataGen;
   try {
+    // 没有 GitHub Token 时，本地 localStorage 是唯一数据源。
+    // 若存在本地缓存，说明用户可能已做本地写入；此时用 GitHub 旧种子数据覆盖会丢失最新修改，
+    // 因此无 Token 且有本地缓存时跳过后台刷新。
+    if (!hasGithubToken()) {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          console.log('后台刷新: 无 Token 且有本地缓存，保留本地数据');
+          return;
+        }
+      } catch (e) { /* ignore */ }
+    }
+    if (genAtStart !== _dataGen) return;
     const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords] =
       await Promise.all([
         fetchRawJSON('child.json').catch(() => null),
@@ -8430,9 +8467,19 @@ if (typeof window !== 'undefined') {
           <span class="lm-link" onclick="switchView('level')">完整等级 →</span>
         </div>
 
-        <!-- 升级进度 -->
+        <!-- 当前等级 + 当前总积分（扩展为全宽醒目主数值，等级置顶为主） -->
+        <div class="lm-total">
+          <div class="lm-level-main">
+            <span class="lm-level-big" id="homeTotalLevel">--</span>
+          </div>
+          <div class="lm-total-row">
+            <span class="lm-total-num" id="homeTotalXp">--</span><span class="lm-total-unit">分</span>
+            <span class="lm-total-gap">距下一级还差 <b id="homeTotalNext">--</b> XP</span>
+          </div>
+        </div>
+
+        <!-- 升级进度（仅可视化进度条，不重复数字/图标） -->
         <div class="id-xp">
-          <div class="id-xp-head"><span>升级进度 <b id="idXpProgressLabel">--</b><span class="id-xp-sem" id="idXpSem">📈 本学期升 -- 级</span></span><span id="idXpToNext">距下一级还差 -- XP</span></div>
           <div class="id-xp-track"><div class="id-xp-fill" id="idXpFill" style="width:0%"></div></div>
         </div>
 
@@ -8449,53 +8496,44 @@ if (typeof window !== 'undefined') {
         </div>
       </section>
 
-      <!-- ════════ 3. 三大星球（左标题 + 右状态卡 · 以人为本） ════════ -->
-      <section class="planet energy" onclick="switchView('xp')" style="cursor:pointer">
-        <div class="planet-left">
-          <div class="p-eyebrow">⚡ 成长星球</div>
-          <div class="p-title">能量星球</div>
-          <p class="p-lead">每一份努力，都点亮一颗能量星。今天也要元气满满呀！</p>
-          <div class="p-live">🌱 本周已积累 <b id="homeWeekXp">--</b> 能量 · 比上周多 <b id="homeWeekXpChange">--</b>%</div>
+      <!-- ════════ 3. 三大板块 · 积分累计（并排紧凑卡片 · 图3风格） ════════ -->
+      <section class="planets-row">
+        <div class="pcard energy" onclick="switchView('xp')" style="cursor:pointer">
+          <div class="pc-head"><span class="pc-dot"></span><span class="pc-name">能量 · 主动打卡</span></div>
+          <div class="pc-score"><span class="pc-num" id="homeXp">--</span><span class="pc-unit">分</span><span class="pc-trend" id="homeXpTrend">--</span></div>
+          <div class="pc-meta" id="homeXpNote">--</div>
+          <div class="pc-track"><div class="pc-fill" id="homeXpProgress" style="width:0%"></div></div>
         </div>
-        <div class="planet-right">
-          <div class="pr-head">⚡ 本学期能量</div>
-          <div class="pr-main"><span class="pr-num" id="homeXp">--</span><span class="pr-xp">分</span><span class="sem-tag" id="homeXpTrend">--</span></div>
-          <div class="pr-track"><div class="pr-fill" id="homeXpProgress" style="width:0%"></div></div>
-          <div class="pr-foot" id="homeXpNote">--</div>
+        <div class="pcard study" onclick="switchView('study')" style="cursor:pointer">
+          <div class="pc-head"><span class="pc-dot"></span><span class="pc-name">知识 · 默认加分</span></div>
+          <div class="pc-score"><span class="pc-num" id="homeStudy">--</span><span class="pc-unit">分</span></div>
+          <div class="pc-meta" id="homeStudyNote">--</div>
+          <div class="pc-track"><div class="pc-fill" id="homeStudyProgress" style="width:0%"></div></div>
         </div>
-      </section>
-
-      <section class="planet study" onclick="switchView('study')" style="cursor:pointer">
-        <div class="planet-left">
-          <div class="p-eyebrow">📖 成长星球</div>
-          <div class="p-title">知识星球</div>
-          <p class="p-lead">知识不是关在课本里的，是藏在大千世界里的宝藏。今天的你，准备点亮哪颗星星？</p>
-          <div class="p-live">✨ 本周你已点亮 <b id="homeWeekStars">--</b> 颗知识星星 🌟</div>
-        </div>
-        <div class="planet-right">
-          <div class="pr-head">📖 学习进度</div>
-          <div class="pr-main"><span class="pr-num" id="homeStudy">--</span><span class="pr-xp">门</span></div>
-          <div class="pr-track"><div class="pr-fill" id="homeStudyProgress" style="width:0%"></div></div>
-          <div class="pr-foot" id="homeStudyNote">--</div>
+        <div class="pcard money" onclick="switchView('money')" style="cursor:pointer">
+          <div class="pc-head"><span class="pc-dot"></span><span class="pc-name">财务 · 默认加分</span></div>
+          <div class="pc-score"><span class="pc-num" id="homeMoney">--</span><span class="pc-unit">分</span></div>
+          <div class="pc-meta" id="homeMoneyNote">--</div>
+          <div class="pc-track"><div class="pc-fill" id="homeMoneyProgress" style="width:0%"></div></div>
         </div>
       </section>
 
-      <section class="planet money" onclick="switchView('money')" style="cursor:pointer">
-        <div class="planet-left">
-          <div class="p-eyebrow">💰 成长星球</div>
-          <div class="p-title">财富星球</div>
-          <p class="p-lead">每一分零花钱，都是自己攒下的宝藏。学会管理，才能越来越富有。</p>
-          <div class="p-live">🏦 小金库 <b id="homeMoneyLive">--</b> · 攒钱计划进行中</div>
+      <!-- ════════ 4. 积分增长趋势（系统总积分趋势 · 迁自能量页） ════════ -->
+      <section class="trend-section home-trend">
+        <div class="section-head">
+          <div class="section-title"><i data-lucide="trending-up"></i>积分增长趋势</div>
+          <div class="trend-tabs" id="homeTrendTabs">
+            <button class="trend-tab active" data-range="7">近7天</button>
+            <button class="trend-tab" data-range="30">近30天</button>
+            <button class="trend-tab" data-range="all">全部</button>
+          </div>
         </div>
-        <div class="planet-right">
-          <div class="pr-head">💰 本学期小金库</div>
-          <div class="pr-main"><span class="pr-num" id="homeMoney">--</span></div>
-          <div class="pr-track"><div class="pr-fill" id="homeMoneyProgress" style="width:0%"></div></div>
-          <div class="pr-foot" id="homeMoneyNote">--</div>
+        <div class="trend-chart-wrap" id="homeTrendChartArea">
+          <!-- JS 渲染趋势折线图 -->
         </div>
       </section>
 
-      <!-- ════════ 4. 今日要做的事（行动重点） ════════ -->
+      <!-- ════════ 5. 今日要做的事（行动重点） ════════ -->
       <section class="today-tasks">
         <div class="tt-head">
           <div class="tt-title">☀️ 今日要做的事</div>
@@ -11492,6 +11530,24 @@ function getDaysToAllowance() {
   return day === 5 ? 0 : (5 - day + 7) % 7;
 }
 
+// 三大板块积分归类：从 XP 获得记录关联（作业→已完成作业、财务→财务流水、其余→主动打卡）
+// 依据 XP 记录的任务名归属：以"作业·"开头＝知识板块；含"财务"＝财务板块；其余＝能量板块
+function getPlanetXp(verifiedXpRecords) {
+  const result = { energy: 0, knowledge: 0, finance: 0 };
+  (verifiedXpRecords || []).forEach(r => {
+    const name = String(r.taskName || r.title || "");
+    const xp = Number(r.xp) || 0;
+    if (name.indexOf("作业") === 0) {
+      result.knowledge += xp;
+    } else if (name.indexOf("财务") >= 0) {
+      result.finance += xp;
+    } else {
+      result.energy += xp;
+    }
+  });
+  return result;
+}
+
 async function renderHome() {
   const cfg = await loadAppData();
   const xp = getLevelProgress(cfg);
@@ -11501,20 +11557,19 @@ async function renderHome() {
   const pendingHomework = (cfg.study?.recentAssignments || []).find(a => a.status !== "done" || !a.submitted);
   const nextGap = Math.max(0, (xp.nextLevel?.xp || xp.current) - xp.current);
 
-  // ═══ 学习卡片 ═══
-  setText("homeStudy", `${homework.todayDone || 0} / ${homework.todayTotal || 0}`);
-  if (homework.todayTotal === 0) {
-    setText("homeStudyNote", "今天还没有作业安排");
-  } else if (homework.todayDone >= homework.todayTotal) {
-    setText("homeStudyNote", "今天的作业都完成啦 🎉");
-  } else {
-    const left = (homework.todayTotal || 0) - (homework.todayDone || 0);
-    setText("homeStudyNote", `还有 ${left} 项没完成`);
-  }
+  // 三大板块积分（从 XP 获得记录关联：作业→已完成作业、财务→财务流水、其余→主动打卡）
+  const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
+  const planetXp = getPlanetXp(verifiedXp);
+  const totalXpAll = verifiedXp.reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const sharePct = (v) => totalXpAll > 0 ? Math.round((v / totalXpAll) * 100) : 0;
+
+  // 当前总积分（醒目主数值）
+  setText("homeTotalXp", xp.current);
+  setText("homeTotalLevel", ((xp.currentLevel?.levelNum || "") + " " + (xp.currentLevel?.name || "")).trim());
+  setText("homeTotalNext", nextGap);
 
   // ═══ 能量星球右侧 ═══
-  setText("homeXp", xp.current);
-  setText("homeWeekStars", getWeekStars(cfg));
+  setText("homeXp", planetXp.energy);
   const _monday = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
   const _lastMonday = (() => { const d = new Date(_monday); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10); })();
   const weekXP = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
@@ -11529,42 +11584,30 @@ async function renderHome() {
   setText("homeWeekXpChange", Math.abs(changePct));
   const xpNoteEl = document.getElementById("homeXpNote");
   if (xpNoteEl) {
-    const goal = 800;
-    const pct = Math.min(100, Math.round(xp.current / goal * 100));
-    xpNoteEl.textContent = `学期目标 ${goal} · 已 ${pct}%`;
+    xpNoteEl.textContent = `占总积分 ${sharePct(planetXp.energy)}%`;
   }
-  document.getElementById("homeXpProgress").style.width = `${xp.progress}%`;
+  document.getElementById("homeXpProgress").style.width = `${sharePct(planetXp.energy)}%`;
 
   // ═══ 知识星球右侧 ═══
-  const allAssignments = getAllAssignments(cfg);
-  const uniqueSubjects = [...new Set(allAssignments.map(a => a.subject).filter(Boolean))];
-  setText("homeStudy", uniqueSubjects.length);
-  const totalHw = (homework.todayDone || 0) + (homework.todayTotal || 0);
-  const hwDone = homework.todayDone || 0;
-  const hwTotal = homework.todayTotal || 0;
-  const hwPct = hwTotal > 0 ? Math.round(hwDone / hwTotal * 100) : 0;
+  setText("homeStudy", planetXp.knowledge);
+  // 本周作业所得积分
+  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && String(r.taskName || r.title || "").indexOf("作业") === 0 && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  setText("homeWeekStudyXp", weekStudyXp);
   const studyProgressEl = document.getElementById("homeStudyProgress");
-  if (studyProgressEl) studyProgressEl.style.width = hwPct + "%";
+  if (studyProgressEl) studyProgressEl.style.width = sharePct(planetXp.knowledge) + "%";
   const studyNoteEl = document.getElementById("homeStudyNote");
   if (studyNoteEl) {
-    if (hwTotal === 0) {
-      studyNoteEl.textContent = "今天还没有作业安排";
-    } else {
-      studyNoteEl.textContent = `作业完成 ${hwPct}% · 已完成 ${hwDone}/${hwTotal} 项`;
-    }
+    studyNoteEl.textContent = `占总积分 ${sharePct(planetXp.knowledge)}%`;
   }
 
-  // ═══ 财富星球右侧 ═══
+  // ═══ 财富板块 ═══
   const totalMoney = cfg.finance?.totalAssets || 0;
-  setText("homeMoney", formatMoney(totalMoney));
-  setText("homeMoneyLive", formatMoney(totalMoney));
-  const moneyGoal = cfg.finance?.savingsGoal || 600;
-  const moneyPct = moneyGoal > 0 ? Math.min(100, Math.round(totalMoney / moneyGoal * 100)) : 0;
+  setText("homeMoney", planetXp.finance);
   const moneyProgressEl = document.getElementById("homeMoneyProgress");
-  if (moneyProgressEl) moneyProgressEl.style.width = moneyPct + "%";
+  if (moneyProgressEl) moneyProgressEl.style.width = sharePct(planetXp.finance) + "%";
   const moneyNoteEl = document.getElementById("homeMoneyNote");
   if (moneyNoteEl) {
-    moneyNoteEl.textContent = `目标 ${formatMoney(moneyGoal)} · 已攒 ${moneyPct}%`;
+    moneyNoteEl.textContent = `占总积分 ${sharePct(planetXp.finance)}%`;
   }
 
   // ═══ 能量获取细节已并入三大星球（移除独立冗余卡片） ═══
@@ -11623,7 +11666,7 @@ async function renderHome() {
       const dotTxt = isPast ? "✓" : (lv.levelNum || idx + 1);
       const lvTxt = isPast
         ? (lv.levelNum || `Lv.${idx + 1}`)
-        : (isCur ? `你在第 ${idx + 1} 级` : "下一级");
+        : (isCur ? "当前" : "下一级");
       const line = i < windowLevels.length - 1 ? `<div class="ij-line ${isCur || isPast ? "on" : ""}"></div>` : "";
       return `<div class="ij-node ${cls}"><span class="ij-dot">${dotTxt}</span><span class="ij-name">${lv.name}</span><span class="ij-lv">${lvTxt}</span></div>${line}`;
     }).join("");
@@ -11859,6 +11902,13 @@ async function renderHome() {
 
   // ═══ 今日关注已移除（与今日要做的事 + 三大星球重复） ═══
 
+  // ═══ 首页 · 系统总积分增长趋势 ═══
+  const homeTrendArea = document.getElementById("homeTrendChartArea");
+  if (homeTrendArea) {
+    renderTrendChart(verifiedXp, homeTrendRange, homeTrendArea);
+    bindHomeTrendTabs();
+  }
+
   // 渲染学期状态条（避免首次加载显示 "--"）
   if (window.SemesterCalendar && window.SemesterCalendar.renderSemesterBar) {
     window.SemesterCalendar.renderSemesterBar();
@@ -11875,6 +11925,7 @@ async function renderHome() {
 
 let pendingRedeemPriv = null;
 let currentTrendRange = 7;
+let homeTrendRange = 7;
 
 async function renderXp() {
   const cfg = await loadAppData();
@@ -12165,8 +12216,8 @@ async function renderXp() {
 // ══════════════════════════════════════
 // 趋势图渲染
 // ══════════════════════════════════════
-function renderTrendChart(records, range) {
-  const area = document.getElementById("trendChartArea");
+function renderTrendChart(records, range, areaEl) {
+  const area = areaEl || document.getElementById("trendChartArea");
   if (!area) return;
 
   // 按日期聚合 XP
@@ -12277,6 +12328,24 @@ function bindTrendTabs() {
       const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
       renderTrendChart(verifiedXp, currentTrendRange);
     });
+  });
+}
+
+// 首页趋势图标签切换（独立于能量页，作用域限定在首页容器内）
+function bindHomeTrendTabs() {
+  const wrap = document.getElementById("homeTrendTabs");
+  if (!wrap) return;
+  const buttons = wrap.querySelectorAll(".trend-tab");
+  buttons.forEach(btn => {
+    btn.onclick = () => {
+      buttons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      homeTrendRange = btn.getAttribute("data-range");
+      loadAppData().then(cfg => {
+        const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
+        renderTrendChart(verifiedXp, homeTrendRange, document.getElementById("homeTrendChartArea"));
+      });
+    };
   });
 }
 
