@@ -2571,6 +2571,46 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       background: var(--neutral-100);
       color: var(--neutral-700);
     }
+    /* GitHub Token 设置 */
+    .token-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+    .token-status.ok {
+      background: var(--colourful-mint-green-100, #e0faf0);
+      color: var(--colourful-mint-green-700, #21755b);
+    }
+    .token-status.missing {
+      background: var(--colourful-sunny-coral-100, #ffeadb);
+      color: var(--colourful-sunny-coral-700, #b93a13);
+    }
+    .token-status i { width: 14px; height: 14px; flex-shrink: 0; }
+    .token-hint {
+      font-size: 11px;
+      color: var(--neutral-400);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .token-hint a { color: var(--colourful-mint-green-500); text-decoration: underline; }
+    .token-hint a:hover { color: var(--colourful-mint-green-600); }
+    .btn-test-token {
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: var(--neutral-100);
+      color: var(--neutral-600);
+      font-size: 12px;
+      font-weight: 600;
+      transition: all .15s;
+    }
+    .btn-test-token:hover { background: var(--neutral-200); }
+    .btn-test-token:disabled { opacity: .5; }
     .btn-secondary:hover { background: var(--neutral-200); }
     .btn-primary {
       background: var(--colourful-butter-yellow-500);
@@ -9446,6 +9486,23 @@ if (typeof window !== 'undefined') {
             <i data-lucide="plus"></i> 新增一学年
           </button>
         </div>
+
+        <!-- GitHub 连接设置 -->
+        <div class="settings-section">
+          <h4><i data-lucide="github" style="width:16px;height:16px"></i> GitHub 连接</h4>
+          <div class="form-grid">
+            <div class="form-field full-width">
+              <label>Personal Access Token</label>
+              <input type="password" id="settingsGithubToken" placeholder="ghp_xxxx... 或 github_pat_xxxx..." />
+              <div id="tokenStatus" class="token-status missing"><i data-lucide="alert-circle"></i><span>未设置，请添加 Token</span></div>
+              <div class="token-hint">需要写入数据（审批通过、记账等）时使用。
+                <a href="https://github.com/settings/tokens/new?scopes=repo&description=Yara" target="_blank" rel="noopener">去 GitHub 创建 Token →</a>
+                （勾选 repo 权限）
+              </div>
+              <button type="button" class="btn-test-token" id="btnTestToken" onclick="testGithubToken()"><i data-lucide="refresh-cw" style="width:12px;height:12px;vertical-align:-2px"></i> 测试连接</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="settings-drawer-foot">
         <button class="btn btn-secondary" onclick="closeSettingsDrawer()">取消</button>
@@ -9871,8 +9928,63 @@ function populateSettingsForm() {
   setVal("settingsClass", child.className || "");
   setVal("settingsMotto", child.motto || "");
 
+  // 更新 GitHub Token 状态
+  updateTokenStatus();
+
   // 填充校历设置
   populateCalendarSettings();
+}
+
+function updateTokenStatus() {
+  const hasToken = window.DataStore && window.DataStore.hasGithubToken && window.DataStore.hasGithubToken();
+  const statusEl = document.getElementById("tokenStatus");
+  if (!statusEl) return;
+  if (hasToken) {
+    statusEl.className = "token-status ok";
+    statusEl.innerHTML = '<i data-lucide="check-circle"></i><span>Token 已设置，可以写入数据</span>';
+  } else {
+    statusEl.className = "token-status missing";
+    statusEl.innerHTML = '<i data-lucide="alert-circle"></i><span>未设置，请添加 Token</span>';
+  }
+  setTimeout(() => lucide.createIcons(), 20);
+}
+
+async function testGithubToken() {
+  const btn = document.getElementById("btnTestToken");
+  if (btn) { btn.disabled = true; btn.textContent = "测试中..."; }
+  // 保存当前输入框中的 token
+  const tokenInput = document.getElementById("settingsGithubToken");
+  const token = tokenInput ? tokenInput.value.trim() : "";
+  if (token) {
+    window.DataStore.setGithubToken(token);
+  }
+  const existingToken = window.DataStore.getGithubToken();
+  if (!existingToken) {
+    showToast("请先输入 Token 再测试", false);
+    if (btn) { btn.disabled = false; btn.textContent = "测试连接"; }
+    return;
+  }
+  try {
+    const resp = await fetch("https://api.github.com/user", {
+      headers: { "Authorization": "Bearer " + existingToken, "Accept": "application/vnd.github.v3+json" }
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.message || "HTTP " + resp.status);
+    }
+    const user = await resp.json();
+    // 验证 repo 权限
+    const repoResp = await fetch("https://api.github.com/repos/meramei/Yara", {
+      headers: { "Authorization": "Bearer " + existingToken, "Accept": "application/vnd.github.v3+json" }
+    });
+    if (!repoResp.ok) throw new Error("无法访问仓库，请检查 Token 的 repo 权限");
+    showToast("✅ 连接成功！用户：" + (user.login || "") + "，Token 有效", true);
+    updateTokenStatus();
+  } catch (e) {
+    showToast("❌ 连接失败: " + (e.message || "未知错误"), false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "测试连接"; }
+  }
 }
 
 function populateCalendarSettings() {
@@ -9984,8 +10096,15 @@ function saveSettings() {
   // 保存校历设置
   saveCalendarSettings();
 
+  // 保存 GitHub Token
+  const tokenInput = document.getElementById("settingsGithubToken");
+  if (tokenInput && tokenInput.value.trim()) {
+    window.DataStore.setGithubToken(tokenInput.value.trim());
+    updateTokenStatus();
+  }
+
   closeSettingsDrawer();
-  showToast("✅ 设置已保存，已同步到飞书", true);
+  showToast("✅ 设置已保存", true);
 
   // 重新渲染首页相关内容
   if (typeof renderHome === "function") {
@@ -12056,7 +12175,12 @@ window.approveXpRecord = async function(btn, recordId) {
     showToast("✅ 已通过该条记录，能量已到账", true);
   } catch (e) {
     console.error("审批失败:", e);
-    alert("审批失败: " + (e.message || "未知错误"));
+    const msg = e.message || "";
+    if (msg.indexOf("GitHub Token") >= 0 || msg.indexOf("Token") >= 0) {
+      showTokenRequiredToast();
+    } else {
+      showToast("❌ 审批失败: " + msg, false);
+    }
   } finally {
     if (btn) { btn.disabled = false; btn.classList.remove("busy"); }
   }
@@ -12080,7 +12204,12 @@ window.rejectXpRecord = async function(btn, recordId) {
     showToast("已退回该条记录", false);
   } catch (e) {
     console.error("退回失败:", e);
-    alert("退回失败: " + (e.message || "未知错误"));
+    const msg = e.message || "";
+    if (msg.indexOf("GitHub Token") >= 0 || msg.indexOf("Token") >= 0) {
+      showTokenRequiredToast();
+    } else {
+      showToast("❌ 退回失败: " + msg, false);
+    }
   } finally {
     if (btn) { btn.disabled = false; btn.classList.remove("busy"); }
   }
@@ -14380,6 +14509,28 @@ function showToast(msg, ok) {
   toast.className = "toast show " + (ok ? "ok" : "err");
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => { toast.className = "toast"; }, 2600);
+}
+
+function showTokenRequiredToast() {
+  // 创建一个友好的弹窗引导用户去设置 Token
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px";
+  overlay.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:28px 24px 20px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.15);text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">🔑</div>
+      <h3 style="font-size:17px;font-weight:700;color:#1a1a1a;margin:0 0 6px">需要 GitHub Token</h3>
+      <p style="font-size:13px;color:#666;margin:0 0 20px;line-height:1.5">审批通过、记账等写入操作需要 GitHub Token 认证。请先在设置中配置。</p>
+      <div style="display:flex;gap:10px">
+        <button onclick="this.closest('.modal-overlay').remove()" style="flex:1;padding:10px;border-radius:12px;border:1px solid #e5e5e5;background:white;font-size:14px;font-weight:600;color:#666;cursor:pointer">取消</button>
+        <button onclick="this.closest('.modal-overlay').remove();openSettingsDrawer()" style="flex:1;padding:10px;border-radius:12px;border:none;background:var(--colourful-mint-green-500,#36b98b);color:white;font-size:14px;font-weight:600;cursor:pointer">去设置</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", function(e) {
+    if (e.target === overlay) overlay.remove();
+  });
 }
 
 function initProfile() {
