@@ -6987,6 +6987,15 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     .balance-preview-value.begin { color: var(--neutral-700); }
     .balance-preview-value.expense { color: var(--pink-600); }
     .balance-preview-value.end { color: var(--mint-700); }
+    .rec-diff-hint {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(248,245,255,.6);
+      line-height: 1.4;
+    }
 
     /* 操作按钮行 */
     .rec-actions {
@@ -9271,7 +9280,7 @@ if (typeof window !== 'undefined') {
       <!-- 余额预览 -->
       <div class="balance-preview" id="balancePreview">
         <div class="balance-preview-row">
-          <span class="balance-preview-label">当前余额</span>
+          <span class="balance-preview-label">期初余额</span>
           <span class="balance-preview-value begin" id="previewBegin">¥0.00</span>
         </div>
         <div class="balance-preview-row">
@@ -9282,6 +9291,7 @@ if (typeof window !== 'undefined') {
           <span class="balance-preview-label">现在余额</span>
           <span class="balance-preview-value end" id="previewEnd">¥0.00</span>
         </div>
+        <div class="rec-diff-hint" id="previewHint"></div>
       </div>
 
       <form id="reconcileForm" onsubmit="submitReconciliation(event)">
@@ -10450,30 +10460,47 @@ if (typeof window !== "undefined") {
   function updateBalancePreview() {
     const nowBalanceInput = document.getElementById("recCurrentBalance");
     const nowBalance = Number(nowBalanceInput.value) || 0;
+    const hintEl = document.getElementById("previewHint");
+    const diffEl = document.getElementById("previewExpense");
 
     // 还没填余额时，不显示差额
     if (!nowBalanceInput.value || nowBalanceInput.value === "") {
       document.getElementById("previewBegin").textContent = fmtMoney(currentFreeBalance);
-      document.getElementById("previewExpense").textContent = "等待输入…";
-      document.getElementById("previewExpense").style.color = "var(--neutral-400)";
+      diffEl.textContent = "--";
+      diffEl.style.color = "var(--neutral-400)";
       document.getElementById("previewEnd").textContent = "--";
+      if (hintEl) hintEl.textContent = "请输入现在钱包里的余额";
       recTotalDiff = 0;
       renderRecEntries();
       return;
     }
 
-    // 差额 = 现在余额 - 当前余额；正数=存入（收入），负数=支出
+    // 差额 = 现在余额 - 期初余额；负数=花出去（支出），正数=存入（收入）
     recTotalDiff = nowBalance - currentFreeBalance;
 
     document.getElementById("previewBegin").textContent = fmtMoney(currentFreeBalance);
 
-    const diffEl = document.getElementById("previewExpense");
-    if (recTotalDiff >= 0) {
-      diffEl.textContent = "存入 " + fmtMoney(recTotalDiff);
-      diffEl.style.color = "var(--mint-600)";
-    } else {
-      diffEl.textContent = "花出去 " + fmtMoney(Math.abs(recTotalDiff));
+    if (recTotalDiff < 0) {
+      // 花出去了：显示负数
+      diffEl.textContent = "-" + fmtMoney(Math.abs(recTotalDiff));
       diffEl.style.color = "var(--pink-600)";
+      if (hintEl) {
+        hintEl.textContent = `你花出去了 ${fmtMoney(Math.abs(recTotalDiff))}，请逐笔记录每一笔花在哪了`;
+        hintEl.style.color = "var(--pink-600)";
+      }
+    } else if (recTotalDiff > 0) {
+      // 存入了：显示正数
+      diffEl.textContent = "+" + fmtMoney(recTotalDiff);
+      diffEl.style.color = "var(--mint-600)";
+      if (hintEl) {
+        hintEl.textContent = `你存入了 ${fmtMoney(recTotalDiff)}，请逐笔记录每一笔存了什么`;
+        hintEl.style.color = "var(--mint-600)";
+      }
+    } else {
+      // 余额没变化
+      diffEl.textContent = "¥0.00";
+      diffEl.style.color = "var(--neutral-500)";
+      if (hintEl) { hintEl.textContent = "余额没有变化，无需拆分"; hintEl.style.color = "var(--neutral-400)"; }
     }
 
     document.getElementById("previewEnd").textContent = fmtMoney(nowBalance);
