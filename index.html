@@ -8020,7 +8020,7 @@ async function redeemPrivilege(record) {
 // ── 更新操作 ──
 
 async function updateStudyRecord(recordId, fields) {
-  const study = await fetchRawJSON('study.json').catch(() => ({ allHomework: [] }));
+  const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ allHomework: [] }));
   const idx = (study.allHomework || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
     Object.assign(study.allHomework[idx], fields);
@@ -8030,8 +8030,25 @@ async function updateStudyRecord(recordId, fields) {
   }
 }
 
+// 从缓存或 CDN 获取原始数据（优先缓存，避免 CDN 延迟导致数据不一致）
+function _getCachedRaw(key) {
+  if (cachedData && cachedData[key] !== undefined) return cachedData[key];
+  // 缓存中无此数据，可能是首次加载不完整，尝试从 CDN 读取
+  return null; // 调用方自行 fallback
+}
+
+async function _getRawDataFromSource(filename) {
+  // 优先使用缓存数据
+  const key = filename.replace('.json', '');
+  const cached = _getCachedRaw(key);
+  if (cached !== null) return cached;
+  // 缓存不可用，从 CDN 读取
+  return await fetchRawJSON(filename).catch(() => null);
+}
+
 async function updateXpRecord(recordId, fields) {
-  const records = await fetchRawJSON('xpRecords.json').catch(() => []);
+  const records = (cachedData && cachedData.xpRecords) ? cachedData.xpRecords : await fetchRawJSON('xpRecords.json').catch(() => []);
+  if (!Array.isArray(records)) return;
   const idx = records.findIndex(r => r.id === recordId);
   if (idx >= 0) {
     const updateData = { ...fields };
@@ -8043,11 +8060,13 @@ async function updateXpRecord(recordId, fields) {
     _updateCacheRecord('xpRecords', recordId, updateData);
     _updateCacheRecord('recentRecords', recordId, { ...fields, status: fields.status, reviewStatus: updateData.reviewStatus });
     _persistCache();
+  } else {
+    console.warn('updateXpRecord: 未找到记录', recordId);
   }
 }
 
 async function updateFinanceRecord(recordId, fields) {
-  const finance = await fetchRawJSON('finance.json').catch(() => ({ recentTransactions: [] }));
+  const finance = (cachedData && cachedData.finance) ? cachedData.finance : await fetchRawJSON('finance.json').catch(() => ({ recentTransactions: [] }));
   const idx = (finance.recentTransactions || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
     Object.assign(finance.recentTransactions[idx], fields);
@@ -8058,7 +8077,7 @@ async function updateFinanceRecord(recordId, fields) {
 }
 
 async function updateScoreRecord(recordId, fields) {
-  const study = await fetchRawJSON('study.json').catch(() => ({ examRecords: [] }));
+  const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ examRecords: [] }));
   const idx = (study.examRecords || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
     Object.assign(study.examRecords[idx], fields);
@@ -8069,7 +8088,7 @@ async function updateScoreRecord(recordId, fields) {
 }
 
 async function updateXpRule(recordId, fields) {
-  const config = await fetchRawJSON('config.json').catch(() => ({ xpRuleList: [] }));
+  const config = (cachedData && cachedData.config) ? cachedData.config : await fetchRawJSON('config.json').catch(() => ({ xpRuleList: [] }));
   const idx = (config.xpRuleList || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
     Object.assign(config.xpRuleList[idx], fields);
@@ -8080,7 +8099,7 @@ async function updateXpRule(recordId, fields) {
 }
 
 async function updateEvaluationRecord(recordId, fields) {
-  const study = await fetchRawJSON('study.json').catch(() => ({ evaluations: [] }));
+  const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ evaluations: [] }));
   const idx = (study.evaluations || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
     Object.assign(study.evaluations[idx], fields);
@@ -9134,7 +9153,7 @@ if (typeof window !== 'undefined') {
 
         <div class="form-group">
           <label class="form-label">现在余额 (元)</label>
-          <input type="number" step="0.01" min="0" class="form-input" id="recCurrentBalance" placeholder="输入钱包里现在的钱数" required oninput="updateBalancePreview()" />
+          <input type="number" step="0.01" min="0" class="form-input" id="recCurrentBalance" placeholder="输入钱包里现在的钱数" required onblur="updateBalancePreview()" />
           <p style="font-size:11px;color:var(--neutral-400);margin-top:4px">系统自动算出差额，并引导你逐笔把每一笔花销/存入记清楚</p>
         </div>
 
