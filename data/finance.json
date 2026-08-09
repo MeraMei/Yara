@@ -33,7 +33,7 @@
     },
     {
       "id": "recvryO1Jbehqx",
-      "date": "2026-08-06",
+      "date": "2026-08-07",
       "type": "income",
       "amount": 18,
       "rawAmount": 18,
@@ -47,7 +47,7 @@
     },
     {
       "id": "recvrdD4PJnF8b",
-      "date": "2026-08-02",
+      "date": "2026-08-03",
       "type": "income",
       "amount": 7.32,
       "rawAmount": 7.32,
@@ -58,7 +58,7 @@
     },
     {
       "id": "recvrdBYG6LZAQ",
-      "date": "2026-07-30",
+      "date": "2026-07-31",
       "type": "income",
       "amount": 18,
       "rawAmount": 18,
@@ -72,7 +72,7 @@
     },
     {
       "id": "recvrdHQzTyPIp",
-      "date": "2026-07-24",
+      "date": "2026-07-25",
       "type": "income",
       "amount": 200,
       "rawAmount": 200,
@@ -86,7 +86,7 @@
     },
     {
       "id": "recvrdBYG6goda",
-      "date": "2026-07-23",
+      "date": "2026-07-24",
       "type": "income",
       "amount": 18,
       "rawAmount": 18,
@@ -100,7 +100,7 @@
     },
     {
       "id": "recvrdBYG6WFS0",
-      "date": "2026-07-16",
+      "date": "2026-07-17",
       "type": "income",
       "amount": 18,
       "rawAmount": 18,
@@ -114,7 +114,7 @@
     },
     {
       "id": "recvrdBYG6kOII",
-      "date": "2026-07-09",
+      "date": "2026-07-10",
       "type": "income",
       "amount": 18,
       "rawAmount": 18,
@@ -128,7 +128,7 @@
     },
     {
       "id": "recvrdBYG6JtP0",
-      "date": "2026-07-07",
+      "date": "2026-07-08",
       "type": "income",
       "amount": 278.5,
       "rawAmount": 278.5,
@@ -142,7 +142,7 @@
     },
     {
       "id": "recvrdBYG6LLDm",
-      "date": "2026-07-03",
+      "date": "2026-07-04",
       "type": "income",
       "amount": 500,
       "rawAmount": 500,
@@ -156,7 +156,7 @@
     },
     {
       "id": "recvrdBQ1zNSd8",
-      "date": "2026-07-02",
+      "date": "2026-07-03",
       "type": "income",
       "amount": 63.43,
       "rawAmount": 63.43,
@@ -167,7 +167,7 @@
     },
     {
       "id": "recvrdBXP88Ukk",
-      "date": "2026-07-02",
+      "date": "2026-07-03",
       "type": "income",
       "amount": 30,
       "rawAmount": 30,
@@ -181,7 +181,7 @@
     },
     {
       "id": "recvrdBQ1zBfmE",
-      "date": "2026-02-15",
+      "date": "2026-02-16",
       "type": "income",
       "amount": 300,
       "rawAmount": 300,
@@ -192,7 +192,7 @@
     },
     {
       "id": "recvrdBQ1zvCA2",
-      "date": "2026-02-15",
+      "date": "2026-02-16",
       "type": "income",
       "amount": 666,
       "rawAmount": 666,
@@ -203,7 +203,7 @@
     },
     {
       "id": "recvrdBQ1zTQeJ",
-      "date": "2026-02-03",
+      "date": "2026-02-04",
       "type": "expense",
       "amount": 1000,
       "rawAmount": -1000,
@@ -214,7 +214,7 @@
     },
     {
       "id": "recvrdBMaLDYUv",
-      "date": "2025-11-12",
+      "date": "2025-11-13",
       "type": "income",
       "amount": 10032.32,
       "rawAmount": 10032.32,
