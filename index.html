@@ -7395,9 +7395,14 @@ function writeGithubFile(path, content, message) {
 
 // ── 数据加载 ──
 
+// 数据版本号计数器：每次写入操作递增，后台刷新据此判断数据是否已被写入更新
+let _dataGen = 0;
+
 // 加载完整 dashboard 数据
 async function loadData() {
   if (cachedData) return cachedData;
+
+  if (loadPromise) return loadPromise;
 
   // 快速路径：从 localStorage 读取缓存，让页面秒开
   try {
@@ -7405,13 +7410,10 @@ async function loadData() {
     if (raw) {
       cachedData = JSON.parse(raw);
       loadPromise = Promise.resolve(cachedData);
-      // 后台静默刷新，拉取 GitHub 最新数据
-      setTimeout(() => _backgroundRefresh(), 100);
+      // 不在快速路径中调度 _backgroundRefresh()，避免与写操作产生竞态条件
       return cachedData;
     }
   } catch (e) { /* ignore */ }
-
-  if (loadPromise) return loadPromise;
 
   loadPromise = (async () => {
     try {
@@ -7465,7 +7467,9 @@ async function loadData() {
 }
 
 // 后台静默刷新：从 GitHub 拉取最新数据，不阻塞 UI
+// 只在首次打开页面时由 boot() 调用一次
 async function _backgroundRefresh() {
+  const genAtStart = _dataGen;
   try {
     const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords] =
       await Promise.all([
@@ -7484,9 +7488,15 @@ async function _backgroundRefresh() {
       xpRecords || [], finance || null, study || null,
       config || null, xpSources || [], redeemRecords || []
     );
+    // 如果后台刷新期间发生了写入操作（_dataGen 已变化），则跳过，
+    // 避免 CDN 旧数据覆盖用户写入的最新数据
+    if (genAtStart !== _dataGen) {
+      console.log('后台刷新: 跳过，数据已被写入操作更新');
+      return;
+    }
     cachedData = dashboard;
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
-    // 通知 UI 更新：用最新数据重绘当前页面
+    // 不覆盖 localStorage，避免 CDN 旧数据覆盖用户写入的最新数据
+    // 通知 UI 更新
     window.dispatchEvent(new CustomEvent('yara-data-refreshed'));
   } catch (e) {
     console.warn('后台刷新失败，继续使用缓存数据:', e.message);
@@ -7789,6 +7799,7 @@ function loadChildData() {
 }
 
 async function updateChildData(child) {
+  _dataGen++;
   const updated = { ...(cachedData?.child || {}), ...child };
   await writeGithubFile('child.json', updated, '更新个人信息');
   saveChildData(child);
@@ -7834,6 +7845,7 @@ function loadCalendarData() {
 
 // 新增 XP 获得记录
 async function addXpRecord(record) {
+  _dataGen++;
   const recordId = generateId('xp_');
   const newRecord = {
     id: recordId,
@@ -7876,6 +7888,7 @@ async function addXpRecord(record) {
 
 // 新增 XP 规则
 async function addXpRule(rule) {
+  _dataGen++;
   const recordId = generateId('xpr_');
   const newRule = {
     id: recordId,
@@ -7899,6 +7912,7 @@ async function addXpRule(rule) {
 
 // 新增学习/作业记录
 async function addStudyRecord(record) {
+  _dataGen++;
   const recordId = generateId('hw_');
   const newRecord = {
     id: recordId,
@@ -7938,6 +7952,7 @@ async function addStudyRecord(record) {
 
 // 新增成绩记录
 async function addScoreRecord(record) {
+  _dataGen++;
   const recordId = generateId('score_');
   const newRecord = {
     id: recordId,
@@ -7962,6 +7977,7 @@ async function addScoreRecord(record) {
 
 // 新增财务记录
 async function addFinanceRecord(record) {
+  _dataGen++;
   const recordId = generateId('fin_');
   const amount = Number(record.amount) || 0;
   const isIncome = record.type === 'income';
@@ -8004,6 +8020,7 @@ async function addFinanceRecord(record) {
 
 // 新增期末评价记录
 async function addEvaluationRecord(record) {
+  _dataGen++;
   const recordId = generateId('eval_');
   const newRecord = {
     id: recordId,
@@ -8023,6 +8040,7 @@ async function addEvaluationRecord(record) {
 
 // 兑换权益
 async function redeemPrivilege(record) {
+  _dataGen++;
   const recordId = generateId('redeem_');
   const levels = await fetchRawJSON('levels.json').catch(() => []);
   const privilegeName = record.name || record.privilegeName || '';
@@ -8062,6 +8080,7 @@ async function redeemPrivilege(record) {
 // ── 更新操作 ──
 
 async function updateStudyRecord(recordId, fields) {
+  _dataGen++;
   const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ allHomework: [] }));
   const idx = (study.allHomework || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
@@ -8089,6 +8108,7 @@ async function _getRawDataFromSource(filename) {
 }
 
 async function updateXpRecord(recordId, fields) {
+  _dataGen++;
   const records = (cachedData && cachedData.xpRecords) ? cachedData.xpRecords : await fetchRawJSON('xpRecords.json').catch(() => []);
   if (!Array.isArray(records)) return;
   const idx = records.findIndex(r => r.id === recordId);
@@ -8108,6 +8128,7 @@ async function updateXpRecord(recordId, fields) {
 }
 
 async function updateFinanceRecord(recordId, fields) {
+  _dataGen++;
   const finance = (cachedData && cachedData.finance) ? cachedData.finance : await fetchRawJSON('finance.json').catch(() => ({ recentTransactions: [] }));
   const idx = (finance.recentTransactions || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
@@ -8119,6 +8140,7 @@ async function updateFinanceRecord(recordId, fields) {
 }
 
 async function updateScoreRecord(recordId, fields) {
+  _dataGen++;
   const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ examRecords: [] }));
   const idx = (study.examRecords || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
@@ -8130,6 +8152,7 @@ async function updateScoreRecord(recordId, fields) {
 }
 
 async function updateXpRule(recordId, fields) {
+  _dataGen++;
   const config = (cachedData && cachedData.config) ? cachedData.config : await fetchRawJSON('config.json').catch(() => ({ xpRuleList: [] }));
   const idx = (config.xpRuleList || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
@@ -8141,6 +8164,7 @@ async function updateXpRule(recordId, fields) {
 }
 
 async function updateEvaluationRecord(recordId, fields) {
+  _dataGen++;
   const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ evaluations: [] }));
   const idx = (study.evaluations || []).findIndex(r => r.id === recordId);
   if (idx >= 0) {
@@ -14817,10 +14841,10 @@ async function boot(page) {
   // 自动重连成功后，用最新数据重渲染当前视图
   if (!window.__dataRefreshBound) {
     window.__dataRefreshBound = true;
-    // 统一数据变更监听：任何写操作成功后触发，先强制拉取最新数据，再重渲染当前视图
+    // 统一数据变更监听：后台刷新完成后，直接用 cachedData 重绘当前视图
+    // 注意：不在这里调用 refreshData()，避免触发新的 _backgroundRefresh() 导致无限循环
     window.addEventListener("yara-data-refreshed", async () => {
       const p = window.__currentView || "home";
-      try { if (window.DataStore && window.DataStore.refreshData) await window.DataStore.refreshData(); } catch (e) {}
       if (p === "home") { if (typeof renderHome === "function") renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
       else if (p === "xp" && typeof renderXp === "function") renderXp();
       else if (p === "study" && typeof renderStudy === "function") renderStudy();
@@ -14847,6 +14871,8 @@ async function boot(page) {
   }
   initEditModal();
   setTimeout(() => lucide.createIcons(), 50);
+  // 首次加载完成后，后台静默拉取 GitHub 最新数据（只执行一次）
+  setTimeout(() => _backgroundRefresh(), 100);
 }
 
 
