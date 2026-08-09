@@ -12529,7 +12529,6 @@ function renderHwRow(a, hidden, index) {
   const shortSubj = ["语文", "数学", "英语"].includes(a.subject)
     ? { "语文": "语", "数学": "数", "英语": "英" }[a.subject]
     : (a.subject || "").slice(0, 1) || "科";
-  const editIdx = index != null ? index : "";
   const itemId = a.id || "";
 
   const modList = Array.isArray(a.modules) && a.modules.length > 0
@@ -12550,9 +12549,9 @@ function renderHwRow(a, hidden, index) {
     else if (daysLeft <= 2) { dueClass = " hw-due-soon"; dueText = `还剩 ${daysLeft} 天`; }
   }
 
-  return `<div class="hw-row${hiddenClass}${isDone ? " hw-done" : ""}" data-idx="${editIdx}" data-id="${itemId}">
+  return `<div class="hw-row${hiddenClass}${isDone ? " hw-done" : ""}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
     <div class="hw-check-col">
-      <button class="hw-check-btn${isDone ? " checked" : ""}" data-toggle-status="${editIdx}" title="${isDone ? "标记为待完成" : "标记为已完成"}">
+      <button class="hw-check-btn${isDone ? " checked" : ""}" data-toggle-status="${itemId}" title="${isDone ? "标记为待完成" : "标记为已完成"}">
         <i data-lucide="${isDone ? "check-circle-2" : "circle"}"></i>
       </button>
     </div>
@@ -12562,10 +12561,10 @@ function renderHwRow(a, hidden, index) {
       <div class="hw-meta${dueClass}"><i data-lucide="calendar"></i>${dueText}</div>
     </div>
     <div class="hw-actions">
-      <button class="hw-submit-btn${isSubmitted ? " submitted" : ""}" data-toggle-submit="${editIdx}" title="${isSubmitted ? "取消提交" : "标记已提交"}">
+      <button class="hw-submit-btn${isSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${isSubmitted ? "取消提交" : "标记已提交"}">
         <i data-lucide="${isSubmitted ? "send" : "send"}"></i>
       </button>
-      <button class="hw-edit-btn" data-edit="${editIdx}" title="编辑详情">
+      <button class="hw-edit-btn" data-edit="${itemId}" title="编辑详情">
         <i data-lucide="more-horizontal"></i>
       </button>
     </div>
@@ -14893,17 +14892,12 @@ function initEditModal() {
     });
   }
 
-  // 公共辅助：按索引获取作业（从数据源按状态排序）
-  async function getAssignmentByIndex(idxStr) {
-    const parts = idxStr.split("-");
-    const source = parts[0] === "p" ? "pending" : "done";
-    const idx = parseInt(parts[1], 10);
+  // 按作业唯一 id 查找，避免索引/前缀/排序错位导致打开错误条目
+  async function getAssignmentById(id) {
     const cfg = await loadAppData();
     const allAssignments = getAllAssignments(cfg);
-    const list = source === "pending"
-      ? allAssignments.filter(a => a.status !== "done").sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""))
-      : allAssignments.filter(a => a.status === "done").sort((a, b) => (b.dueDate || "").localeCompare(a.dueDate || ""));
-    return { item: list[idx], cfg };
+    const item = allAssignments.find(a => a.id === id) || null;
+    return { item, cfg };
   }
 
   // 作业完成能量累加（客户端兜底，防止 API 瞬时不可用导致能量丢失）
@@ -14936,7 +14930,7 @@ function initEditModal() {
     const toggleBtn = e.target.closest("[data-toggle-status]");
     if (toggleBtn) {
       e.stopPropagation();
-      const { item, cfg } = await getAssignmentByIndex(toggleBtn.getAttribute("data-toggle-status"));
+      const { item, cfg } = await getAssignmentById(toggleBtn.getAttribute("data-toggle-status"));
       if (!item || !item.id) return;
 
       const newDone = item.status !== "done";
@@ -15010,7 +15004,7 @@ function initEditModal() {
     const submitBtn = e.target.closest("[data-toggle-submit]");
     if (submitBtn) {
       e.stopPropagation();
-      const { item } = await getAssignmentByIndex(submitBtn.getAttribute("data-toggle-submit"));
+      const { item } = await getAssignmentById(submitBtn.getAttribute("data-toggle-submit"));
       if (!item || !item.id) return;
 
       const newSubmitted = item.submitted !== true;
@@ -15062,7 +15056,7 @@ function initEditModal() {
     // 编辑按钮
     const editBtn = e.target.closest("[data-edit]");
     if (editBtn) {
-      const { item } = await getAssignmentByIndex(editBtn.getAttribute("data-edit"));
+      const { item } = await getAssignmentById(editBtn.getAttribute("data-edit"));
       if (item) openEditModal(item);
     }
   });
