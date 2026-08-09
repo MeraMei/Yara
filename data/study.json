@@ -547,12 +547,29 @@
     }
   ],
   "homework": {
-    "total": 21,
+    "total": 22,
     "done": 8,
     "todayTotal": 2,
     "todayDone": 2
   },
   "recentAssignments": [
+    {
+      "id": "hw_mslv9a7m9uniba",
+      "subject": "语文",
+      "title": "语文",
+      "description": "",
+      "homeworkType": "假期作业",
+      "module": "",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-07-20",
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
     {
       "id": "recvrd7AIvjkbE",
       "subject": "数学",
@@ -630,6 +647,23 @@
     }
   ],
   "allHomework": [
+    {
+      "id": "hw_mslv9a7m9uniba",
+      "subject": "语文",
+      "title": "语文",
+      "description": "",
+      "homeworkType": "假期作业",
+      "module": "",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-07-20",
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
     {
       "date": "2026-07-15",
       "items": [
