@@ -10,10 +10,11 @@
     "datetime": "2026-08-09",
     "xp": 3,
     "xpCategory": "",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "主动丢垃圾",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "recvrLXIraOr1K",
