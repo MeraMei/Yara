@@ -9210,6 +9210,7 @@ function notifyDataChanged() {
 // ── 更新操作 ──
 
 async function updateStudyRecord(recordId, fields) {
+  _dataGen++;
   const payload = {};
   if (fields.title !== undefined) payload.title = fields.title;
   if (fields.description !== undefined) payload.description = fields.description;
@@ -12218,6 +12219,7 @@ function getAllAssignments(cfg) {
 
 // 本地更新作业数据（API 不可用时的回退方案）
 async function updateHomeworkLocally(homeworkId, fields) {
+  _dataGen++;
   const data = await loadAppData();
   const groups = data.study?.allHomework || [];
   let found = false;

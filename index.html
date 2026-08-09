@@ -8186,12 +8186,22 @@ async function redeemPrivilege(record) {
 async function updateStudyRecord(recordId, fields) {
   _dataGen++;
   const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ allHomework: [] }));
-  const idx = (study.allHomework || []).findIndex(r => r.id === recordId);
-  if (idx >= 0) {
-    Object.assign(study.allHomework[idx], fields);
-    await writeGithubFile('study.json', study, '更新作业记录');
-    _updateCacheRecord('study.allHomework', recordId, fields);
-    _persistCache();
+  const groups = study.allHomework || [];
+  let found = false;
+  for (const group of groups) {
+    const items = group.items || [];
+    const idx = items.findIndex(r => r.id === recordId);
+    if (idx >= 0) {
+      Object.assign(items[idx], fields);
+      await writeGithubFile('study.json', study, '更新作业记录');
+      _updateCacheRecord('study.allHomework', recordId, fields);
+      _persistCache();
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    throw new Error('未找到作业记录: ' + recordId);
   }
 }
 
@@ -11225,6 +11235,7 @@ function getAllAssignments(cfg) {
 
 // 本地更新作业数据（API 不可用时的回退方案）
 async function updateHomeworkLocally(homeworkId, fields) {
+  _dataGen++;
   const data = await loadAppData();
   const groups = data.study?.allHomework || [];
   let found = false;
