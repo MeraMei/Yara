@@ -1,0 +1,5 @@
+# 同步/维护脚本目录
+# raw/ 为拉取飞书后生成的中间原始数据，可随时用 dump-tables.py 重新生成，不入库
+scripts/raw/
+__pycache__/
+*.pyc

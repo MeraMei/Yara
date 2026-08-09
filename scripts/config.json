@@ -1,0 +1,26 @@
+{
+  "feishuBase": "EgnqbkrzcafOnrs1ESnc6jiDnkg",
+  "tables": {
+    "config-subject": "tblqZHxnVEeKqs9I",
+    "config-level": "tblT20qy329BcYsq",
+    "config-xp-rule": "tblrFP0Jmiq8WDCT",
+    "config-ability-module": "tblDSS5DrM9nUk7Y",
+    "config-personal": "tblxEk4eWeObbW3G",
+    "config-calendar": "tblr5xFPgOFOaI7r",
+    "record-homework": "tbl39gCCirCdSy43",
+    "record-score": "tblnXJB8o0r2hrNO",
+    "record-xp": "tblDkfJ68JNp1S8w",
+    "record-finance": "tblGWWf3IWjceBqG",
+    "record-evaluation": "tbliX7Z2oMF9feMx"
+  },
+  "multiValueFields": {
+    "record-homework": ["能力模块"],
+    "record-score": ["错误模块"]
+  },
+  "paths": {
+    "_comment": "以下路径均相对本 scripts/ 目录，可按需修改",
+    "rawDir": "raw",
+    "dataDir": "../data",
+    "vendorDir": "vendor"
+  }
+}
