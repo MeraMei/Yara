@@ -14396,7 +14396,7 @@ function layoutShell(active) {
       ${pages.map(([key, label, href, icon]) => `
         <a class="${active === key ? "active" : ""}" href="javascript:void(0)" data-page="${key}" onclick="switchView(\'${key}\')" style="cursor:pointer" role="link" tabindex="0"><i data-lucide="${icon}"></i>${label}</a>
       `).join("")}
-      <a href="system-settings.html" data-page="settings" role="link" tabindex="0"><i data-lucide="settings"></i>系统设置</a>
+      <a href="system-settings.html" data-page="settings" role="link" tabindex="0"><i>⚙️</i>系统设置</a>
     </nav>
   `;
 }
