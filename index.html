@@ -880,7 +880,7 @@ h1 {
   transition: color .2s;
   cursor: pointer;
 }
-.bottom-tab-item i { width: 22px; height: 22px; }
+.bottom-tab-item i { width: 22px; height: 22px; font-size: 18px; line-height: 1; font-style: normal; display: grid; place-items: center; }
 .bottom-tab-item.active {
   color: var(--colourful-butter-yellow-600);
 }
@@ -9517,12 +9517,12 @@ if (typeof window !== 'undefined') {
 
   
   <nav class="bottom-tab-bar">
-    <a class="bottom-tab-item active" href="javascript:void(0)" data-page="home" onclick="switchView('home')"><i data-lucide="home"></i><span>中心</span></a>
-    <a class="bottom-tab-item" href="javascript:void(0)" data-page="xp" onclick="switchView('xp')"><i data-lucide="sparkles"></i><span>能量</span></a>
-    <a class="bottom-tab-item" href="javascript:void(0)" data-page="study" onclick="switchView('study')"><i data-lucide="book-open"></i><span>知识</span></a>
-    <a class="bottom-tab-item" href="javascript:void(0)" data-page="money" onclick="switchView('money')"><i data-lucide="wallet"></i><span>财富</span></a>
-    <a class="bottom-tab-item" href="javascript:void(0)" data-page="data-entry" onclick="switchView('data-entry')"><i data-lucide="pen-line"></i><span>记录</span></a>
-    <a class="bottom-tab-item" href="system-settings.html" data-page="settings"><i data-lucide="settings"></i><span>设置</span></a>
+    <a class="bottom-tab-item active" href="javascript:void(0)" data-page="home" onclick="switchView('home')"><i>🌌</i><span>中心</span></a>
+    <a class="bottom-tab-item" href="javascript:void(0)" data-page="xp" onclick="switchView('xp')"><i>⚡</i><span>能量</span></a>
+    <a class="bottom-tab-item" href="javascript:void(0)" data-page="study" onclick="switchView('study')"><i>🌍</i><span>知识</span></a>
+    <a class="bottom-tab-item" href="javascript:void(0)" data-page="money" onclick="switchView('money')"><i>💰</i><span>财富</span></a>
+    <a class="bottom-tab-item" href="javascript:void(0)" data-page="data-entry" onclick="switchView('data-entry')"><i>📝</i><span>记录</span></a>
+    <a class="bottom-tab-item" href="system-settings.html" data-page="settings"><i>⚙️</i><span>设置</span></a>
   </nav>
   <script>
 
@@ -14396,11 +14396,11 @@ let currentEditItem = null;
 
 function layoutShell(active) {
   const pages = [
-    ["home", "🌌 小宇宙中心", "home.html", "layout-dashboard"],
-    ["xp", "⚡ 能量星球", "xp-growth.html", "sparkles"],
-    ["study", "🌍 知识星球", "study.html", "book-open"],
-    ["money", "💰 财富星球", "money.html", "wallet"],
-    ["data-entry", "📝 记录小行星", "data-entry.html", "pen-line"],
+    ["home", "小宇宙中心", "home.html", "🌌"],
+    ["xp", "能量星球", "xp-growth.html", "⚡"],
+    ["study", "知识星球", "study.html", "🌍"],
+    ["money", "财富星球", "money.html", "💰"],
+    ["data-entry", "记录小行星", "data-entry.html", "📝"],
   ];
 
   let childName = "";
@@ -14426,7 +14426,7 @@ function layoutShell(active) {
     <div class="nav-label">菜单</div>
     <nav class="nav">
       ${pages.map(([key, label, href, icon]) => `
-        <a class="${active === key ? "active" : ""}" href="javascript:void(0)" data-page="${key}" onclick="switchView(\'${key}\')" style="cursor:pointer" role="link" tabindex="0"><i data-lucide="${icon}"></i>${label}</a>
+        <a class="${active === key ? "active" : ""}" href="javascript:void(0)" data-page="${key}" onclick="switchView(\'${key}\')" style="cursor:pointer" role="link" tabindex="0"><i>${icon}</i>${label}</a>
       `).join("")}
     </nav>
     <nav class="nav-foot">
@@ -14944,8 +14944,9 @@ async function switchView(page) {
   }
 }
 
-// 启动：渲染首页
-boot("home");
+// 启动：渲染首页（支持 ?view=xxx 从其他页面指定进入某个星球）
+const __urlView = new URLSearchParams(location.search).get("view");
+boot(["home", "xp", "study", "money", "data-entry"].includes(__urlView) ? __urlView : "home");
   </script>
 </body>
 </html>

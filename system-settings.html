@@ -594,10 +594,51 @@ body {
 .lvl-priv:first-of-type { border-top: 0; }
 .lvl-priv i { font-style: normal; font-size: 13px; }
 
+/* ════════ 移动端底部导航（与主平台一致） ════════ */
+.bottom-tab-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: rgba(255,255,255,.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0,0,0,.06);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  z-index: 100;
+  box-shadow: 0 -2px 20px rgba(0,0,0,.04);
+}
+.bottom-tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--colourful-neutral-400);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+  transition: color .2s;
+  cursor: pointer;
+}
+.bottom-tab-item i { width: 22px; height: 22px; font-size: 18px; line-height: 1; font-style: normal; display: grid; place-items: center; }
+.bottom-tab-item.active { color: var(--colourful-lavender-600); }
+.bottom-tab-item:hover { color: var(--colourful-lavender-600); }
+
 /* 响应式 */
 @media (max-width: 920px) {
   .sidebar { transform: translateX(-100%); }
   .main { margin-left: 0; padding: 22px; }
+}
+@media (min-width: 921px) {
+  .bottom-tab-bar { display: none; }
+  body { padding-bottom: 0; }
+}
+@media (max-width: 920px) {
+  body { padding-bottom: 66px; }
 }
 </style>
 </head>
@@ -617,6 +658,7 @@ body {
       <a href="index.html"><i>⚡</i>能量星球</a>
       <a href="index.html"><i>🌍</i>知识星球</a>
       <a href="index.html"><i>💰</i>财富星球</a>
+      <a href="index.html"><i>📝</i>记录小行星</a>
     </nav>
     <nav class="nav-foot">
       <a href="system-settings.html" class="active"><i>⚙️</i>系统设置</a>
@@ -894,6 +936,16 @@ body {
       </div>
     </div>
   </main>
+
+  <!-- 移动端底部导航（与主平台一致） -->
+  <nav class="bottom-tab-bar">
+    <a class="bottom-tab-item" href="index.html"><i>🌌</i><span>中心</span></a>
+    <a class="bottom-tab-item" href="index.html?view=xp"><i>⚡</i><span>能量</span></a>
+    <a class="bottom-tab-item" href="index.html?view=study"><i>🌍</i><span>知识</span></a>
+    <a class="bottom-tab-item" href="index.html?view=money"><i>💰</i><span>财富</span></a>
+    <a class="bottom-tab-item" href="index.html?view=data-entry"><i>📝</i><span>记录</span></a>
+    <a class="bottom-tab-item active" href="system-settings.html"><i>⚙️</i><span>设置</span></a>
+  </nav>
 
 <script>
 (function(){
