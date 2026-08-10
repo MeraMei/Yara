@@ -8831,7 +8831,12 @@ async function loadData() {
   return loadPromise;
 }
 
+// 数据版本号，用于视图缓存：每次数据刷新时递增，渲染函数凭此判断是否需要重绘
+let __dataVersion = 0;
+// 记录每个视图最后渲染时的数据版本号
+const __viewRendered = {};
 function refreshData() {
+  __dataVersion++;
   cachedData = null;
   loadPromise = null;
   return loadData();
@@ -11906,10 +11911,19 @@ function getDateStr(record) {
 
 // ── UI 刷新工具 ──
 
-// 统一刷新 lucide 图标
+// 统一刷新 lucide 图标（防抖 + requestAnimationFrame）
+let __iconRefreshTimer = null;
 function refreshIcons(delay) {
-  const d = delay != null ? delay : 30;
-  if (window.lucide) setTimeout(() => lucide.createIcons(), d);
+  if (!window.lucide) return;
+  if (__iconRefreshTimer) clearTimeout(__iconRefreshTimer);
+  if (delay != null && delay > 0) {
+    __iconRefreshTimer = setTimeout(() => {
+      __iconRefreshTimer = null;
+      requestAnimationFrame(() => lucide.createIcons());
+    }, delay);
+  } else {
+    requestAnimationFrame(() => lucide.createIcons());
+  }
 }
 
 // ── 交互工具 ──
@@ -16044,11 +16058,13 @@ function initSidebarToggle() {
       closeSidebar();
     }
   });
-  // 屏幕尺寸变化到桌面端时关闭侧边栏展开状态
+  // 屏幕尺寸变化到桌面端时关闭侧边栏展开状态（带防抖，避免高频触发）
+  let __resizeTimer = null;
   window.addEventListener("resize", function() {
-    if (window.innerWidth > 920) {
-      closeSidebar();
-    }
+    if (__resizeTimer) clearTimeout(__resizeTimer);
+    __resizeTimer = setTimeout(function() {
+      if (window.innerWidth > 920) closeSidebar();
+    }, 100);
   });
 }
 
@@ -16067,7 +16083,8 @@ async function boot(page) {
       else if (p === "xp" && typeof renderXp === "function") renderXp();
       else if (p === "study" && typeof renderStudy === "function") renderStudy();
       else if (p === "money" && typeof renderMoney === "function") renderMoney();
-      try { setTimeout(() => lucide.createIcons(), 50); } catch (e) {}
+      __viewRendered[p] = __dataVersion;
+      try { refreshIcons(20); } catch (e) {}
     });
   }
   layoutShell(page);
@@ -16084,11 +16101,12 @@ async function boot(page) {
     if (page === "study") await renderStudy();
     if (page === "money") await renderMoney();
     if (page === "data-entry") initDataEntryGuarded();
+    __viewRendered[page] = __dataVersion;
   } catch (e) {
     console.error("渲染失败:", e);
   }
   initEditModal();
-  setTimeout(() => lucide.createIcons(), 50);
+  if (window.lucide) refreshIcons(20);
 }
 
 
@@ -16187,31 +16205,51 @@ async function renderLevelLadder() {
   refreshIcons();
 }
 
-function switchView(page) {
-  // 0. 每次切换先回到页面顶部，避免停留在上一页的滚动位置
-  window.scrollTo({ top: 0, behavior: "auto" });
-  const scroller = document.querySelector(".main") || document.querySelector(".wrap");
-  if (scroller) scroller.scrollTop = 0;
-  // 1. 隐藏所有视图，显示目标视图
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  const target = document.getElementById("view-" + page);
-  if (target) target.classList.add("active");
-  // 2. 更新侧边栏菜单 active 高亮
-  document.querySelectorAll("[data-sidebar] .nav a").forEach(a => a.classList.toggle("active", a.getAttribute("data-page") === page));
-  // 3. 更新底部 tab 栏 active 高亮
-  document.querySelectorAll(".bottom-tab-item").forEach(t => t.classList.toggle("active", t.getAttribute("data-page") === page));
-  document.body.setAttribute("data-view", page);
-  // 4. 调用对应渲染函数
-  if (page === "home") { renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
-  else if (page === "xp") renderXp();
-  else if (page === "study") renderStudy();
-  else if (page === "money") renderMoney();
-  else if (page === "data-entry") initDataEntryGuarded();
-  else if (page === "level") renderLevelLadder();
-  // 5. 移动端关闭侧边栏
-  closeSidebar();
-  // 6. 刷新 lucide 图标
-  setTimeout(() => lucide.createIcons(), 50);
+async function switchView(page) {
+  // 上次切换仍在进行中则记录最后一次点击，切换完成后自动跳转
+  if (window.__switchingView) {
+    window.__pendingView = page;
+    return;
+  }
+  window.__switchingView = true;
+  window.__pendingView = null;
+  try {
+    // 0. 每次切换先回到页面顶部，避免停留在上一页的滚动位置
+    window.scrollTo({ top: 0, behavior: "auto" });
+    const scroller = document.querySelector(".main") || document.querySelector(".wrap");
+    if (scroller) scroller.scrollTop = 0;
+    // 1. 隐藏所有视图，显示目标视图
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    const target = document.getElementById("view-" + page);
+    if (target) target.classList.add("active");
+    // 2. 更新侧边栏菜单 active 高亮
+    document.querySelectorAll("[data-sidebar] .nav a").forEach(a => a.classList.toggle("active", a.getAttribute("data-page") === page));
+    // 3. 更新底部 tab 栏 active 高亮
+    document.querySelectorAll(".bottom-tab-item").forEach(t => t.classList.toggle("active", t.getAttribute("data-page") === page));
+    document.body.setAttribute("data-view", page);
+    // 4. 视图缓存：只有数据版本有变化时才重新渲染，避免重复全量渲染
+    if (__viewRendered[page] !== __dataVersion) {
+      if (page === "home") { await renderHome(); if (typeof renderSemesterBar === "function") renderSemesterBar(); }
+      else if (page === "xp") await renderXp();
+      else if (page === "study") await renderStudy();
+      else if (page === "money") await renderMoney();
+      else if (page === "data-entry") initDataEntryGuarded();
+      else if (page === "level") renderLevelLadder();
+      __viewRendered[page] = __dataVersion;
+    }
+    // 5. 移动端关闭侧边栏
+    closeSidebar();
+    // 6. 刷新 lucide 图标
+    if (window.lucide) refreshIcons(20);
+  } finally {
+    window.__switchingView = false;
+    // 切换完成后，如果有排队请求，立即跳转
+    if (window.__pendingView) {
+      const p = window.__pendingView;
+      window.__pendingView = null;
+      switchView(p);
+    }
+  }
 }
 
 // 启动：渲染首页
