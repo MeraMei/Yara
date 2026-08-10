@@ -1008,6 +1008,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
 @media (max-width: 920px) {
   .sidebar { opacity: 0; visibility: hidden; pointer-events: none; position: fixed; transform: translateX(-100%); transition: transform .3s ease, opacity .3s ease, visibility .3s ease; }
   .main { margin-left: 0; padding: 22px; }
+  body { padding-bottom: 66px; }
   h1 { font-size: 32px; }
   .hero { padding: 22px; border-radius: 24px; }
   .hero-note { padding: 16px; }
@@ -13088,14 +13089,6 @@ async function renderMoney() {
   setText("wealthSourceHint", `共 ${wealthIncomes.length} 笔存入`);
 }
 
-// ═══════════════════════════════════════════════════════════
-// MODULE: data-entry.js
-// ═══════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════════════════════
-// data-entry.js — 记录小行星页面逻辑
-// ═══════════════════════════════════════════════════════════════
-
 // ── 能力模块：优先从 API 加载配置表，加载前用硬编码兜底 ──
 let DE_LOADED_MODULES = null; // 缓存 api 加载的模块数据
 
@@ -14012,7 +14005,6 @@ function layoutShell(active) {
     ["xp", "能量星球", "xp-growth.html", "⚡"],
     ["study", "知识星球", "study.html", "🌍"],
     ["money", "财富星球", "money.html", "💰"],
-    ["data-entry", "记录小行星", "data-entry.html", "📝"],
   ];
 
   let childName = "";
@@ -14412,7 +14404,6 @@ async function boot(page) {
     if (page === "xp") await renderXp();
     if (page === "study") await renderStudy();
     if (page === "money") await renderMoney();
-    if (page === "data-entry") initDataEntryGuarded();
     __viewRendered[page] = __dataVersion;
   } catch (e) {
     console.error("渲染失败:", e);
@@ -14436,12 +14427,6 @@ async function boot(page) {
   </script>
   <script>
 /* ════════ 单页应用：视图切换 (SPA) ════════ */
-let __dataEntryReady = false;
-function initDataEntryGuarded() {
-  if (__dataEntryReady) return;
-  __dataEntryReady = true;
-  initDataEntry();
-}
 
 // ── 等级详情页 · 成长阶梯渲染 ──
 // 根据权益名称为其分配一个直观的 emoji 图标
@@ -14555,7 +14540,6 @@ async function switchView(page) {
       else if (page === "xp") await renderXp();
       else if (page === "study") await renderStudy();
       else if (page === "money") await renderMoney();
-      else if (page === "data-entry") { initDataEntryGuarded(); }
       else if (page === "level") { renderLevelLadder(); }
       __viewRendered[page] = __dataVersion;
     }
@@ -14576,7 +14560,7 @@ async function switchView(page) {
 
 // 启动：渲染首页（支持 ?view=xxx 从其他页面指定进入某个星球）
 const __urlView = new URLSearchParams(location.search).get("view");
-boot(["home", "xp", "study", "money", "data-entry"].includes(__urlView) ? __urlView : "home");
+boot(["home", "xp", "study", "money"].includes(__urlView) ? __urlView : "home");
   </script>
 </body>
 </html>

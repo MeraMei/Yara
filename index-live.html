@@ -857,7 +857,6 @@ body[data-view="home"] .bottom-tab-item.active { color: var(--colourful-sunny-co
 body[data-view="xp"] .bottom-tab-item.active { color: var(--colourful-mint-green-600); }
 body[data-view="study"] .bottom-tab-item.active { color: var(--colourful-sky-blue-600); }
 body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-coral-600); }
-body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-candy-pink-600); }
 .bottom-tab-item:hover {
   color: var(--colourful-butter-yellow-600);
 }
@@ -909,6 +908,38 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+}
+/* 侧边栏底部：系统设置入口 */
+.nav-foot {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(30,28,26,.08);
+  display: grid;
+  gap: 6px;
+}
+.nav-foot a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: var(--colourful-neutral-600);
+  font-weight: 800;
+  transition: .18s ease;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.nav-foot a i { width: 20px; text-align: center; font-style: normal; }
+.nav-foot a:hover, .nav-foot a.active {
+  background: white;
+  color: var(--colourful-neutral-900);
+  box-shadow: 0 8px 22px -14px rgba(30,28,26,.3);
+  transform: translateX(2px);
+}
+.nav-foot a.active {
+  background: linear-gradient(135deg, var(--colourful-lavender-100), white);
+  color: var(--colourful-lavender-700);
 }
 
 @media (max-width: 920px) {
@@ -972,8 +1003,8 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
 }
 
 @media (max-width: 920px) {
-  .sidebar { display: none; }
   .main { margin-left: 0; padding: 22px; }
+  body { padding-bottom: 66px; }
   h1 { font-size: 32px; }
   .hero { padding: 22px; border-radius: 24px; }
   .hero-note { padding: 16px; }
@@ -9965,364 +9996,7 @@ if (typeof window !== "undefined") {
     </div>
   </main>
   </section>
-  <section class="view" id="view-data-entry">
-<main class="main">
-    <div class="wrap">
-      <section class="hero compact">
-        <div>
-          <div class="eyebrow"><i data-lucide="pen-line"></i>记录小行星</div>
-          <h1>Yara的当前状态</h1>
-          <p class="lead">今天发生了什么？记录下来，让成长有迹可循。</p>
-        </div>
-      </section>
-
-      <div class="feishu-banner">
-        <i data-lucide="database"></i>
-        数据存储在飞书多维表格「Yara的小宇宙」，录入后所有页面实时同步。
-      </div>
-
-      <div class="tab-bar">
-        <button class="active" data-tab="xp"><i data-lucide="sparkles" style="display:inline;width:16px;height:16px;vertical-align:-3px;margin-right:5px"></i>XP 记录</button>
-        <button data-tab="study"><i data-lucide="book-open" style="display:inline;width:16px;height:16px;vertical-align:-3px;margin-right:5px"></i>学习记录</button>
-        <button data-tab="money"><i data-lucide="wallet" style="display:inline;width:16px;height:16px;vertical-align:-3px;margin-right:5px"></i>财务记录</button>
-      </div>
-
-      <!-- XP 表单 -->
-      <div class="form-panel" id="panel-xp">
-        <div class="card" style="padding:24px">
-          <div class="section-title" style="font-size:20px;margin-bottom:16px">新增 XP 记录</div>
-          <div class="form-grid">
-            <div class="field" style="grid-column:1/-1">
-              <label>从规则选择任务（可选）</label>
-              <select id="xpTaskSelect"><option value="">—— 手动输入新任务 ——</option></select>
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label>做了什么</label>
-              <input id="xpTitle" placeholder="比如：每天阅读30分钟、收拾自己的卧室" />
-            </div>
-            <div class="field" style="grid-column:1/-1">
-              <label>备注说明（必填）</label>
-              <input id="xpNote" placeholder="简单说明这次做了什么" />
-            </div>
-            <div class="field">
-              <label>XP 分值</label>
-              <div class="choice-group" id="xpValueGroup">
-                <label class="choice-pill"><input type="radio" name="xpValue" value="5">+5 XP</label>
-                <label class="choice-pill checked"><input type="radio" name="xpValue" value="10" checked>+10 XP</label>
-                <label class="choice-pill"><input type="radio" name="xpValue" value="15">+15 XP</label>
-                <label class="choice-pill"><input type="radio" name="xpValue" value="20">+20 XP</label>
-              </div>
-            </div>
-            <div class="field">
-              <label>分类</label>
-              <div class="choice-group" id="xpTypeGroup">
-                <label class="choice-pill checked"><input type="radio" name="xpType" value="学习成长" checked>学习成长</label>
-                <label class="choice-pill"><input type="radio" name="xpType" value="兴趣爱好">兴趣爱好</label>
-                <label class="choice-pill"><input type="radio" name="xpType" value="身体成长">身体成长</label>
-                <label class="choice-pill"><input type="radio" name="xpType" value="能力成长">能力成长</label>
-              </div>
-            </div>
-            <div class="field">
-              <label>日期</label>
-              <input type="date" id="xpDate" />
-            </div>
-            <div class="field">
-              <label>审核状态</label>
-              <div class="choice-group" id="xpStatusGroup">
-                <label class="choice-pill checked"><input type="radio" name="xpStatus" value="pending" checked>待确认</label>
-                <label class="choice-pill positive"><input type="radio" name="xpStatus" value="verified">已通过</label>
-                <label class="choice-pill danger"><input type="radio" name="xpStatus" value="returned">已退回</label>
-              </div>
-            </div>
-            <div class="field" id="xpReasonField" style="display:none">
-              <label>退回原因</label>
-              <input id="xpReason" placeholder="说明为什么退回" />
-            </div>
-          </div>
-          <div class="submit-row">
-            <button class="btn" id="submitXp">录入</button>
-            <span class="toast" id="xpToast"></span>
-          </div>
-          <div class="record-list" id="xpRecent"></div>
-        </div>
-      </div>
-
-      <!-- 学习表单 -->
-      <div class="form-panel" id="panel-study" style="display:none">
-        <div class="sub-tab-bar" style="display:flex;gap:6px;margin-bottom:18px;">
-          <button class="sub-tab active" data-study-tab="homework" style="padding:8px 16px;border-radius:12px;font-weight:900;font-size:13px;background:var(--lav-100);color:var(--lav-700);border:none;cursor:pointer;">作业录入</button>
-          <button class="sub-tab" data-study-tab="score" style="padding:8px 16px;border-radius:12px;font-weight:900;font-size:13px;background:var(--neutral-100);color:var(--neutral-600);border:none;cursor:pointer;">成绩录入</button>
-          <button class="sub-tab" data-study-tab="review" style="padding:8px 16px;border-radius:12px;font-weight:900;font-size:13px;background:var(--neutral-100);color:var(--neutral-600);border:none;cursor:pointer;">审核作业</button>
-          <button class="sub-tab" data-study-tab="evaluation" style="padding:8px 16px;border-radius:12px;font-weight:900;font-size:13px;background:var(--neutral-100);color:var(--neutral-600);border:none;cursor:pointer;">期末评语</button>
-        </div>
-
-        <!-- 作业录入 -->
-        <div class="study-sub-panel" id="study-sub-homework">
-          <div class="card" style="padding:24px">
-            <div class="section-title" style="font-size:20px;margin-bottom:4px">作业录入</div>
-            <p class="lead" style="font-size:13px;color:var(--neutral-500);margin-bottom:16px;">粘贴大段作业文本，自动识别科目、拆分条目。</p>
-
-            <div class="field" style="margin-bottom:14px;">
-              <label>粘贴作业原文</label>
-              <textarea id="homeworkRaw" placeholder="比如：&#10;语文：&#10;第一、背诵并默写四上古诗。&#10;第二、每天练字。&#10;数学：&#10;1. 暑假作业P33-P35&#10;2. 计算题练习30题"></textarea>
-              <button class="btn ghost" id="parseHomeworkBtn" style="margin-top:8px;font-size:13px;padding:8px 14px;">智能拆分</button>
-            </div>
-
-            <div id="parsedHomework" style="display:none;margin-bottom:16px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                <div style="font-size:13px;font-weight:900;color:var(--neutral-700);">拆分结果（可编辑勾选）</div>
-                <button class="btn" id="batchSubmitStudy" style="font-size:12px;padding:7px 16px;">一键录入全部</button>
-              </div>
-              <div id="parsedList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
-            </div>
-
-            <div class="form-grid">
-              <div class="field">
-                <label>科目</label>
-                <div class="choice-group" id="studySubjectGroup">
-                  <label class="choice-pill checked"><input type="radio" name="studySubject" value="语文" checked>语文</label>
-                  <label class="choice-pill"><input type="radio" name="studySubject" value="数学">数学</label>
-                  <label class="choice-pill"><input type="radio" name="studySubject" value="英语">英语</label>
-                  <label class="choice-pill"><input type="radio" name="studySubject" value="科学">科学</label>
-                </div>
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>作业类型</label>
-                <div class="choice-group" id="homeworkTypeGroup">
-                  <label class="choice-pill checked"><input type="radio" name="homeworkType" value="日常作业" checked>日常作业</label>
-                  <label class="choice-pill"><input type="radio" name="homeworkType" value="暑假作业">暑假作业</label>
-                  <label class="choice-pill"><input type="radio" name="homeworkType" value="假期作业">假期作业</label>
-                  <label class="choice-pill"><input type="radio" name="homeworkType" value="家庭作业">家庭作业</label>
-                </div>
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>学习能力模块（可多选，绑定作业）</label>
-                <div id="homeworkModuleCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;"></div>
-              </div>
-              <div class="field">
-                <label>完成状态</label>
-                <div class="choice-group" id="studyStatusGroup">
-                  <label class="choice-pill checked"><input type="radio" name="studyStatus" value="pending" checked>待完成</label>
-                  <label class="choice-pill positive"><input type="radio" name="studyStatus" value="done">已完成</label>
-                </div>
-              </div>
-              <div class="field">
-                <label>是否提交</label>
-                <div class="choice-group" id="studySubmittedGroup">
-                  <label class="choice-pill checked"><input type="radio" name="studySubmitted" value="0" checked>未提交</label>
-                  <label class="choice-pill positive"><input type="radio" name="studySubmitted" value="1">已提交</label>
-                </div>
-              </div>
-              <div class="field">
-                <label>日期（截止/提交）</label>
-                <input type="date" id="studyDate" />
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>作业标题</label>
-                <input id="studyTitle" placeholder="比如：抄写生字第3课" />
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>说明 / 详情</label>
-                <textarea id="studyDesc" placeholder="作业详情、拆分后的子项说明等"></textarea>
-              </div>
-            </div>
-            <div class="submit-row">
-              <button class="btn" id="submitStudy">录入</button>
-              <span class="toast" id="studyToast"></span>
-            </div>
-            <div class="record-list" id="studyRecent"></div>
-          </div>
-        </div>
-
-        <!-- 成绩录入 -->
-        <div class="study-sub-panel" id="study-sub-score" style="display:none">
-          <div class="card" style="padding:24px">
-            <div class="section-title" style="font-size:20px;margin-bottom:4px">成绩录入</div>
-            <p class="lead" style="font-size:13px;color:var(--neutral-500);margin-bottom:16px;">录入考试成绩，标记扣分模块。</p>
-            <div class="form-grid">
-              <div class="field">
-                <label>科目</label>
-                <div class="choice-group" id="scoreSubjectGroup">
-                  <label class="choice-pill checked"><input type="radio" name="scoreSubject" value="语文" checked>语文</label>
-                  <label class="choice-pill"><input type="radio" name="scoreSubject" value="数学">数学</label>
-                  <label class="choice-pill"><input type="radio" name="scoreSubject" value="英语">英语</label>
-                  <label class="choice-pill"><input type="radio" name="scoreSubject" value="科学">科学</label>
-                </div>
-              </div>
-              <div class="field">
-                <label>考试类型</label>
-                <div class="choice-group" id="scoreTypeGroup">
-                  <label class="choice-pill checked"><input type="radio" name="scoreType" value="期末" checked>期末</label>
-                  <label class="choice-pill"><input type="radio" name="scoreType" value="期中">期中</label>
-                  <label class="choice-pill"><input type="radio" name="scoreType" value="月考">月考</label>
-                  <label class="choice-pill"><input type="radio" name="scoreType" value="单元测试">单元测试</label>
-                  <label class="choice-pill"><input type="radio" name="scoreType" value="日常测验">日常测验</label>
-                </div>
-              </div>
-              <div class="field">
-                <label>学期</label>
-                <select id="scoreSemester">
-                </select>
-              </div>
-              <div class="field">
-                <label>等级</label>
-                <select id="scoreGrade">
-                  <option value="A+">A+</option>
-                  <option value="A">A</option>
-                  <option value="B+">B+</option>
-                  <option value="B">B</option>
-                  <option value="C+">C+</option>
-                  <option value="C">C</option>
-                  <option value="D+">D+</option>
-                  <option value="D">D</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>分数（选填）</label>
-                <input type="number" id="scoreNumber" placeholder="如：95" min="0" max="100" />
-              </div>
-              <div class="field">
-                <label>日期</label>
-                <input type="date" id="scoreDate" />
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>考试名称</label>
-                <input id="scoreTitle" placeholder="比如：三年级下学期语文期末考试" />
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>扣分模块（可多选）</label>
-                <div id="errorModuleCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;"></div>
-              </div>
-            </div>
-            <div class="submit-row">
-              <button class="btn" id="submitScore">录入成绩</button>
-              <span class="toast" id="scoreToast"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 作业审核 -->
-        <div class="study-sub-panel" id="study-sub-review" style="display:none">
-          <div class="card" style="padding:24px">
-            <div class="section-title" style="font-size:20px;margin-bottom:4px">作业审核</div>
-            <p class="lead" style="font-size:13px;color:var(--neutral-500);margin-bottom:16px;">审核已提交的作业，确认全对或标记需订正。</p>
-            <div id="reviewList" style="display:flex;flex-direction:column;gap:10px;">
-              <div class="empty-state"><p>暂无待审核作业</p></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 期末评语录入 -->
-        <div class="study-sub-panel" id="study-sub-evaluation" style="display:none">
-          <div class="card" style="padding:24px">
-            <div class="section-title" style="font-size:20px;margin-bottom:4px">期末评语录入</div>
-            <p class="lead" style="font-size:13px;color:var(--neutral-500);margin-bottom:16px;">录入某学期末的老师评语与家长评语。</p>
-            <div class="form-grid">
-              <div class="field">
-                <label>学期</label>
-                <select id="evalSemester">
-                  <option value="一年级上学期">一年级上学期</option>
-                  <option value="一年级下学期">一年级下学期</option>
-                  <option value="二年级上学期">二年级上学期</option>
-                  <option value="二年级下学期">二年级下学期</option>
-                  <option value="三年级上学期">三年级上学期</option>
-                  <option value="三年级下学期">三年级下学期</option>
-                  <option value="四年级上学期">四年级上学期</option>
-                  <option value="四年级下学期">四年级下学期</option>
-                  <option value="五年级上学期">五年级上学期</option>
-                  <option value="五年级下学期">五年级下学期</option>
-                  <option value="六年级上学期">六年级上学期</option>
-                  <option value="六年级下学期">六年级下学期</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>日期</label>
-                <input type="date" id="evalDate" />
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>老师评语</label>
-                <textarea id="evalTeacherComment" placeholder="老师对本学期的评语"></textarea>
-              </div>
-              <div class="field" style="grid-column:1/-1">
-                <label>家长评语</label>
-                <textarea id="evalParentComment" placeholder="家长对本学期的评语"></textarea>
-              </div>
-            </div>
-            <div class="submit-row">
-              <button class="btn" id="submitEvaluation">录入评语</button>
-              <span class="toast" id="evalToast"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 财务表单 -->
-      <div class="form-panel" id="panel-money" style="display:none">
-        <div class="card" style="padding:24px">
-          <div class="section-title" style="font-size:20px;margin-bottom:16px">新增财务记录</div>
-          <div class="form-grid three">
-            <div class="field">
-              <label>类型</label>
-              <div class="choice-group" id="moneyTypeGroup">
-                <label class="choice-pill positive checked"><input type="radio" name="moneyType" value="income" checked>收入</label>
-                <label class="choice-pill warning"><input type="radio" name="moneyType" value="expense">支出</label>
-              </div>
-            </div>
-            <div class="field">
-              <label>金额 (元)</label>
-              <input type="number" id="moneyAmount" placeholder="0.00" step="0.01" min="0.01" />
-            </div>
-            <div class="field">
-              <label>账户</label>
-              <div class="choice-group" id="moneyAccountGroup">
-                <label class="choice-pill checked"><input type="radio" name="moneyAccount" value="free" checked>自由基金</label>
-                <label class="choice-pill"><input type="radio" name="moneyAccount" value="wealth">财富增值</label>
-              </div>
-            </div>
-            <div class="field">
-              <label>分类</label>
-              <input id="moneyCategory" placeholder="比如：零花钱、文具、零食" list="moneyCats" />
-              <datalist id="moneyCats">
-                <option value="零花钱"><option value="文具"><option value="零食"><option value="玩具">
-                <option value="家务奖励"><option value="礼物"><option value="书本"><option value="其他">
-              </datalist>
-            </div>
-            <div class="field">
-              <label>描述</label>
-              <input id="moneyDesc" placeholder="比如：买了新的彩笔" />
-            </div>
-            <div class="field">
-              <label>日期</label>
-              <input type="date" id="moneyDate" />
-            </div>
-            <div class="field">
-              <label>是否值得（自由基金）</label>
-              <div class="choice-group" id="moneyWorthGroup">
-                <label class="choice-pill checked"><input type="radio" name="moneyWorth" value="" checked>不评价</label>
-                <label class="choice-pill positive"><input type="radio" name="moneyWorth" value="值得">值得</label>
-                <label class="choice-pill"><input type="radio" name="moneyWorth" value="一般">一般</label>
-                <label class="choice-pill warning"><input type="radio" name="moneyWorth" value="不值得">不值得</label>
-              </div>
-            </div>
-            <div class="field">
-              <label>原因说明</label>
-              <input id="moneyReason" placeholder="这笔消费/存入的原因" />
-            </div>
-            <div class="field">
-              <label>消费建议</label>
-              <input id="moneySuggestion" placeholder="给 Yara 的消费建议" />
-            </div>
-          </div>
-          <div class="submit-row">
-            <button class="btn" id="submitMoney">录入</button>
-            <span class="toast" id="moneyToast"></span>
-          </div>
-          <div class="record-list" id="moneyRecent"></div>
-        </div>
-      </div>
-    </div>
-  </main>
-  </section>
+  
 
   <!-- ════════ 等级详情页 · 成长阶梯 ════════ -->
   <section class="view" id="view-level">
@@ -10710,7 +10384,7 @@ if (typeof window !== "undefined") {
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="xp" onclick="switchView('xp')"><i data-lucide="sparkles"></i><span>能量</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="study" onclick="switchView('study')"><i data-lucide="book-open"></i><span>知识</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="money" onclick="switchView('money')"><i data-lucide="wallet"></i><span>财富</span></a>
-    <a class="bottom-tab-item" href="javascript:void(0)" data-page="data-entry" onclick="switchView('data-entry')"><i data-lucide="pen-line"></i><span>记录</span></a>
+    <a class="bottom-tab-item" href="system-settings.html" data-page="settings"><i data-lucide="settings"></i><span>设置</span></a>
   </nav>
   <script>
 
@@ -14814,13 +14488,7 @@ async function renderMoney() {
   setText("wealthSourceHint", `共 ${wealthIncomes.length} 笔存入`);
 }
 
-// ═══════════════════════════════════════════════════════════
-// MODULE: data-entry.js
-// ═══════════════════════════════════════════════════════════
 
-// ═══════════════════════════════════════════════════════════════
-// data-entry.js — 记录小行星页面逻辑
-// ═══════════════════════════════════════════════════════════════
 
 // ── 能力模块：优先从 API 加载配置表，加载前用硬编码兜底 ──
 let DE_LOADED_MODULES = null; // 缓存 api 加载的模块数据
@@ -15704,7 +15372,7 @@ function layoutShell(active) {
     ["xp", "⚡ 能量星球", "xp-growth.html", "sparkles"],
     ["study", "🌍 知识星球", "study.html", "book-open"],
     ["money", "💰 财富星球", "money.html", "wallet"],
-    ["data-entry", "📝 记录小行星", "data-entry.html", "pen-line"],
+    
   ];
 
   let childName = "";
@@ -15732,6 +15400,9 @@ function layoutShell(active) {
       ${pages.map(([key, label, href, icon]) => `
         <a class="${active === key ? "active" : ""}" href="javascript:void(0)" data-page="${key}" onclick="switchView(\'${key}\')" style="cursor:pointer" role="link" tabindex="0"><i data-lucide="${icon}"></i>${label}</a>
       `).join("")}
+    </nav>
+    <nav class="nav-foot">
+      <a href="system-settings.html" data-page="settings" role="link" tabindex="0"><i data-lucide="settings"></i>系统设置</a>
     </nav>
   `;
 }
@@ -16100,7 +15771,7 @@ async function boot(page) {
     if (page === "xp") await renderXp();
     if (page === "study") await renderStudy();
     if (page === "money") await renderMoney();
-    if (page === "data-entry") initDataEntryGuarded();
+    
     __viewRendered[page] = __dataVersion;
   } catch (e) {
     console.error("渲染失败:", e);
@@ -16114,12 +15785,7 @@ async function boot(page) {
   </script>
   <script>
 /* ════════ 单页应用：视图切换 (SPA) ════════ */
-let __dataEntryReady = false;
-function initDataEntryGuarded() {
-  if (__dataEntryReady) return;
-  __dataEntryReady = true;
-  initDataEntry();
-}
+
 
 // ── 等级详情页 · 成长阶梯渲染 ──
 // 根据权益名称为其分配一个直观的 emoji 图标
@@ -16233,7 +15899,7 @@ async function switchView(page) {
       else if (page === "xp") await renderXp();
       else if (page === "study") await renderStudy();
       else if (page === "money") await renderMoney();
-      else if (page === "data-entry") initDataEntryGuarded();
+      
       else if (page === "level") renderLevelLadder();
       __viewRendered[page] = __dataVersion;
     }

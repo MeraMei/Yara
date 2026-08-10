@@ -111,6 +111,53 @@ body {
   z-index: 20;
   overflow: hidden;
 }
+/* 侧边栏展开 (移动端) */
+.sidebar.show {
+  opacity: 1; visibility: visible; pointer-events: auto;
+}
+/* 侧边栏遮罩层 (移动端) */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30,28,26,.4);
+  z-index: 14;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease, visibility .3s ease;
+  pointer-events: none;
+}
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+/* ════════ 汉堡菜单按钮 (移动端) ════════ */
+.hamburger-btn {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,.6);
+  box-shadow: 0 4px 12px rgba(30,28,26,.08);
+  z-index: 30;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .18s ease;
+}
+.hamburger-btn:active { transform: scale(.95); }
+.hamburger-btn svg {
+  width: 22px;
+  height: 22px;
+  color: var(--colourful-neutral-800);
+}
+
 .sidebar::after {
   content: "🐾";
   position: absolute;
@@ -630,19 +677,47 @@ body {
 
 /* 响应式 */
 @media (max-width: 920px) {
-  .sidebar { transform: translateX(-100%); }
+  .hamburger-btn { display: flex; }
+  .main { padding-top: 72px; }
+  .sidebar { opacity: 0; visibility: hidden; pointer-events: none; transform: translateX(-100%); transition: transform .3s ease, opacity .3s ease, visibility .3s ease; }
   .main { margin-left: 0; padding: 22px; }
+  body { padding-bottom: 66px; }
 }
 @media (min-width: 921px) {
   .bottom-tab-bar { display: none; }
   body { padding-bottom: 0; }
 }
-@media (max-width: 920px) {
-  body { padding-bottom: 66px; }
+
+/* 移动端：副科卡片从3列改为2列，避免文字截断和按钮溢出 */
+@media (max-width: 640px) {
+  .sub-grid { grid-template-columns: repeat(2, 1fr); }
+  .sub-card { padding: 8px 10px; gap: 8px; }
+  .sub-card .icon-box { width: 30px; height: 30px; border-radius: 9px; font-size: 13px; }
+  .sub-card b { font-size: 12px; }
+  .sub-card .sc-ops .btn.ghost.mini { padding: 3px 6px; font-size: 11px; }
+}
+/* 超小屏：副科卡片改为1列 */
+@media (max-width: 400px) {
+  .sub-grid { grid-template-columns: 1fr; }
+}
+/* 移动端小屏适配 */
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+}
+/* 移动端：主科能力区允许换行，避免溢出 */
+@media (max-width: 640px) {
+  .main-sub { grid-template-columns: auto 1fr; }
+  .main-sub .ms-info { flex-wrap: wrap; }
+  .main-sub .ms-abills { flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
+  .main-sub .ms-ops { grid-column: 1 / -1; justify-content: flex-end; }
+  .ab-cell { font-size: 11px; padding: 2px 8px; }
+  .ab-cell i { width: 16px; height: 16px; font-size: 10px; }
 }
 </style>
 </head>
 <body>
+  <button class="hamburger-btn" aria-label="菜单" onclick="toggleSidebar()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  <div class="sidebar-overlay" onclick="closeSidebar()"></div>
   <!-- 侧边栏：毛玻璃 + 猫咪头像 + 渐变个人卡 -->
   <aside class="sidebar">
     <div class="profile">
@@ -658,7 +733,6 @@ body {
       <a href="index.html"><i>⚡</i>能量星球</a>
       <a href="index.html"><i>🌍</i>知识星球</a>
       <a href="index.html"><i>💰</i>财富星球</a>
-      <a href="index.html"><i>📝</i>记录小行星</a>
     </nav>
     <nav class="nav-foot">
       <a href="system-settings.html" class="active"><i>⚙️</i>系统设置</a>
@@ -943,7 +1017,6 @@ body {
     <a class="bottom-tab-item" href="index.html?view=xp"><i>⚡</i><span>能量</span></a>
     <a class="bottom-tab-item" href="index.html?view=study"><i>🌍</i><span>知识</span></a>
     <a class="bottom-tab-item" href="index.html?view=money"><i>💰</i><span>财富</span></a>
-    <a class="bottom-tab-item" href="index.html?view=data-entry"><i>📝</i><span>记录</span></a>
     <a class="bottom-tab-item active" href="system-settings.html"><i>⚙️</i><span>设置</span></a>
   </nav>
 
@@ -958,6 +1031,26 @@ body {
     document.querySelectorAll('.tabp').forEach(function(p){ p.classList.toggle('on', p.dataset.p === b.dataset.t); });
   });
 })();
+
+// 移动端侧边栏切换
+function toggleSidebar() {
+  var sidebar = document.querySelector(".sidebar");
+  var overlay = document.querySelector(".sidebar-overlay");
+  if (!sidebar) return;
+  sidebar.classList.toggle("show");
+  if (overlay) overlay.classList.toggle("show");
+}
+function closeSidebar() {
+  var sidebar = document.querySelector(".sidebar");
+  var overlay = document.querySelector(".sidebar-overlay");
+  if (sidebar) sidebar.classList.remove("show");
+  if (overlay) overlay.classList.remove("show");
+}
+// 点击侧边栏内的导航链接后自动关闭 (移动端)
+document.addEventListener("click", function(e) {
+  var navLink = e.target.closest(".sidebar .nav a, .sidebar .nav-foot a");
+  if (navLink) closeSidebar();
+});
 </script>
 </body>
 </html>
