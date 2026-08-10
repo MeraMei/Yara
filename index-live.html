@@ -9673,9 +9673,6 @@ if (typeof window !== "undefined") {
             <button class="btn-primary-sm" onclick="openXpModal()">
               <i data-lucide="plus" style="width:14px;height:14px"></i> 获得 XP
             </button>
-            <button class="btn-outline-sm" onclick="checkInDaily()">
-              <i data-lucide="calendar-check" style="width:14px;height:14px"></i> 日常打卡
-            </button>
           </div>
         </div>
       </section>
@@ -11373,7 +11370,7 @@ if (typeof window !== "undefined") {
       categories.forEach(cat => {
         const groupEl = document.getElementById("xpGroupPage-" + cat);
         if (!groupEl) return;
-        const tasks = xpRules[cat] || [];
+        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·"));
         groupEl.innerHTML = tasks.map(t =>
           `<option value="${t.name}" data-xp="${t.xp}" data-category="${cat}">${t.name} (+${t.xp}XP)</option>`
         ).join("");
@@ -12460,11 +12457,11 @@ const MONEY_INTROS = [
 ];
 function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-// 连续打卡（浇水）天数：从今天(或昨天)起往前数，遇断档即停
+// 连续活跃天数：从今天(或昨天)起往前数，有任意已通过 XP 记录即算一天，遇断档即停
 function getCheckInStreak(cfg) {
   const set = new Set();
   (cfg.xpRecords || []).forEach(r => {
-    if (r.taskName === "日常打卡" && (r.reviewStatus === "已通过" || r.status === "verified")) {
+    if (r.reviewStatus === "已通过" || r.status === "verified") {
       set.add(getDateStr(r));
     }
   });
@@ -13390,41 +13387,7 @@ window.confirmRedeem = async function() {
   }
 };
 
-async function refreshXpPage() {
-  await window.DataStore.refreshData();
-  await renderXp();
-}
 
-// 日常打卡
-window.checkInDaily = async function() {
-  try {
-    const cfg = await loadAppData();
-    const today = new Date().toISOString().slice(0, 10);
-    const records = cfg.recentRecords || [];
-    const already = records.find(r => r.taskName === "日常打卡" && r.time === today);
-    if (already) {
-      alert("今天已经打过卡啦，明天再来吧！");
-      return;
-    }
-    let xpValue = 10;
-    const ruleList = cfg.config?.xpRuleList || [];
-    const rule = ruleList.find(r => r.name === "日常打卡");
-    if (rule && rule.xp) xpValue = rule.xp;
-
-    await window.DataStore.addXpRecord({
-      taskName: "日常打卡",
-      description: "完成今天的日常打卡",
-      date: today,
-      status: "verified",
-      xp: xpValue,
-      xpCategory: "学习成长",
-    });
-    alert("打卡成功！获得 +" + xpValue + " XP");
-    await refreshXpPage();
-  } catch (err) {
-    alert("打卡失败：" + err.message);
-  }
-};
 
 
 // ═══════════════════════════════════════════════════════════
