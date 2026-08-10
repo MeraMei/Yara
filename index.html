@@ -367,6 +367,7 @@ body::before {
   position: relative;
   z-index: 1;
 }
+.nav a i { width: 20px; text-align: center; font-style: normal; }
 .nav a:hover, .nav a.active {
   background: white;
   color: var(--colourful-neutral-900);
@@ -375,6 +376,37 @@ body::before {
 }
 .nav a.active {
   background: linear-gradient(135deg, var(--colourful-butter-yellow-100), white);
+}
+.nav-foot {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(30,28,26,.08);
+  display: grid;
+  gap: 6px;
+}
+.nav-foot a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  color: var(--colourful-neutral-600);
+  font-weight: 800;
+  transition: .18s ease;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.nav-foot a i { width: 20px; text-align: center; font-style: normal; }
+.nav-foot a:hover, .nav-foot a.active {
+  background: white;
+  color: var(--colourful-neutral-900);
+  box-shadow: 0 8px 22px -14px rgba(30,28,26,.3);
+  transform: translateX(2px);
+}
+.nav-foot a.active {
+  background: linear-gradient(135deg, var(--colourful-lavender-100), white);
+  color: var(--colourful-lavender-700);
 }
 .constraint {
   margin-top: auto;
@@ -14396,6 +14428,8 @@ function layoutShell(active) {
       ${pages.map(([key, label, href, icon]) => `
         <a class="${active === key ? "active" : ""}" href="javascript:void(0)" data-page="${key}" onclick="switchView(\'${key}\')" style="cursor:pointer" role="link" tabindex="0"><i data-lucide="${icon}"></i>${label}</a>
       `).join("")}
+    </nav>
+    <nav class="nav-foot">
       <a href="system-settings.html" data-page="settings" role="link" tabindex="0"><i>⚙️</i>系统设置</a>
     </nav>
   `;
