@@ -2575,47 +2575,7 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       border-radius: 0 999px 999px 0;
     }
 
-    /* ════════ 设置抽屉 ════════ */
-    .settings-drawer {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      pointer-events: none;
-    }
-    .settings-drawer.open { pointer-events: auto; }
-    .settings-drawer-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(30,28,26,.4);
-      opacity: 0;
-      transition: opacity var(--duration-normal) var(--easing-default);
-    }
-    .settings-drawer.open .settings-drawer-overlay { opacity: 1; }
-    .settings-drawer-panel {
-      position: absolute;
-      top: 0; right: 0; bottom: 0;
-      width: min(420px, 90vw);
-      background: var(--colourful-neutral-50);
-      box-shadow: -8px 0 32px rgba(30,28,26,.12);
-      transform: translateX(100%);
-      transition: transform var(--duration-normal) var(--easing-default);
-      display: flex;
-      flex-direction: column;
-    }
-    .settings-drawer.open .settings-drawer-panel { transform: translateX(0); }
-    .settings-drawer-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--neutral-200);
-      background: white;
-    }
-    .settings-drawer-head h3 {
-      font: 800 18px var(--font-display);
-      color: var(--neutral-900);
-      letter-spacing: -.01em;
-    }
+    /* ════════ 设置抽屉（已由独立配置页替代，样式移除） ════════ */
     .icon-btn {
       width: 36px; height: 36px;
       border-radius: 10px;
@@ -2628,28 +2588,6 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
     }
     .icon-btn:hover { background: var(--neutral-200); color: var(--neutral-800); }
     .icon-btn i { width: 18px; height: 18px; }
-    .settings-drawer-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 24px;
-    }
-    .settings-section {
-      margin-bottom: 28px;
-    }
-    .settings-section h4 {
-      font: 700 14px var(--font-display);
-      color: var(--neutral-800);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .settings-section h4::before {
-      content: "";
-      width: 3px; height: 16px;
-      border-radius: 2px;
-      background: var(--colourful-butter-yellow-400);
-    }
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2687,78 +2625,10 @@ body[data-view="data-entry"] .bottom-tab-item.active { color: var(--colourful-ca
       color: var(--neutral-400);
       font-weight: 500;
     }
-    .btn-add-year {
-      margin-top: 14px;
-      width: 100%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: var(--colourful-butter-yellow-100);
-      color: var(--colourful-butter-yellow-700);
-      font-size: 13px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all .15s;
-    }
-    .btn-add-year:hover { background: var(--colourful-butter-yellow-200); }
-    .btn-add-year i { width: 16px; height: 16px; }
-    .settings-drawer-foot {
-      display: flex;
-      gap: 10px;
-      padding: 16px 24px;
-      border-top: 1px solid var(--neutral-200);
-      background: white;
-    }
-    .settings-drawer-foot .btn {
-      flex: 1;
-      justify-content: center;
-    }
     .btn-secondary {
       background: var(--neutral-100);
       color: var(--neutral-700);
     }
-    /* GitHub Token 设置 */
-    .token-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 12px;
-      border-radius: 10px;
-      margin-top: 8px;
-    }
-    .token-status.ok {
-      background: var(--colourful-mint-green-100, #e0faf0);
-      color: var(--colourful-mint-green-700, #21755b);
-    }
-    .token-status.missing {
-      background: var(--colourful-sunny-coral-100, #ffeadb);
-      color: var(--colourful-sunny-coral-700, #b93a13);
-    }
-    .token-status i { width: 14px; height: 14px; flex-shrink: 0; }
-    .token-hint {
-      font-size: 11px;
-      color: var(--neutral-400);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-    .token-hint a { color: var(--colourful-mint-green-500); text-decoration: underline; }
-    .token-hint a:hover { color: var(--colourful-mint-green-600); }
-    .btn-test-token {
-      margin-top: 10px;
-      padding: 8px 14px;
-      border-radius: 10px;
-      background: var(--neutral-100);
-      color: var(--neutral-600);
-      font-size: 12px;
-      font-weight: 600;
-      transition: all .15s;
-    }
-    .btn-test-token:hover { background: var(--neutral-200); }
-    .btn-test-token:disabled { opacity: .5; }
     .btn-secondary:hover { background: var(--neutral-200); }
     .btn-primary {
       background: var(--colourful-butter-yellow-500);
@@ -9614,137 +9484,13 @@ if (typeof window !== 'undefined') {
   </div>
 
   
-  <!-- ════════ 设置抽屉（基本信息 + 校历设置） ════════ -->
-  <div class="settings-drawer" id="settingsDrawer" role="dialog" aria-modal="true" aria-label="设置">
-    <div class="settings-drawer-overlay" onclick="closeSettingsDrawer()"></div>
-    <div class="settings-drawer-panel">
-      <div class="settings-drawer-head">
-        <h3><i data-lucide="settings" style="width:18px;height:18px;vertical-align:-3px"></i> 设置</h3>
-        <button class="icon-btn" onclick="closeSettingsDrawer()" aria-label="关闭"><i data-lucide="x"></i></button>
-      </div>
-      <div class="settings-drawer-body">
-        <!-- 基本信息 -->
-        <div class="settings-section">
-          <h4>基本信息</h4>
-          <div class="form-grid">
-            <div class="form-field">
-              <label>姓名</label>
-              <input type="text" id="settingsName" placeholder="孩子姓名" />
-            </div>
-            <div class="form-field">
-              <label>生日</label>
-              <input type="date" id="settingsBirthday" />
-            </div>
-            <div class="form-field">
-              <label>性别</label>
-              <select id="settingsGender">
-                <option value="女生">女生</option>
-                <option value="男生">男生</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>年级</label>
-              <select id="settingsGrade">
-                <option value="一年级">一年级</option>
-                <option value="二年级">二年级</option>
-                <option value="三年级">三年级</option>
-                <option value="四年级">四年级</option>
-                <option value="五年级">五年级</option>
-                <option value="六年级">六年级</option>
-                <option value="初一">初一</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>学校</label>
-              <input type="text" id="settingsSchool" placeholder="学校名称" />
-            </div>
-            <div class="form-field">
-              <label>班级</label>
-              <input type="text" id="settingsClass" placeholder="如：一班" />
-            </div>
-            <div class="form-field full-width">
-              <label>个性签名</label>
-              <input type="text" id="settingsMotto" placeholder="一句话自我介绍" />
-            </div>
-          </div>
-        </div>
-
-        <!-- 校历设置 -->
-        <div class="settings-section">
-          <h4>校历设置</h4>
-          <div class="form-grid">
-            <div class="form-field">
-              <label>学年</label>
-              <select id="settingsAcademicYear"></select>
-            </div>
-            <div class="form-field">
-              <label>学期</label>
-              <select id="settingsSemester">
-                <option value="1">第一学期（上）</option>
-                <option value="2">第二学期（下）</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>开学日期</label>
-              <input type="date" id="settingsStartDate" />
-            </div>
-            <div class="form-field">
-              <label>期中考试</label>
-              <input type="date" id="settingsMidTermDate" />
-            </div>
-            <div class="form-field">
-              <label>期末考试</label>
-              <input type="date" id="settingsFinalExamDate" />
-            </div>
-            <div class="form-field">
-              <label>教学周数</label>
-              <input type="number" id="settingsTeachingWeeks" min="1" placeholder="如：20" />
-            </div>
-            <div class="form-field" id="settingsBreakRow">
-              <label id="settingsBreakLabel">寒假开始</label>
-            </div>
-            <div class="form-field" id="settingsWinterBreakRow" style="display:none">
-              <input type="date" id="settingsWinterBreakDate" />
-            </div>
-            <div class="form-field full-width" id="settingsSummerBreakRow" style="display:none">
-              <input type="date" id="settingsSummerBreakDate" />
-            </div>
-          </div>
-          <button class="btn-add-year" onclick="addNewAcademicYear()">
-            <i data-lucide="plus"></i> 新增一学年
-          </button>
-        </div>
-
-        <!-- GitHub 连接设置 -->
-        <div class="settings-section">
-          <h4><i data-lucide="github" style="width:16px;height:16px"></i> GitHub 连接</h4>
-          <div class="form-grid">
-            <div class="form-field full-width">
-              <label>Personal Access Token</label>
-              <input type="password" id="settingsGithubToken" placeholder="ghp_xxxx... 或 github_pat_xxxx..." />
-              <div id="tokenStatus" class="token-status missing"><i data-lucide="alert-circle"></i><span>未设置，请添加 Token</span></div>
-              <div class="token-hint">需要写入数据（审批通过、记账等）时使用。
-                <a href="https://github.com/settings/tokens/new?scopes=repo&description=Yara" target="_blank" rel="noopener">去 GitHub 创建 Token →</a>
-                （勾选 repo 权限）
-              </div>
-              <button type="button" class="btn-test-token" id="btnTestToken" onclick="testGithubToken()"><i data-lucide="refresh-cw" style="width:12px;height:12px;vertical-align:-2px"></i> 测试连接</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="settings-drawer-foot">
-        <button class="btn btn-secondary" onclick="closeSettingsDrawer()">取消</button>
-        <button class="btn btn-primary" onclick="saveSettings()">保存设置</button>
-      </div>
-    </div>
-  </div>
-
   <nav class="bottom-tab-bar">
     <a class="bottom-tab-item active" href="javascript:void(0)" data-page="home" onclick="switchView('home')"><i data-lucide="home"></i><span>中心</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="xp" onclick="switchView('xp')"><i data-lucide="sparkles"></i><span>能量</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="study" onclick="switchView('study')"><i data-lucide="book-open"></i><span>知识</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="money" onclick="switchView('money')"><i data-lucide="wallet"></i><span>财富</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="data-entry" onclick="switchView('data-entry')"><i data-lucide="pen-line"></i><span>记录</span></a>
+    <a class="bottom-tab-item" href="system-settings.html" data-page="settings"><i data-lucide="settings"></i><span>设置</span></a>
   </nav>
   <script>
 
@@ -10112,336 +9858,12 @@ function _fmtMD(s) {
 
 // ── 设置面板相关 ──
 
-async function openSettingsDrawer() {
-  const drawer = document.getElementById("settingsDrawer");
-  if (drawer) drawer.classList.add("open");
-  // 强制从飞书刷新最新数据（绕过本地缓存），再填充表单，确保展示的是飞书数据库里的实时数据
-  try {
-    if (window.DataStore && typeof window.DataStore.refreshData === "function") {
-      await window.DataStore.refreshData();
-    } else if (window.DataStore && typeof window.DataStore.loadData === "function") {
-      await window.DataStore.loadData();
-    }
-  } catch (e) { /* 拉取失败时回退到当前缓存 */ }
-  populateSettingsForm();
-  refreshIcons(50);
+// 设置入口统一跳转到系统配置页（原弹出抽屉已由独立配置页替代）
+function openSettingsDrawer() {
+  window.location.href = "system-settings.html";
 }
 
-function closeSettingsDrawer() {
-  const drawer = document.getElementById("settingsDrawer");
-  if (drawer) drawer.classList.remove("open");
-}
-
-function populateSettingsForm() {
-  // 填充基本信息
-  // 优先从 DataStore 加载 child 数据，若为空则尝试从主数据源（cachedData）获取
-  let child = window.DataStore && window.DataStore.loadChildData
-    ? window.DataStore.loadChildData() || {}
-    : {};
-  // 如果 loadChildData 返回空对象（如 cachedData 尚未初始化），从主数据源补充
-  if ((!child.name || !child.grade) && window.DataStore && window.__lastData) {
-    child = window.__lastData.child || child;
-  }
-
-  const setVal = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.value = val || "";
-  };
-
-  setVal("settingsName", child.name || "Yara");
-  setVal("settingsBirthday", child.birthday || "");
-  setVal("settingsGender", child.gender || "女生");
-  setVal("settingsGrade", child.grade || "三年级");
-  setVal("settingsSchool", child.school || "");
-  setVal("settingsClass", child.className || "");
-  setVal("settingsMotto", child.motto || "");
-
-  // 更新 GitHub Token 状态
-  updateTokenStatus();
-
-  // 填充校历设置
-  populateCalendarSettings();
-}
-
-function updateTokenStatus() {
-  const hasToken = window.DataStore && window.DataStore.hasGithubToken && window.DataStore.hasGithubToken();
-  const statusEl = document.getElementById("tokenStatus");
-  if (!statusEl) return;
-  if (hasToken) {
-    statusEl.className = "token-status ok";
-    statusEl.innerHTML = '<i data-lucide="check-circle"></i><span>Token 已设置，可以写入数据</span>';
-  } else {
-    statusEl.className = "token-status missing";
-    statusEl.innerHTML = '<i data-lucide="alert-circle"></i><span>未设置，请添加 Token</span>';
-  }
-  refreshIcons(20);
-}
-
-async function testGithubToken() {
-  const btn = document.getElementById("btnTestToken");
-  if (btn) { btn.disabled = true; btn.textContent = "测试中..."; }
-  // 保存当前输入框中的 token
-  const tokenInput = document.getElementById("settingsGithubToken");
-  const token = tokenInput ? tokenInput.value.trim() : "";
-  if (token) {
-    window.DataStore.setGithubToken(token);
-  }
-  const existingToken = window.DataStore.getGithubToken();
-  if (!existingToken) {
-    showToast("请先输入 Token 再测试", false);
-    if (btn) { btn.disabled = false; btn.textContent = "测试连接"; }
-    return;
-  }
-  try {
-    const resp = await fetch("https://api.github.com/user", {
-      headers: { "Authorization": "Bearer " + existingToken, "Accept": "application/vnd.github.v3+json" }
-    });
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.message || "HTTP " + resp.status);
-    }
-    const user = await resp.json();
-    // 验证 repo 权限
-    const repoResp = await fetch("https://api.github.com/repos/meramei/Yara", {
-      headers: { "Authorization": "Bearer " + existingToken, "Accept": "application/vnd.github.v3+json" }
-    });
-    if (!repoResp.ok) throw new Error("无法访问仓库，请检查 Token 的 repo 权限");
-    showToast("✅ 连接成功！用户：" + (user.login || "") + "，Token 有效", true);
-    updateTokenStatus();
-  } catch (e) {
-    showToast("❌ 连接失败: " + (e.message || "未知错误"), false);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = "测试连接"; }
-  }
-}
-
-function populateCalendarSettings() {
-  const calendarData = getCalendarData();
-  const yearSelect = document.getElementById("settingsAcademicYear");
-  const semesterSelect = document.getElementById("settingsSemester");
-
-  if (yearSelect) {
-    yearSelect.innerHTML = calendarData.map(y =>
-      `<option value="${y.academicYear}">${y.academicYear}学年（${y.grade}）</option>`
-    ).join("");
-
-    // 默认选中当前学年
-    const currentInfo = getCurrentSemesterInfo();
-    yearSelect.value = currentInfo.academicYear;
-
-    yearSelect.removeEventListener("change", updateSemesterDateFields);
-    yearSelect.addEventListener("change", updateSemesterDateFields);
-  }
-
-  if (semesterSelect) {
-    semesterSelect.innerHTML = `
-      <option value="1">第一学期（上）</option>
-      <option value="2">第二学期（下）</option>
-    `;
-    const currentInfo = getCurrentSemesterInfo();
-    semesterSelect.value = String(currentInfo.semester);
-    semesterSelect.removeEventListener("change", updateSemesterDateFields);
-    semesterSelect.addEventListener("change", updateSemesterDateFields);
-  }
-
-  updateSemesterDateFields();
-}
-
-function updateSemesterDateFields() {
-  const yearSelect = document.getElementById("settingsAcademicYear");
-  const semesterSelect = document.getElementById("settingsSemester");
-  if (!yearSelect || !semesterSelect) return;
-
-  const calendarData = getCalendarData();
-  const yearData = calendarData.find(y => y.academicYear === yearSelect.value);
-  if (!yearData) return;
-
-  const semKey = "semester" + semesterSelect.value;
-  const semData = yearData[semKey];
-  if (!semData) return;
-
-  const setVal = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.value = val || "";
-  };
-
-  setVal("settingsStartDate", semData.startDate);
-  setVal("settingsMidTermDate", semData.midTermStart);
-  setVal("settingsFinalExamDate", semData.finalExamStart);
-
-  const breakDateId = semesterSelect.value === "1"
-    ? "settingsWinterBreakDate"
-    : "settingsSummerBreakDate";
-  const breakLabelId = "settingsBreakLabel";
-  const breakField = document.getElementById(breakDateId);
-  const breakRow = document.getElementById("settingsBreakRow");
-  const breakLabel = document.getElementById(breakLabelId);
-
-  if (semesterSelect.value === "1") {
-    if (breakLabel) breakLabel.textContent = "寒假开始";
-    setVal("settingsWinterBreakDate", semData.winterBreakStart);
-    if (document.getElementById("settingsWinterBreakRow")) {
-      document.getElementById("settingsWinterBreakRow").style.display = "";
-    }
-    if (document.getElementById("settingsSummerBreakRow")) {
-      document.getElementById("settingsSummerBreakRow").style.display = "none";
-    }
-  } else {
-    if (breakLabel) breakLabel.textContent = "暑假开始";
-    setVal("settingsSummerBreakDate", semData.summerBreakStart);
-    if (document.getElementById("settingsWinterBreakRow")) {
-      document.getElementById("settingsWinterBreakRow").style.display = "none";
-    }
-    if (document.getElementById("settingsSummerBreakRow")) {
-      document.getElementById("settingsSummerBreakRow").style.display = "";
-    }
-  }
-
-  setVal("settingsTeachingWeeks", semData.teachingWeeks);
-}
-
-function saveSettings() {
-  // 保存基本信息
-  const getVal = (id) => {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : "";
-  };
-
-  const childData = {
-    name: getVal("settingsName"),
-    birthday: getVal("settingsBirthday"),
-    gender: getVal("settingsGender"),
-    grade: getVal("settingsGrade"),
-    school: getVal("settingsSchool"),
-    className: getVal("settingsClass"),
-    motto: getVal("settingsMotto"),
-  };
-
-  if (window.DataStore && window.DataStore.saveChildData) {
-    window.DataStore.saveChildData(childData);
-  }
-
-  // 保存校历设置
-  saveCalendarSettings();
-
-  // 保存 GitHub Token
-  const tokenInput = document.getElementById("settingsGithubToken");
-  if (tokenInput && tokenInput.value.trim()) {
-    window.DataStore.setGithubToken(tokenInput.value.trim());
-    updateTokenStatus();
-  }
-
-  closeSettingsDrawer();
-  showToast("✅ 设置已保存", true);
-
-  // 重新渲染首页相关内容
-  if (typeof renderHome === "function") {
-    renderHome();
-  }
-  renderSemesterBar();
-
-  // 刷新侧边栏
-  if (typeof layoutShell === "function") {
-    layoutShell("home");
-  }
-  refreshIcons(50);
-}
-
-function saveCalendarSettings() {
-  const yearSelect = document.getElementById("settingsAcademicYear");
-  const semesterSelect = document.getElementById("settingsSemester");
-  if (!yearSelect || !semesterSelect) return;
-
-  const getVal = (id) => {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : "";
-  };
-
-  const calendarData = getCalendarData();
-  const yearData = calendarData.find(y => y.academicYear === yearSelect.value);
-  if (!yearData) return;
-
-  const semKey = "semester" + semesterSelect.value;
-  const semData = yearData[semKey];
-  if (!semData) return;
-
-  semData.startDate = getVal("settingsStartDate") || semData.startDate;
-  semData.midTermStart = getVal("settingsMidTermDate") || semData.midTermStart;
-  semData.finalExamStart = getVal("settingsFinalExamDate") || semData.finalExamStart;
-
-  if (semesterSelect.value === "1") {
-    semData.winterBreakStart = getVal("settingsWinterBreakDate") || semData.winterBreakStart;
-  } else {
-    semData.summerBreakStart = getVal("settingsSummerBreakDate") || semData.summerBreakStart;
-  }
-
-  const weeks = parseInt(getVal("settingsTeachingWeeks"), 10);
-  if (weeks && weeks > 0) {
-    semData.teachingWeeks = weeks;
-  }
-
-  saveCalendarData(calendarData);
-}
-
-function addNewAcademicYear() {
-  const calendarData = getCalendarData();
-  const lastYear = calendarData[calendarData.length - 1];
-  if (!lastYear) return;
-
-  // 推算新学年
-  const lastYearStart = parseInt(lastYear.academicYear.split("-")[0], 10);
-  const newYearStart = lastYearStart + 1;
-  const newYearEnd = newYearStart + 1;
-  const newAcademicYear = `${newYearStart}-${newYearEnd}`;
-
-  // 年级递增（简单映射）
-  const gradeMap = {
-    "一年级": "二年级", "二年级": "三年级", "三年级": "四年级",
-    "四年级": "五年级", "五年级": "六年级", "六年级": "初一",
-  };
-  const newGrade = gradeMap[lastYear.grade] || "未知年级";
-
-  // 按规律推算日期（9月1日开学，第10周期中，教学周复制上一年对应学期）
-  const newYearData = {
-    academicYear: newAcademicYear,
-    grade: newGrade,
-    semester1: {
-      name: "第一学期",
-      shortName: "上",
-      startDate: `${newYearStart}-09-01`,
-      midTermStart: _addWeeks(`${newYearStart}-09-01`, 9),
-      finalExamStart: _addWeeks(`${newYearStart}-09-01`, lastYear.semester1.teachingWeeks - 1),
-      winterBreakStart: _addWeeks(`${newYearStart}-09-01`, lastYear.semester1.teachingWeeks),
-      teachingWeeks: lastYear.semester1.teachingWeeks
-    },
-    semester2: {
-      name: "第二学期",
-      shortName: "下",
-      startDate: `${newYearEnd}-02-20`,
-      midTermStart: _addWeeks(`${newYearEnd}-02-20`, 9),
-      finalExamStart: _addWeeks(`${newYearEnd}-02-20`, lastYear.semester2.teachingWeeks - 1),
-      summerBreakStart: _addWeeks(`${newYearEnd}-02-20`, lastYear.semester2.teachingWeeks),
-      teachingWeeks: lastYear.semester2.teachingWeeks
-    }
-  };
-
-  calendarData.push(newYearData);
-  saveCalendarData(calendarData);
-  populateCalendarSettings();
-
-  // 选中新学年
-  const yearSelect = document.getElementById("settingsAcademicYear");
-  if (yearSelect) yearSelect.value = newAcademicYear;
-  updateSemesterDateFields();
-  showToast(`✅ 已新增学年「${newAcademicYear}」`, true);
-}
-
-// 辅助：日期加N周后的日期字符串
-function _addWeeks(dateStr, weeks) {
-  const d = new Date(dateStr + "T00:00:00");
-  d.setDate(d.getDate() + weeks * 7);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+function closeSettingsDrawer() { /* 兼容占位：抽屉已移除，配置页无需关闭 */ }
 
 // ── 导出 ──
 if (typeof window !== "undefined") {
@@ -10454,9 +9876,6 @@ if (typeof window !== "undefined") {
     renderSemesterBar,
     openSettingsDrawer,
     closeSettingsDrawer,
-    saveSettings,
-    addNewAcademicYear,
-    populateSettingsForm,
   };
 }
 
@@ -14977,6 +14396,7 @@ function layoutShell(active) {
       ${pages.map(([key, label, href, icon]) => `
         <a class="${active === key ? "active" : ""}" href="javascript:void(0)" data-page="${key}" onclick="switchView(\'${key}\')" style="cursor:pointer" role="link" tabindex="0"><i data-lucide="${icon}"></i>${label}</a>
       `).join("")}
+      <a href="system-settings.html" data-page="settings" role="link" tabindex="0"><i data-lucide="settings"></i>系统设置</a>
     </nav>
   `;
 }
