@@ -8118,7 +8118,7 @@ const GITHUB_BRANCH = 'main';
 const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/data`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data`;
 
-const CACHE_KEY = "yara_growth_data_v6";
+const CACHE_KEY = "yara_growth_data_v7";
 const CHILD_CACHE_KEY = "yara_child_profile";
 const CALENDAR_CACHE_KEY = "yara_calendar_data";
 
@@ -8765,7 +8765,7 @@ async function saveDiaryEntries(entries) {
 }
 
 // 新增/覆盖一篇日记：同一天重复写则覆盖当天那一篇（不新增）
-// entry: { date, mood, content, completeFour, completeFeel, hits }
+// entry: { date, mood, content, completeFour, completeFeel, hits, xp }
 async function addDiaryEntry(entry) {
   _dataGen++;
   const date = entry.date || todayStr();
@@ -8780,6 +8780,7 @@ async function addDiaryEntry(entry) {
     completeFour: !!entry.completeFour,
     completeFeel: !!entry.completeFeel,
     hits: entry.hits || [],
+    xp: entry.xp || 0,
     createdAt: entry.createdAt || new Date().toISOString(),
   };
   if (idx >= 0) list[idx] = saved; else list.unshift(saved);
@@ -8788,7 +8789,7 @@ async function addDiaryEntry(entry) {
 }
 
 // ── AI 式智能分析：从自由正文判断是否自然写出时间/地点/人物/事件/感受 ──
-const DIARY_TIME_WORDS = ["今天","昨天","前天","早上","早晨","清晨","上午","中午","下午","傍晚","晚上","夜里","白天","放学后","下课","午休","睡前","回家后","周末","星期","假期","暑假","寒假","刚才","时候"];
+const DIARY_TIME_WORDS = ["今天","昨天","前天","早上","早晨","清晨","上午","中午","下午","傍晚","晚上","夜里","白天","放学后","下课","午休","睡前","回家后","周末","星期","假期","暑假","寒假","刚才","时候","然后","后来","之后","现在","刚刚","一会儿","每天","有一天","有一次","首先","接着","最后","那时","这时候","那几天","每天"];
 const DIARY_PLACE_WORDS = ["在","公园","操场","教室","学校","家里","家","超市","商场","广场","图书馆","医院","房间","阳台","厨房","外面","楼下","小区","车上","公交","地铁","饭店","餐厅","书店","游乐园","动物园","海边","山里","老家","奶奶家","外婆家","园","场","站"];
 const DIARY_PEOPLE_WORDS = ["爸爸","妈妈","爷爷","奶奶","外公","外婆","同学","朋友","好朋友","老师","弟弟","妹妹","哥哥","姐姐","舅舅","姑姑","叔叔","阿姨","我们","他","她","他们","大家","小伙伴","一起"];
 const DIARY_EVENT_WORDS = ["玩","去","做","写","看","吃","跑","跳","游戏","作业","练字","比赛","学","踢","画","唱","读","逛","读书","运动","跑步","骑车","游泳","爬山","野餐","做饭","手工","棋","拼图","乐高","散步","跳绳","打球","上课","参观","旅游","旅行","放风筝","钓鱼","看电影","看电视","玩手机"];
@@ -8805,13 +8806,14 @@ function analyzeDiaryElements(content) {
   const people = has(DIARY_PEOPLE_WORDS);
   const event = has(DIARY_EVENT_WORDS);
   const feel = has(DIARY_FEEL_WORDS);
+  const elementCount = [time, place, people, event].filter(Boolean).length;
   const hits = [];
   if (time) hits.push("时间");
   if (place) hits.push("地点");
   if (people) hits.push("人物");
   if (event) hits.push("事件");
   if (feel) hits.push("感受");
-  return { time, place, people, event, feel, completeFour: time && place && people && event, completeFeel: feel, hits };
+  return { time, place, people, event, feel, hits, completeFour: elementCount >= 3, completeFeel: feel, elementCount };
 }
 
 // ── 日记本 UI 渲染与交互 ──
@@ -8873,7 +8875,9 @@ async function submitDiary() {
   const analysis = analyzeDiaryElements(content);
   const completeFour = analysis.completeFour;
   const completeFeel = !!mood || analysis.completeFeel;
-  const xp = (completeFour && completeFeel) ? 10 : 6;
+  // 阶梯式评分：5/5 要素 → 10 XP，4/5 → 8 XP，3/5 → 6 XP，少于 3 → 4 XP
+  const hitCount = analysis.hits.length;
+  const xp = hitCount >= 5 ? 10 : hitCount >= 4 ? 8 : hitCount >= 3 ? 6 : 4;
   const btn = document.querySelector("#diaryModalPage .btn-confirm");
   const original = btn.textContent;
   btn.textContent = "保存中..."; btn.disabled = true;
@@ -8886,6 +8890,7 @@ async function submitDiary() {
       completeFour,
       completeFeel,
       hits: analysis.hits,
+      xp,
     });
     // 2. 发放 XP（同日去重：当天已有"写日记"记录则不重复发放）
     const cfg = await DataStore.loadData();
@@ -8912,9 +8917,11 @@ async function submitDiary() {
     closeDiaryModal();
     const all5 = ["时间", "地点", "人物", "事件", "感受"];
     const missing = all5.filter(k => !analysis.hits.includes(k));
-    const hint = completeFour && completeFeel
-      ? "写得很完整，继续保持！"
-      : missing.length ? `下次把${missing.join("、")}也写出来更好` : "";
+    // 阶梯式评分的提示语
+    let hint = "";
+    if (hitCount >= 5) hint = "五要素齐全，拿满分！🎉";
+    else if (hitCount >= 4) hint = `就差${missing.join("、")}了，下次写出来拿 10 XP！`;
+    else if (missing.length) hint = `下次把${missing.join("、")}也写出来拿更多 XP 哦 ✍️`;
     // 3. 提交成功后明确提示：积分 + 保存成功状态
     if (awardedXp > 0) {
       showToast(`✅ 保存成功！本次 +${awardedXp} XP${hint ? "，" + hint : ""}`, true);
@@ -8952,7 +8959,7 @@ async function renderDiary() {
   entries = entries.slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
   const totalCount = entries.length;
   const streak = calcDiaryStreak(entries);
-  const totalDiaryXp = entries.reduce((sum, d) => sum + ((d.completeFour && d.completeFeel) ? 10 : 6), 0);
+  const totalDiaryXp = entries.reduce((sum, d) => sum + (Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6)), 0);
   setText("diaryStats", `已写 ${totalCount} 篇 · 连续 ${streak} 天 · 累计 ${totalDiaryXp} XP`);
   setText("dStatCount", totalCount);
   setText("dStatStreak", streak);
@@ -8964,9 +8971,9 @@ async function renderDiary() {
   } else {
     tl.innerHTML = entries.slice(0, 6).map(d => {
       const hits = d.hits || [];
-      const metaFour = d.completeFour ? `<span class="ok">四要素 ✓</span>` : `<span class="no">四要素不全</span>`;
+      const metaFour = d.completeFour ? `<span class="ok">${hits.filter(h => h !== "感受").length}/4 要素 ✓</span>` : `<span class="no">${hits.filter(h => h !== "感受").length}/4 要素</span>`;
       const metaFeel = d.completeFeel ? `<span class="ok">感受 ✓</span>` : `<span class="no">感受缺</span>`;
-      const xp = (d.completeFour && d.completeFeel) ? 10 : 6;
+      const xp = Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6);
       const hitsTxt = hits.length ? `<span class="dl-hits">写到：${hits.join(" · ")}</span>` : "";
       return `<div class="dl-item">
         <div class="dl-head"><span class="dl-date">${formatDiaryDate(d.date)}</span><span class="dl-mood">${d.mood || "📝"}</span></div>
