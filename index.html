@@ -1199,6 +1199,282 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
 .energy-source-card .op-source-title i { color: var(--colourful-mint-green-600); }
 
 /* 双维度对比 */
+/* ════════ 我的日记本（能量版块核心 · 写作卡片式，左右平衡布局） ════════ */
+.diary-module {
+  margin-bottom: 20px;
+}
+.diary-card {
+  background: linear-gradient(150deg, #ffffff 0%, #f6fbf8 100%);
+  border-radius: 18px;
+  padding: 18px;
+  border: 1px solid rgba(54,185,139,.25);
+  box-shadow: var(--shadow-1);
+}
+/* 头部：标题靠左、写日记按钮靠右，左右呼应 */
+.diary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.diary-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.diary-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #1e5d4a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.diary-icon {
+  font-size: 20px;
+}
+.diary-stats {
+  font-size: 12px;
+  color: #7a8a82;
+}
+.diary-write {
+  background: linear-gradient(135deg, #36b98b, #289371);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(54,185,139,.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.diary-write:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(54,185,139,.4);
+}
+/* 主体：左右两栏，视觉平衡 */
+.diary-main {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+/* 左栏：统计 + 本周打卡 */
+.diary-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.diary-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.diary-stat {
+  background: #fff;
+  border: 1px solid #e7f7f0;
+  border-radius: 12px;
+  padding: 12px 6px;
+  text-align: center;
+}
+.diary-stat b {
+  display: block;
+  font-size: 20px;
+  color: #1e5d4a;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.diary-stat span {
+  font-size: 11px;
+  color: #7a8a82;
+}
+.diary-checkin {
+  background: #fff;
+  border: 1px solid #e7f7f0;
+  border-radius: 12px;
+  padding: 12px;
+}
+.diary-checkin h4 {
+  font-size: 12px;
+  color: #1e5d4a;
+  font-weight: 700;
+  margin: 0 0 10px;
+  text-align: center;
+}
+.diary-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.diary-strip .d-dot {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #eef2ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #b5bdb8;
+}
+.diary-strip .d-dot.on {
+  background: #e7f7f0;
+  color: #1e8a68;
+}
+.diary-strip .d-dot.today {
+  border: 2px solid #36b98b;
+  font-weight: 800;
+  color: #1e5d4a;
+}
+/* 右栏：最近日记（卡片网格） */
+.diary-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.diary-right h4 {
+  font-size: 12px;
+  color: #1e5d4a;
+  font-weight: 700;
+  margin: 0;
+}
+.diary-tl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.diary-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #9aa8a0;
+  font-size: 13px;
+  padding: 18px 0;
+}
+.diary-tl .dl-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid #eef2ef;
+}
+.diary-tl .dl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.diary-tl .dl-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e5d4a;
+}
+.diary-tl .dl-mood {
+  font-size: 16px;
+}
+.diary-tl .dl-text {
+  font-size: 13px;
+  color: #5c5650;
+  line-height: 1.5;
+}
+.diary-tl .dl-meta {
+  font-size: 11px;
+  color: #8f9b94;
+}
+.diary-tl .dl-meta .ok { color: #1e8a68; font-weight: 600; }
+.diary-tl .dl-meta .no { color: #c9a227; font-weight: 600; }
+/* 写日记弹窗 */
+.modal.diary-modal { max-width: 560px; width: 100%; }
+.diary-modal .modal-body { max-height: 62vh; overflow-y: auto; }
+.diary-moods {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  margin-top: 6px;
+}
+.diary-moods button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 22px;
+  flex: 1;
+  min-width: 0;
+  height: 60px;
+  border-radius: 12px;
+  border: 1px solid #eef2ef;
+  background: #fff;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease;
+}
+.diary-moods button .m-emoji { line-height: 1; }
+.diary-moods button .m-label {
+  font-size: 11px;
+  color: #7a8a82;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.diary-moods button:hover { transform: scale(1.06); }
+.diary-moods button.sel {
+  background: #e7f7f0;
+  border-color: #36b98b;
+  box-shadow: 0 0 0 2px rgba(54,185,139,.25);
+}
+.diary-moods button.sel .m-label { color: #1e8a68; }
+.diary-mood-other {
+  margin-top: 8px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.diary-mood-other.show { display: flex; }
+.diary-mood-other input {
+  flex: 1;
+  border: 1px solid #eef2ef;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #5c5650;
+  background: #fff;
+  outline: none;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.diary-mood-other input:focus {
+  border-color: #36b98b;
+  box-shadow: 0 0 0 2px rgba(54,185,139,.15);
+}
+.diary-tip {
+  font-size: 12px;
+  color: #1e8a68;
+  background: #e7f7f0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-top: 4px;
+}
+@media (max-width: 420px) {
+  .diary-moods { gap: 5px; }
+  .diary-moods button { font-size: 19px; height: 54px; }
+  .diary-moods button .m-label { font-size: 10px; }
+}
+.diary-tl .dl-hits {
+  font-size: 11px;
+  color: #1e8a68;
+  font-weight: 600;
+}
+@media (max-width: 720px) {
+  .diary-main { grid-template-columns: 1fr; }
+  .diary-left { flex-direction: row; flex-wrap: wrap; }
+  .diary-left .diary-stats-grid { flex: 1 1 150px; }
+  .diary-left .diary-checkin { flex: 1 1 200px; }
+}
+@media (max-width: 560px) {
+  .diary-top { flex-direction: column; align-items: flex-start; }
+  .diary-tl { grid-template-columns: 1fr; }
+}
 .dim-compare-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -6875,7 +7151,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       padding: 20px;
       transition: opacity .2s ease, visibility .2s ease;
     }
-    .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+    .modal-overlay.active { display: flex; opacity: 1; visibility: visible; pointer-events: auto; }
     .modal-card {
       background: rgba(255,255,255,.95);
       backdrop-filter: blur(12px);
@@ -7558,7 +7834,7 @@ async function loadData() {
   loadPromise = (async () => {
     try {
       // 并行加载所有数据文件
-      const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords] =
+      const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries] =
         await Promise.all([
           fetchRawJSON('child.json').catch(() => null),
           fetchRawJSON('calendar.json').catch(() => []),
@@ -7569,13 +7845,14 @@ async function loadData() {
           fetchRawJSON('config.json').catch(() => null),
           fetchRawJSON('xpSources.json').catch(() => []),
           fetchRawJSON('redeemRecords.json').catch(() => []),
+          fetchRawJSON('diaryEntries.json').catch(() => []),
         ]);
 
       // 合并为 dashboard 结构（与飞书版 getDashboard() 返回结构一致）
       const dashboard = buildDashboard(
         child || {}, calendar || [], levels || [],
         xpRecords || [], finance || null, study || null,
-        config || null, xpSources || [], redeemRecords || []
+        config || null, xpSources || [], redeemRecords || [], diaryEntries || []
       );
 
       cachedData = dashboard;
@@ -7674,7 +7951,7 @@ function refreshData() {
 
 // ── 构建 dashboard 数据结构（与 server.js 的 buildDashboard 对应） ──
 
-function buildDashboard(child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords) {
+function buildDashboard(child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries) {
   // 计算总 XP
   const verifiedXp = xpRecords.filter(r => r.reviewStatus === '已通过');
   const totalXP = verifiedXp.reduce((sum, r) => sum + (Number(r.xp) || 0), 0);
@@ -7748,6 +8025,7 @@ function buildDashboard(child, calendar, levels, xpRecords, finance, study, conf
     study: processedStudy,
     finance: processedFinance,
     config: processedConfig,
+    diaryEntries: diaryEntries || [],
   };
 }
 
@@ -7929,6 +8207,7 @@ function getEmptyData() {
       xpRuleList: [],
       abilityModules: {},
     },
+    diaryEntries: [],
   };
 }
 
@@ -8047,6 +8326,288 @@ async function addXpRecord(record) {
   });
   _persistCache();
   return recordId;
+}
+
+// ── 日记本数据存取（第 10 个数据文件 diaryEntries.json，只存 GitHub，不接飞书同步） ──
+
+// 读取日记列表（优先缓存，否则从 GitHub 拉取）
+async function loadDiaryEntries() {
+  if (cachedData && Array.isArray(cachedData.diaryEntries)) {
+    return cachedData.diaryEntries;
+  }
+  return fetchRawJSON('diaryEntries.json').catch(() => []);
+}
+
+// 写入整份日记列表
+async function saveDiaryEntries(entries) {
+  _dataGen++;
+  const list = Array.isArray(entries) ? entries : [];
+  await writeGithubFile('diaryEntries.json', list, '更新日记本');
+  if (cachedData) cachedData.diaryEntries = list;
+  _persistCache();
+  return list;
+}
+
+// 新增/覆盖一篇日记：同一天重复写则覆盖当天那一篇（不新增）
+// entry: { date, mood, content, completeFour, completeFeel, hits }
+async function addDiaryEntry(entry) {
+  _dataGen++;
+  const date = entry.date || todayStr();
+  const current = await loadDiaryEntries();
+  const list = Array.isArray(current) ? current.slice() : [];
+  const idx = list.findIndex(d => d.date === date);
+  const saved = {
+    id: entry.id || generateId('diary_'),
+    date,
+    mood: entry.mood || '',
+    content: entry.content || '',
+    completeFour: !!entry.completeFour,
+    completeFeel: !!entry.completeFeel,
+    hits: entry.hits || [],
+    createdAt: entry.createdAt || new Date().toISOString(),
+  };
+  if (idx >= 0) list[idx] = saved; else list.unshift(saved);
+  await saveDiaryEntries(list);
+  return saved;
+}
+
+// ── AI 式智能分析：从自由正文判断是否自然写出时间/地点/人物/事件/感受 ──
+const DIARY_TIME_WORDS = ["今天","昨天","前天","早上","早晨","清晨","上午","中午","下午","傍晚","晚上","夜里","白天","放学后","下课","午休","睡前","回家后","周末","星期","假期","暑假","寒假","刚才","时候"];
+const DIARY_PLACE_WORDS = ["在","公园","操场","教室","学校","家里","家","超市","商场","广场","图书馆","医院","房间","阳台","厨房","外面","楼下","小区","车上","公交","地铁","饭店","餐厅","书店","游乐园","动物园","海边","山里","老家","奶奶家","外婆家","园","场","站"];
+const DIARY_PEOPLE_WORDS = ["爸爸","妈妈","爷爷","奶奶","外公","外婆","同学","朋友","好朋友","老师","弟弟","妹妹","哥哥","姐姐","舅舅","姑姑","叔叔","阿姨","我们","他","她","他们","大家","小伙伴","一起"];
+const DIARY_EVENT_WORDS = ["玩","去","做","写","看","吃","跑","跳","游戏","作业","练字","比赛","学","踢","画","唱","读","逛","读书","运动","跑步","骑车","游泳","爬山","野餐","做饭","手工","棋","拼图","乐高","散步","跳绳","打球","上课","参观","旅游","旅行","放风筝","钓鱼","看电影","看电视","玩手机"];
+const DIARY_FEEL_WORDS = ["开心","高兴","快乐","难过","伤心","生气","兴奋","紧张","幸福","喜欢","讨厌","棒","累","辛苦","好玩","有趣","舒服","满足","感动","温暖","骄傲","期待","担心","害怕","无聊","失望","舍不得","爱","哭","笑","愉快","惊喜","太好了","真开心","开心极了","棒极了"];
+
+// 分析正文，返回每个要素是否自然出现
+function analyzeDiaryElements(content) {
+  const empty = { time:false, place:false, people:false, event:false, feel:false, hits:[] };
+  const text = (content || "").trim();
+  if (!text) return empty;
+  const has = (arr) => arr.some(w => text.includes(w));
+  const time = has(DIARY_TIME_WORDS);
+  const place = has(DIARY_PLACE_WORDS);
+  const people = has(DIARY_PEOPLE_WORDS);
+  const event = has(DIARY_EVENT_WORDS);
+  const feel = has(DIARY_FEEL_WORDS);
+  const hits = [];
+  if (time) hits.push("时间");
+  if (place) hits.push("地点");
+  if (people) hits.push("人物");
+  if (event) hits.push("事件");
+  if (feel) hits.push("感受");
+  return { time, place, people, event, feel, completeFour: time && place && people && event, completeFeel: feel, hits };
+}
+
+// ── 日记本 UI 渲染与交互 ──
+
+let _diaryMood = "";
+
+function openDiaryModal() {
+  _diaryMood = "";
+  const content = document.getElementById("diaryContent");
+  if (content) content.value = "";
+  document.querySelectorAll("#diaryMoods button").forEach(b => b.classList.remove("sel"));
+  const otherWrap = document.querySelector(".diary-mood-other");
+  if (otherWrap) otherWrap.classList.remove("show");
+  const otherInput = document.getElementById("diaryMoodOther");
+  if (otherInput) otherInput.value = "";
+  const m = document.getElementById("diaryModalPage");
+  if (m) m.classList.add("active");
+}
+
+function closeDiaryModal() {
+  const m = document.getElementById("diaryModalPage");
+  if (m) m.classList.remove("active");
+}
+
+let _diaryMoodOtherActive = false;
+
+function pickDiaryMood(btn) {
+  const val = btn.getAttribute("data-mood") || "";
+  document.querySelectorAll("#diaryMoods button").forEach(b => b.classList.remove("sel"));
+  btn.classList.add("sel");
+  const otherWrap = document.querySelector(".diary-mood-other");
+  const otherInput = document.getElementById("diaryMoodOther");
+  if (val === "other") {
+    _diaryMoodOtherActive = true;
+    if (otherWrap) otherWrap.classList.add("show");
+    if (otherInput) otherInput.focus();
+  } else {
+    _diaryMoodOtherActive = false;
+    if (otherWrap) otherWrap.classList.remove("show");
+    if (otherInput) otherInput.value = "";
+  }
+  _diaryMood = val;
+}
+
+async function submitDiary() {
+  const content = (document.getElementById("diaryContent").value || "").trim();
+  // 若选择了"其他"，将自定义文字作为心情（emoji 用 ✏️ 兜底）
+  let mood = _diaryMood;
+  if (_diaryMood === "other") {
+    const otherVal = (document.getElementById("diaryMoodOther").value || "").trim();
+    if (!otherVal) { showToast("填一下你的心情吧 ✍️", false); return; }
+    mood = "✏️ " + otherVal;
+  }
+  // 1. 心情必选：未选（含"其他"未填）禁止提交
+  if (!mood) { showToast("先选一个今天的心情吧 😊", false); return; }
+  // 2. 正文至少 30 字，不足禁止提交
+  const contentLen = content.replace(/\s/g, "").length;
+  if (contentLen < 30) {
+    showToast(`再写点吧，至少 30 个字（现在还差 ${30 - contentLen} 字）✏️`, false);
+    return;
+  }
+  // 智能分析正文，看看有没有自然写出四要素 + 感受
+  const analysis = analyzeDiaryElements(content);
+  const completeFour = analysis.completeFour;
+  const completeFeel = !!mood || analysis.completeFeel;
+  const xp = (completeFour && completeFeel) ? 10 : 6;
+  const btn = document.querySelector("#diaryModalPage .btn-confirm");
+  const original = btn.textContent;
+  btn.textContent = "保存中..."; btn.disabled = true;
+  try {
+    // 1. 保存日记（同日覆盖当天那一篇）
+    await DataStore.addDiaryEntry({
+      date: todayStr(),
+      mood,
+      content,
+      completeFour,
+      completeFeel,
+      hits: analysis.hits,
+    });
+    // 2. 发放 XP（同日去重：当天已有"写日记"记录则不重复发放）
+    const cfg = await DataStore.loadData();
+    const already = (cfg.xpRecords || []).find(r =>
+      r.taskName === "写日记：写作四要素+感受" && getDateStr(r) === todayStr());
+    let awardedXp = 0;
+    if (!already) {
+      await DataStore.addXpRecord({
+        taskName: "写日记：写作四要素+感受",
+        xp,
+        xpCategory: "能力成长",
+        description: (completeFour && completeFeel)
+          ? `能量记录（写到了${analysis.hits.join("、")}）`
+          : `能量记录（只写到了${(analysis.hits.length ? analysis.hits.join("、") : "很少要素")}）`,
+        status: "pending",
+        date: todayStr(),
+      });
+      awardedXp = xp;
+    } else {
+      // 今天已记过，不再重复加分
+      awardedXp = 0;
+    }
+    await DataStore.refreshData();
+    closeDiaryModal();
+    const all5 = ["时间", "地点", "人物", "事件", "感受"];
+    const missing = all5.filter(k => !analysis.hits.includes(k));
+    const hint = completeFour && completeFeel
+      ? "写得很完整，继续保持！"
+      : missing.length ? `下次把${missing.join("、")}也写出来更好` : "";
+    // 3. 提交成功后明确提示：积分 + 保存成功状态
+    if (awardedXp > 0) {
+      showToast(`✅ 保存成功！本次 +${awardedXp} XP${hint ? "，" + hint : ""}`, true);
+    } else {
+      showToast(`✅ 保存成功！今天已记过能量，本次不再加分${hint ? "，" + hint : ""}`, true);
+    }
+    await renderDiary();
+    await renderXp();
+    refreshIcons(50);
+  } catch (e) {
+    console.error("保存能量记录失败:", e);
+    const errMsg = (e && e.message) || "";
+    // 4. 提交失败明确提示：区分 Token 缺失与其它错误
+    if (errMsg.indexOf("Token") >= 0 || errMsg.indexOf("token") >= 0) {
+      showTokenRequiredToast();
+    } else {
+      showToast("✖ 保存失败，请重试", false);
+      handleWriteError(e, null);
+    }
+  } finally {
+    btn.textContent = original; btn.disabled = false;
+  }
+}
+
+// 渲染日记本：统计 + 本周打卡条 + 最近日记卡片网格
+async function renderDiary() {
+  const moduleEl = document.getElementById("diaryModule");
+  if (!moduleEl) return;
+  const cfg = await DataStore.loadData();
+  const entries = (cfg.diaryEntries || []).slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const totalCount = entries.length;
+  const streak = calcDiaryStreak(entries);
+  const totalDiaryXp = entries.reduce((sum, d) => sum + ((d.completeFour && d.completeFeel) ? 10 : 6), 0);
+  setText("diaryStats", `已写 ${totalCount} 篇 · 连续 ${streak} 天 · 累计 ${totalDiaryXp} XP`);
+  setText("dStatCount", totalCount);
+  setText("dStatStreak", streak);
+  renderDiaryStrip(entries);
+  const tl = document.getElementById("diaryTimeline");
+  if (!tl) return;
+  if (entries.length === 0) {
+    tl.innerHTML = `<div class="diary-empty">还没有记录，记下第一笔吧 ✨</div>`;
+  } else {
+    tl.innerHTML = entries.slice(0, 6).map(d => {
+      const hits = d.hits || [];
+      const metaFour = d.completeFour ? `<span class="ok">四要素 ✓</span>` : `<span class="no">四要素不全</span>`;
+      const metaFeel = d.completeFeel ? `<span class="ok">感受 ✓</span>` : `<span class="no">感受缺</span>`;
+      const xp = (d.completeFour && d.completeFeel) ? 10 : 6;
+      const hitsTxt = hits.length ? `<span class="dl-hits">写到：${hits.join(" · ")}</span>` : "";
+      return `<div class="dl-item">
+        <div class="dl-head"><span class="dl-date">${formatDiaryDate(d.date)}</span><span class="dl-mood">${d.mood || "📝"}</span></div>
+        ${hitsTxt}
+        ${d.content ? `<div class="dl-text">${escapeHtmlReason(d.content)}</div>` : ""}
+        <div class="dl-meta">${metaFour} · ${metaFeel} · +${xp} XP</div>
+      </div>`;
+    }).join("");
+  }
+}
+
+// 渲染最近 7 天打卡条（今天倒推 6 天，共 7 个圆点）
+function renderDiaryStrip(entries) {
+  const strip = document.getElementById("diaryStrip");
+  if (!strip) return;
+  const doneSet = new Set((entries || []).map(d => d.date));
+  const pad = (n) => String(n).padStart(2, "0");
+  const todayKey = todayStr();
+  let cells = "";
+  for (let back = 6; back >= 0; back--) {
+    const d = new Date();
+    d.setDate(d.getDate() - back);
+    const key = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const isDone = doneSet.has(key);
+    const isToday = key === todayKey;
+    cells += `<span class="d-dot${isDone ? " on" : ""}${isToday ? " today" : ""}">${d.getDate()}</span>`;
+  }
+  strip.innerHTML = cells;
+}
+
+// 计算连续写日记天数（从今天往前数连续有日记的天数）
+function calcDiaryStreak(entries) {
+  if (!entries || entries.length === 0) return 0;
+  const set = new Set(entries.map(d => d.date));
+  let streak = 0;
+  const d = new Date();
+  // 今天没写则从昨天开始数（允许今天还没写时保住连续天数）
+  if (!set.has(todayStr())) d.setDate(d.getDate() - 1);
+  const pad = (n) => String(n).padStart(2, "0");
+  while (streak < 90) {
+    const key = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    if (!set.has(key)) break;
+    streak++;
+    d.setDate(d.getDate() - 1);
+  }
+  return streak;
+}
+
+// 格式化日记日期：YYYY-MM-DD → 今天/昨天/M月D日
+function formatDiaryDate(date) {
+  if (!date) return "";
+  const today = todayStr();
+  if (date === today) return `${date.slice(5).replace("-", "月")}日 · 今天`;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const pad = (n) => String(n).padStart(2, "0");
+  const yest = `${y.getFullYear()}-${pad(y.getMonth() + 1)}-${pad(y.getDate())}`;
+  if (date === yest) return `${date.slice(5).replace("-", "月")}日 · 昨天`;
+  return `${date.slice(5).replace("-", "月")}日`;
 }
 
 // 新增 XP 规则
@@ -8443,6 +9004,10 @@ if (typeof window !== 'undefined') {
     updateXpRule,
     updateEvaluationRecord,
     todayStr,
+    // 日记本
+    loadDiaryEntries,
+    saveDiaryEntries,
+    addDiaryEntry,
     // GitHub 专属
     getGithubToken,
     hasGithubToken,
@@ -8614,6 +9179,35 @@ if (typeof window !== 'undefined') {
             <button class="btn-primary-sm" onclick="openXpModal()">
               <i data-lucide="plus" style="width:14px;height:14px"></i> 获得 XP
             </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════ 今日能量记录（能量版块核心 · 对应"写日记：写作四要素+感受"） ════════ -->
+      <section class="diary-module" id="diaryModule">
+        <div class="diary-card">
+          <div class="diary-top">
+            <div class="diary-info">
+              <div class="diary-name"><span class="diary-icon">⚡</span>今日能量记录</div>
+              <div class="diary-stats" id="diaryStats">已记 -- 条 · 连续 -- 天 · 累计 -- XP</div>
+            </div>
+            <button class="diary-write" onclick="openDiaryModal()">✍️ 记一笔能量</button>
+          </div>
+          <div class="diary-main">
+            <div class="diary-left">
+              <div class="diary-stats-grid">
+                <div class="diary-stat"><b id="dStatCount">0</b><span>累计记录</span></div>
+                <div class="diary-stat"><b id="dStatStreak">0</b><span>连续天数</span></div>
+              </div>
+              <div class="diary-checkin">
+                <h4>📅 本周打卡</h4>
+                <div class="diary-strip" id="diaryStrip"><!-- JS 渲染最近 7 天打卡 --></div>
+              </div>
+            </div>
+            <div class="diary-right">
+              <h4>🕘 最近记录</h4>
+              <div class="diary-tl" id="diaryTimeline"><div class="diary-empty">还没有记录，记下第一笔吧 ✨</div></div>
+            </div>
           </div>
         </div>
       </section>
@@ -9097,6 +9691,42 @@ if (typeof window !== 'undefined') {
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeXpModal()">取消</button>
         <button class="btn-confirm" onclick="submitAddXpPage()">添加 XP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 今日能量记录弹窗 ════════ -->
+  <div class="modal-overlay" id="diaryModalPage">
+    <div class="modal diary-modal">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="zap"></i>记一笔今日能量</div>
+        <button class="modal-close" onclick="closeDiaryModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">💭 今天的心情</label>
+          <div class="diary-moods" id="diaryMoods">
+            <button type="button" data-mood="😊" onclick="pickDiaryMood(this)"><span class="m-emoji">😊</span><span class="m-label">开心</span></button>
+            <button type="button" data-mood="😄" onclick="pickDiaryMood(this)"><span class="m-emoji">😄</span><span class="m-label">兴奋</span></button>
+            <button type="button" data-mood="😌" onclick="pickDiaryMood(this)"><span class="m-emoji">😌</span><span class="m-label">平静</span></button>
+            <button type="button" data-mood="😢" onclick="pickDiaryMood(this)"><span class="m-emoji">😢</span><span class="m-label">难过</span></button>
+            <button type="button" data-mood="😡" onclick="pickDiaryMood(this)"><span class="m-emoji">😡</span><span class="m-label">生气</span></button>
+            <button type="button" data-mood="🤩" onclick="pickDiaryMood(this)"><span class="m-emoji">🤩</span><span class="m-label">惊喜</span></button>
+            <button type="button" data-mood="other" onclick="pickDiaryMood(this)"><span class="m-emoji">✏️</span><span class="m-label">其他</span></button>
+          </div>
+          <div class="diary-mood-other">
+            <input type="text" id="diaryMoodOther" placeholder="自己填一个心情…" disabled />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">✏️ 今天做了什么</label>
+          <textarea class="form-textarea" id="diaryContent" rows="6" placeholder="把今天开心、难忘的事自由写下来吧…"></textarea>
+        </div>
+        <div class="diary-tip" id="diaryTip">写完提交后，我会看看你有没有把时间、地点、人物、事件和感受都写出来，写全了 +10 XP ✨</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeDiaryModal()">取消</button>
+        <button class="btn-confirm" onclick="submitDiary()"><i data-lucide="check" style="width:14px;height:14px;vertical-align:middle"></i> 写完啦</button>
       </div>
     </div>
   </div>
@@ -11425,6 +12055,9 @@ async function renderXp() {
     xpRulesEl.innerHTML = cards;
   }
   setText("earnXpTotal", `${totalAvailableTasks} 个可用任务`);
+
+  // ════════ 我的日记本 ════════
+  await renderDiary();
 }
 
 // ══════════════════════════════════════

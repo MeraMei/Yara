@@ -3,3 +3,8 @@
 scripts/raw/
 __pycache__/
 *.pyc
+
+# 工作流设计草稿/临时预览文件，不入库
+.superpowers/
+diary-fusion.html
+diary-preview.html

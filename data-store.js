@@ -426,6 +426,7 @@
       self._fetchRawJSON('config.json').catch(function () { return null; }),
       self._fetchRawJSON('xpSources.json').catch(function () { return []; }),
       self._fetchRawJSON('redeemRecords.json').catch(function () { return []; }),
+      self._fetchRawJSON('diaryEntries.json').catch(function () { return []; }),
     ]).then(function (results) {
       var child = results[0] || {};
       var calendar = results[1] || [];
@@ -436,6 +437,7 @@
       var config = results[6] || null;
       var xpSources = results[7] || [];
       var redeemRecords = results[8] || [];
+      var diaryEntries = results[9] || [];
 
       // 保存原始数据
       self._rawData = {
@@ -448,10 +450,11 @@
         config: config,
         xpSources: xpSources,
         redeemRecords: redeemRecords,
+        diaryEntries: diaryEntries,
       };
 
       return self._buildDashboard(
-        child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords
+        child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries
       );
     });
   };
@@ -459,7 +462,7 @@
   // ── buildDashboard — 完整的数据聚合逻辑（与 server.js buildDashboard 一致） ──
 
   DataStore.prototype._buildDashboard = function (
-    child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords
+    child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries
   ) {
     var self = this;
 
@@ -542,6 +545,7 @@
       study: processedStudy,
       finance: processedFinance,
       config: processedConfig,
+      diaryEntries: diaryEntries || [],
     };
   };
 
@@ -855,6 +859,38 @@
     var records = (this._rawData.xpRecords || []).slice();
     records.unshift(record);
     return this.saveXpRecords(records);
+  };
+
+  // 写入日记本数据（第 10 个数据文件，只存 GitHub，不接飞书同步）
+  DataStore.prototype.saveDiaryEntries = function (entries) {
+    var self = this;
+    var list = Array.isArray(entries) ? entries : [];
+    return self._writeFile('data/diaryEntries.json', list, '更新日记本').then(function () {
+      self._rawData.diaryEntries = list;
+      if (self.data) self.data.diaryEntries = list;
+      return self._rebuildDashboard();
+    });
+  };
+
+  // 新增/覆盖一篇日记：同一天重复写则覆盖当天那一篇（不新增）
+  DataStore.prototype.addDiaryEntry = function (entry) {
+    var self = this;
+    var date = entry.date || todayStr();
+    var list = (self._rawData.diaryEntries || []).slice();
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) if (list[i].date === date) { idx = i; break; }
+    var saved = {
+      id: entry.id || ('diary_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)),
+      date: date,
+      mood: entry.mood || '',
+      content: entry.content || '',
+      completeFour: !!entry.completeFour,
+      completeFeel: !!entry.completeFeel,
+      hits: entry.hits || [],
+      createdAt: entry.createdAt || new Date().toISOString(),
+    };
+    if (idx >= 0) list[idx] = saved; else list.unshift(saved);
+    return self.saveDiaryEntries(list);
   };
 
   // 写入财务数据
