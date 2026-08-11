@@ -594,6 +594,18 @@ h1 {
 .ss-btn:active { transform: translateY(0); }
 .ss-btn.hw { background: linear-gradient(135deg, var(--colourful-sky-blue-300), var(--colourful-sky-blue-500)); }
 .ss-btn.score { background: linear-gradient(135deg, var(--colourful-sky-blue-400), var(--colourful-sky-blue-700)); }
+/* 知识页 hero 快捷按钮：沿用"记一笔能量"药丸样式，但用知识星球蓝紫粉主色 */
+.kn-hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kn-diary-write {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: linear-gradient(135deg, #6ab5ff, #9255f5, #ea4d85);
+  color: #fff; border: none; border-radius: 999px; padding: 9px 14px;
+  font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  box-shadow: 0 3px 8px rgba(146,85,245,.35);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.kn-diary-write i { width: 14px; height: 14px; }
+.kn-diary-write:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(146,85,245,.42); }
 /* 能量星球 hero 右状态卡：今日能量统计 + 快捷操作（左右模式） */
 .xp-hero-note { display: grid; gap: 14px; align-content: start; }
 .xp-hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -3345,6 +3357,22 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .hw-progress-track { height: 8px; border-radius: 999px; background: var(--neutral-100); overflow: hidden; margin-top: 10px; }
     .hw-progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--colourful-sky-blue-300), var(--colourful-sky-blue-500)); transition: width .8s cubic-bezier(.4,0,.2,1); }
     .hw-progress-foot { font-size: 12px; font-weight: 700; color: var(--neutral-600); margin-top: 8px; }
+
+    /* ════════ 作业标题内联进度（挪到作业二字旁） ════════ */
+    .hw-title-progress {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--neutral-500);
+      vertical-align: middle;
+    }
+    .hw-title-count { font: 800 14px var(--font-display); color: var(--neutral-900); letter-spacing: -.02em; }
+    .hw-title-track { width: 72px; height: 6px; border-radius: 999px; background: var(--neutral-100); overflow: hidden; }
+    .hw-title-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--colourful-sky-blue-300), var(--colourful-sky-blue-500)); transition: width .8s cubic-bezier(.4,0,.2,1); display: block; }
+    .hw-title-pct { font-size: 12px; font-weight: 700; color: var(--colourful-sky-blue-600); white-space: nowrap; }
 
     /* ════════ 作业行（新设计） ════════ */
     .hw-row {
@@ -9308,18 +9336,17 @@ if (typeof window !== 'undefined') {
           <div class="ss-head"><i data-lucide="zap"></i>今日能量</div>
           <div class="xp-hero-stats">
             <div class="xp-hero-stat">
+              <span class="xp-hero-stat-label">本周获得</span>
+              <span class="xp-hero-stat-value" id="heroStatWeek">--</span>
+            </div>
+            <div class="xp-hero-stat">
               <span class="xp-hero-stat-label">今日获得</span>
               <span class="xp-hero-stat-value" id="heroStatToday">--</span>
             </div>
-            <div class="xp-hero-stat">
-              <span class="xp-hero-stat-label">待确认</span>
-              <span class="xp-hero-stat-value" id="heroStatPending">--</span>
-            </div>
           </div>
-          <div class="ov-actions">
-            <button class="btn-primary-sm" onclick="openXpModal()">
-              <i data-lucide="plus" style="width:14px;height:14px"></i> 获得 XP
-            </button>
+          <div class="xp-hero-actions">
+            <button class="diary-write" onclick="openDiaryModal()"><i data-lucide="book-open" style="width:14px;height:14px"></i>能量日记</button>
+            <button class="diary-write" onclick="openXpModal()"><i data-lucide="zap" style="width:14px;height:14px"></i>能量打卡</button>
           </div>
         </div>
       </section>
@@ -9407,11 +9434,21 @@ if (typeof window !== 'undefined') {
           <p class="lead" id="studyIntro"></p>
           <div class="hero-live"><i data-lucide="sparkles"></i><span id="studyLiveText">--</span></div>
         </div>
-        <div class="hero-note sub-status">
-          <div class="ss-head"><i data-lucide="pen-line"></i>快速录入</div>
-          <div class="ss-actions">
-            <button class="ss-btn hw" onclick="openAddHomeworkModal()"><i data-lucide="list-checks"></i>添加作业</button>
-            <button class="ss-btn score" onclick="openAddScoreModal()"><i data-lucide="award"></i>录入成绩</button>
+        <div class="hero-note sub-status xp-hero-note">
+          <div class="ss-head"><i data-lucide="pen-line"></i>知识能量</div>
+          <div class="xp-hero-stats">
+            <div class="xp-hero-stat">
+              <span class="xp-hero-stat-label">本周获得</span>
+              <span class="xp-hero-stat-value" id="studyStatWeek">--</span>
+            </div>
+            <div class="xp-hero-stat">
+              <span class="xp-hero-stat-label">今日获得</span>
+              <span class="xp-hero-stat-value" id="studyStatToday">--</span>
+            </div>
+          </div>
+          <div class="xp-hero-actions kn-hero-actions">
+            <button class="kn-diary-write" onclick="openAddHomeworkModal()"><i data-lucide="list-checks" style="width:14px;height:14px"></i>作业录入</button>
+            <button class="kn-diary-write" onclick="openAddScoreModal()"><i data-lucide="award" style="width:14px;height:14px"></i>成绩录入</button>
           </div>
         </div>
       </section>
@@ -9419,26 +9456,20 @@ if (typeof window !== 'undefined') {
       <!-- ════════ ① 作业（本职 · 天天用） ════════ -->
       <div class="section-block">
         <div class="section-head">
-          <div class="section-title"><i data-lucide="list-checks"></i>作业</div>
+          <div class="section-title"><i data-lucide="list-checks"></i>作业
+            <span class="hw-title-progress">
+              <span class="hw-title-count" id="studyHeroCount">--</span>
+              <span class="hw-title-track"><span class="hw-title-fill" id="studyHeroFill" style="width:0%"></span></span>
+              <span class="hw-title-pct" id="studyHeroPct">--</span>
+            </span>
+          </div>
           <div class="section-head-actions">
-            <button class="hw-add-btn" onclick="openAddHomeworkModal()">
-              <i data-lucide="plus" style="width:14px;height:14px"></i>添加作业
-            </button>
             <div class="hw-filter-tabs" id="hwFilterTabs">
               <button class="hw-filter-btn active" data-filter="pending">待完成</button>
               <button class="hw-filter-btn" data-filter="done">已完成</button>
               <button class="hw-filter-btn" data-filter="all">全部</button>
             </div>
           </div>
-        </div>
-        <div class="hw-progress-card">
-          <div class="hw-progress-head"><i data-lucide="book-open"></i>学习进度</div>
-          <div class="hw-progress-main">
-            <span class="hw-progress-count" id="studyHeroCount">--</span>
-            <span class="hw-progress-pct" id="studyHeroPct">--</span>
-          </div>
-          <div class="hw-progress-track"><div class="hw-progress-fill" id="studyHeroFill" style="width:0%"></div></div>
-          <div class="hw-progress-foot" id="studyHeroNote">--</div>
         </div>
         <div class="hw-stats-row" id="hwStatsRow"></div>
         <div class="card-panel">
@@ -12148,6 +12179,15 @@ async function renderXp() {
     heroStatToday.textContent = todayXpH > 0 ? `+${todayXpH}` : "0";
     heroStatToday.style.color = todayXpH > 0 ? "" : "var(--neutral-400)";
   }
+  // 本周获得能量（本周一至今，已通过的记录）
+  const heroStatEl = document.getElementById("heroStatWeek");
+  if (heroStatEl) {
+    const _m = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
+    const weekXpH = (cfg.xpRecords || []).filter(r => getDateStr(r) >= _m && r.reviewStatus === "已通过")
+      .reduce((sum, r) => sum + (Number(r.xp) || 0), 0);
+    heroStatEl.textContent = weekXpH > 0 ? `+${weekXpH}` : "0";
+    heroStatEl.style.color = weekXpH > 0 ? "" : "var(--neutral-400)";
+  }
 
   // ════════ 分类数据聚合 ════════
   const xpRecordsAll = cfg.xpRecords || [];
@@ -12858,6 +12898,27 @@ async function renderStudy() {
   const stars = getWeekStars(cfg);
   const studyLiveEl = document.getElementById("studyLiveText");
   if (studyLiveEl) studyLiveEl.innerHTML = `本周你已点亮 <strong>${stars}</strong> 颗知识星星 🌟`;
+
+  // 知识板块 本周/今日 获得能量（以"作业·"开头的已通过 XP 记录）
+  const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
+  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") === 0;
+  const stoday = new Date();
+  const sMonday = new Date(stoday);
+  sMonday.setDate(stoday.getDate() - ((stoday.getDay() + 6) % 7));
+  const sMondayStr = sMonday.toISOString().slice(0, 10);
+  const sTodayStr = stoday.toISOString().slice(0, 10);
+  let sWeekK = 0, sTodayK = 0;
+  verifiedXp.forEach(r => {
+    if (!isKnowledge(r)) return;
+    const xp = Number(r.xp) || 0;
+    const d = getDateStr(r);
+    if (d >= sMondayStr) sWeekK += xp;
+    if (d === sTodayStr) sTodayK += xp;
+  });
+  const sWeekEl = document.getElementById("studyStatWeek");
+  if (sWeekEl) { sWeekEl.textContent = sWeekK > 0 ? `+${sWeekK}` : "0"; sWeekEl.style.color = sWeekK > 0 ? "" : "var(--neutral-400)"; }
+  const sTodayEl = document.getElementById("studyStatToday");
+  if (sTodayEl) { sTodayEl.textContent = sTodayK > 0 ? `+${sTodayK}` : "0"; sTodayEl.style.color = sTodayK > 0 ? "" : "var(--neutral-400)"; }
 
   const subjBarClass = { "语文": "cn", "数学": "math", "英语": "en" };
   const subjIcon = { "语文": "book-open", "数学": "calculator", "英语": "languages" };
