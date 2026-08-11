@@ -8286,7 +8286,7 @@ async function _backgroundRefresh() {
     // 始终尝试从 GitHub 拉取最新数据，与本地缓存做比对
     // 无变化时仅更新缓存不触发重渲染，有变化时自动更新 UI
     if (genAtStart !== _dataGen) return;
-    const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords] =
+    const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries] =
       await Promise.all([
         fetchRawJSON('child.json').catch(() => null),
         fetchRawJSON('calendar.json').catch(() => []),
@@ -8297,11 +8297,12 @@ async function _backgroundRefresh() {
         fetchRawJSON('config.json').catch(() => null),
         fetchRawJSON('xpSources.json').catch(() => []),
         fetchRawJSON('redeemRecords.json').catch(() => []),
+        fetchRawJSON('diaryEntries.json').catch(() => []),
       ]);
     const dashboard = buildDashboard(
       child || {}, calendar || [], levels || [],
       xpRecords || [], finance || null, study || null,
-      config || null, xpSources || [], redeemRecords || []
+      config || null, xpSources || [], redeemRecords || [], diaryEntries || []
     );
     // 如果后台刷新期间发生了写入操作（_dataGen 已变化），则跳过，
     // 避免 CDN 旧数据覆盖用户写入的最新数据
@@ -8740,12 +8741,17 @@ async function addXpRecord(record) {
 
 // ── 日记本数据存取（第 10 个数据文件 diaryEntries.json，只存 GitHub，不接飞书同步） ──
 
-// 读取日记列表（优先缓存，否则从 GitHub 拉取）
+// 读取日记列表（优先缓存，但缓存为空时从 GitHub 重新拉取，避免后台刷新误覆盖导致数据丢失）
 async function loadDiaryEntries() {
-  if (cachedData && Array.isArray(cachedData.diaryEntries)) {
+  if (cachedData && Array.isArray(cachedData.diaryEntries) && cachedData.diaryEntries.length > 0) {
     return cachedData.diaryEntries;
   }
-  return fetchRawJSON('diaryEntries.json').catch(() => []);
+  // 缓存为空时直接从 GitHub 拉取，不信任缓存中的空数组
+  const raw = await fetchRawJSON('diaryEntries.json').catch(() => []);
+  if (cachedData && Array.isArray(raw) && raw.length > 0) {
+    cachedData.diaryEntries = raw;
+  }
+  return raw;
 }
 
 // 写入整份日记列表
@@ -8937,8 +8943,13 @@ async function submitDiary() {
 async function renderDiary() {
   const moduleEl = document.getElementById("diaryModule");
   if (!moduleEl) return;
-  const cfg = await DataStore.loadData();
-  const entries = (cfg.diaryEntries || []).slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  // 优先使用 loadDiaryEntries（它会在缓存为空时回退到 GitHub），避免缓存损坏导致不显示
+  let entries = await DataStore.loadDiaryEntries().catch(() => []);
+  if (!Array.isArray(entries) || entries.length === 0) {
+    const cfg = await DataStore.loadData();
+    entries = (cfg.diaryEntries || []).slice();
+  }
+  entries = entries.slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
   const totalCount = entries.length;
   const streak = calcDiaryStreak(entries);
   const totalDiaryXp = entries.reduce((sum, d) => sum + ((d.completeFour && d.completeFeel) ? 10 : 6), 0);
