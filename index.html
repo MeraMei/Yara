@@ -8344,8 +8344,13 @@ async function _backgroundRefresh() {
 let __dataVersion = 0;
 // 记录每个视图最后渲染时的数据版本号
 const __viewRendered = {};
-function refreshData() {
+function refreshData(localOnly) {
   __dataVersion++;
+  if (localOnly && cachedData) {
+    // 写操作已更新本地缓存，无需重新从 GitHub 拉取
+    _persistCache();
+    return Promise.resolve(cachedData);
+  }
   cachedData = null;
   loadPromise = null;
   return loadData();
@@ -8897,7 +8902,7 @@ async function submitDiary() {
       // 今天已记过，不再重复加分
       awardedXp = 0;
     }
-    await DataStore.refreshData();
+    await DataStore.refreshData(true);
     closeDiaryModal();
     const all5 = ["时间", "地点", "人物", "事件", "感受"];
     const missing = all5.filter(k => !analysis.hits.includes(k));
@@ -10911,7 +10916,7 @@ if (typeof window !== "undefined") {
       if (!name) { alert("请输入任务名称"); return; }
       if (!xp || parseInt(xp, 10) <= 0) { alert("请输入有效的 XP 分值"); return; }
       DataStore.addXpRule({ name, category, xp: parseInt(xp, 10), method, description })
-        .then(() => DataStore.refreshData())
+        .then(() => DataStore.refreshData(true))
         .then(() => populateXpTaskSelectPage())
         .then(() => {
           closeNewTaskModalPage();
@@ -10950,7 +10955,7 @@ if (typeof window !== "undefined") {
         description,
         status: "pending",
       }).then(async () => {
-        await DataStore.refreshData();
+        await DataStore.refreshData(true);
         const cfg = await DataStore.loadData();
         const pending = cfg.pendingCount || (cfg.recentRecords || []).filter(r => r.status === "pending").length;
         closeXpModal();
@@ -11558,16 +11563,20 @@ function getDateStr(record) {
 // 统一刷新 lucide 图标
 // 防抖 + requestAnimationFrame 双保险：同一帧内多次调用只执行一次，避免重复扫描 DOM
 let __iconRefreshTimer = null;
+// 全局图标刷新去重：同一帧内多次调用只执行一次，避免 44 次冗余扫描
+let __iconRefreshQueued = false;
 function refreshIcons(delay) {
   if (!window.lucide) return;
-  if (__iconRefreshTimer) clearTimeout(__iconRefreshTimer);
+  if (__iconRefreshQueued) return;
+  __iconRefreshQueued = true;
+  const doRefresh = () => {
+    lucide.createIcons();
+    __iconRefreshQueued = false;
+  };
   if (delay != null && delay > 0) {
-    __iconRefreshTimer = setTimeout(() => {
-      __iconRefreshTimer = null;
-      requestAnimationFrame(() => lucide.createIcons());
-    }, delay);
+    __iconRefreshTimer = setTimeout(() => requestAnimationFrame(doRefresh), delay);
   } else {
-    requestAnimationFrame(() => lucide.createIcons());
+    requestAnimationFrame(doRefresh);
   }
 }
 
@@ -13064,7 +13073,7 @@ window.approveXpRecord = async function(btn, recordId) {
   const prevScroll = strip ? strip.scrollLeft : 0;
   try {
     await window.DataStore.updateXpRecord(recordId, { status: "verified" });
-    await window.DataStore.refreshData();
+    await window.DataStore.refreshData(true);
     await renderXp();
     // 恢复并定位到刚审批的那张卡，让它留在用户眼前
     const stripAfter = document.getElementById("xpRecordsStrip");
@@ -13115,7 +13124,7 @@ window.rejectXpRecord = async function(btn, recordId, reason) {
   const prevScroll = strip ? strip.scrollLeft : 0;
   try {
     await window.DataStore.updateXpRecord(recordId, { status: "returned", returnReason: reason || "" });
-    await window.DataStore.refreshData();
+    await window.DataStore.refreshData(true);
     await renderXp();
     const stripAfter = document.getElementById("xpRecordsStrip");
     if (stripAfter && prevScroll) stripAfter.scrollLeft = prevScroll;
@@ -15101,7 +15110,7 @@ function initDataEntry() {
       document.getElementById("xpNote").value = "";
       document.getElementById("xpReason").value = "";
       document.getElementById("xpTaskSelect").value = "";
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
       await refreshXpRecent();
     } catch (err) {
       deShowToast("xpToast", "录入失败：" + err.message, false);
@@ -15209,7 +15218,7 @@ function initDataEntry() {
       document.getElementById("parsedHomework").style.display = "none";
       document.getElementById("studyTitle").value = "";
       document.getElementById("studyDesc").value = "";
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
       await refreshStudyRecent();
     } else {
       deShowToast("studyToast", `录入 ${ok} 条，${fail} 条失败`, false);
@@ -15243,7 +15252,7 @@ function initDataEntry() {
       document.getElementById("homeworkRaw").value = "";
       document.getElementById("parsedHomework").style.display = "none";
       document.querySelectorAll(".hw-module-cb").forEach(cb => cb.checked = false);
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
       await refreshStudyRecent();
     } catch (err) {
       deShowToast("studyToast", "录入失败：" + err.message, false);
@@ -15276,7 +15285,7 @@ function initDataEntry() {
       document.getElementById("scoreTitle").value = "";
       if (document.getElementById("scoreNumber")) document.getElementById("scoreNumber").value = "";
       document.querySelectorAll(".err-module-cb").forEach(cb => cb.checked = false);
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
     } catch (err) {
       deShowToast("scoreToast", "录入失败：" + err.message, false);
     } finally {
@@ -15301,7 +15310,7 @@ function initDataEntry() {
       document.getElementById("evalTeacherComment").value = "";
       document.getElementById("evalParentComment").value = "";
       document.getElementById("evalDate").value = "";
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
     } catch (err) {
       deShowToast("evalToast", "录入失败：" + err.message, false);
     } finally {
@@ -15335,7 +15344,7 @@ function initDataEntry() {
       document.getElementById("moneyReason").value = "";
       document.getElementById("moneySuggestion").value = "";
       setRadioValue("moneyWorthGroup", "");
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
       await refreshMoneyRecent();
     } catch (err) {
       deShowToast("moneyToast", "录入失败：" + err.message, false);
@@ -15396,7 +15405,7 @@ window.saveProfile = async function() {
       console.warn("飞书同步失败，已保存到本地:", feishuErr);
     }
     if (localSuccess) {
-      await DataStore.refreshData();
+      await DataStore.refreshData(true);
       showToast("保存成功！");
     } else {
       showToast("保存失败，请重试");
@@ -15712,7 +15721,7 @@ async function saveAddHomework() {
     });
     const xpVal = ADD_HW_TYPE_XP[hwType] || 2;
     closeAddHomeworkModal();
-    await DataStore.refreshData();
+    await DataStore.refreshData(true);
     await renderStudy();
     refreshIcons(50);
     showToast(`✅ 作业已添加，完成后可得 +${xpVal} XP`, true);
@@ -15875,7 +15884,7 @@ async function submitScore() {
       xpCategory: "学习成长",
     });
     closeAddScoreModal();
-    await DataStore.refreshData();
+    await DataStore.refreshData(true);
     if (typeof renderStudy === "function") await renderStudy();
     if (typeof renderScoreAnalysis === "function") await renderScoreAnalysis();
     refreshIcons(50);
@@ -15907,7 +15916,7 @@ async function submitEvaluation() {
       date,
     });
     closeAddEvalModal();
-    await DataStore.refreshData();
+    await DataStore.refreshData(true);
     refreshIcons(50);
     showToast("✅ 期末评价已录入", true);
   } catch (e) {
@@ -15999,7 +16008,7 @@ async function saveEdit() {
   }
 
   closeEditModal();
-  window.DataStore && window.DataStore.refreshData();
+  window.DataStore && window.DataStore.refreshData(true);
   await renderStudy();
   refreshIcons(50);
   showToast("✅ 作业已更新", true);
@@ -16112,7 +16121,7 @@ function initEditModal() {
       }
       // 刷新数据，让能量累加立即反映到首页/能量星球
       if (newDone && window.DataStore && window.DataStore.refreshData) {
-        window.DataStore.refreshData().catch(() => {});
+        window.DataStore.refreshData(true).catch(() => {});
       }
       // 增量 DOM 更新（P5）
       const rowEl = document.querySelector(`.hw-row[data-id="${item.id}"]`);
@@ -16184,7 +16193,7 @@ function initEditModal() {
       }
       // 刷新数据，确保提交状态与后端同步
       if (window.DataStore && window.DataStore.refreshData) {
-        window.DataStore.refreshData().catch(() => {});
+        window.DataStore.refreshData(true).catch(() => {});
       }
       refreshIcons(50);
       showToast(newSubmitted ? "✅ 已标记为已提交" : "已取消提交", newSubmitted);
