@@ -1,5 +1,5 @@
 {
-  "totalAssets": 11167.57,
+  "totalAssets": 11088.67,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,27 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 1098.5,
+      "balance": 1019.6,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_msoodw355kcksw",
+      "date": "2026-08-11",
+      "type": "expense",
+      "amount": 78.9,
+      "rawAmount": -78.9,
+      "category": "名创优品-拼豆",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "名创优品-拼豆",
+      "worthIt": "值得",
+      "reason": "很值得很喜欢！拼了好多可爱的小玩意！",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "recvryO1Jbehqx",
       "date": "2026-08-07",
@@ -40,7 +55,10 @@
       "category": "7月利息",
       "account": "wealth",
       "accountType": "财富增值账户",
-      "description": "7月利息"
+      "description": "7月利息",
+      "worthIt": "",
+      "reason": "",
+      "suggestion": ""
     },
     {
       "id": "recvrdBYG6LZAQ",
@@ -149,7 +167,10 @@
       "category": "截止6月利息",
       "account": "wealth",
       "accountType": "财富增值账户",
-      "description": "截止6月利息"
+      "description": "截止6月利息",
+      "worthIt": "",
+      "reason": "",
+      "suggestion": ""
     },
     {
       "id": "recvrdBXP88Ukk",
@@ -174,7 +195,10 @@
       "category": "爷爷奶奶给的压岁钱",
       "account": "wealth",
       "accountType": "财富增值账户",
-      "description": "爷爷奶奶给的压岁钱"
+      "description": "爷爷奶奶给的压岁钱",
+      "worthIt": "",
+      "reason": "",
+      "suggestion": ""
     },
     {
       "id": "recvrdBQ1zvCA2",
@@ -185,7 +209,10 @@
       "category": "姥姥姥爷给的压岁钱",
       "account": "wealth",
       "accountType": "财富增值账户",
-      "description": "姥姥姥爷给的压岁钱"
+      "description": "姥姥姥爷给的压岁钱",
+      "worthIt": "",
+      "reason": "",
+      "suggestion": ""
     },
     {
       "id": "recvrdBQ1zTQeJ",
@@ -196,7 +223,10 @@
       "category": "修复家中的移动硬盘",
       "account": "wealth",
       "accountType": "财富增值账户",
-      "description": "修复家中的移动硬盘"
+      "description": "修复家中的移动硬盘",
+      "worthIt": "",
+      "reason": "",
+      "suggestion": ""
     },
     {
       "id": "recvrdBMaLDYUv",
@@ -207,7 +237,10 @@
       "category": "初始资金",
       "account": "wealth",
       "accountType": "财富增值账户",
-      "description": "初始资金"
+      "description": "初始资金",
+      "worthIt": "",
+      "reason": "",
+      "suggestion": ""
     }
   ]
 }
