@@ -10,10 +10,11 @@
     "datetime": "2026-08-11 13:37:03",
     "xp": 6,
     "xpCategory": "能力成长",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "能量记录（只写到了地点、人物、事件、感受）",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_msooe3xsnwx8cd",
