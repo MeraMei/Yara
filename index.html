@@ -174,6 +174,7 @@
   --neutral-800: var(--colourful-neutral-800);
   --neutral-900: var(--colourful-neutral-900);
   --orange-50: var(--colourful-sunny-coral-50);
+  --orange-700: var(--colourful-sunny-coral-700);
   --orange-800: var(--colourful-sunny-coral-800);
   --card-bg: var(--surface-glass);
   --bg: var(--background);
@@ -8420,8 +8421,6 @@ function closeDiaryModal() {
   if (m) m.classList.remove("active");
 }
 
-let _diaryMoodOtherActive = false;
-
 function pickDiaryMood(btn) {
   const val = btn.getAttribute("data-mood") || "";
   document.querySelectorAll("#diaryMoods button").forEach(b => b.classList.remove("sel"));
@@ -8429,11 +8428,9 @@ function pickDiaryMood(btn) {
   const otherWrap = document.querySelector(".diary-mood-other");
   const otherInput = document.getElementById("diaryMoodOther");
   if (val === "other") {
-    _diaryMoodOtherActive = true;
     if (otherWrap) otherWrap.classList.add("show");
     if (otherInput) otherInput.focus();
   } else {
-    _diaryMoodOtherActive = false;
     if (otherWrap) otherWrap.classList.remove("show");
     if (otherInput) otherInput.value = "";
   }
@@ -9715,7 +9712,7 @@ if (typeof window !== 'undefined') {
             <button type="button" data-mood="other" onclick="pickDiaryMood(this)"><span class="m-emoji">✏️</span><span class="m-label">其他</span></button>
           </div>
           <div class="diary-mood-other">
-            <input type="text" id="diaryMoodOther" placeholder="自己填一个心情…" disabled />
+            <input type="text" id="diaryMoodOther" placeholder="自己填一个心情…" />
           </div>
         </div>
         <div class="form-group">

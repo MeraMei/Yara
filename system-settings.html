@@ -438,6 +438,21 @@ body {
 .conn .ci b { font: 700 14px var(--font-body); display: block; color: var(--colourful-neutral-900); }
 .conn .ci span { font-size: 12px; color: var(--colourful-neutral-500); font-weight: 600; }
 
+/* GitHub Token 配置 */
+.token-row { grid-template-columns: 88px 1fr auto; }
+.token-hint { font-size: 12px; color: var(--colourful-neutral-500); font-weight: 600; margin-top: 10px; line-height: 1.5; background: var(--colourful-neutral-50); border-radius: 10px; padding: 8px 12px; }
+
+/* 轻量 toast 提示 */
+.toast {
+  position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px);
+  background: var(--colourful-neutral-900); color: #fff; font: 600 13px var(--font-body);
+  padding: 10px 18px; border-radius: 999px; box-shadow: var(--shadow-3);
+  opacity: 0; visibility: hidden; transition: opacity .25s ease, transform .25s ease, visibility .25s; z-index: 9999; max-width: 90vw; text-align: center;
+}
+.toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+.toast.ok { background: var(--colourful-mint-green-600); }
+.toast.err { background: var(--colourful-error-600); }
+
 /* 多色书签卡片（对齐 index mini-card 风格） */
 .bookmarks { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 12px; margin-top: 16px; }
 .bk {
@@ -791,8 +806,19 @@ body {
       </div>
       <div class="card">
         <div class="card-title mint">🔗 GitHub 连接</div>
-        <div class="conn"><div class="st ok"></div><div class="ci"><b>GitHub 已连接</b><span>数据自动同步到云端仓库</span></div><button class="btn ghost mini">断开</button></div>
-        <div class="conn"><div class="st no"></div><div class="ci"><b>自动同步开关</b><span>每次修改后自动推送</span></div><button class="btn primary mini">开启</button></div>
+        <div class="conn" id="connStatus">
+          <div class="st no" id="connDot"></div>
+          <div class="ci"><b id="connTitle">未连接</b><span id="connDesc">还没有配置 Token，写入操作暂不可用</span></div>
+          <button class="btn ghost mini" id="connBtn" onclick="disconnectGithub()" style="display:none">断开</button>
+        </div>
+        <div class="form-row token-row">
+          <label>Token</label>
+          <div class="field">
+            <input type="password" id="githubTokenInput" placeholder="粘贴 GitHub Token（ghp_/github_pat_ 开头）" autocomplete="off" />
+          </div>
+          <button class="btn primary mini" onclick="saveGithubToken()">保存</button>
+        </div>
+        <div class="token-hint" id="tokenHint">Token 只保存在本机浏览器，用于把数据写入 GitHub 仓库。主站会据此自动同步，不会上传到任何服务器。</div>
       </div>
     </div>
 
@@ -1051,6 +1077,69 @@ document.addEventListener("click", function(e) {
   var navLink = e.target.closest(".sidebar .nav a, .sidebar .nav-foot a");
   if (navLink) closeSidebar();
 });
+
+/* ════════ GitHub Token 配置 ════════ */
+var GITHUB_TOKEN_KEY = "github_token";
+
+function getGithubToken() {
+  try { return localStorage.getItem(GITHUB_TOKEN_KEY) || ""; } catch (e) { return ""; }
+}
+function setGithubToken(token) {
+  try { localStorage.setItem(GITHUB_TOKEN_KEY, token); } catch (e) {}
+}
+function clearGithubToken() {
+  try { localStorage.removeItem(GITHUB_TOKEN_KEY); } catch (e) {}
+}
+
+// 轻量 toast
+function showToast(msg, ok) {
+  var el = document.getElementById("settingsToast");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = "toast show" + (ok !== false ? " ok" : " err");
+  clearTimeout(el._t);
+  el._t = setTimeout(function() { el.classList.remove("show"); }, 2600);
+}
+
+// 读取当前连接状态并渲染
+function renderGithubStatus() {
+  var token = getGithubToken();
+  var dot = document.getElementById("connDot");
+  var title = document.getElementById("connTitle");
+  var desc = document.getElementById("connDesc");
+  var btn = document.getElementById("connBtn");
+  var input = document.getElementById("githubTokenInput");
+  var has = !!token;
+  if (dot) dot.className = "st " + (has ? "ok" : "no");
+  if (title) title.textContent = has ? "GitHub 已连接" : "未连接";
+  if (desc) desc.textContent = has ? "Token 已配置，数据可自动同步到云端仓库" : "还没有配置 Token，写入操作暂不可用";
+  if (btn) btn.style.display = has ? "" : "none";
+  if (input) input.value = has ? token : "";
+}
+
+// 保存 Token
+function saveGithubToken() {
+  var input = document.getElementById("githubTokenInput");
+  var token = (input && input.value || "").trim();
+  if (!token) { showToast("请先粘贴 GitHub Token", false); return; }
+  if (!/^(ghp_|github_pat_|gho_|ghu_|ghs_|ghr_)/.test(token)) {
+    showToast("Token 格式看起来不对，请检查后重试", false);
+    return;
+  }
+  setGithubToken(token);
+  renderGithubStatus();
+  showToast("✅ Token 已保存，数据可自动同步");
+}
+
+// 断开 GitHub 连接
+function disconnectGithub() {
+  clearGithubToken();
+  renderGithubStatus();
+  showToast("已断开 GitHub 连接");
+}
+
+document.addEventListener("DOMContentLoaded", renderGithubStatus);
 </script>
+<div class="toast" id="settingsToast"></div>
 </body>
 </html>
