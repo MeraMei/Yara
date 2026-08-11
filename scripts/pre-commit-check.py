@@ -160,11 +160,12 @@ def main():
     # ─────────────────────────────────────────────
     def check_css_vars(path, label):
         html = read(path)
+        # used/safe 均带 -- 前缀（var(--x)），defined 必须同样带 -- 前缀，三者才能直接取差集
         used = set(re.findall(r'var\((--[a-zA-Z0-9-]+)', html))
-        defined = set(re.findall(r'(?:^|\s)--([a-zA-Z0-9-]+)\s*:', html))
+        defined = set(re.findall(r'(?:^|\s)(--[a-zA-Z0-9-]+)\s*:', html))
         block = re.search(r':root\s*\{([^}]*)\}', html)
         if block:
-            defined |= set(re.findall(r'--([a-zA-Z0-9-]+)\s*:', block.group(1)))
+            defined |= set(re.findall(r'(--[a-zA-Z0-9-]+)\s*:', block.group(1)))
         # 带内置回退值的（var(--x, fallback)）可安全降级
         safe = set(re.findall(r'var\((--[a-zA-Z0-9-]+)\s*,\s*[^)]+\)', html))
         missing = sorted(v for v in used if v not in defined and v not in safe)
