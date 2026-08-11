@@ -594,27 +594,32 @@ h1 {
 .ss-btn:active { transform: translateY(0); }
 .ss-btn.hw { background: linear-gradient(135deg, var(--colourful-sky-blue-300), var(--colourful-sky-blue-500)); }
 .ss-btn.score { background: linear-gradient(135deg, var(--colourful-sky-blue-400), var(--colourful-sky-blue-700)); }
-/* 知识页 hero 快捷按钮：沿用"记一笔能量"药丸样式，但用知识星球蓝紫粉主色 */
-.kn-hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.kn-diary-write {
+/* ════════ 星球 hero 右状态卡：能量统计 + 快捷操作（能量/知识/财富 三板块统一） ════════ */
+.planet-hero { display: grid; gap: 12px; align-content: start; }
+.planet-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.planet-stat { text-align: left; padding: 7px 11px; border-radius: 12px; background: rgba(255,255,255,.62); }
+.planet-stat-label { display: block; font-size: 11px; font-weight: 700; color: var(--colourful-neutral-500); letter-spacing: .02em; }
+.planet-stat-value { display: block; margin-top: 2px; font: 800 22px/1 var(--font-display); color: var(--colourful-neutral-900); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.planet-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.planet-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  background: linear-gradient(135deg, #6ab5ff, #9255f5, #ea4d85);
-  color: #fff; border: none; border-radius: 999px; padding: 9px 14px;
+  border: none; border-radius: 999px; padding: 9px 14px;
   font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
-  box-shadow: 0 3px 8px rgba(146,85,245,.35);
+  color: var(--colourful-neutral-800);
   transition: transform .15s ease, box-shadow .15s ease;
 }
-.kn-diary-write i { width: 14px; height: 14px; }
-.kn-diary-write:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(146,85,245,.42); }
-/* 能量星球 hero 右状态卡：今日能量统计 + 快捷操作（左右模式） */
-.xp-hero-note { display: grid; gap: 14px; align-content: start; }
-.xp-hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.xp-hero-stat { text-align: left; }
-.xp-hero-stat-label { display: block; font-size: 11px; font-weight: 700; color: var(--colourful-neutral-500); }
-.xp-hero-stat-value { display: block; margin-top: 2px; font: 800 26px/1 var(--font-display); color: var(--colourful-neutral-900); letter-spacing: -.02em; }
-.xp-hero-note .ov-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px; }
-.xp-hero-note .ov-actions .btn-primary-sm,
-.xp-hero-note .ov-actions .btn-outline-sm { white-space: nowrap; }
+.planet-btn i { width: 14px; height: 14px; }
+.planet-btn:hover { transform: translateY(-1px); }
+.planet-btn:active { transform: translateY(0); }
+/* 能量：黄油黄 + 青柠（浅色柔和） */
+.planet-btn.en { background: linear-gradient(135deg, var(--colourful-butter-yellow-200), var(--colourful-butter-yellow-300), var(--colourful-lime-pop-300)); box-shadow: 0 3px 8px rgba(130,214,50,.26); }
+/* 知识：天空蓝 + 薰衣草 + 糖果粉（浅色柔和） */
+.planet-btn.kn { background: linear-gradient(135deg, var(--colourful-sky-blue-200), var(--colourful-lavender-300), var(--colourful-candy-pink-300)); box-shadow: 0 3px 8px rgba(146,85,245,.22); }
+/* 财富：黄油黄 + 阳光珊瑚 + 青柠（浅色柔和） */
+.planet-btn.mn { background: linear-gradient(135deg, var(--colourful-butter-yellow-200), var(--colourful-sunny-coral-300), var(--colourful-lime-pop-300)); box-shadow: 0 3px 8px rgba(249,96,36,.22); }
+/* 星球 hero 底部（财富总资产等补充信息） */
+.planet-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 8px; border-top: 1px dashed rgba(249,96,36,.25); font-size: 12px; font-weight: 700; color: var(--colourful-neutral-500); }
+.planet-foot b { color: var(--colourful-neutral-900); font: 800 16px var(--font-display); }
 .profile-note { align-content: start; }
 .profile-note p + p { margin-top: 4px; }
 .today-grid .card { min-height: 150px; }
@@ -746,6 +751,9 @@ h1 {
 .pill.warn { background: var(--colourful-sunny-coral-100); color: var(--colourful-sunny-coral-700); }
 .pill.info { background: var(--colourful-sky-blue-100); color: var(--colourful-sky-blue-700); }
 .pill.lav { background: var(--colourful-lavender-100); color: var(--colourful-lavender-700); }
+.pill-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill-group .pill { cursor: pointer; border: 1px solid transparent; transition: all .15s; }
+.pill-group .pill.active { background: var(--colourful-butter-yellow-200); color: var(--colourful-neutral-800); border-color: var(--colourful-sunny-coral-300); box-shadow: 0 2px 6px -2px rgba(249,96,36,.3); }
 
 .stack { display: grid; gap: 12px; }
 .mini-card {
@@ -1024,6 +1032,12 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
 .choice-pill.warning.checked::before { background: var(--colourful-sunny-coral-500); }
 .choice-pill.danger.checked { background: var(--colourful-candy-pink-50); border-color: var(--colourful-candy-pink-300); color: var(--colourful-candy-pink-700); }
 .choice-pill.danger.checked::before { background: var(--colourful-candy-pink-500); }
+/* 知识板块（天空蓝）选中态 */
+.choice-pill.kn:hover, #addScoreModal .choice-pill:hover { border-color: var(--colourful-sky-blue-300); background: var(--colourful-sky-blue-50); }
+.choice-pill.kn.checked, #addScoreModal .choice-pill.checked { background: var(--colourful-sky-blue-50); border-color: var(--colourful-sky-blue-400); color: var(--colourful-sky-blue-800); }
+.choice-pill.kn.checked::before, #addScoreModal .choice-pill.checked::before { background: var(--colourful-sky-blue-500); }
+/* 录入弹窗内的 XP 提示（知识蓝） */
+.xp-hint.kn { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--colourful-sky-blue-50); border: 1px solid var(--colourful-sky-blue-200); font-size: 12px; color: var(--colourful-sky-blue-800); }
 
 /* ════════ 响应式 ════════ */
 @media (max-width: 1180px) {
@@ -3337,26 +3351,6 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       padding: 6px;
       box-shadow: 0 1px 2px rgba(30,28,26,.03), 0 4px 12px -6px rgba(30,28,26,.08);
     }
-
-    /* ════════ 学习进度卡（作业区块顶部，毛玻璃） ════════ */
-    .hw-progress-card {
-      background: rgba(255,255,255,.78);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,.7);
-      border-radius: 18px;
-      padding: 16px 18px;
-      margin-bottom: 14px;
-      box-shadow: 0 1px 2px rgba(30,28,26,.03), 0 6px 18px -10px rgba(30,28,26,.12);
-    }
-    .hw-progress-head { display: flex; align-items: center; gap: 7px; font: 700 14px var(--font-display); color: var(--neutral-900); }
-    .hw-progress-head i { width: 16px; height: 16px; color: var(--colourful-sky-blue-600); }
-    .hw-progress-main { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 10px; }
-    .hw-progress-count { font: 800 30px/1 var(--font-display); color: var(--neutral-900); letter-spacing: -.02em; }
-    .hw-progress-pct { font-size: 13px; font-weight: 700; color: var(--colourful-sky-blue-600); }
-    .hw-progress-track { height: 8px; border-radius: 999px; background: var(--neutral-100); overflow: hidden; margin-top: 10px; }
-    .hw-progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--colourful-sky-blue-300), var(--colourful-sky-blue-500)); transition: width .8s cubic-bezier(.4,0,.2,1); }
-    .hw-progress-foot { font-size: 12px; font-weight: 700; color: var(--neutral-600); margin-top: 8px; }
 
     /* ════════ 作业标题内联进度（挪到作业二字旁） ════════ */
     .hw-title-progress {
@@ -6433,6 +6427,12 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       font-size: 15px;
     }
 
+    /* 财富星球顶部：自由基金 + 花销分析 并排 */
+    .money-hero-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 16px; align-items: stretch; }
+    @media (max-width: 820px) { .money-hero-grid { grid-template-columns: 1fr; } }
+    .money-hero-grid .free-fund-card { margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+    .money-hero-grid .analysis-card-spend { margin-bottom: 0; }
+
     /* 自由基金主卡（阳光珊瑚 + 黄油黄） */
     .free-fund-card {
       background:
@@ -9327,26 +9327,25 @@ if (typeof window !== 'undefined') {
       <section class="hero sub-hero">
         <span class="sub-stars"><i></i><i></i><i></i><i></i><i></i></span>
         <div>
-          <div class="eyebrow"><i data-lucide="sparkles"></i> 成长星球</div>
           <h1>能量星球</h1>
           <p class="lead" id="xpIntro"></p>
           <div class="hero-live"><i data-lucide="sprout"></i><span id="xpLiveText">--</span></div>
         </div>
-        <div class="hero-note sub-status xp-hero-note">
+        <div class="hero-note sub-status planet-hero">
           <div class="ss-head"><i data-lucide="zap"></i>今日能量</div>
-          <div class="xp-hero-stats">
-            <div class="xp-hero-stat">
-              <span class="xp-hero-stat-label">本周获得</span>
-              <span class="xp-hero-stat-value" id="heroStatWeek">--</span>
+          <div class="planet-stats">
+            <div class="planet-stat">
+              <span class="planet-stat-label">本周获得</span>
+              <span class="planet-stat-value" id="heroStatWeek">--</span>
             </div>
-            <div class="xp-hero-stat">
-              <span class="xp-hero-stat-label">今日获得</span>
-              <span class="xp-hero-stat-value" id="heroStatToday">--</span>
+            <div class="planet-stat">
+              <span class="planet-stat-label">今日获得</span>
+              <span class="planet-stat-value" id="heroStatToday">--</span>
             </div>
           </div>
-          <div class="xp-hero-actions">
-            <button class="diary-write" onclick="openDiaryModal()"><i data-lucide="book-open" style="width:14px;height:14px"></i>能量日记</button>
-            <button class="diary-write" onclick="openXpModal()"><i data-lucide="zap" style="width:14px;height:14px"></i>能量打卡</button>
+          <div class="planet-actions">
+            <button class="planet-btn en" onclick="openDiaryModal()"><i data-lucide="book-open"></i>能量日记</button>
+            <button class="planet-btn en" onclick="openXpModal()"><i data-lucide="zap"></i>能量打卡</button>
           </div>
         </div>
       </section>
@@ -9359,7 +9358,6 @@ if (typeof window !== 'undefined') {
               <div class="diary-name"><span class="diary-icon">⚡</span>今日能量记录</div>
               <div class="diary-stats" id="diaryStats">已记 -- 条 · 连续 -- 天 · 累计 -- XP</div>
             </div>
-            <button class="diary-write" onclick="openDiaryModal()">✍️ 记一笔能量</button>
           </div>
           <div class="diary-main">
             <div class="diary-left">
@@ -9429,26 +9427,25 @@ if (typeof window !== 'undefined') {
       <section class="hero sub-hero">
         <span class="sub-stars"><i></i><i></i><i></i><i></i><i></i></span>
         <div>
-          <div class="eyebrow"><i data-lucide="book-open"></i> 成长星球</div>
           <h1>知识星球</h1>
           <p class="lead" id="studyIntro"></p>
           <div class="hero-live"><i data-lucide="sparkles"></i><span id="studyLiveText">--</span></div>
         </div>
-        <div class="hero-note sub-status xp-hero-note">
+        <div class="hero-note sub-status planet-hero">
           <div class="ss-head"><i data-lucide="pen-line"></i>知识能量</div>
-          <div class="xp-hero-stats">
-            <div class="xp-hero-stat">
-              <span class="xp-hero-stat-label">本周获得</span>
-              <span class="xp-hero-stat-value" id="studyStatWeek">--</span>
+          <div class="planet-stats">
+            <div class="planet-stat">
+              <span class="planet-stat-label">本周获得</span>
+              <span class="planet-stat-value" id="studyStatWeek">--</span>
             </div>
-            <div class="xp-hero-stat">
-              <span class="xp-hero-stat-label">今日获得</span>
-              <span class="xp-hero-stat-value" id="studyStatToday">--</span>
+            <div class="planet-stat">
+              <span class="planet-stat-label">今日获得</span>
+              <span class="planet-stat-value" id="studyStatToday">--</span>
             </div>
           </div>
-          <div class="xp-hero-actions kn-hero-actions">
-            <button class="kn-diary-write" onclick="openAddHomeworkModal()"><i data-lucide="list-checks" style="width:14px;height:14px"></i>作业录入</button>
-            <button class="kn-diary-write" onclick="openAddScoreModal()"><i data-lucide="award" style="width:14px;height:14px"></i>成绩录入</button>
+          <div class="planet-actions">
+            <button class="planet-btn kn" onclick="openAddHomeworkModal()"><i data-lucide="list-checks"></i>作业录入</button>
+            <button class="planet-btn kn" onclick="openAddScoreModal()"><i data-lucide="award"></i>成绩录入</button>
           </div>
         </div>
       </section>
@@ -9458,7 +9455,6 @@ if (typeof window !== 'undefined') {
         <div class="section-head">
           <div class="section-title"><i data-lucide="list-checks"></i>作业
             <span class="hw-title-progress">
-              <span class="hw-title-count" id="studyHeroCount">--</span>
               <span class="hw-title-track"><span class="hw-title-fill" id="studyHeroFill" style="width:0%"></span></span>
               <span class="hw-title-pct" id="studyHeroPct">--</span>
             </span>
@@ -9579,32 +9575,35 @@ if (typeof window !== 'undefined') {
       <section class="hero sub-hero">
         <span class="sub-stars"><i></i><i></i><i></i><i></i><i></i></span>
         <div>
-          <div class="eyebrow"><i data-lucide="wallet"></i> 成长星球</div>
           <h1>财富星球</h1>
           <p class="lead" id="moneyIntro"></p>
           <div class="hero-live"><i data-lucide="coins"></i><span id="moneyLiveText">--</span></div>
         </div>
-        <div class="hero-note sub-status">
-          <div class="ss-head"><i data-lucide="wallet"></i>总资产</div>
-          <div class="ss-main">
-            <span class="ss-lv" id="moneyHeroBalance">--</span>
-            <span class="ss-xp" id="moneyHeroNote">--</span>
+        <div class="hero-note sub-status planet-hero">
+          <div class="ss-head"><i data-lucide="wallet"></i>财富能量</div>
+          <div class="planet-stats">
+            <div class="planet-stat">
+              <span class="planet-stat-label">本周获得</span>
+              <span class="planet-stat-value" id="moneyStatWeek">--</span>
+            </div>
+            <div class="planet-stat">
+              <span class="planet-stat-label">今日获得</span>
+              <span class="planet-stat-value" id="moneyStatToday">--</span>
+            </div>
           </div>
-          <div class="ss-track"><div class="ss-fill" id="moneyHeroFill" style="width:0%"></div></div>
-          <div class="ss-foot" id="moneyHeroFoot">--</div>
+          <div class="planet-actions">
+            <button class="planet-btn mn" onclick="openReconcileModal()"><i data-lucide="refresh-cw"></i>花销复盘</button>
+            <button class="planet-btn mn" onclick="openFinanceEntryModal()"><i data-lucide="coins"></i>财务进账</button>
+          </div>
         </div>
       </section>
 
       <section class="section">
+        <div class="money-hero-grid">
         <!-- 自由基金主卡 -->
         <div class="card free-fund-card">
           <div class="ffc-label">自由基金</div>
           <div class="ffc-amount" id="freeFundAmount">--</div>
-          <div class="ffc-sub" id="freeFundSub">本周零花钱已发放</div>
-          <button class="ffc-btn" onclick="openReconcileModal()">
-            <i data-lucide="plus" style="width:16px;height:16px"></i>
-            记一笔
-          </button>
         </div>
 
         <!-- 花销分析（环形图） -->
@@ -9624,6 +9623,7 @@ if (typeof window !== 'undefined') {
             <div class="wr-bar"><div class="wr-bar-fill" id="worthRateFill" style="width:0%"></div></div>
             <span class="wr-value" id="worthRateValue">0%</span>
           </div>
+        </div>
         </div>
       </section>
 
@@ -9789,7 +9789,7 @@ if (typeof window !== 'undefined') {
         <div class="choice-group" id="addTypeGroup">
           <label class="choice-pill"><input type="radio" name="addType" value="日常作业" checked>日常</label>
           <label class="choice-pill"><input type="radio" name="addType" value="暑假作业">暑假</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="假期作业">假期</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色</label>
           <label class="choice-pill"><input type="radio" name="addType" value="家庭作业">家庭</label>
         </div>
       </div>
@@ -9821,73 +9821,70 @@ if (typeof window !== 'undefined') {
   </div>
 
   <!-- 成绩录入弹窗 -->
-  <div class="modal-overlay" id="addScoreModal" onclick="if(event.target===this)closeAddScoreModal()">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div class="modal-title"><i data-lucide="award"></i>录入成绩</div>
-        <button class="modal-close" onclick="closeAddScoreModal()"><i data-lucide="x"></i></button>
+  <!-- 录入成绩弹窗（对齐作业录入逻辑 · 知识蓝） -->
+  <div class="edit-modal-overlay" id="addScoreModal">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <div class="edit-modal-title"><i data-lucide="award" style="width:18px;height:18px"></i>录入成绩</div>
+        <button class="edit-modal-close" onclick="closeAddScoreModal()"><i data-lucide="x"></i></button>
       </div>
-      <div class="modal-body">
-        <div class="edit-field">
-          <label>科目</label>
-          <div class="choice-group" id="scoreSubjectGroup">
-            <label class="choice-pill"><input type="radio" name="scoreSubject" value="语文" checked>语文</label>
-            <label class="choice-pill"><input type="radio" name="scoreSubject" value="数学">数学</label>
-            <label class="choice-pill"><input type="radio" name="scoreSubject" value="英语">英语</label>
-          </div>
-        </div>
-        <div class="edit-field-row">
-          <div class="edit-field">
-            <label>考试类型</label>
-            <div class="choice-group" id="scoreTypeGroup">
-              <label class="choice-pill"><input type="radio" name="scoreType" value="单元测试" checked>单元测试</label>
-              <label class="choice-pill"><input type="radio" name="scoreType" value="日常测验">日常</label>
-              <label class="choice-pill"><input type="radio" name="scoreType" value="月考">月考</label>
-              <label class="choice-pill"><input type="radio" name="scoreType" value="期中">期中</label>
-              <label class="choice-pill"><input type="radio" name="scoreType" value="期末">期末</label>
-            </div>
-          </div>
-          <div class="edit-field">
-            <label>等级</label>
-            <select class="semester-select" id="scoreGrade">
-              <option value="A+">A+</option>
-              <option value="A" selected>A</option>
-              <option value="B+">B+</option>
-              <option value="B">B</option>
-              <option value="C+">C+</option>
-              <option value="C">C</option>
-              <option value="D+">D+</option>
-              <option value="D">D</option>
-            </select>
-          </div>
-        </div>
-        <div class="edit-field-row">
-          <div class="edit-field">
-            <label>分数（选填）</label>
-            <input type="number" id="scoreNumber" placeholder="如 95" min="0" max="100" />
-          </div>
-          <div class="edit-field">
-            <label>学期</label>
-            <select class="semester-select" id="scoreSemester"></select>
-          </div>
-        </div>
-        <div class="edit-field">
-          <label>失分模块（可多选 · 主动复盘 +1 XP）</label>
-          <div class="choice-group sm" id="errorModuleCheckboxes"></div>
-        </div>
-        <div class="edit-field">
-          <label>备注（选填）</label>
-          <input type="text" id="scoreTitle" placeholder="如：第3单元测试" />
-        </div>
-        <div class="edit-field">
-          <label>日期</label>
-          <input type="date" id="scoreDate" />
-        </div>
-        <div class="xp-hint" style="margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--colourful-butter-yellow-50);border:1px solid var(--colourful-butter-yellow-200);font-size:12px;color:var(--colourful-butter-yellow-800);">
-          ✨ 主动录入成绩 <b>+2 XP</b>，勾选失分模块再 <b>+1 XP</b>
+      <div class="edit-field">
+        <label>科目</label>
+        <div class="choice-group" id="scoreSubjectGroup">
+          <label class="choice-pill kn"><input type="radio" name="scoreSubject" value="语文" checked>语文</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreSubject" value="数学">数学</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreSubject" value="英语">英语</label>
         </div>
       </div>
-      <div class="modal-foot">
+      <div class="edit-field">
+        <label>考试类型</label>
+        <div class="choice-group" id="scoreTypeGroup">
+          <label class="choice-pill kn"><input type="radio" name="scoreType" value="单元测试" checked>单元</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreType" value="日常测验">日常</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreType" value="月考">月考</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreType" value="期中">期中</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreType" value="期末">期末</label>
+        </div>
+      </div>
+      <div class="edit-field-row">
+        <div class="edit-field">
+          <label>分数（选填）</label>
+          <input type="number" id="scoreNumber" placeholder="如 95" min="0" max="100" />
+        </div>
+        <div class="edit-field">
+          <label>等级</label>
+          <select class="semester-select" id="scoreGrade">
+            <option value="A+">A+</option>
+            <option value="A" selected>A</option>
+            <option value="B+">B+</option>
+            <option value="B">B</option>
+            <option value="C+">C+</option>
+            <option value="C">C</option>
+            <option value="D+">D+</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label>学期</label>
+        <select class="semester-select" id="scoreSemester"></select>
+      </div>
+      <div class="edit-field">
+        <label>失分模块（可多选 · 主动复盘 +1 XP）</label>
+        <div class="choice-group sm" id="errorModuleCheckboxes"></div>
+      </div>
+      <div class="edit-field">
+        <label>备注（选填）</label>
+        <input type="text" id="scoreTitle" placeholder="如：第3单元测试" />
+      </div>
+      <div class="edit-field">
+        <label>日期</label>
+        <input type="date" id="scoreDate" />
+      </div>
+      <div class="xp-hint kn">
+        ✨ 主动录入成绩 <b>+2 XP</b>，勾选失分模块再 <b>+1 XP</b>
+      </div>
+      <div class="edit-modal-actions">
         <button class="btn-secondary" onclick="closeAddScoreModal()">取消</button>
         <button class="btn-primary" id="submitScore">保存</button>
       </div>
@@ -9978,6 +9975,44 @@ if (typeof window !== 'undefined') {
         <div class="modal-footer">
           <button type="button" class="btn-secondary" onclick="closeReconcileModal()">取消</button>
           <button type="submit" class="btn-primary" id="submitBtn">确认记录</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ 财务进账弹窗（财富星球 · 关联 XP） ════════ -->
+  <div class="modal-overlay" id="financeEntryModal" onclick="if(event.target===this)closeFinanceEntryModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="coins"></i>财务进账</div>
+        <button class="modal-close" onclick="closeFinanceEntryModal()">
+          <i data-lucide="x" style="width:16px;height:16px"></i>
+        </button>
+      </div>
+      <form id="financeEntryForm" onsubmit="submitFinanceEntry(event)">
+        <div class="form-group">
+          <label class="form-label">进账来源 <span style="color:var(--colourful-error-600)">*</span></label>
+          <input type="text" class="form-input" id="financeSource" placeholder="如：零花钱、红包、卖废品收入…" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">金额 (元) <span style="color:var(--colourful-error-600)">*</span></label>
+          <input type="number" step="0.01" min="0" class="form-input" id="financeAmount" placeholder="输入金额" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">日期</label>
+          <input type="date" class="form-input" id="financeDate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">存入账户</label>
+          <div class="pill-group" id="financeAccountGroup">
+            <button type="button" class="pill active" data-fin-account="wealth" onclick="setFinanceAccount(this,'wealth')">💰 财富基金</button>
+            <button type="button" class="pill" data-fin-account="free" onclick="setFinanceAccount(this,'free')">🎈 自由基金</button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeFinanceEntryModal()">取消</button>
+          <button type="submit" class="btn-primary" id="submitFinanceEntry">确认记录</button>
         </div>
       </form>
     </div>
@@ -10711,6 +10746,69 @@ if (typeof window !== "undefined") {
     document.getElementById("reconcileModal").classList.remove("active");
   }
 
+  // ════════ 财务进账（财富星球：单笔收支录入 + 关联 XP） ════════
+  let _finAccount = "wealth";
+  function openFinanceEntryModal() {
+    _finAccount = "wealth";
+    document.getElementById("financeEntryForm").reset();
+    document.getElementById("financeDate").value = new Date().toISOString().slice(0, 10);
+    // 重置选中态
+    document.querySelectorAll("#financeAccountGroup .pill").forEach(b => b.classList.toggle("active", b.dataset.finAccount === "wealth"));
+    document.getElementById("financeEntryModal").classList.add("active");
+    if (window.lucide) refreshIcons(30);
+  }
+  function closeFinanceEntryModal() {
+    document.getElementById("financeEntryModal").classList.remove("active");
+  }
+  function setFinanceAccount(btn, account) {
+    _finAccount = account;
+    document.querySelectorAll("#financeAccountGroup .pill").forEach(b => b.classList.toggle("active", b === btn));
+  }
+  async function submitFinanceEntry(e) {
+    if (e) e.preventDefault();
+    const amount = Number(document.getElementById("financeAmount").value);
+    if (!amount || amount <= 0) { alert("请输入有效金额"); return; }
+    const source = document.getElementById("financeSource").value.trim();
+    if (!source) { alert("请输入进账来源"); return; }
+    const date = document.getElementById("financeDate").value || new Date().toISOString().slice(0, 10);
+    const btn = document.getElementById("submitFinanceEntry");
+    btn.disabled = true; btn.textContent = "记录中…";
+    try {
+      await window.DataStore.addFinanceRecord({
+        type: "income",
+        amount,
+        account: _finAccount,
+        category: source,
+        description: source,
+        date,
+        worthIt: "值得",
+      });
+      // 财务进账（财务进账只是动作记录，分值低：2 XP）
+      const _cfg = window.__lastData || (cachedData || await loadAppData());
+      const _entryRule = (_cfg?.config?.xpRuleList || []).find(r => r.name === "财务进账");
+      const _entryXp = (_entryRule && Number(_entryRule.xp)) ? Number(_entryRule.xp) : 2;
+      await window.DataStore.addXpRecord({
+        taskName: "财务进账",
+        description: `记录收入：${source}（${_finAccount === "free" ? "自由基金" : "财富基金"}）¥${amount}`,
+        date,
+        status: "verified",
+        xp: _entryXp,
+        xpCategory: "能力成长",
+      });
+      closeFinanceEntryModal();
+      if (window.refreshData) refreshData();
+      await renderMoney();
+      if (window.lucide) refreshIcons(50);
+      alert(`✅ 已记录进账 ¥${amount} 到${_finAccount === "free" ? "自由基金" : "财富基金"}，获得 +${_entryXp} XP 🎉`);
+    } catch (err) {
+      console.error("财务进账失败:", err);
+      handleWriteError(err, "提交失败，请稍后重试");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "确认记录";
+    }
+  }
+
   // 新建一条空明细
   function newEntry() {
     return { amount: "", content: "", worthIt: "", reason: "", suggestion: "" };
@@ -10935,25 +11033,33 @@ if (typeof window !== "undefined") {
         });
       }
 
-      // 本次财务复盘（从配置规则中查找分值，支持动态调整）
+      // 本次花销复盘：每笔复盘记录 +2 XP，当日累计封顶 10 XP（支出复盘/存入复盘均可多次叠加）
       const _cfg = window.__lastData || (cachedData || await loadAppData());
-      const _financeRule = (_cfg?.config?.xpRuleList || []).find(function(r){return r.name==="财务复盘"});
-      const _financeXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 10;
-      await window.DataStore.addXpRecord({
-        taskName: "财务复盘",
-        description: `完成一次自由基金对账复盘（${entries.length} 笔明细）`,
-        date,
-        status: "verified",
-        xp: _financeXp,
-        xpCategory: "能力成长",
-      });
+      const _financeRule = (_cfg?.config?.xpRuleList || []).find(function(r){return r.name==="花销复盘"});
+      const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 2;
+      const _capXp = 10;
+      const _todayReviewed = (_cfg.xpRecords || []).filter(function(r){
+        return r.taskName === "花销复盘" && getDateStr(r) === date;
+      }).reduce(function(s,r){ return s + (Number(r.xp)||0); }, 0);
+      const _rawXp = entries.length * _perRecXp;
+      const _financeXp = Math.max(0, Math.min(_rawXp, _capXp - _todayReviewed));
+      if (_financeXp > 0) {
+        await window.DataStore.addXpRecord({
+          taskName: "花销复盘",
+          description: `完成一次花销复盘（${entries.length} 笔明细）`,
+          date,
+          status: "verified",
+          xp: _financeXp,
+          xpCategory: "能力成长",
+        });
+      }
 
       closeReconcileModal();
       // 刷新页面数据
       if (window.refreshData) refreshData();
       await renderMoney();
       if (window.lucide) refreshIcons(50);
-      alert(`已记录 ${entries.length} 笔财务流水，完成一次财务复盘，+10 XP 🎉`);
+      alert(`已记录 ${entries.length} 笔财务流水，完成一次花销复盘，+${_financeXp} XP（当日复盘累计封顶 ${_capXp} XP）🎉`);
     } catch (e) {
       console.error("提交失败:", e);
       handleWriteError(e, "提交失败，请稍后重试");
@@ -12171,19 +12277,25 @@ async function renderXp() {
 
   // ════════ 顶部统计 ════════
   setText("heroStatPending", `${pending}`);
+  // 能量板块自身的任务（不含"作业·"知识任务、不含"财务"财富任务），保证各模块数值互不串扰
+  const _xpAll = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
   const todayStr = new Date().toISOString().slice(0, 10);
-  const todayXpH = (cfg.xpRecords || []).filter(r => getDateStr(r) === todayStr && r.reviewStatus === "已通过")
+  const _m = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
+  const _isEnergyTask = (r) => {
+    const n = String(r.taskName || r.title || "");
+    return n.indexOf("作业") !== 0 && n.indexOf("财务") < 0;
+  };
+  const todayXpH = _xpAll.filter(r => getDateStr(r) === todayStr && _isEnergyTask(r))
     .reduce((sum, r) => sum + (Number(r.xp) || 0), 0);
   const heroStatToday = document.getElementById("heroStatToday");
   if (heroStatToday) {
     heroStatToday.textContent = todayXpH > 0 ? `+${todayXpH}` : "0";
     heroStatToday.style.color = todayXpH > 0 ? "" : "var(--neutral-400)";
   }
-  // 本周获得能量（本周一至今，已通过的记录）
+  // 本周获得能量（本周一至今，能量板块自身任务）
   const heroStatEl = document.getElementById("heroStatWeek");
   if (heroStatEl) {
-    const _m = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
-    const weekXpH = (cfg.xpRecords || []).filter(r => getDateStr(r) >= _m && r.reviewStatus === "已通过")
+    const weekXpH = _xpAll.filter(r => getDateStr(r) >= _m && _isEnergyTask(r))
       .reduce((sum, r) => sum + (Number(r.xp) || 0), 0);
     heroStatEl.textContent = weekXpH > 0 ? `+${weekXpH}` : "0";
     heroStatEl.style.color = weekXpH > 0 ? "" : "var(--neutral-400)";
@@ -12958,11 +13070,9 @@ async function renderStudy() {
   setText("overviewSubjCount", overviewSorted.map(s => s.name[0]).join(" · "));
 
   // 右侧状态卡：学习进度
-  setText("studyHeroCount", `${subjStats.length} 门`); // 科目数
   setText("studyHeroPct", `作业完成 ${donePct}%`);     // 完成率
   const studyHeroFill = document.getElementById("studyHeroFill");
   if (studyHeroFill) studyHeroFill.style.width = `${donePct}%`;
-  setText("studyHeroNote", `已完成 ${doneList.length} / ${total} 项作业`);
 
   if (subjRadarEl && subjStats.length >= 3) {
     // 知识模块主色（天蓝）：科目完成率雷达统一使用该色，保持版块配色一致
@@ -13948,9 +14058,6 @@ async function renderMoney() {
 
   // ════════ 顶部简介（随机切换）+ 实时数据行 ════════
   setText("moneyIntro", pickRandom(MONEY_INTROS));
-  const freeBal = (freeAcc.balance === null || freeAcc.balance === undefined || freeAcc.balance === "") ? 0 : Number(freeAcc.balance);
-  const wealthBal = (wealthAcc.balance === null || wealthAcc.balance === undefined || wealthAcc.balance === "") ? 0 : Number(wealthAcc.balance);
-  const totalBal = freeBal + wealthBal;
   const daysToAllow = getDaysToAllowance();
   const moneyLiveEl = document.getElementById("moneyLiveText");
   if (moneyLiveEl) moneyLiveEl.innerHTML =
@@ -13958,16 +14065,18 @@ async function renderMoney() {
 
   // ════════ 2. 自由基金主卡（唯一展示自由基金余额） ════════
   setText("freeFundAmount", formatMoney(freeAcc.balance));
-  if (freeAcc.weeklyAllowance != null) {
-    setText("freeFundSub", `每周零花钱 ¥${freeAcc.weeklyAllowance} · 本周已发放`);
-  }
 
-  // 右侧状态卡：总资产（自由基金 + 财富增值）—— 账户名取自数据库，避免硬编码
-  setText("moneyHeroBalance", formatMoney(totalBal));
-  const moneyAccNames = (accounts || []).map(a => (a.name || (a.key === "free" ? "自由基金" : "财富增值")).replace(/账户$/, "")).filter(Boolean);
-  setText("moneyHeroNote", moneyAccNames.length > 0 ? moneyAccNames.join(" + ") : "自由基金 + 财富增值");
-  const moneyHeroFoot = document.getElementById("moneyHeroFoot");
-  if (moneyHeroFoot) moneyHeroFoot.style.display = "none";
+  // 财富板块自身的任务（含"财务"或"花销"），本周/今日获得能量互不串扰其他版块
+  const _mTx = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
+  const _mtoday = new Date().toISOString().slice(0, 10);
+  const _mm = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
+  const _isMoneyTask = (r) => { const n = String(r.taskName || r.title || ""); return n.indexOf("财务") >= 0 || n.indexOf("花销") >= 0; };
+  const _mweekXp = _mTx.filter(r => getDateStr(r) >= _mm && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const _mtodayXp = _mTx.filter(r => getDateStr(r) === _mtoday && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const moneyWeekEl = document.getElementById("moneyStatWeek");
+  if (moneyWeekEl) { moneyWeekEl.textContent = _mweekXp > 0 ? `+${_mweekXp}` : "0"; moneyWeekEl.style.color = _mweekXp > 0 ? "" : "var(--neutral-400)"; }
+  const moneyTodayEl = document.getElementById("moneyStatToday");
+  if (moneyTodayEl) { moneyTodayEl.textContent = _mtodayXp > 0 ? `+${_mtodayXp}` : "0"; moneyTodayEl.style.color = _mtodayXp > 0 ? "" : "var(--neutral-400)"; }
 
   // ════════ 3. 花销分析（环形图 · 仅自由账户） ════════
   const spendDonutEl = document.getElementById("spendDonutChart");
@@ -15121,10 +15230,10 @@ function closeEditModal() {
 
 /* ════════ 添加作业 ════════ */
 // 哪些作业类型需要独立截止日期（暑假/假期），其余默认当天写完
-const ADD_HW_DUE_TYPES = new Set(["暑假作业", "假期作业"]);
+const ADD_HW_DUE_TYPES = new Set(["暑假作业", "特色作业"]);
 // 作业类型 → 对应 XP 任务名（与 xpSources 一致）
 const ADD_HW_TYPE_XP = {
-  "日常作业": 2, "暑假作业": 2, "假期作业": 3, "家庭作业": 4
+  "日常作业": 2, "暑假作业": 2, "特色作业": 3, "家庭作业": 4
 };
 
 function getTodayVal() {
@@ -15305,7 +15414,7 @@ function renderErrorModulesFor(subject) {
   if (!box) return;
   const options = getModuleOptions(subject);
   box.innerHTML = options.map(m => `
-    <label class="choice-pill">
+    <label class="choice-pill kn">
       <input type="checkbox" name="errModule" value="${m}">${m}
     </label>
   `).join("");
@@ -15330,13 +15439,13 @@ function openAddScoreModal() {
   document.getElementById("scoreDate").value = getTodayVal();
   populateScoreSemesterOptions(document.getElementById("scoreSemester"));
   renderErrorModulesFor("语文");
-  modal.classList.add("active");
+  modal.classList.add("show");
   refreshIcons(0);
 }
 
 function closeAddScoreModal() {
   const modal = document.getElementById("addScoreModal");
-  if (modal) modal.classList.remove("active");
+  if (modal) modal.classList.remove("show");
 }
 
 function openAddEvalModal() {
@@ -15559,7 +15668,7 @@ function initEditModal() {
     const ruleList = (cfg && cfg.config && cfg.config.xpRuleList) || [];
     const rule = ruleList.find(r => r.name === "作业·" + hwType);
     // 优先从规则表查找，其次从默认映射表查找，最后回退到合理值
-    const _defaultMap = {'日常作业':2,'暑假作业':2,'假期作业':3,'家庭作业':4,'阅读作业':2,'练习作业':3};
+    const _defaultMap = {'日常作业':2,'暑假作业':2,'特色作业':3,'家庭作业':4,'阅读作业':2,'练习作业':3};
     const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (_defaultMap[hwType] || 2);
     const subject = item.subject || "其他";
     try {
@@ -15813,6 +15922,8 @@ async function boot(page) {
     initAddHomeworkModal();
     if (typeof initScoreEvalModals === "function") initScoreEvalModals();
   }
+  // 每周五自动发放零花钱（+18 到自由基金），启动时检查一次
+  checkAndAddWeeklyAllowance();
   if (window.lucide) refreshIcons(20);
   // 隐藏启动加载动画
   const loader = document.getElementById("bootLoader");
@@ -15954,6 +16065,37 @@ async function switchView(page) {
       window.__pendingView = null;
       switchView(p);
     }
+  }
+}
+
+// 每周五自动发放零花钱 +18（存入财富基金）：系统自动加进去，当天仅一次
+async function checkAndAddWeeklyAllowance() {
+  try {
+    const today = new Date();
+    if (today.getDay() !== 5) return; // 仅每周五
+    const dateStr = todayStr();
+    const cfg = window.__lastData || (cachedData || await loadAppData());
+    const finance = cfg.finance || { recentTransactions: [] };
+    const already = (finance.recentTransactions || []).some(t =>
+      t.type === "income" && t.description === "每周零花钱" && getDateStr(t) === dateStr
+    );
+    if (already) return; // 当天已发放，避免重复
+    await addFinanceRecord({
+      date: dateStr, type: "income", amount: 18, account: "free",
+      category: "零花钱", description: "每周零花钱", worthIt: "值得",
+      reason: "系统每周五自动发放零花钱",
+    });
+    // 关联 XP（财务进账动作记录低分值）
+    const _cfg2 = window.__lastData || (cachedData || await loadAppData());
+    const _entryRule = (_cfg2?.config?.xpRuleList || []).find(r => r.name === "财务进账");
+    const _entryXp = (_entryRule && Number(_entryRule.xp)) ? Number(_entryRule.xp) : 2;
+    await window.DataStore.addXpRecord({
+      taskName: "财务进账",
+      description: "系统每周五自动发放零花钱：¥18",
+      date: dateStr, status: "verified", xp: _entryXp, xpCategory: "能力成长",
+    });
+  } catch (e) {
+    console.warn("零花钱自动发放失败:", e);
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "totalAssets": 11166.57,
+  "totalAssets": 11167.57,
   "accounts": [
     {
       "key": "wealth",
@@ -11,26 +11,12 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 1097.5,
+      "balance": 1098.5,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
-    {
-      "id": "recvrAidOdYwfm",
-      "date": "2026-08-07",
-      "type": "expense",
-      "amount": 1,
-      "rawAmount": -1,
-      "category": "自检测试-财务分析XP",
-      "account": "free",
-      "accountType": "自由基金账户",
-      "description": "自检测试-财务分析XP",
-      "worthIt": "值得",
-      "reason": "自动发放XP自检",
-      "suggestion": ""
-    },
     {
       "id": "recvryO1Jbehqx",
       "date": "2026-08-07",

@@ -128,7 +128,7 @@ function getPlanetXp(verifiedXpRecords) {
 │    → grantHomeworkCompletionXp(item, cfg)                           │
 │    → 从系统设置规则中查找 "作业·{homeworkType}"                     │
 │    → 匹配成功使用规则 XP 值，否则使用默认映射表                      │
-│      {日常作业:2, 暑假作业:2, 假期作业:3, 家庭作业:4, ...}          │
+│      {日常作业:2, 暑假作业:2, 特色作业:3, 家庭作业:4, ...}          │
 │    → DataStore.addXpRecord({taskName:"作业·{type}", ...})           │
 │    → 状态：verified（自动通过）                                      │
 │    → 归属知识星球积分                                               │

@@ -1,21 +1,5 @@
 [
   {
-    "id": "xp_mso6iifb5i70h6",
-    "domain": "XP",
-    "type": "XP获得",
-    "title": "写日记：写作四要素+感受",
-    "taskName": "写日记：写作四要素+感受",
-    "taskCategory": "能力成长",
-    "date": "2026-08-11",
-    "datetime": "2026-08-11",
-    "xp": 6,
-    "xpCategory": "能力成长",
-    "reviewStatus": "待确认",
-    "returnReason": "",
-    "description": "能量记录（只写到了事件）",
-    "_hasValidName": true
-  },
-  {
     "id": "recvrLXIraOr1K",
     "domain": "XP",
     "type": "XP获得",
@@ -46,22 +30,6 @@
     "reviewStatus": "已通过",
     "returnReason": "",
     "description": "今天和爸爸去条鱼，户外30分钟",
-    "_hasValidName": true
-  },
-  {
-    "id": "recvrAifE9FgFk",
-    "domain": "XP",
-    "type": "XP获得",
-    "title": "财务能力分析",
-    "taskName": "财务能力分析",
-    "taskCategory": "能力成长",
-    "date": "2026-08-07",
-    "datetime": "2026-08-07 12:00:00",
-    "xp": 5,
-    "xpCategory": "能力成长",
-    "reviewStatus": "已通过",
-    "returnReason": "",
-    "description": "完成一次财务分析",
     "_hasValidName": true
   },
   {
@@ -116,8 +84,8 @@
     "id": "recvrA8RZM2SsO",
     "domain": "XP",
     "type": "XP获得",
-    "title": "作业·假期作业",
-    "taskName": "作业·假期作业",
+    "title": "作业·特色作业",
+    "taskName": "作业·特色作业",
     "taskCategory": "学习成长",
     "date": "2026-08-07",
     "datetime": "2026-08-07 04:29:10",
@@ -125,7 +93,7 @@
     "xpCategory": "学习成长",
     "reviewStatus": "已通过",
     "returnReason": "",
-    "description": "完成数学作业（假期作业）",
+    "description": "完成数学作业（特色作业）",
     "_hasValidName": true
   },
   {
