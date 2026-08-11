@@ -1,5 +1,5 @@
 {
-  "totalAssets": 10932.67,
+  "totalAssets": 10902.77,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,27 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 863.6,
+      "balance": 833.7,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_msooe1ml2bo30a",
+      "date": "2026-08-11",
+      "type": "expense",
+      "amount": 29.9,
+      "rawAmount": -29.9,
+      "category": "贴贴小猫挂件",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "贴贴小猫挂件",
+      "worthIt": "值得",
+      "reason": "从宝鸡买的，妈妈一个我一个，很喜欢！",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "fin_msoodzz8zw80k7",
       "date": "2026-08-11",
