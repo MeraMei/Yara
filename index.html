@@ -8219,6 +8219,13 @@ async function _backgroundRefresh() {
     }
     // 数据比对：只有关键数据真正变化时才触发重渲染，避免无谓的闪现
     if (cachedData) {
+      // 如果缓存是最近 5 分钟内写入的（用户刚提交过数据），跳过 CDN 覆盖，
+      // 避免 CDN 缓存延迟导致新写入的数据丢失
+      const _cachedAt = cachedData._cachedAt || 0;
+      if (Date.now() - _cachedAt < 5 * 60 * 1000) {
+        console.log('后台刷新: 缓存数据较新（写入时间 < 5min），跳过 CDN 覆盖');
+        return;
+      }
       const oldKey = cachedData.currentXP + '|' + (cachedData.xpRecords||[]).length + '|' + (cachedData.xpRecords||[]).reduce(function(s,r){return s+Number(r.xp||0)},0);
       const newKey = dashboard.currentXP + '|' + (dashboard.xpRecords||[]).length + '|' + (dashboard.xpRecords||[]).reduce(function(s,r){return s+Number(r.xp||0)},0);
       if (oldKey === newKey) {
@@ -8600,7 +8607,8 @@ async function addXpRecord(record) {
     taskName: record.taskName || record.title || '',
     taskCategory: record.xpCategory || record.type || '',
     date: record.date || todayStr(),
-    datetime: record.date || todayStr(),
+    // datetime 记录实际创建时间，用于基于操作时间的统计（如财富页面的今日/本周获得）
+    datetime: new Date().toISOString().slice(0, 19).replace('T', ' '),
     xp: Number(record.xp) || 0,
     xpCategory: record.xpCategory || record.type || '',
     reviewStatus: record.status === 'verified' ? '已通过' : record.status === 'returned' ? '已退回' : '待确认',
@@ -8608,8 +8616,10 @@ async function addXpRecord(record) {
     description: record.description || '',
     _hasValidName: true,
   };
-  // 读取当前数据并追加
-  const currentRecords = await fetchRawJSON('xpRecords.json').catch(() => []);
+  // 读取当前数据并追加（优先使用本地缓存，避免 CDN 缓存延迟）
+  const currentRecords = Array.isArray(cachedData && cachedData.xpRecords)
+    ? cachedData.xpRecords
+    : await fetchRawJSON('xpRecords.json').catch(() => []);
   const updated = [newRecord, ...currentRecords];
   await writeGithubFile('xpRecords.json', updated, '新增 XP 记录');
   // 增量更新缓存
@@ -9040,12 +9050,20 @@ async function addFinanceRecord(record) {
     suggestion: record.suggestion || '',
     reviewStatus: '已通过',
   };
-  const finance = await fetchRawJSON('finance.json').catch(() => ({
-    totalAssets: 0, accounts: [
-      { key: 'wealth', name: '财富增值账户', balance: 0 },
-      { key: 'free', name: '自由基金账户', balance: 0 },
-    ], recentTransactions: []
-  }));
+  // 优先使用本地缓存数据（避免 CDN raw.githubusercontent.com 缓存延迟导致数据丢失）
+  let fromCache = false;
+  let finance;
+  if (cachedData && cachedData.finance) {
+    finance = JSON.parse(JSON.stringify(cachedData.finance));
+    fromCache = true;
+  } else {
+    finance = await fetchRawJSON('finance.json').catch(() => ({
+      totalAssets: 0, accounts: [
+        { key: 'wealth', name: '财富增值账户', balance: 0 },
+        { key: 'free', name: '自由基金账户', balance: 0 },
+      ], recentTransactions: []
+    }));
+  }
   if (!finance.recentTransactions) finance.recentTransactions = [];
   finance.recentTransactions.unshift(newRecord);
   // 更新账户余额
@@ -9057,7 +9075,17 @@ async function addFinanceRecord(record) {
   // 更新总资产
   finance.totalAssets = finance.accounts.reduce((sum, a) => sum + Number(a.balance || 0), 0);
   await writeGithubFile('finance.json', finance, '新增财务记录');
-  _addToCache('finance.recentTransactions', newRecord);
+  // 同步更新内存缓存（deep copy 后需手动更新，不能直接用 _addToCache 避免重复添加）
+  if (fromCache && cachedData && cachedData.finance) {
+    cachedData.finance.recentTransactions.unshift(newRecord);
+    if (cachedData.finance.accounts) {
+      const cacheAcc = cachedData.finance.accounts.find(a => a.key === newRecord.account);
+      if (cacheAcc) cacheAcc.balance = Number(account ? account.balance : 0);
+    }
+    cachedData.finance.totalAssets = finance.totalAssets;
+  } else {
+    _addToCache('finance.recentTransactions', newRecord);
+  }
   _persistCache();
   return recordId;
 }
@@ -9242,6 +9270,8 @@ async function updateEvaluationRecord(recordId, fields) {
 
 function _persistCache() {
   if (!cachedData) return;
+  // 记录缓存的写入时间戳，用于防止 _backgroundRefresh 用 CDN 旧数据覆盖
+  cachedData._cachedAt = Date.now();
   // 每次持久化前重新计算 totalXP 和等级数据，确保缓存一致性
   if (cachedData.xpRecords && cachedData.levels) {
     const verifiedXp = cachedData.xpRecords.filter(function(r) { return r.reviewStatus === '已通过'; });
@@ -10956,22 +10986,22 @@ if (typeof window !== "undefined") {
         category: source,
         description: source,
         date,
-        worthIt: "值得",
       });
       // 财务进账（财务进账只是动作记录，分值低：2 XP）
-      const _cfg = window.__lastData || (cachedData || await loadAppData());
-      const _entryRule = (_cfg?.config?.xpRuleList || []).find(r => r.name === "财务进账");
+      // ⚠️ XP 记录的日期 = 录入时间（今天），不是交易日期
+      const _entryRule = (cachedData?.config?.xpRuleList || []).find(r => r.name === "财务进账");
       const _entryXp = (_entryRule && Number(_entryRule.xp)) ? Number(_entryRule.xp) : 2;
       await window.DataStore.addXpRecord({
         taskName: "财务进账",
         description: `记录收入：${source}（${_finAccount === "free" ? "自由基金" : "财富基金"}）¥${amount}`,
-        date,
+        date: new Date().toISOString().slice(0, 10),
         status: "verified",
         xp: _entryXp,
         xpCategory: "能力成长",
       });
       closeFinanceEntryModal();
-      if (window.refreshData) refreshData();
+      // 不调用 refreshData()：DataStore.addFinanceRecord 和 addXpRecord 已更新 cachedData，
+      // 直接重渲染即可，避免重新加载 CDN 数据导致缓存覆盖
       await renderMoney();
       if (window.lucide) refreshIcons(50);
       alert(`✅ 已记录进账 ¥${amount} 到${_finAccount === "free" ? "自由基金" : "财富基金"}，获得 +${_entryXp} XP 🎉`);
@@ -11166,6 +11196,13 @@ if (typeof window !== "undefined") {
       alert(`还有 ${fmtMoney(remaining)} 没记完，请继续添加明细或修改金额。`);
       return;
     }
+    // 余额计算模式下，余额增加（收入）不需要复盘，直接阻断提交
+    if (recMode === "balance" && recTotalDiff > 0) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "确认记录";
+      alert("当前余额比上次多了，复盘仅针对支出，余额增加无需记录。如需存入请使用「财务进账」功能。");
+      return;
+    }
     // 校验：每条明细必须有金额 + 说明 + 是否值得
     const entries = recEntries.map((e) => {
       return { ...e, amount: Number(e.amount) || 0 };
@@ -11190,6 +11227,12 @@ if (typeof window !== "undefined") {
         alert(`第 ${i + 1} 笔还没选「是否值得」`);
         return;
       }
+      if (!e.reason || !e.reason.trim()) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "确认记录";
+        alert(`第 ${i + 1} 笔还没填原因，请说明为什么买这个`);
+        return;
+      }
     }
 
     try {
@@ -11208,18 +11251,18 @@ if (typeof window !== "undefined") {
           worthIt: e.worthIt,
           reason: (e.reason || "").trim(),
           suggestion: "",
-          // 记一笔复盘流程已单独发放复盘 XP，跳过逐笔自动发放
-          skipAutoXp: true,
         });
       }
 
       // 本次花销复盘：每笔复盘记录 +2 XP，当日累计封顶 10 XP（两种模式均可多次叠加）
-      const _cfg = window.__lastData || (cachedData || await loadAppData());
-      const _financeRule = (_cfg?.config?.xpRuleList || []).find(function(r){return r.name==="花销复盘"});
+      // ⚠️ XP 记录的日期 = 录入时间（今天），不是交易日期
+      const _todayStr = new Date().toISOString().slice(0, 10);
+      const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="花销复盘"});
       const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 2;
       const _capXp = 10;
-      const _todayReviewed = (_cfg.xpRecords || []).filter(function(r){
-        return r.taskName === "花销复盘" && getDateStr(r) === date;
+      // 只统计已通过的复盘记录，按录入时间（todayStr）封顶
+      const _todayReviewed = (cachedData?.xpRecords || []).filter(function(r){
+        return r.taskName === "花销复盘" && getDateStr(r) === _todayStr && r.reviewStatus === "已通过";
       }).reduce(function(s,r){ return s + (Number(r.xp)||0); }, 0);
       const _rawXp = entries.length * _perRecXp;
       const _financeXp = Math.max(0, Math.min(_rawXp, _capXp - _todayReviewed));
@@ -11227,7 +11270,7 @@ if (typeof window !== "undefined") {
         await window.DataStore.addXpRecord({
           taskName: "花销复盘",
           description: `完成一次花销复盘（${recMode === "item" ? "逐笔" : "余额"} · ${entries.length} 笔明细）`,
-          date,
+          date: _todayStr,
           status: "verified",
           xp: _financeXp,
           xpCategory: "能力成长",
@@ -11235,8 +11278,8 @@ if (typeof window !== "undefined") {
       }
 
       closeReconcileModal();
-      // 刷新页面数据
-      if (window.refreshData) refreshData();
+      // 不调用 refreshData()：addFinanceRecord 和 addXpRecord 已更新 cachedData，
+      // 直接重渲染即可，避免重新加载 CDN 数据导致缓存覆盖
       await renderMoney();
       if (window.lucide) refreshIcons(50);
       alert(`已记录 ${entries.length} 笔财务流水，完成一次花销复盘，+${_financeXp} XP（当日复盘累计封顶 ${_capXp} XP）🎉`);
@@ -14300,12 +14343,15 @@ async function renderMoney() {
   setText("freeFundNotWorthAmt", `${Number(_notWorthAmt).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}元/${_notWorthArr.length}笔`);
 
   // 财富板块自身的任务（含"财务"或"花销"），本周/今日获得能量互不串扰其他版块
+  // 筛选依据改为 datetime（记录创建时间），而非 date（记录的业务日期），
+  // 确保今天录入的复盘/进账积分（即使日期选了其他日期）也能正确计入今日/本周获得
   const _mTx = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
   const _mtoday = new Date().toISOString().slice(0, 10);
   const _mm = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
+  const _getActionDate = (r) => (r.datetime || r.date || "").slice(0, 10);
   const _isMoneyTask = (r) => { const n = String(r.taskName || r.title || ""); return n.indexOf("财务") >= 0 || n.indexOf("花销") >= 0; };
-  const _mweekXp = _mTx.filter(r => getDateStr(r) >= _mm && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
-  const _mtodayXp = _mTx.filter(r => getDateStr(r) === _mtoday && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const _mweekXp = _mTx.filter(r => _getActionDate(r) >= _mm && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const _mtodayXp = _mTx.filter(r => _getActionDate(r) === _mtoday && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   const moneyWeekEl = document.getElementById("moneyStatWeek");
   if (moneyWeekEl) { moneyWeekEl.textContent = _mweekXp > 0 ? `+${_mweekXp}` : "0"; moneyWeekEl.style.color = _mweekXp > 0 ? "" : "var(--neutral-400)"; }
   const moneyTodayEl = document.getElementById("moneyStatToday");
