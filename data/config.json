@@ -4,21 +4,21 @@
       "name": "语文",
       "category": "主科",
       "description": "",
-      "color": "#ec4899",
+      "color": "#F95D9F",
       "icon": "book-open"
     },
     {
       "name": "数学",
       "category": "主科",
       "description": "",
-      "color": "#3b82f6",
+      "color": "#4A9EFF",
       "icon": "calculator"
     },
     {
       "name": "英语",
       "category": "主科",
       "description": "",
-      "color": "#10b981",
+      "color": "#3DD9A0",
       "icon": "languages"
     },
     {
