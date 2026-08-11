@@ -1,5 +1,5 @@
 {
-  "totalAssets": 10932.67,
+  "totalAssets": 11167.57,
   "accounts": [
     {
       "key": "wealth",
@@ -11,42 +11,12 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 863.6,
+      "balance": 1098.5,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
-    {
-      "id": "fin_msokkwo9rc9bem",
-      "date": "2026-08-11",
-      "type": "expense",
-      "amount": 78.9,
-      "rawAmount": -78.9,
-      "category": "拼豆",
-      "account": "free",
-      "accountType": "自由基金账户",
-      "description": "拼豆",
-      "worthIt": "值得",
-      "reason": "很喜欢！",
-      "suggestion": "",
-      "reviewStatus": "已通过"
-    },
-    {
-      "id": "fin_msokel369r9o4k",
-      "date": "2026-07-31",
-      "type": "expense",
-      "amount": 156,
-      "rawAmount": -156,
-      "category": "故事会员年费",
-      "account": "free",
-      "accountType": "自由基金账户",
-      "description": "故事会员年费",
-      "worthIt": "一般",
-      "reason": "",
-      "suggestion": "",
-      "reviewStatus": "已通过"
-    },
     {
       "id": "recvryO1Jbehqx",
       "date": "2026-08-07",
