@@ -1,51 +1,12 @@
-#!/usr/bin/env bash
-# ---------------------------------------------------------------------------
-# pre-commit — Yara 成长工作台 · 提交前自动全平台体检
-#
-# 由 scripts/install-hooks.sh 安装（复制或软链）到 .git/hooks/pre-commit。
-# git 会在每次 git commit 前自动执行本脚本；体检有"必须修复"问题则拒绝提交。
-# 这样不再依赖人工记得去跑检查，机制本身保证每次提交都先过检。
-#
-# 若确有紧急情况想临时绕过，可用 git commit --no-verify（请谨慎使用）。
-# ---------------------------------------------------------------------------
-set -euo pipefail
+#!/bin/bash
+# Yara 提交前自动体检钩子
+# 在 git commit 之前自动运行 pre-commit-check.py
 
-# 兼容 bash < 4 的目录定位
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-CHECK="$ROOT/scripts/pre-commit-check.py"
-
-if [ ! -f "$CHECK" ]; then
-    echo "⚠️  找不到体检脚本: $CHECK" >&2
-    echo "   请先还原 scripts/pre-commit-check.py，或修复本钩子。" >&2
+echo "🔍 运行提交前检查..."
+python3 "$(git rev-parse --show-toplevel)/scripts/pre-commit-check.py"
+if [ $? -ne 0 ] && [ $? -ne 2 ]; then
+    echo "❌ 提交前检查未通过，提交已阻断。请修复后重新提交。"
+    echo "   如需跳过检查，请使用 git commit --no-verify"
     exit 1
 fi
-
-echo "▶ 提交前全平台体检进行中…"
-echo
-
-# 全量体检：覆盖结构、交互、数据一致性、样式、Token 闭环、仓库卫生。
-set +e
-python3 "$CHECK"
-RC=$?
-set -e
-
-echo
-case $RC in
-    0)
-        echo "✅ 体检通过，允许提交。"
-        exit 0
-        ;;
-    1)
-        echo "✋ 体检存在【必须修复】问题，已阻止本次提交。" >&2
-        echo "   请修复后再提交；如为紧急情况可用 git commit --no-verify 绕过。" >&2
-        exit 1
-        ;;
-    2)
-        echo "⚠️ 体检无阻断问题，但有建议项，可以先提交（建议稍后查看）。"
-        exit 0
-        ;;
-    *)
-        echo "⚠️ 体检脚本异常退出（$RC），为安全起见阻止提交。" >&2
-        exit 1
-        ;;
-esac
+echo "✅ 检查通过，继续提交"

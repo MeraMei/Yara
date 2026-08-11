@@ -134,6 +134,7 @@
   --coral-50: var(--colourful-sunny-coral-50);
   --coral-100: var(--colourful-sunny-coral-100);
   --coral-200: var(--colourful-sunny-coral-200);
+  --coral-300: var(--colourful-sunny-coral-300);
   --coral-400: var(--colourful-sunny-coral-400);
   --coral-500: var(--colourful-sunny-coral-500);
   --coral-600: var(--colourful-sunny-coral-600);
@@ -3051,6 +3052,39 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       .info-card { padding: 16px 18px; }
       .today-status-grid { grid-template-columns: 1fr; }
       .ts-card:last-child { grid-column: auto; }
+      /* ════════ 全页面移动端响应式（统一 600px 断点） ════════ */
+      .planets-row { grid-template-columns: 1fr 1fr; }
+      .today-tasks { padding: 16px; }
+      .trend-chart-wrap { height: 120px; }
+      .trend-section { padding: 14px; }
+      .freq-card { padding: 12px; }
+      .exam-view-toggle { flex-wrap: wrap; }
+      .exam-view-toggle button { padding: 6px 10px; font-size: 11px; }
+      .detail-top { flex-wrap: wrap; gap: 6px; }
+      .hero-mini { flex-wrap: wrap; padding: 12px; gap: 10px; }
+      .hero-mini .hm-ava { width: 40px; height: 40px; }
+      .hm-name { font-size: 15px; }
+      .lad { padding: 10px 12px; gap: 8px; }
+      .lad .lad-no { width: 28px; height: 28px; font-size: 12px; }
+      .lad .lad-name { font-size: 12px; }
+      .rule-card { padding: 12px; }
+      .wealth-fund-card { padding: 14px 16px; }
+      .wfc-amount { font-size: 20px; }
+      .tx-list-v2 .tx-item-v2 { gap: 8px; padding: 9px 0; }
+      .tx-list-v2 .tx-date-box { width: 40px; }
+      .tx-list-v2 .tx-date-main { font-size: 10px; }
+      .tx-list-v2 .tx-date-rel { font-size: 9px; }
+      .tx-list-v2 .tx-icon-box { width: 26px; height: 26px; }
+      .tx-list-v2 .tx-name { font-size: 12px; }
+      .tx-list-v2 .tx-note { font-size: 10px; }
+      .tx-list-v2 .tx-amount { font-size: 13px; }
+      .tx-filter-tabs { flex-wrap: wrap; gap: 2px; }
+      .tx-filter-btn { font-size: 10px; padding: 4px 9px; }
+      .edit-field-row { grid-template-columns: 1fr; }
+      .modal-body { padding: 16px; }
+      .modal-card { padding: 18px; }
+      .modal-head { padding: 18px 18px 0; }
+      .modal-foot { padding: 0 18px 18px; }
     }
   
  
@@ -6684,6 +6718,16 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       flex-shrink: 0;
       min-width: 36px;
       text-align: right;
+    }
+
+    /* ════════ 财富星球移动端响应式 ════════ */
+    @media (max-width: 600px) {
+      .free-fund-card { padding: 20px 16px 18px; }
+      .ffc-amount { font-size: 28px; }
+      .ffc-stats { grid-template-columns: 1fr 1fr; }
+      .spend-donut-wrap { flex-direction: column; gap: 12px; padding: 8px 12px 12px; }
+      .donut-svg-lg { width: 110px; height: 110px; }
+      .worth-rate-row { padding: 10px 12px 14px; }
     }
 
     /* 收支记录筛选 Tab */
@@ -10895,8 +10939,8 @@ if (typeof window !== "undefined") {
 
   // 格式化金额
   function fmtMoney(value) {
-    if (value === null || value === undefined || value === "") return "¥0.00";
-    return "¥" + Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (value === null || value === undefined || value === "") return "¥0.0";
+    return "¥" + Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
 
   // 获取值得的样式类
@@ -11429,7 +11473,7 @@ const GRADE_ORDER = ["A+", "A", "B+", "B"];
 
 function formatMoney(value) {
   if (value === null || value === undefined || value === "") return "暂无数据";
-  return "¥" + Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "¥" + Number(value).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
 // ── DOM 安全操作工具 ──
@@ -14339,8 +14383,8 @@ async function renderMoney() {
   const _worthAmt = _worthArr.reduce((s, t) => s + Number(t.amount || 0), 0);
   const _notWorthAmt = _notWorthArr.reduce((s, t) => s + Number(t.amount || 0), 0);
   setText("freeFundReviewed", _reviewedAmt > 0 ? formatMoney(_reviewedAmt) : "¥0");
-  setText("freeFundWorthAmt", `${Number(_worthAmt).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}元/${_worthArr.length}笔`);
-  setText("freeFundNotWorthAmt", `${Number(_notWorthAmt).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}元/${_notWorthArr.length}笔`);
+  setText("freeFundWorthAmt", `${formatMoney(_worthAmt)}/${_worthArr.length}笔`);
+  setText("freeFundNotWorthAmt", `${formatMoney(_notWorthAmt)}/${_notWorthArr.length}笔`);
 
   // 财富板块自身的任务（含"财务"或"花销"），本周/今日获得能量互不串扰其他版块
   // 筛选依据改为 datetime（记录创建时间），而非 date（记录的业务日期），
@@ -14373,27 +14417,30 @@ async function renderMoney() {
       }
     } else {
       const totalSpend = freeExpenses.reduce((s, t) => s + Number(t.amount || 0), 0);
-      const catAgg = groupSum(freeExpenses, t => (t.description || t.category || "其他").trim(), t => Number(t.amount || 0));
-      const topCats = Object.entries(catAgg).sort((a, b) => b[1] - a[1]);
-
-      const catColors = [
-        "#f96024", "#fdd832", "#82d632", "#ff7d4d",
-        "#ffe760", "#a0e756", "#e04a15", "#66b522"
-      ];
-      const donutItems = topCats.map(([name, value], i) => ({
-        name, value, color: catColors[i % catColors.length]
+      const fmt1 = v => "¥" + Number(v).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      // 按值得程度聚合：值得 / 一般 / 不值得
+      const worthMap = { "值得": 0, "一般": 0, "不值得": 0 };
+      freeExpenses.forEach(t => {
+        const w = t.worthIt || t.worth || "一般";
+        if (worthMap[w] != null) worthMap[w] += Number(t.amount || 0);
+      });
+      const worthAgg = Object.entries(worthMap).filter(([, v]) => v > 0);
+      const worthColors = { "值得": "var(--colourful-lime-pop-500)", "一般": "var(--colourful-butter-yellow-300)", "不值得": "var(--colourful-sunny-coral-500)" };
+      const donutItems = worthAgg.map(([name, value]) => ({
+        name, value, color: worthColors[name] || "#ccc"
       }));
-      const donut = renderDonutChart(donutItems, 140, 16, formatMoney(totalSpend), "总支出");
+      const donut = renderDonutChart(donutItems, 140, 16, fmt1(totalSpend), "总支出");
       spendDonutEl.innerHTML = donut.svg + donut.center;
 
       if (spendLegendEl) {
-        spendLegendEl.innerHTML = topCats.slice(0, 5).map(([name, value], i) => {
+        spendLegendEl.innerHTML = worthAgg.map(([name, value]) => {
           const pctVal = Math.round((value / totalSpend) * 100);
+          const icon = name === "值得" ? "✅" : name === "不值得" ? "❌" : "🤔";
           return `
             <div class="spend-legend-item">
-              <span class="sl-dot" style="background:${catColors[i % catColors.length]}"></span>
-              <span class="sl-name">${name}</span>
-              <span class="sl-val">${formatMoney(value)}</span>
+              <span class="sl-dot" style="background:${worthColors[name] || "#ccc"}"></span>
+              <span class="sl-name">${icon} ${name}</span>
+              <span class="sl-val">${fmt1(value)}</span>
             </div>
           `;
         }).join("");
@@ -14467,7 +14514,7 @@ async function renderMoney() {
     const renderRow = (tx, idx, isHidden) => {
       const isIncome = tx.type === "in" || tx.type === "income";
       const sign = isIncome ? "+" : "−";
-      const amountStr = sign + "¥" + Number(tx.amount).toLocaleString("zh-CN", { minimumFractionDigits: 2 });
+      const amountStr = sign + "¥" + Number(tx.amount).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       const dateInfo = formatDateLabel(tx.date);
       const category = tx.category || tx.sub || (isIncome ? "收入" : "支出");
       const titleText = tx.name || tx.description || "未命名";
