@@ -1,5 +1,5 @@
 {
-  "totalAssets": 11088.67,
+  "totalAssets": 10932.67,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,27 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 1019.6,
+      "balance": 863.6,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_msoodzz8zw80k7",
+      "date": "2026-08-11",
+      "type": "expense",
+      "amount": 156,
+      "rawAmount": -156,
+      "category": "手表的故事会员",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "手表的故事会员",
+      "worthIt": "一般",
+      "reason": "现在感觉有点贵了！",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "fin_msoodw355kcksw",
       "date": "2026-08-11",
