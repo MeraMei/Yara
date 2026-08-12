@@ -851,6 +851,19 @@ body {
       </div>
     </div>
 
+    <!-- DeepSeek API Key 配置（用于成长周报 AI 分析） -->
+    <div class="card">
+      <div class="card-title">🤖 DeepSeek AI <span style="font-size:12px;color:var(--colourful-neutral-500);font-weight:700">· 成长周报智能分析</span></div>
+      <div class="form-row token-row">
+        <label>API Key</label>
+        <div class="field">
+          <input type="password" id="dsKeyInput" placeholder="粘贴 DeepSeek API Key（sk- 开头）" autocomplete="off" />
+        </div>
+        <button class="btn primary mini" onclick="saveDeepSeekKey()">保存</button>
+      </div>
+      <div class="token-hint" id="dsKeyHint">Key 只保存在本机浏览器，用于每次生成成长周报时调用 DeepSeek 分析。不会上传到任何服务器。</div>
+    </div>
+
     <!-- 科目：主科一个色块、副科一个色块；主科能力小方块+描述横排，副科3列卡片 -->
     <div class="tabp" data-p="subject">
       <div class="card">
@@ -1178,7 +1191,36 @@ function disconnectGithub() {
   showToast("已断开 GitHub 连接");
 }
 
-document.addEventListener("DOMContentLoaded", renderGithubStatus);
+/* ════════ DeepSeek API Key 配置 ════════ */
+var DS_KEY_KEY = "deepseek_api_key";
+
+function getDeepSeekKey() {
+  try { return localStorage.getItem(DS_KEY_KEY) || ""; } catch (e) { return ""; }
+}
+function setDeepSeekKey(key) {
+  try { localStorage.setItem(DS_KEY_KEY, key); } catch (e) {}
+}
+
+// 保存 DeepSeek Key
+function saveDeepSeekKey() {
+  var input = document.getElementById("dsKeyInput");
+  var key = (input && input.value || "").trim();
+  if (!key) { showToast("请先粘贴 DeepSeek API Key", false); return; }
+  if (!/^sk-/.test(key)) {
+    showToast("Key 格式看起来不对（应以 sk- 开头）", false);
+    return;
+  }
+  setDeepSeekKey(key);
+  showToast("✅ DeepSeek Key 已保存，可生成成长周报");
+}
+
+// 页面加载时回显已保存的 Key
+function renderDsKey() {
+  var input = document.getElementById("dsKeyInput");
+  if (input) input.value = getDeepSeekKey();
+}
+
+document.addEventListener("DOMContentLoaded", function() { renderGithubStatus(); renderDsKey(); });
 </script>
 <div class="toast" id="settingsToast"></div>
 </body>
