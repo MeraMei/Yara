@@ -1,5 +1,21 @@
 [
   {
+    "id": "xp_mss4ysg7tpktsv",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "财务进账",
+    "taskName": "财务进账",
+    "taskCategory": "能力成长",
+    "date": "2026-08-14",
+    "datetime": "2026-08-13 23:15:10",
+    "xp": 2,
+    "xpCategory": "能力成长",
+    "reviewStatus": "已通过",
+    "returnReason": "",
+    "description": "系统每周五自动发放零花钱：¥18",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_msopfmw92fo01x",
     "domain": "XP",
     "type": "XP获得",
