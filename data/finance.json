@@ -1,5 +1,5 @@
 {
-  "totalAssets": 10902.77,
+  "totalAssets": 10920.77,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,27 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 833.7,
+      "balance": 851.7,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_mss4yq872e5fy3",
+      "date": "2026-08-14",
+      "type": "income",
+      "amount": 18,
+      "rawAmount": 18,
+      "category": "零花钱",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "每周零花钱",
+      "worthIt": "值得",
+      "reason": "系统每周五自动发放零花钱",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "fin_msooe1ml2bo30a",
       "date": "2026-08-11",
@@ -29,8 +44,7 @@
       "description": "贴贴小猫挂件",
       "worthIt": "值得",
       "reason": "从宝鸡买的，妈妈一个我一个，很喜欢！",
-      "suggestion": "",
-      "reviewStatus": "已通过"
+      "suggestion": ""
     },
     {
       "id": "fin_msoodzz8zw80k7",
@@ -44,8 +58,7 @@
       "description": "手表的故事会员",
       "worthIt": "一般",
       "reason": "现在感觉有点贵了！",
-      "suggestion": "",
-      "reviewStatus": "已通过"
+      "suggestion": ""
     },
     {
       "id": "fin_msoodw355kcksw",
@@ -59,8 +72,7 @@
       "description": "名创优品-拼豆",
       "worthIt": "值得",
       "reason": "很值得很喜欢！拼了好多可爱的小玩意！",
-      "suggestion": "",
-      "reviewStatus": "已通过"
+      "suggestion": ""
     },
     {
       "id": "recvryO1Jbehqx",
