@@ -349,7 +349,7 @@ body {
 /* ── 学科（参考图 · 科目列表） ── */
 .ic-chinese { background: #F95D9F; }   /* 语文 · 粉（与 config.json 一致） */
 .ic-math    { background: #4A9EFF; }   /* 数学 · 蓝（与 config.json 一致） */
-.ic-english { background: #3DD9A0; }   /* 英语 · 青（与 config.json 一致） */
+.ic-english { background: #9255F5; }   /* 英语 · 紫（与 config.json 一致） */
 .ic-science { background: #F5D547; color:#fff; }               /* 科学 · 黄 */
 .ic-moral   { background: #9B7BF7; }                            /* 道德与法治 · 紫 */
 .ic-info    { background: #4A9EFF; }                            /* 信息科技 · 蓝 */
@@ -875,7 +875,7 @@ body {
             </div>
             <div class="main-sub">
               <div class="icon-box ic-english">🔤</div>
-              <div class="ms-info"><b class="ms-name">英语</b><div class="ms-abills"><span class="ab-cell"><i style="background:#3DD9A0">11</i>听说</span><span class="ab-cell"><i style="background:#3DD9A0">12</i>单词</span><span class="ab-cell"><i style="background:#3DD9A0">13</i>语感</span><span class="ab-cell"><i style="background:#3DD9A0">14</i>阅读</span><span class="ab-cell"><i style="background:#3DD9A0">15</i>写作</span></div></div>
+              <div class="ms-info"><b class="ms-name">英语</b><div class="ms-abills"><span class="ab-cell"><i style="background:#9255F5">11</i>听说</span><span class="ab-cell"><i style="background:#9255F5">12</i>单词</span><span class="ab-cell"><i style="background:#9255F5">13</i>语感</span><span class="ab-cell"><i style="background:#9255F5">14</i>阅读</span><span class="ab-cell"><i style="background:#9255F5">15</i>写作</span></div></div>
               <div class="ms-ops"><button class="btn ghost mini">修改</button><button class="btn ghost mini">删除</button></div>
             </div>
           </div>
@@ -959,10 +959,10 @@ body {
         <div class="def-card">
           <div class="def-head"><span class="r-dot"></span><b>默认记录 · 自动发放</b><span class="def-tag">⚙️ 自动加分</span><span class="r-n">8 条</span></div>
           <div class="def-grid">
-            <div class="def-item"><span class="ri-ic ic-learn">📝</span><div class="ri-t"><b>作业 · 日常作业</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">📚</span><div class="ri-t"><b>作业 · 暑假作业</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">🏖️</span><div class="ri-t"><b>作业 · 特色作业</b><span>完成作业自动发放</span></div><span class="ri-xp">+3<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">🏠</span><div class="ri-t"><b>作业 · 家庭作业</b><span>完成作业自动发放</span></div><span class="ri-xp">+4<small>XP</small></span></div>
+            <div class="def-item"><span class="ri-ic ic-learn">📝</span><div class="ri-t"><b>作业 · 日常预习</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
+            <div class="def-item"><span class="ri-ic ic-learn">📚</span><div class="ri-t"><b>作业 · 日常复习</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
+            <div class="def-item"><span class="ri-ic ic-learn">🏖️</span><div class="ri-t"><b>作业 · 暑假作业</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
+            <div class="def-item"><span class="ri-ic ic-learn">🎨</span><div class="ri-t"><b>作业 · 特色作业</b><span>完成作业自动发放（含家庭作业）</span></div><span class="ri-xp">+4<small>XP</small></span></div>
             <div class="def-item"><span class="ri-ic ic-learn">🎯</span><div class="ri-t"><b>成绩录入</b><span>录入成绩自动发放</span></div><span class="ri-xp">+2~3<small>XP</small></span></div>
             <div class="def-item"><span class="ri-ic ic-ability">📓</span><div class="ri-t"><b>写日记 · 能量记录</b><span>写日记自动发放</span></div><span class="ri-xp">+6~10<small>XP</small></span></div>
             <div class="def-item"><span class="ri-ic ic-coral">🔄</span><div class="ri-t"><b>花销复盘</b><span>每笔复盘记录 · 当日封顶</span></div><span class="ri-xp">+2<small>XP/笔</small></span></div>
@@ -974,13 +974,16 @@ body {
         <div class="rule-grid">
           <!-- 学习成长 -->
           <div class="rule-card">
-            <div class="rule-head"><span class="r-dot" style="background:#82d632"></span><b>学习成长</b><span class="r-n">5 条</span><button class="btn ghost mini rule-edit">编辑</button></div>
+            <div class="rule-head"><span class="r-dot" style="background:#82d632"></span><b>学习成长</b><span class="r-n">8 条</span><button class="btn ghost mini rule-edit">编辑</button></div>
             <div class="rule-list">
               <div class="rule-item"><span class="ri-ic ic-learn">🏆</span><div class="ri-t"><b>学习进步 · 金牌学生</b><span>期末综合表现荣誉</span></div><span class="ri-xp">+30<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
               <div class="rule-item"><span class="ri-ic ic-learn">✅</span><div class="ri-t"><b>60 分钟内完成作业</b><span>高效专注</span></div><span class="ri-xp">+8<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
               <div class="rule-item"><span class="ri-ic ic-learn">📖</span><div class="ri-t"><b>每天阅读 30 分钟</b><span>课外阅读习惯</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
               <div class="rule-item"><span class="ri-ic ic-learn">✏️</span><div class="ri-t"><b>语数英额外练习</b><span>主动加练</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
               <div class="rule-item"><span class="ri-ic ic-learn">🖌️</span><div class="ri-t"><b>练字 20 分钟以上</b><span>书写练习</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
+              <div class="rule-item"><span class="ri-ic ic-learn">💪</span><div class="ri-t"><b>认真投入 · 遇到难题没放弃</b><span>主动认领 · 家长确认</span></div><span class="ri-xp">+2<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
+              <div class="rule-item"><span class="ri-ic ic-learn">🧩</span><div class="ri-t"><b>认真投入 · 独立完成不会的题</b><span>主动认领 · 家长确认</span></div><span class="ri-xp">+2<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
+              <div class="rule-item"><span class="ri-ic ic-learn">🔁</span><div class="ri-t"><b>认真投入 · 主动复盘错题</b><span>主动认领 · 家长确认</span></div><span class="ri-xp">+2<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
             </div>
           </div>
 
