@@ -3413,16 +3413,24 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     /* ════════ 作业行（新设计） ════════ */
     .hw-row {
       display: grid;
-      grid-template-columns: 36px 40px 1fr auto;
-      gap: 10px;
-      align-items: center;
-      padding: 12px 14px;
+      grid-template-columns: 36px 40px minmax(0, 1fr) auto;
+      column-gap: 10px;
+      row-gap: 2px;
+      align-items: start;
+      padding: 13px 14px;
       border-radius: 10px;
       transition: all .15s ease;
       position: relative;
     }
     .hw-row + .hw-row { border-top: 1px solid var(--neutral-100); }
     .hw-row:hover { background: var(--neutral-50); }
+    /* 顶部对齐：勾选/科目/操作区全部对齐到标题首行，长标题换行时跨行绝对一致 */
+    .hw-row .hw-check-col,
+    .hw-row .hw-subj { align-self: start; }
+    /* 勾选与科目微调，让视觉中心对齐标题首行 */
+    .hw-row .hw-check-col { margin-top: 3px; }
+    .hw-row .hw-subj { margin-top: -1px; }
+    .hw-row .hw-actions { align-self: start; margin-top: 2px; }
     .hw-row.hw-done .hw-title {
       text-decoration: line-through;
       color: var(--neutral-400);
@@ -3434,6 +3442,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .hw-check-col {
       display: flex;
       justify-content: center;
+      align-self: center;
     }
     .hw-check-btn {
       width: 28px;
@@ -3457,92 +3466,205 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--mint-500);
     }
     .hw-check-btn i { width: 22px; height: 22px; }
-    /* 科目标签 */
+    /* 科目标签：柔和浅底+同族深字，与 colorful 主题一致 */
     .hw-subj {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       display: grid;
       place-items: center;
-      font-size: 13px;
-      font-weight: 800;
+      font-size: 12px;
+      font-weight: 700;
       flex-shrink: 0;
       transition: opacity .15s ease;
     }
-    .hw-subj.cn { background: linear-gradient(135deg, #fde8f0 0%, #fbd0de 100%); color: #d63068; }
-    .hw-subj.math { background: linear-gradient(135deg, #e6f2ff 0%, #cce5ff 100%); color: #2b75e0; }
-    .hw-subj.en { background: linear-gradient(135deg, #e0faf0 0%, #c4f4de 100%); color: #289371; }
-    .hw-subj.other { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); color: #475569; }
+    .hw-subj.cn { background: var(--colourful-candy-pink-100); color: var(--colourful-candy-pink-600); }
+    .hw-subj.math { background: var(--colourful-sky-blue-100); color: var(--colourful-sky-blue-600); }
+    .hw-subj.en { background: var(--colourful-lavender-100); color: var(--colourful-lavender-600); }
+    .hw-subj.other { background: var(--colourful-neutral-100); color: var(--colourful-neutral-600); }
     /* 内容区 */
     .hw-content { min-width: 0; }
     .hw-title {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: 700;
       color: var(--neutral-800);
-      line-height: 1.4;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
+      line-height: 1.5;
       transition: all .15s ease;
+      word-break: break-word;
+      overflow-wrap: anywhere;
     }
+    /* 信息标签统一为中性灰（模块/类型/用时），克制不抢眼，与整体UI一致 */
     .hw-mod-tag {
       font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
+      font-weight: 600;
+      padding: 3px 9px;
       border-radius: 999px;
       background: var(--neutral-100);
       color: var(--neutral-600);
+      border: 1px solid var(--neutral-200);
       flex-shrink: 0;
       letter-spacing: .02em;
     }
-    .hw-meta {
-      margin-top: 4px;
-      font-size: 11px;
+    .hw-mod-tag.hw-mod-more {
+      background: transparent;
       color: var(--neutral-400);
-      font-weight: 500;
+      border-style: dashed;
+    }
+    /* 作业类型标签：同中性体系，仅文字加粗区分 */
+    .hw-type-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--neutral-100);
+      color: var(--neutral-700);
+      border: 1px solid var(--neutral-200);
+      flex-shrink: 0;
+      letter-spacing: .02em;
+    }
+    /* 完成用时标签：同中性体系 */
+    .hw-dur-tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--neutral-100);
+      color: var(--neutral-600);
+      border: 1px solid var(--neutral-200);
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .hw-dur-tag i { width: 11px; height: 11px; }
+    /* 标题下方的信息行：标签组 + 截止状态连成一条流，按需换行，基线对齐 */
+    .hw-subline {
       display: flex;
       align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+      line-height: 1;
+    }
+    .hw-chips {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-width: 0;
+    }
+    .hw-mod-group {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 4px;
     }
-    .hw-meta i { width: 11px; height: 11px; }
-    .hw-due-overdue { color: var(--coral-600); font-weight: 600; }
-    .hw-due-today { color: var(--coral-500); font-weight: 600; }
-    .hw-due-soon { color: #d97706; font-weight: 600; }
+    .hw-meta {
+      font-size: 11px;
+      color: var(--neutral-400);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: transparent;
+      transition: all .15s ease;
+    }
+    .hw-meta i { width: 12px; height: 12px; }
+    .hw-due-overdue { color: #e11d48; background: #fff1f2; }
+    .hw-due-today { color: #c2410c; background: #fff7ed; }
+    .hw-due-soon { color: #b45309; background: #fffbeb; }
     /* 操作区 */
     .hw-actions {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 8px;
       flex-shrink: 0;
+      align-self: center;
     }
     .hw-submit-btn, .hw-edit-btn {
-      width: 28px;
-      height: 28px;
       border: none;
-      background: transparent;
       cursor: pointer;
-      padding: 0;
-      display: grid;
-      place-items: center;
-      color: var(--neutral-400);
-      transition: all .12s ease;
-      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 12px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+      border-radius: 999px;
+      transition: all .16s ease;
+      white-space: nowrap;
     }
-    .hw-submit-btn:hover {
-      color: var(--blue-500);
-      background: var(--blue-50);
-    }
-    .hw-submit-btn.submitted {
-      color: var(--blue-500);
+    .hw-submit-btn i, .hw-edit-btn i { width: 12px; height: 12px; }
+    /* 编辑：次级操作，柔和中性浅底，安静收敛 */
+    .hw-edit-btn {
+      background: var(--colourful-neutral-100);
+      color: var(--colourful-neutral-600);
     }
     .hw-edit-btn:hover {
-      color: var(--neutral-600);
-      background: var(--neutral-100);
+      background: var(--colourful-neutral-200);
+      color: var(--colourful-neutral-700);
     }
-    .hw-submit-btn i, .hw-edit-btn i { width: 16px; height: 16px; }
+    /* 提交：主操作，用 colorful 主题的柔和 sky-blue 浅底+深字，与全站按钮语汇一致（浅底深字） */
+    .hw-submit-btn {
+      background: linear-gradient(135deg, var(--colourful-sky-blue-100) 0%, var(--colourful-sky-blue-200) 100%);
+      color: var(--colourful-sky-blue-700);
+    }
+    .hw-submit-btn:hover {
+      background: linear-gradient(135deg, var(--colourful-sky-blue-200) 0%, var(--colourful-sky-blue-300) 100%);
+      color: var(--colourful-sky-blue-800);
+    }
+    .hw-submit-btn:active { transform: translateY(0); }
+    /* 已提交：收敛为静谧的薄荷浅底，弱化不再强调 */
+    .hw-submit-btn.submitted {
+      background: linear-gradient(135deg, var(--colourful-mint-green-100) 0%, var(--colourful-mint-green-200) 100%);
+      color: var(--colourful-mint-green-700);
+    }
+    .hw-submit-btn.submitted:hover {
+      background: linear-gradient(135deg, var(--colourful-mint-green-200) 0%, var(--colourful-mint-green-300) 100%);
+      color: var(--colourful-mint-green-800);
+    }
+    /* 提交按钮统一主色 sky-blue，不再按科目变色，与整体UI一致 */
     /* 隐藏旧的状态列和状态chip */
     .hw-status-col, .status-chip { display: none; }
+    /* 空状态容器 */
+    .hw-empty .empty-state { padding: 36px 16px; }
+    .hw-empty .empty-state i { width: 40px; height: 40px; margin-bottom: 8px; color: var(--neutral-300); }
+    .hw-empty .empty-state div { font-size: 13px; color: var(--neutral-400); font-weight: 600; }
+
+    /* ════════ 补充信息弹窗样式 ════════ */
+    .shm-subject-line {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px; padding: 9px 12px;
+      background: var(--neutral-50); border: 1px solid var(--neutral-100);
+      border-radius: 8px; font-size: 13px; color: var(--neutral-600);
+    }
+    .shm-subject-line .shm-subj-tag {
+      font-weight: 700; padding: 2px 8px; border-radius: 5px; color: #fff; font-size: 12px;
+    }
+    .test-detail {
+      margin-top: 10px; padding: 12px; border: 1px solid var(--neutral-100);
+      border-radius: 8px; background: var(--neutral-50);
+    }
+    .test-detail-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .test-detail-row:last-child { margin-bottom: 0; }
+    .test-detail-label { font-size: 13px; font-weight: 600; color: var(--neutral-600); white-space: nowrap; }
+    .test-wrong-input {
+      width: 72px; padding: 7px 10px; border: 1px solid var(--neutral-200);
+      border-radius: 6px; font-size: 14px; background: #fff; text-align: center;
+    }
+    .test-wrong-input:focus { outline: none; border-color: var(--blue-500); }
+    /* 弹窗内容可滚动（修复整页滚动问题） */
+    .edit-modal { max-height: 85vh; overflow-y: auto; }
+    .edit-modal-overlay { -webkit-overflow-scrolling: touch; }
 
     /* ════════ 展开按钮 ════════ */
     .expand-btn {
@@ -3596,7 +3718,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .sp-dot.cn { background: #F95D9F; }
     .sp-dot.math { background: #4A9EFF; }
-    .sp-dot.en { background: #3DD9A0; }
+    .sp-dot.en { background: #9255F5; }
     .sp-dot.other { background: var(--neutral-400); }
     .sp-num {
       font-size: 13px;
@@ -3616,7 +3738,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .sp-bar-fill.cn { background: #F95D9F; }
     .sp-bar-fill.math { background: #4A9EFF; }
-    .sp-bar-fill.en { background: #3DD9A0; }
+    .sp-bar-fill.en { background: #9255F5; }
     .sp-bar-fill.other { background: var(--neutral-400); }
 
     /* ════════ 学习能力雷达图（五芒星） ════════ */
@@ -4014,7 +4136,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .subj-dot.cn { background: #F95D9F; }
     .subj-dot.math { background: #4A9EFF; }
-    .subj-dot.en { background: #3DD9A0; }
+    .subj-dot.en { background: #9255F5; }
     .subj-dot.sci { background: var(--lav-500); }
     .subj-dot.other { background: var(--neutral-400); }
 
@@ -4328,28 +4450,6 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--neutral-500);
     }
 
-    /* ════════ 作业行编辑按钮 ════════ */
-    .hw-row { position: relative; }
-    .hw-edit-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-      color: var(--neutral-400);
-      opacity: 0;
-      transition: opacity .15s ease, background-color .15s ease, color .15s ease;
-    }
-    .hw-row:hover .hw-edit-btn { opacity: 1; }
-    .hw-edit-btn:hover { background: var(--neutral-100); color: var(--neutral-700); }
-    .hw-edit-btn i { width: 14px; height: 14px; }
-
     /* ════════ 编辑弹窗 ════════ */
     .edit-modal-overlay {
       position: fixed;
@@ -4400,6 +4500,14 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .edit-modal-close i { width: 18px; height: 18px; }
     .edit-field {
       margin-bottom: 16px;
+    }
+    .edit-divider {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; font-weight: 700; color: var(--lav-600);
+      margin: 18px 0 14px;
+    }
+    .edit-divider::before, .edit-divider::after {
+      content: ""; flex: 1; height: 1px; background: var(--neutral-200);
     }
     .edit-field label {
       display: block;
@@ -4481,11 +4589,11 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     @media (max-width: 768px) {
       .es-other-grid { grid-template-columns: repeat(2, 1fr); }
       .hw-row {
-        grid-template-columns: 32px 38px 1fr auto;
-        gap: 8px;
+        grid-template-columns: 30px 34px 1fr auto;
+        column-gap: 8px;
         padding: 10px 12px;
       }
-      .hw-subj { width: 38px; height: 38px; font-size: 12px; }
+      .hw-subj { width: 34px; height: 34px; font-size: 12px; }
     }
     @media (max-width: 640px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -4494,18 +4602,20 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       /* 作业行：超小屏更紧凑 */
       .hw-row {
         grid-template-columns: 28px 34px 1fr auto;
-        gap: 6px;
-        padding: 8px 10px;
+        column-gap: 6px;
+        padding: 9px 10px;
       }
       .hw-check-btn { width: 22px; height: 22px; }
       .hw-check-btn svg { width: 16px; height: 16px; }
-      .hw-subj { width: 34px; height: 34px; font-size: 11px; }
-      .hw-title { font-size: 12px; line-height: 1.35; }
+      .hw-subj { width: 30px; height: 30px; font-size: 11px; }
+      .hw-title { font-size: 12px; line-height: 1.4; }
       .hw-mod-tag { font-size: 9px; padding: 1px 5px; }
-      .hw-meta { font-size: 10px; }
-      .hw-meta i { width: 12px; height: 12px; }
-      .hw-submit-btn, .hw-edit-btn { width: 22px; height: 22px; }
-      .hw-submit-btn svg, .hw-edit-btn svg { width: 13px; height: 13px; }
+      .hw-type-tag, .hw-dur-tag { font-size: 9px; padding: 1px 6px; }
+      .hw-meta { font-size: 10px; padding: 1px 6px; }
+      .hw-meta i { width: 11px; height: 11px; }
+      .hw-submit-btn, .hw-edit-btn { height: 22px; padding: 0 10px; font-size: 10px; }
+      .hw-submit-btn svg, .hw-edit-btn svg { width: 11px; height: 11px; }
+      .hw-actions { gap: 5px; }
       /* 成绩视图 */
       .es-main-grid { grid-template-columns: 1fr; }
       .es-other-grid { grid-template-columns: 1fr; }
@@ -9072,7 +9182,7 @@ async function addStudyRecord(record) {
     cleanTitle: record.title || record.description || '',
     shortTitle: record.title || record.description || '',
     description: record.description || record.title || '',
-    homeworkType: record.homeworkType || '日常作业',
+    homeworkType: record.homeworkType || '日常预习',
     module: record.module || '',
     modules: (Array.isArray(record.modules) ? record.modules : (record.modules ? [record.modules] : [])).slice(),
     status: record.status || 'pending',
@@ -10030,39 +10140,36 @@ if (typeof window !== 'undefined') {
         <label>作业内容</label>
         <textarea id="editTitle" placeholder="输入作业内容"></textarea>
       </div>
-      <div class="edit-field-row">
-        <div class="edit-field">
-          <label>科目</label>
-          <div class="choice-group" id="editSubjectGroup">
-            <label class="choice-pill"><input type="radio" name="editSubject" value="语文">语文</label>
-            <label class="choice-pill"><input type="radio" name="editSubject" value="数学">数学</label>
-            <label class="choice-pill"><input type="radio" name="editSubject" value="英语">英语</label>
-          </div>
-        </div>
-        <div class="edit-field">
-          <label>模块（可多选）</label>
-          <div class="choice-group sm" id="editModuleGroup"></div>
-        </div>
-      </div>
-      <div class="edit-field-row">
-        <div class="edit-field">
-          <label>截止日期</label>
-          <input type="date" id="editDueDate" />
-        </div>
-        <div class="edit-field">
-          <label>状态</label>
-          <div class="choice-group" id="editStatusGroup">
-            <label class="choice-pill"><input type="radio" name="editStatus" value="pending">待完成</label>
-            <label class="choice-pill positive"><input type="radio" name="editStatus" value="done">已完成</label>
-          </div>
+      <div class="edit-field">
+        <label>科目</label>
+        <div class="choice-group" id="editSubjectGroup">
+          <label class="choice-pill"><input type="radio" name="editSubject" value="语文">语文</label>
+          <label class="choice-pill"><input type="radio" name="editSubject" value="数学">数学</label>
+          <label class="choice-pill"><input type="radio" name="editSubject" value="英语">英语</label>
         </div>
       </div>
       <div class="edit-field">
-        <label>提交状态</label>
-        <div class="choice-group" id="editSubmittedGroup">
-          <label class="choice-pill"><input type="radio" name="editSubmitted" value="false">未提交</label>
-          <label class="choice-pill positive"><input type="radio" name="editSubmitted" value="true">已提交</label>
+        <label>截止日期</label>
+        <input type="date" id="editDueDate" />
+      </div>
+      <div class="edit-divider">详情（可修改）</div>
+      <div class="edit-field">
+        <label>作业类型</label>
+        <div class="choice-group" id="editTypeGroup">
+          <label class="choice-pill"><input type="radio" name="editType" value="日常预习">日常预习</label>
+          <label class="choice-pill"><input type="radio" name="editType" value="日常复习">日常复习</label>
+          <label class="choice-pill"><input type="radio" name="editType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="editType" value="特色作业">特色作业</label>
         </div>
+      </div>
+      <div class="edit-field" id="editModuleWrap">
+        <label>能力模块（可多选）</label>
+        <div class="choice-group sm" id="editModuleGroup"></div>
+      </div>
+      <div class="edit-field">
+        <label>关联哪个单元？</label>
+        <div class="choice-group sm" id="editUnitGroup"></div>
+        <div class="due-hint" id="editUnitHint">根据作业内容自动判断，可手动修改</div>
       </div>
       <div class="edit-modal-actions">
         <button class="btn-secondary" id="cancelEdit">取消</button>
@@ -10079,15 +10186,6 @@ if (typeof window !== 'undefined') {
         <button class="edit-modal-close" id="closeAddHomeworkModal"><i data-lucide="x"></i></button>
       </div>
       <div class="edit-field">
-        <label>作业类型</label>
-        <div class="choice-group" id="addTypeGroup">
-          <label class="choice-pill"><input type="radio" name="addType" value="日常作业" checked>日常</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="暑假作业">暑假</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="家庭作业">家庭</label>
-        </div>
-      </div>
-      <div class="edit-field">
         <label>科目</label>
         <div class="choice-group" id="addSubjectGroup">
           <label class="choice-pill"><input type="radio" name="addSubject" value="语文">语文</label>
@@ -10096,12 +10194,26 @@ if (typeof window !== 'undefined') {
         </div>
       </div>
       <div class="edit-field">
-        <label>作业内容</label>
-        <textarea id="addHomeworkTitle" placeholder="输入作业内容"></textarea>
+        <label>作业类型</label>
+        <div class="choice-group" id="addTypeGroup">
+          <label class="choice-pill"><input type="radio" name="addType" value="日常预习" checked>日常预习</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="日常复习">日常复习</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色作业</label>
+        </div>
       </div>
       <div class="edit-field">
-        <label>能力模块（可多选）</label>
-        <div class="choice-group sm" id="addModuleGroup"></div>
+        <label>作业内容</label>
+        <textarea id="addHomeworkTitle" placeholder="输入作业内容，如：预习第1课《观潮》&#13;&#10;或粘贴多条，自动拆分成多条作业"></textarea>
+        <div class="due-hint">关联单元、能力模块在【补充信息】时填写</div>
+      </div>
+      <div class="edit-field">
+        <button class="btn-secondary" id="addSplitBtn" style="width:100%;justify-content:center;"><i data-lucide="wand-sparkles" style="width:15px;height:15px"></i>粘贴多条？智能拆分</button>
+        <div class="due-hint">粘贴多条作业（如老师发的整段文字），自动按"科目+课时"拆分成多条，可勾选后批量保存</div>
+      </div>
+      <div class="edit-field" id="addParsedWrap" style="display:none;">
+        <label>拆分结果 <span class="due-hint">勾选需要保存的条目</span></label>
+        <div id="addParsedList" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
       </div>
       <div class="edit-field" id="addDueFieldWrap">
         <label>截止日期 <span class="due-hint" id="addDueHint"></span></label>
@@ -10110,6 +10222,59 @@ if (typeof window !== 'undefined') {
       <div class="edit-modal-actions">
         <button class="btn-secondary" id="cancelAddHomework">取消</button>
         <button class="btn-primary" id="saveAddHomework">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 补充信息弹窗（类型/模块/单元/测验） ════════ -->
+  <div class="edit-modal-overlay" id="submitHomeworkModal">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <div class="edit-modal-title"><i data-lucide="info" style="width:18px;height:18px"></i>补充信息</div>
+        <button class="edit-modal-close" id="closeSubmitHomeworkModal"><i data-lucide="x"></i></button>
+      </div>
+      <div class="shm-subject-line" id="shmSubjectLine"></div>
+      <div class="edit-field">
+        <label>作业类型</label>
+        <div class="choice-group" id="shmTypeGroup">
+          <label class="choice-pill"><input type="radio" name="shmType" value="日常预习" checked>日常预习</label>
+          <label class="choice-pill"><input type="radio" name="shmType" value="日常复习">日常复习</label>
+          <label class="choice-pill"><input type="radio" name="shmType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="shmType" value="特色作业">特色作业</label>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label>能力模块（可多选）</label>
+        <div class="choice-group sm" id="shmModuleGroup"></div>
+      </div>
+      <div class="edit-field">
+        <label>关联哪个单元？</label>
+        <div class="choice-group sm" id="shmUnitGroup"></div>
+        <div class="due-hint" id="shmUnitHint">根据作业内容自动判断，可手动修改</div>
+      </div>
+      <div class="edit-field">
+        <label>完成用时</label>
+        <div class="choice-group" id="shmDurationGroup">
+          <label class="choice-pill"><input type="radio" name="shmDuration" value="≤15分钟">≤15分钟</label>
+          <label class="choice-pill"><input type="radio" name="shmDuration" value="15-30分钟">15-30分钟</label>
+          <label class="choice-pill"><input type="radio" name="shmDuration" value="30-60分钟">30-60分钟</label>
+          <label class="choice-pill"><input type="radio" name="shmDuration" value="60分钟以上">60分钟以上</label>
+        </div>
+        <div class="due-hint">选一个大致用时，用于学习统计</div>
+      </div>
+      <div class="edit-field">
+        <label>今天有错题吗？</label>
+        <div class="choice-group" id="shmWrongGroup">
+          <label class="choice-pill"><input type="radio" name="shmWrong" value="0">没有</label>
+          <label class="choice-pill"><input type="radio" name="shmWrong" value="1">1题</label>
+          <label class="choice-pill"><input type="radio" name="shmWrong" value="2">2题</label>
+          <label class="choice-pill"><input type="radio" name="shmWrong" value="3">3题以上</label>
+        </div>
+        <div class="due-hint">如实填写，用于能力评估（不发能量）</div>
+      </div>
+      <div class="edit-modal-actions">
+        <button class="btn-secondary" id="cancelSubmitHomework">取消</button>
+        <button class="btn-primary" id="saveSubmitHomework">保存</button>
       </div>
     </div>
   </div>
@@ -13229,7 +13394,7 @@ window.confirmRedeem = async function() {
 const RADAR_COLORS = {
   "语文": { main: "#F95D9F", light: "#fde8f0", stroke: "#d63068" },
   "数学": { main: "#4A9EFF", light: "#e6f2ff", stroke: "#2b75e0" },
-  "英语": { main: "#3DD9A0", light: "#e0faf0", stroke: "#289371" },
+  "英语": { main: "#9255F5", light: "#efe9ff", stroke: "#6d28d9" },
 };
 const RADAR_SUBJ_ICON = { "语文": "book-open", "数学": "calculator", "英语": "languages" };
 
@@ -13327,26 +13492,56 @@ function renderHwRow(a, hidden, index) {
     ? { "语文": "语", "数学": "数", "英语": "英" }[a.subject]
     : (a.subject || "").slice(0, 1) || "科";
   const itemId = a.id || "";
+  const safeTitle = typeof escapeHtmlReason === "function" ? escapeHtmlReason(title) : title;
 
   const modList = Array.isArray(a.modules) && a.modules.length > 0
     ? a.modules
     : (a.module ? [a.module] : []);
-  const modTag = modList.length > 0
-    ? modList.map(m => `<span class="hw-mod-tag">${m}</span>`).join("")
-    : "";
+  let modTag = "";
+  if (modList.length > 0) {
+    const MAX_SHOW = 3;
+    const shown = modList.slice(0, MAX_SHOW);
+    const extra = modList.length - MAX_SHOW;
+    modTag = shown.map(m => `<span class="hw-mod-tag">${m}</span>`).join("")
+      + (extra > 0 ? `<span class="hw-mod-tag hw-mod-more">+${extra}</span>` : "");
+  }
 
+  // 作业类型标签（与模块区分，浅色描边样式）
+  const typeName = a.homeworkType || "";
+  const typeTag = typeName ? `<span class="hw-type-tag">${typeName}</span>` : "";
+
+  // 完成用时标签（有记录才展示）
+  const durTag = a.duration ? `<span class="hw-dur-tag"><i data-lucide="timer"></i>${a.duration}</span>` : "";
+
+  // 截止状态
   let dueClass = "";
-  let dueText = `截止 ${a.dueDate || "--"}`;
+  let dueIcon = "calendar";
+  let dueText = a.dueDate ? `截止 ${a.dueDate}` : "";
   if (!isDone && a.dueDate) {
     const today = new Date(); today.setHours(0,0,0,0);
     const due = new Date(a.dueDate); due.setHours(0,0,0,0);
     const daysLeft = Math.ceil((due - today) / (1000*60*60*24));
-    if (daysLeft < 0) { dueClass = " hw-due-overdue"; dueText = `已逾期 ${Math.abs(daysLeft)} 天`; }
+    if (daysLeft < 0) { dueClass = " hw-due-overdue"; dueIcon = "alert-circle"; dueText = `已逾期 ${Math.abs(daysLeft)} 天`; }
     else if (daysLeft === 0) { dueClass = " hw-due-today"; dueText = "今天截止"; }
     else if (daysLeft <= 2) { dueClass = " hw-due-soon"; dueText = `还剩 ${daysLeft} 天`; }
+  } else if (isDone && a.dueDate) {
+    dueClass = " hw-due-done"; dueText = "";
   }
 
-  return `<div class="hw-row${hiddenClass}${isDone ? " hw-done" : ""}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
+  const metaBit = dueText ? `<span class="hw-meta${dueClass}"><i data-lucide="${dueIcon}"></i>${dueText}</span>` : "";
+
+  // 右侧操作：提交 + 编辑（始终垂直居中）
+  const actions = `
+    <div class="hw-actions">
+      <button class="hw-submit-btn${isSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${isSubmitted ? "已提交" : "提交作业"}">
+        <i data-lucide="${isSubmitted ? "check" : "send"}"></i>${isSubmitted ? "已提交" : "提交"}
+      </button>
+      <button class="hw-edit-btn" data-edit="${itemId}" title="编辑作业">
+        <i data-lucide="pencil"></i>编辑
+      </button>
+    </div>`;
+
+  return `<div class="hw-row${subjClass === "cn" ? " cn" : ""}${subjClass === "math" ? " math" : ""}${subjClass === "en" ? " en" : ""}${hiddenClass}${isDone ? " hw-done" : ""}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
     <div class="hw-check-col">
       <button class="hw-check-btn${isDone ? " checked" : ""}" data-toggle-status="${itemId}" title="${isDone ? "标记为待完成" : "标记为已完成"}">
         <i data-lucide="${isDone ? "check-circle-2" : "circle"}"></i>
@@ -13354,17 +13549,13 @@ function renderHwRow(a, hidden, index) {
     </div>
     <div class="hw-subj ${subjClass}">${shortSubj}</div>
     <div class="hw-content">
-      <div class="hw-title">${title}${modTag}</div>
-      <div class="hw-meta${dueClass}"><i data-lucide="calendar"></i>${dueText}</div>
+      <div class="hw-title">${safeTitle}</div>
+      <div class="hw-subline">
+        <span class="hw-chips">${typeTag}${modTag ? `<span class="hw-mod-group">${modTag}</span>` : ""}${durTag}</span>
+        ${metaBit}
+      </div>
     </div>
-    <div class="hw-actions">
-      <button class="hw-submit-btn${isSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${isSubmitted ? "取消提交" : "标记已提交"}">
-        <i data-lucide="${isSubmitted ? "send" : "send"}"></i>
-      </button>
-      <button class="hw-edit-btn" data-edit="${itemId}" title="编辑详情">
-        <i data-lucide="more-horizontal"></i>
-      </button>
-    </div>
+    ${actions}
   </div>`;
 }
 
@@ -13542,11 +13733,13 @@ async function renderStudy() {
     const list = getFilteredList(filter);
 
     if (list.length === 0) {
-      let emptyText = "暂无数据";
-      if (filter === "pending") emptyText = "全部完成啦，真棒！";
-      else if (filter === "done") emptyText = "还没有完成的作业记录";
-      listEl.innerHTML = emptyStateHTML("inbox", emptyText);
+      let emptyIcon = "inbox";
+      let emptyText = "暂无作业";
+      if (filter === "pending") { emptyIcon = "party-popper"; emptyText = "太棒了，当前没有待办作业！"; }
+      else if (filter === "done") { emptyIcon = "list-checks"; emptyText = "还没有已完成的作业记录"; }
+      listEl.innerHTML = `<div class="hw-empty">${emptyStateHTML(emptyIcon, emptyText)}</div>`;
       if (showMoreBtn) showMoreBtn.style.display = "none";
+      // 隐藏统计行中的无效提示
       return;
     }
 
@@ -13555,10 +13748,11 @@ async function renderStudy() {
     const hidden = list.slice(visibleCount);
     let html = visible.map((a, i) => renderHwRow(a, false, "a-" + i)).join("");
     html += hidden.map((a, i) => renderHwRow(a, !hwExpanded, "a-" + (i + visibleCount))).join("");
+    listEl.innerHTML = html;
     if (hidden.length > 0) {
       if (showMoreBtn) {
         showMoreBtn.style.display = "block";
-        showMoreBtn.textContent = hwExpanded ? "收回" : `展开更多（+${hidden.length} 条）`;
+        showMoreBtn.textContent = hwExpanded ? "收回" : `展开更多（还有 ${hidden.length} 条）`;
         showMoreBtn.onclick = function() {
           hwExpanded = !hwExpanded;
           renderAssignmentList(filter);
@@ -13567,7 +13761,6 @@ async function renderStudy() {
     } else if (showMoreBtn) {
       showMoreBtn.style.display = "none";
     }
-    listEl.innerHTML = html;
     refreshIcons(0);
   }
 
@@ -13707,7 +13900,7 @@ async function renderStudy() {
 
     let points = [];
     let yLabels = [];
-    const subjectColor = { "语文": "#F95D9F", "数学": "#4A9EFF", "英语": "#3DD9A0" }[subject] || "#6366f1";
+    const subjectColor = { "语文": "#F95D9F", "数学": "#4A9EFF", "英语": "#9255F5" }[subject] || "#6366f1";
 
     if (hasScores) {
       // 有分数：用分数绘制折线图
@@ -13803,7 +13996,7 @@ async function renderStudy() {
 
     // ═══ 数据来源1：作业练习数据（当前学期） ═══
     const semesterLabel = currentScoreSemester || "";
-    const hwModules = {}; // { moduleName: { practiceCount, doneCount } }
+    const hwModules = {}; // { moduleName: { practiceCount, doneCount, wrongCount } }
 
     // 遍历所有作业，按模块统计
     allAssignments.forEach(a => {
@@ -13816,9 +14009,12 @@ async function renderStudy() {
       modList.forEach(mod => {
         const m = mod.trim();
         if (!m) return;
-        if (!hwModules[m]) hwModules[m] = { practiceCount: 0, doneCount: 0 };
+        if (!hwModules[m]) hwModules[m] = { practiceCount: 0, doneCount: 0, wrongCount: 0 };
         hwModules[m].practiceCount++;
         if (a.status === "done") hwModules[m].doneCount++;
+        // 错题数：仅计入已完成作业的错题事实（不发能量，仅用于评估）
+        const wc = Number(a.wrongCount);
+        if (a.status === "done" && !isNaN(wc) && wc > 0) hwModules[m].wrongCount += wc;
       });
     });
 
@@ -13855,15 +14051,15 @@ async function renderStudy() {
     // 计算每个模块的综合指标
     const moduleStats = [];
     allModNames.forEach(modName => {
-      const hw = hwModules[modName] || { practiceCount: 0, doneCount: 0 };
+      const hw = hwModules[modName] || { practiceCount: 0, doneCount: 0, wrongCount: 0 };
       const errCount = examModules[modName] || 0;
       const completionRate = hw.practiceCount > 0
         ? Math.round((hw.doneCount / hw.practiceCount) * 100)
         : 0;
 
-      // 综合"薄弱指数"：失分次数权重高，练习少+完成率低也扣分
-      // 公式：失分*30 + 练习不足扣分 + 完成率低扣分
-      let weakScore = errCount * 30;
+      // 综合"薄弱指数"：失分次数权重高，错题事实 + 练习少 + 完成率低也扣分
+      // 公式：失分*30 + 错题*15 + 练习不足扣分 + 完成率低扣分
+      let weakScore = errCount * 30 + hw.wrongCount * 15;
       if (hw.practiceCount < 2) weakScore += 25; // 练习太少
       else if (hw.practiceCount < 5) weakScore += 10;
       if (completionRate < 40) weakScore += 20;
@@ -13872,7 +14068,7 @@ async function renderStudy() {
       // 等级判定
       let level = "good";
       let levelText = "掌握良好";
-      if (errCount > 0 || (hw.practiceCount > 0 && completionRate < 40)) {
+      if (errCount > 0 || hw.wrongCount > 0 || (hw.practiceCount > 0 && completionRate < 40)) {
         level = "weak";
         levelText = "薄弱";
       } else if (hw.practiceCount === 0 || completionRate < 70 || hw.practiceCount < 3) {
@@ -13886,6 +14082,7 @@ async function renderStudy() {
         doneCount: hw.doneCount,
         completionRate,
         errorCount: errCount,
+        wrongCount: hw.wrongCount,
         level,
         levelText,
         weakScore,
@@ -13925,6 +14122,7 @@ async function renderStudy() {
             <span>练习 <strong>${m.practiceCount}</strong> 次</span>
             <span>完成率 <strong>${m.completionRate}%</strong></span>
             <span>失分 <strong>${m.errorCount}</strong> 次</span>
+            ${m.wrongCount > 0 ? `<span>错题 <strong>${m.wrongCount}</strong> 题</span>` : ""}
           </div>
         </div>
       `;
@@ -14929,6 +15127,21 @@ async function refreshMoneyRecent() {
 
 // ── 作业智能拆分 ──
 
+// 根据作业内容判定作业类型：日常预习/日常复习/暑假作业/特色作业
+function inferHomeworkType(text) {
+  if (!text) return "日常预习";
+  const t = String(text);
+  // 暑假作业优先（特征最明显）
+  if (/暑假|假期作业|假期|下学期.*预习|暑假大本|暑假作业/.test(t)) return "暑假作业";
+  // 特色作业：动手/实践/展示类
+  if (/手抄报|手工作品|手工|画画|绘画|观察|实践|实验|日记|阅读打卡|打卡|书法|书法练习|演讲|朗诵|口才|小报|手绘|制作|剪贴|贴画|泥塑|折纸|种植|养|社会实践|研学/.test(t)) return "特色作业";
+  // 预习：提前看/读/圈
+  if (/预习|提前|明天(要|要讲|上课)|下节|读通|初读|圈生字|标生字|查生字|查字典|标自然段|读熟课文|明天.*讲/.test(t)) return "日常预习";
+  // 复习/巩固：回看、错题、订正
+  if (/复习|回顾|错题|看错题|订正|巩固|熟读|背诵|默写|背|熟记|练习册.*订正|重新|重做|消化|巩固练习/.test(t)) return "日常复习";
+  return "日常预习";
+}
+
 function parseHomeworkText(text) {
   const items = [];
   const subjectKeywords = {
@@ -14963,7 +15176,7 @@ function parseHomeworkText(text) {
                          .trim();
       if (rest && rest.length > 2) {
         const mod = inferModule(currentSubject, rest, "");
-        items.push({ subject: currentSubject, text: rest, module: mod });
+        items.push({ subject: currentSubject, text: rest, module: mod, type: inferHomeworkType(rest) });
       }
       continue;
     }
@@ -14972,13 +15185,13 @@ function parseHomeworkText(text) {
     if (numMatch) {
       const itemText = numMatch[1] ? numMatch[1].trim() : trimmed;
       const mod = inferModule(currentSubject, itemText, "");
-      items.push({ subject: currentSubject || "未识别", text: itemText, module: mod });
+      items.push({ subject: currentSubject || "未识别", text: itemText, module: mod, type: inferHomeworkType(itemText) });
       continue;
     }
 
     if (trimmed.length > 2) {
       const mod = inferModule(currentSubject, trimmed, "");
-      items.push({ subject: currentSubject || "未识别", text: trimmed, module: mod });
+      items.push({ subject: currentSubject || "未识别", text: trimmed, module: mod, type: inferHomeworkType(trimmed) });
     }
   }
 
@@ -15610,32 +15823,54 @@ function layoutShell(active) {
 
 // ── 编辑弹窗 ──
 
-function openEditModal(item) {
+async function openEditModal(item) {
   currentEditItem = { ...item };
   const modal = document.getElementById("editModal");
   document.getElementById("editTitle").value = item.title || "";
   setRadioValue("editSubjectGroup", item.subject || "语文");
-  const mods = Array.isArray(item.modules) ? item.modules : (item.module ? [item.module] : []);
-  updateModuleCheckboxes(item.subject || "语文", mods);
   document.getElementById("editDueDate").value = item.dueDate || "";
-  setRadioValue("editStatusGroup", item.status === "done" ? "done" : "pending");
-  setRadioValue("editSubmittedGroup", item.submitted ? "true" : "false");
+
+  // 详情字段：作业类型/能力模块/关联单元
+  const subject = item.subject || "语文";
+  setRadioValue("editTypeGroup", item.homeworkType || "日常预习");
+  populateChoiceGroup("editModuleGroup", getModuleOptions(subject), item.modules || []);
+
+  const units = await getTeachingUnits(subject);
+  const unitHint = document.getElementById("editUnitHint");
+  let selIndex = (item.unitIndex !== undefined && item.unitIndex !== null && Number(item.unitIndex) >= 0) ? Number(item.unitIndex) : -1;
+  if (units.length > 0) {
+    if (selIndex >= 0 && units[selIndex]) {
+      if (unitHint) unitHint.textContent = "已关联：" + units[selIndex].name;
+    } else {
+      const guessed = guessUnitFromTitle(subject, item.title, units);
+      if (guessed >= 0) {
+        selIndex = guessed;
+        if (unitHint) unitHint.textContent = "✅ 已自动匹配到：" + units[guessed].name;
+      } else {
+        if (unitHint) unitHint.textContent = "未自动匹配到单元，特色作业等请选【其他】";
+      }
+    }
+  }
+  populateUnitGroup("editUnitGroup", units, selIndex, unitHint);
+
+  // 随堂测验已合并到【录入成绩】，编辑不再处理测验
   modal.classList.add("show");
+  refreshIcons(0);
 }
 
 function closeEditModal() {
   const modal = document.getElementById("editModal");
-  modal.classList.remove("show");
+  if (modal) modal.classList.remove("show");
   currentEditItem = null;
 }
 
 /* ════════ 添加作业 ════════ */
-// 哪些作业类型需要独立截止日期（暑假/假期），其余默认当天写完
-const ADD_HW_DUE_TYPES = new Set(["暑假作业", "特色作业"]);
-// 作业类型 → 对应 XP 任务名（与 xpSources 一致）
+// 作业类型 XP：日常预习/日常复习/暑假作业/特色作业（家庭作业合并到特色作业）
 const ADD_HW_TYPE_XP = {
-  "日常作业": 2, "暑假作业": 2, "特色作业": 3, "家庭作业": 4
+  "日常预习": 2, "日常复习": 2, "暑假作业": 2, "特色作业": 4
 };
+// 哪些作业类型需要独立截止日期
+const ADD_HW_DUE_TYPES = new Set(["暑假作业", "特色作业"]);
 
 function getTodayVal() {
   const d = new Date();
@@ -15643,33 +15878,35 @@ function getTodayVal() {
 }
 
 function syncAddHomeworkDue() {
-  // 根据作业类型联动截止日期：暑假/假期显示可填，日常/家庭锁定今天
-  const type = getRadioValue("addTypeGroup") || "日常作业";
+  // 添加作业时截止日期总是默认今天，类型在提交时选
+  // 但仍保留可填功能，供暑假作业等长周期作业使用
   const wrap = document.getElementById("addDueFieldWrap");
   const input = document.getElementById("addHomeworkDueDate");
   const hint = document.getElementById("addDueHint");
   if (!wrap || !input) return;
-  if (ADD_HW_DUE_TYPES.has(type)) {
-    wrap.style.display = "";
-    if (hint) hint.textContent = "";
-    if (!input.value) input.value = getTodayVal();
-  } else {
-    wrap.style.display = "none";
-    input.value = getTodayVal();
-    if (hint) hint.textContent = "";
-  }
+  // 默认总是显示，让用户可以手动调整截止日期
+  wrap.style.display = "";
+  if (!input.value) input.value = getTodayVal();
 }
+
+// 添加作业弹窗的拆分状态（一次粘贴多条 → 拆分结果）
+const addParsedItems = { current: [] };
 
 function openAddHomeworkModal() {
   const modal = document.getElementById("addHomeworkModal");
   if (!modal) return;
-  // 重置表单
+  // 重置表单（添加作业：科目 + 作业类型 + 内容 + 截止日期）
   document.getElementById("addHomeworkTitle").value = "";
   document.getElementById("addHomeworkDueDate").value = getTodayVal();
   setRadioValue("addSubjectGroup", "语文");
-  setRadioValue("addTypeGroup", "日常作业");
-  updateAddHomeworkModules("语文", []);
+  setRadioValue("addTypeGroup", "日常预习");
   syncAddHomeworkDue();
+  // 重置拆分状态
+  const parsedWrap = document.getElementById("addParsedWrap");
+  if (parsedWrap) parsedWrap.style.display = "none";
+  const parsedList = document.getElementById("addParsedList");
+  if (parsedList) parsedList.innerHTML = "";
+  addParsedItems.current = [];
   modal.classList.add("show");
   refreshIcons(0);
   setTimeout(() => {
@@ -15683,66 +15920,95 @@ function closeAddHomeworkModal() {
   if (modal) modal.classList.remove("show");
 }
 
-function updateAddHomeworkModules(subject, selectedModules) {
-  const group = document.getElementById("addModuleGroup");
-  if (!group) return;
-  const options = getModuleOptions(subject);
-  const selSet = new Set(selectedModules || []);
-  group.innerHTML = options.map(m => `
-    <label class="choice-pill ${selSet.has(m) ? "checked" : ""}">
-      <input type="checkbox" name="addModule" value="${m}" ${selSet.has(m) ? "checked" : ""}>${m}
-    </label>
-  `).join("");
-  group.querySelectorAll(".choice-pill").forEach(pill => {
-    pill.addEventListener("click", function(e) {
-      const cb = this.querySelector("input");
-      cb.checked = !cb.checked;
-      this.classList.toggle("checked", cb.checked);
-      e.preventDefault();
-    });
-  });
-}
-
-function getCheckedAddHomeworkModules() {
-  return Array.from(document.querySelectorAll("#addModuleGroup input:checked")).map(cb => cb.value);
-}
-
 async function saveAddHomework() {
   const title = document.getElementById("addHomeworkTitle").value.trim();
-  if (!title) { showToast("先写一下作业内容吧 ✏️", false); return; }
   const subject = getRadioValue("addSubjectGroup") || "语文";
-  const modules = getCheckedAddHomeworkModules();
-  const module = modules[0] || "";
-  const hwType = getRadioValue("addTypeGroup") || "日常作业";
   const today = getTodayVal();
-  // 日期规则：日常/家庭默认今天写完；暑假/假期用所选（默认今天）
-  const dueDate = ADD_HW_DUE_TYPES.has(hwType)
-    ? (document.getElementById("addHomeworkDueDate").value || today)
-    : today;
+  const dueDate = document.getElementById("addHomeworkDueDate").value || today;
 
   const btn = document.getElementById("saveAddHomework");
   const original = btn.textContent;
   btn.textContent = "保存中..."; btn.disabled = true;
   try {
-    // date=录入日（今天），dueDate=截止日（按类型规则）
+    // ── 场景一：已拆分多条 → 批量保存勾选项 ──
+    const parsedList = document.getElementById("addParsedList");
+    const hasParsed = parsedList && parsedList.children.length > 0;
+    if (hasParsed) {
+      const items = addParsedItems.current || [];
+      const checks = parsedList.querySelectorAll(".add-parse-check:checked");
+      if (checks.length === 0) {
+        btn.textContent = original; btn.disabled = false;
+        showToast("请至少勾选一条要保存的作业", false);
+        return;
+      }
+      const selected = [];
+      checks.forEach(cb => {
+        const idx = parseInt(cb.dataset.idx, 10);
+        if (!isNaN(idx) && items[idx]) selected.push(items[idx]);
+      });
+      let ok = 0, fail = 0;
+      for (const it of selected) {
+        try {
+          await DataStore.addStudyRecord({
+            subject: it.subject || subject,
+            title: it.text || it.title,
+            description: it.text || it.title,
+            homeworkType: it.type || getRadioValue("addTypeGroup") || "日常预习",
+            modules: it.module ? [it.module] : [],
+            module: it.module || "",
+            status: "pending",
+            submitted: false,
+            date: today,
+            dueDate: dueDate,
+            unitIndex: -1,
+            hasTest: false,
+            testScope: null,
+            isFullScore: null,
+            wrongCount: 0,
+            errorModules: [],
+          });
+          ok++;
+        } catch (e) { fail++; }
+      }
+      if (fail > 0) {
+        showToast(`成功 ${ok} 条，失败 ${fail} 条`, fail > 0 ? false : true);
+      } else {
+        showToast(`✅ 已录入 ${ok} 条作业，提交后可补充详细信息`, true);
+      }
+      closeAddHomeworkModal();
+      await DataStore.refreshData(true);
+      await renderStudy();
+      refreshIcons(50);
+      return;
+    }
+
+    // ── 场景二：单条录入 ──
+    if (!title) { showToast("先写一下作业内容吧 ✏️", false); return; }
+    // 添加作业：存基础信息 + 作业类型；模块/单元/测验在提交时填写
+    const hwTypeNow = getRadioValue("addTypeGroup") || "日常预习";
     await DataStore.addStudyRecord({
       subject,
       title,
       description: title,
-      homeworkType: hwType,
-      modules,
-      module,
+      homeworkType: hwTypeNow,
+      modules: [], // 能力模块在提交时填写
+      module: "",
       status: "pending",
       submitted: false,
       date: today,
       dueDate: dueDate,
+      unitIndex: -1, // 关联单元索引（-1表示未关联）
+      hasTest: false, // 是否有随堂测验
+      testScope: null, // 测验范围：today/past
+      isFullScore: null, // 是否全对
+      wrongCount: 0, // 错题数
+      errorModules: [], // 错题模块
     });
-    const xpVal = ADD_HW_TYPE_XP[hwType] || 2;
     closeAddHomeworkModal();
     await DataStore.refreshData(true);
     await renderStudy();
     refreshIcons(50);
-    showToast(`✅ 作业已添加，完成后可得 +${xpVal} XP`, true);
+    showToast("✅ 作业已添加，提交后可补充详细信息", true);
   } catch (e) {
     console.error("添加作业失败:", e);
     const errMsg = (e && e.message) || "";
@@ -15767,15 +16033,308 @@ function initAddHomeworkModal() {
   if (overlay) overlay.addEventListener("click", function(e) {
     if (e.target === overlay) closeAddHomeworkModal();
   });
-  // 科目切换 → 重置模块
-  document.querySelectorAll("#addSubjectGroup input").forEach(radio => {
-    radio.addEventListener("change", function() {
-      updateAddHomeworkModules(this.value, []);
+  // 智能拆分：一次粘贴多条 → 自动拆分成多条
+  const splitBtn = document.getElementById("addSplitBtn");
+  if (splitBtn) splitBtn.addEventListener("click", () => {
+    const raw = document.getElementById("addHomeworkTitle").value.trim();
+    if (!raw) { showToast("先粘贴作业内容再拆分 ✍️", false); return; }
+    const items = parseHomeworkText(raw);
+    if (items.length === 0) { showToast("未能识别作业内容，请检查格式", false); return; }
+    addParsedItems.current = items;
+    const wrap = document.getElementById("addParsedWrap");
+    const list = document.getElementById("addParsedList");
+    if (wrap) wrap.style.display = "block";
+    if (list) {
+      list.innerHTML = items.map((it, i) => `
+        <div class="parse-card" style="display:flex;flex-direction:column;gap:6px;padding:9px 10px;background:var(--neutral-50);border:1px solid var(--neutral-200);border-radius:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" checked class="add-parse-check" data-idx="${i}" style="accent-color:var(--lav-600);flex-shrink:0;" />
+            <span class="hw-subject ${it.subject === "语文" ? "hw-sub-cn" : it.subject === "数学" ? "hw-sub-math" : it.subject === "英语" ? "hw-sub-en" : ""}" style="font-size:10px;padding:2px 7px;flex-shrink:0;">${it.subject || "未识别"}</span>
+            ${it.module ? `<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:var(--mint-100);color:var(--mint-700);flex-shrink:0;font-weight:700;">${it.module}</span>` : ""}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="font-size:11px;color:var(--neutral-500);flex-shrink:0;">类型</label>
+            <select class="add-parse-type" data-idx="${i}" style="flex:1;font-size:12px;padding:3px 6px;border:1px solid var(--neutral-300);border-radius:8px;background:#fff;color:var(--neutral-800);">
+              ${["日常预习","日常复习","暑假作业","特色作业"].map(t => `<option value="${t}" ${it.type === t ? "selected" : ""}>${t}</option>`).join("")}
+            </select>
+          </div>
+          <span style="font-size:12px;color:var(--neutral-700);line-height:1.4;">${it.text}</span>
+        </div>
+      `).join("");
+    }
+    refreshIcons(0);
+    showToast(`识别出 ${items.length} 条作业，勾选后点保存批量录入 ✅`, true);
+  });
+  // 科目切换无需重置模块（模块在提交时选）
+}
+
+/* ════════ 补充信息弹窗（类型/模块/单元/测验） ════════ */
+
+// 中文字符 → 数字（支持"一"到"十"及阿拉伯数字）
+function cnToNum(s) {
+  if (s == null) return -1;
+  if (/^\d+$/.test(s)) return parseInt(s, 10);
+  const cnMap = { "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10 };
+  if (cnMap[s] !== undefined) return cnMap[s];
+  return -1;
+}
+
+// 读取教学配置中的单元目录（从 config.json 的 teaching.subjects 读取）
+let __teachingUnitsCache = null;
+async function getTeachingUnits(subject) {
+  try {
+    // 优先从内存缓存读取
+    if (__teachingUnitsCache && __teachingUnitsCache[subject]) {
+      return __teachingUnitsCache[subject];
+    }
+    let cfgJson = null;
+    // 尝试从 DataStore 缓存读取
+    if (window.DataStore && window.DataStore._config && window.DataStore._config.teaching) {
+      cfgJson = window.DataStore._config;
+    } else {
+      const resp = await fetch("/data/config.json");
+      if (resp.ok) cfgJson = await resp.json();
+    }
+    if (!cfgJson || !cfgJson.teaching || !cfgJson.teaching.subjects) return [];
+    const subjects = cfgJson.teaching.subjects;
+    __teachingUnitsCache = __teachingUnitsCache || {};
+    for (const key of Object.keys(subjects)) {
+      __teachingUnitsCache[key] = (subjects[key] && subjects[key].units) || [];
+    }
+    return __teachingUnitsCache[subject] || [];
+  } catch (err) {
+    console.warn("读取教学配置失败:", err.message);
+    return [];
+  }
+}
+
+// 根据作业内容自动判断属于哪个单元：返回单元索引，找不到返回 -1
+function guessUnitFromTitle(subject, title, units) {
+  if (!title || !units || units.length === 0) return -1;
+  const t = String(title) || "";
+  // 1) 优先匹配"第X课"里的课目录
+  const lessonMatch = t.match(/第\s*([一二三四五六七八九十\d]+)\s*课/);
+  if (lessonMatch) {
+    const lessonNum = cnToNum(lessonMatch[1]);
+    for (let i = 0; i < units.length; i++) {
+      const items = String(units[i].items || "").split(/、|，|,|;/).map(s => s.trim()).filter(Boolean);
+      for (const it of items) {
+        const m = it.match(/^(?:第\s*)?([一二三四五六七八九十\d]+)\s*[课Unit课]/i);
+        if (m && cnToNum(m[1]) === lessonNum) return i;
+      }
+    }
+  }
+  // 2) 匹配课文名（如"观潮""盘古开天地"）
+  for (let i = 0; i < units.length; i++) {
+    const items = String(units[i].items || "").split(/、|，|,|;/).map(s => s.trim()).filter(Boolean);
+    for (const it of items) {
+      const clean = it.replace(/^(?:第\s*)?[一二三四五六七八九十\d]+\s*[课Unit课]\s*/i, "");
+      if (clean && clean.length >= 2 && t.indexOf(clean) >= 0) return i;
+    }
+  }
+  // 3) 匹配"第X单元"
+  const unitMatch = t.match(/第\s*([一二三四五六七八九十\d]+)\s*单元/);
+  if (unitMatch) {
+    const un = cnToNum(unitMatch[1]);
+    for (let i = 0; i < units.length; i++) {
+      const m = String(units[i].name || "").match(/第\s*([一二三四五六七八九十\d]+)\s*单元/);
+      if (m && cnToNum(m[1]) === un) return i;
+    }
+  }
+  return -1;
+}
+
+// 填充"关联单元"选项组（胶囊按钮，固定追加"其他"选项）
+// selectedIndex: >=0 选中该单元；<0 时默认选中"其他"（特色作业等无单元归属的作业）
+function populateUnitGroup(groupId, units, selectedIndex, hintEl) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const uList = units || [];
+  if (uList.length === 0) {
+    group.innerHTML = `<label class="choice-pill warning checked"><input type="radio" name="${groupId}" value="other" checked>其他</label>`;
+    if (hintEl) hintEl.textContent = "未配置单元目录，默认归为其他";
+    return;
+  }
+  const names = uList.map((u, i) =>
+    (u && u.name) ? u.name : ("单元" + (i + 1))
+  );
+  const pills = names.map((n, i) =>
+    `<label class="choice-pill"><input type="radio" name="${groupId}" value="${i}">${typeof escapeHtmlReason === "function" ? escapeHtmlReason(n) : n}</label>`
+  ).join("");
+  // 固定追加"其他"
+  group.innerHTML = pills + `<label class="choice-pill warning"><input type="radio" name="${groupId}" value="other">其他</label>`;
+  if (typeof initChoicePills === "function") initChoicePills(group);
+  const sel = (selectedIndex !== undefined && selectedIndex !== null && Number(selectedIndex) >= 0 && uList[Number(selectedIndex)])
+    ? String(Number(selectedIndex)) : "other";
+  setRadioValue(groupId, sel);
+}
+
+// 填充能力模块复选框
+function populateChoiceGroup(groupId, options, selected) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const selSet = new Set(selected || []);
+  group.innerHTML = options.map(m => `
+    <label class="choice-pill ${selSet.has(m) ? "checked" : ""}">
+      <input type="checkbox" value="${m}" ${selSet.has(m) ? "checked" : ""}>${m}
+    </label>
+  `).join("");
+  group.querySelectorAll(".choice-pill").forEach(pill => {
+    pill.addEventListener("click", function(e) {
+      const cb = this.querySelector("input");
+      cb.checked = !cb.checked;
+      this.classList.toggle("checked", cb.checked);
+      e.preventDefault();
     });
   });
-  // 作业类型切换 → 联动截止日期显隐
-  document.querySelectorAll("#addTypeGroup input").forEach(radio => {
-    radio.addEventListener("change", syncAddHomeworkDue);
+}
+
+function getCheckedOfGroup(groupId) {
+  return Array.from(document.querySelectorAll("#" + groupId + " input:checked")).map(cb => cb.value);
+}
+
+// 打开补充信息弹窗
+let __shmCurrentItem = null; // 当前补充信息的作业
+let __shmSubject = "语文";
+async function openSubmitHomeworkModal(item) {
+  if (!item) return;
+  __shmCurrentItem = item;
+  __shmSubject = item.subject || "语文";
+
+  const modal = document.getElementById("submitHomeworkModal");
+  if (!modal) return;
+
+  // 科目行
+  const subjLine = document.getElementById("shmSubjectLine");
+  const subjColor = (SUBJECT_CONFIG[__shmSubject] && SUBJECT_CONFIG[__shmSubject].cls) === "en" ? "#9255F5" :
+    (SUBJECT_CONFIG[__shmSubject] && SUBJECT_CONFIG[__shmSubject].cls) === "math" ? "#4A9EFF" : "#F95D9F";
+  if (subjLine) {
+    subjLine.innerHTML = `<span class="shm-subj-tag" style="background:${subjColor}">${__shmSubject}</span>
+      <span>${typeof escapeHtmlReason === "function" ? escapeHtmlReason(item.title || "") : (item.title || "")}</span>`;
+  }
+
+  // 作业类型（预填已有值）
+  setRadioValue("shmTypeGroup", item.homeworkType || "日常预习");
+
+  // 完成用时（预填已有值）
+  setRadioValue("shmDurationGroup", item.duration || "");
+
+  // 错题数（预填已有值）
+  setRadioValue("shmWrongGroup", item.wrongCount != null ? String(item.wrongCount) : "");
+
+  // 能力模块
+  populateChoiceGroup("shmModuleGroup", getModuleOptions(__shmSubject), item.modules || []);
+
+  // 单元目录 + 自动判断（胶囊按钮组，含"其他"）
+  const units = await getTeachingUnits(__shmSubject);
+  const unitHint = document.getElementById("shmUnitHint");
+  let selIndex = -1;
+  if (units.length > 0) {
+    // 自动判断
+    const guessed = guessUnitFromTitle(__shmSubject, item.title, units);
+    if (guessed >= 0) {
+      selIndex = guessed;
+      if (unitHint) unitHint.textContent = "✅ 已自动匹配到：" + units[guessed].name;
+    } else {
+      if (unitHint) unitHint.textContent = "未自动匹配到单元，特色作业等请选【其他】";
+    }
+  }
+  populateUnitGroup("shmUnitGroup", units, selIndex, unitHint);
+
+  // 随堂测验已合并到【录入成绩】，此处不再填写
+  modal.classList.add("show");
+  refreshIcons(0);
+}
+
+// 随堂测验已合并到【录入成绩】，删除原联动函数
+
+function closeSubmitHomeworkModal() {
+  const modal = document.getElementById("submitHomeworkModal");
+  if (modal) modal.classList.remove("show");
+  __shmCurrentItem = null;
+}
+
+// 保存补充信息
+async function saveSubmitHomework() {
+  if (!__shmCurrentItem || !__shmCurrentItem.id) { showToast("未找到作业，请重试", false); return; }
+  const hwType = getRadioValue("shmTypeGroup") || "日常预习";
+  const duration = getRadioValue("shmDurationGroup") || "";
+  const wrongCount = getRadioValue("shmWrongGroup") || "";
+  const modules = getCheckedOfGroup("shmModuleGroup");
+  const module = modules[0] || "";
+  const unitVal = getRadioValue("shmUnitGroup") || "other";
+  const unitIndex = (unitVal !== "other" && unitVal !== "") ? Number(unitVal) : -1;
+  const units = await getTeachingUnits(__shmSubject);
+  const unitName = (unitIndex >= 0 && units[unitIndex]) ? units[unitIndex].name : null;
+
+  // 随堂测验已合并到【录入成绩】，此处不再保存
+  const payload = {
+    homeworkType: hwType,
+    duration,
+    wrongCount: wrongCount !== "" ? Number(wrongCount) : null,
+    modules,
+    module,
+    unitIndex,
+    unitName,
+  };
+
+  const btn = document.getElementById("saveSubmitHomework");
+  const original = btn.textContent;
+  btn.textContent = "保存中..."; btn.disabled = true;
+  try {
+    let saved = false;
+    try {
+      const resp = await fetch(`/api/homework/${__shmCurrentItem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await resp.json();
+      if (result.ok) saved = true;
+    } catch (apiErr) {
+      console.warn("补充信息保存 API 失败，使用本地回退:", apiErr.message);
+    }
+    if (!saved && window.DataStore && window.DataStore.updateStudyRecord) {
+      try {
+        await window.DataStore.updateStudyRecord(__shmCurrentItem.id, payload);
+        saved = true;
+      } catch (dsErr) { console.warn("补充信息保存 DataStore 失败:", dsErr.message); }
+    }
+    if (!saved) {
+      await updateHomeworkLocally(__shmCurrentItem.id, payload);
+    }
+    // 随堂测验的能量发放已合并到【录入成绩】，此处移除
+    closeSubmitHomeworkModal();
+    if (window.DataStore && window.DataStore.refreshData) {
+      await window.DataStore.refreshData(true).catch(() => {});
+    }
+    if (typeof renderStudy === "function") await renderStudy();
+    refreshIcons(50);
+    showToast("✅ 补充信息已保存", true);
+  } catch (e) {
+    console.error("补充信息保存失败:", e);
+    const errMsg = (e && e.message) || "";
+    if (errMsg.indexOf("Token") >= 0 || errMsg.indexOf("token") >= 0) {
+      showTokenRequiredToast();
+    } else {
+      showToast("✖ 保存失败，请重试", false);
+    }
+  } finally {
+    btn.textContent = original; btn.disabled = false;
+  }
+}
+
+function initSubmitHomeworkModal() {
+  const modal = document.getElementById("submitHomeworkModal");
+  if (!modal) return;
+  const closeBtn = document.getElementById("closeSubmitHomeworkModal");
+  if (closeBtn) closeBtn.addEventListener("click", closeSubmitHomeworkModal);
+  const cancelBtn = document.getElementById("cancelSubmitHomework");
+  if (cancelBtn) cancelBtn.addEventListener("click", closeSubmitHomeworkModal);
+  const saveBtn = document.getElementById("saveSubmitHomework");
+  if (saveBtn) saveBtn.addEventListener("click", saveSubmitHomework);
+  if (modal) modal.addEventListener("click", function(e) {
+    if (e.target === modal) closeSubmitHomeworkModal();
   });
 }
 
@@ -15972,21 +16531,27 @@ async function saveEdit() {
 
   const newTitle = document.getElementById("editTitle").value;
   const newSubject = getRadioValue("editSubjectGroup");
-  const newModules = getCheckedEditModules();
-  const newModule = newModules[0] || "";
   const newDueDate = document.getElementById("editDueDate").value;
-  const newStatus = getRadioValue("editStatusGroup");
-  const newSubmitted = getRadioValue("editSubmittedGroup") === "true";
 
-  // 同步写入 modules 数组，保证多选能力模块在列表/雷达图中完整生效
+  // 详情字段：作业类型/能力模块/关联单元
+  const hwType = getRadioValue("editTypeGroup") || "日常预习";
+  const modules = getCheckedOfGroup("editModuleGroup");
+  const module = modules[0] || "";
+  const unitVal = getRadioValue("editUnitGroup") || "other";
+  const unitIndex = (unitVal !== "other" && unitVal !== "") ? Number(unitVal) : -1;
+  const units = await getTeachingUnits(newSubject);
+  const unitName = (unitIndex >= 0 && units[unitIndex]) ? units[unitIndex].name : null;
+  // 随堂测验已合并到【录入成绩】，编辑不再处理测验
+
   const payload = {
     title: newTitle,
     subject: newSubject,
-    module: newModule,
-    modules: newModules,
     dueDate: newDueDate,
-    status: newStatus === "done" ? "done" : "pending",
-    submitted: newSubmitted,
+    homeworkType: hwType,
+    modules,
+    module,
+    unitIndex,
+    unitName,
   };
 
   let saved = false;
@@ -16010,12 +16575,7 @@ async function saveEdit() {
       }
     }
     if (!saved) {
-      await updateHomeworkLocally(currentEditItem.id, {
-        title: newTitle, subject: newSubject, module: newModule,
-        modules: newModules, dueDate: newDueDate,
-        status: newStatus === "done" ? "done" : "pending",
-        submitted: newSubmitted,
-      });
+      await updateHomeworkLocally(currentEditItem.id, payload);
       saved = true;
     }
   }
@@ -16033,13 +16593,6 @@ async function saveEdit() {
 }
 
 function initEditModal() {
-  const subjectRadios = document.querySelectorAll("#editSubjectGroup input");
-  subjectRadios.forEach(radio => {
-    radio.addEventListener("change", function() {
-      updateModuleCheckboxes(this.value, []);
-    });
-  });
-
   const closeBtn = document.getElementById("closeEditModal");
   if (closeBtn) closeBtn.addEventListener("click", closeEditModal);
   const cancelBtn = document.getElementById("cancelEdit");
@@ -16055,6 +16608,14 @@ function initEditModal() {
     });
   }
 
+  // 编辑弹窗：科目变更 → 刷新能力模块
+  document.querySelectorAll("#editSubjectGroup input").forEach(r => {
+    r.addEventListener("change", function() {
+      const subj = getRadioValue("editSubjectGroup");
+      if (subj) populateChoiceGroup("editModuleGroup", getModuleOptions(subj), []);
+    });
+  });
+
   // 按作业唯一 id 查找，避免索引/前缀/排序错位导致打开错误条目
   async function getAssignmentById(id) {
     const cfg = await loadAppData();
@@ -16065,11 +16626,12 @@ function initEditModal() {
 
   // 作业完成能量累加（客户端兜底，防止 API 瞬时不可用导致能量丢失）
   async function grantHomeworkCompletionXp(item, cfg) {
-    const hwType = item.homeworkType || "日常作业";
+    const hwType = item.homeworkType || "日常预习";
     const ruleList = (cfg && cfg.config && cfg.config.xpRuleList) || [];
     const rule = ruleList.find(r => r.name === "作业·" + hwType);
     // 优先从规则表查找，其次从默认映射表查找，最后回退到合理值
-    const _defaultMap = {'日常作业':2,'暑假作业':2,'特色作业':3,'家庭作业':4,'阅读作业':2,'练习作业':3};
+    // 作业类型统一为4种：日常预习2 / 日常复习2 / 暑假作业2 / 特色作业4（家庭作业合并到特色作业）
+    const _defaultMap = {'日常预习':2,'日常复习':2,'暑假作业':2,'特色作业':4};
     const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (_defaultMap[hwType] || 2);
     const subject = item.subject || "其他";
     try {
@@ -16165,60 +16727,18 @@ function initEditModal() {
       return;
     }
 
-    // 切换提交状态
+    // 提交按钮 → 打开提交确认弹窗（在弹窗里选类型/模块/单元/测验后确认）
     const submitBtn = e.target.closest("[data-toggle-submit]");
     if (submitBtn) {
       e.stopPropagation();
       const { item } = await getAssignmentById(submitBtn.getAttribute("data-toggle-submit"));
-      if (!item || !item.id) return;
-
-      const newSubmitted = item.submitted !== true;
-      let toggled = false;
-      try {
-        const resp = await fetch(`/api/homework/${item.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ submitted: newSubmitted }),
-        });
-        const result = await resp.json();
-        if (result.ok) toggled = true;
-      } catch (apiErr) {
-        console.warn("切换提交状态 API 失败，使用本地回退:", apiErr.message);
+      if (item && item.id && typeof openSubmitHomeworkModal === "function") {
+        openSubmitHomeworkModal(item);
       }
-      if (!toggled && window.DataStore && window.DataStore.updateStudyRecord) {
-        try {
-          await window.DataStore.updateStudyRecord(item.id, { submitted: newSubmitted });
-          toggled = true;
-        } catch (dsErr) {
-          console.warn("切换提交状态 DataStore 失败:", dsErr.message);
-        }
-      }
-      if (!toggled) {
-        await updateHomeworkLocally(item.id, { submitted: newSubmitted });
-      } else {
-        if (window.DataStore && window.DataStore.updateStudyRecord) {
-          await window.DataStore.updateStudyRecord(item.id, { submitted: newSubmitted }).catch(() => {});
-        }
-      }
-      // 增量 DOM 更新（P5）
-      const rowEl2 = document.querySelector(`.hw-row[data-id="${item.id}"]`);
-      if (rowEl2) {
-        const btn = rowEl2.querySelector("[data-toggle-submit]");
-        if (btn) {
-          btn.classList.toggle("submitted", newSubmitted);
-          btn.title = newSubmitted ? "取消提交" : "标记已提交";
-        }
-      }
-      // 刷新数据，确保提交状态与后端同步
-      if (window.DataStore && window.DataStore.refreshData) {
-        window.DataStore.refreshData(true).catch(() => {});
-      }
-      refreshIcons(50);
-      showToast(newSubmitted ? "✅ 已标记为已提交" : "已取消提交", newSubmitted);
       return;
     }
 
-    // 编辑按钮
+    // 编辑按钮 → 只改基础信息（内容/科目/截止日期）
     const editBtn = e.target.closest("[data-edit]");
     if (editBtn) {
       const { item } = await getAssignmentById(editBtn.getAttribute("data-edit"));
@@ -16321,6 +16841,7 @@ async function boot(page) {
     window.__editModalInit = true;
     initEditModal();
     initAddHomeworkModal();
+    if (typeof initSubmitHomeworkModal === "function") initSubmitHomeworkModal();
     if (typeof initScoreEvalModals === "function") initScoreEvalModals();
   }
   // 每周五自动发放零花钱（+18 到自由基金），启动时检查一次

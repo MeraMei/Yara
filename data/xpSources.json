@@ -40,7 +40,14 @@
         "description": ""
       },
       {
-        "name": "作业·日常作业",
+        "name": "作业·日常预习",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·日常复习",
         "category": "学习成长",
         "xp": 2,
         "method": "按次",
@@ -56,16 +63,30 @@
       {
         "name": "作业·特色作业",
         "category": "学习成长",
-        "xp": 3,
+        "xp": 4,
         "method": "按次",
         "description": "完成作业自动发放"
       },
       {
-        "name": "作业·家庭作业",
+        "name": "认真投入 - 遇到难题没有马上放弃",
         "category": "学习成长",
-        "xp": 4,
+        "xp": 2,
         "method": "按次",
-        "description": "完成作业自动发放"
+        "description": "主动认领，家长确认后发放"
+      },
+      {
+        "name": "认真投入 - 独立完成以前不会的题",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "主动认领，家长确认后发放"
+      },
+      {
+        "name": "认真投入 - 主动复盘错题",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "主动认领，家长确认后发放"
       }
     ]
   },

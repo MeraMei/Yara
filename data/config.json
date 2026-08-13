@@ -18,7 +18,7 @@
       "name": "英语",
       "category": "主科",
       "description": "",
-      "color": "#3DD9A0",
+      "color": "#9255F5",
       "icon": "languages"
     },
     {
@@ -130,7 +130,14 @@
         "description": ""
       },
       {
-        "name": "作业·日常作业",
+        "name": "作业·日常预习",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "完成作业自动发放"
+      },
+      {
+        "name": "作业·日常复习",
         "category": "学习成长",
         "xp": 2,
         "method": "按次",
@@ -146,16 +153,30 @@
       {
         "name": "作业·特色作业",
         "category": "学习成长",
-        "xp": 3,
+        "xp": 4,
         "method": "按次",
         "description": "完成作业自动发放"
       },
       {
-        "name": "作业·家庭作业",
+        "name": "认真投入 - 遇到难题没有马上放弃",
         "category": "学习成长",
-        "xp": 4,
+        "xp": 2,
         "method": "按次",
-        "description": "完成作业自动发放"
+        "description": "主动认领，家长确认后发放"
+      },
+      {
+        "name": "认真投入 - 独立完成以前不会的题",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "主动认领，家长确认后发放"
+      },
+      {
+        "name": "认真投入 - 主动复盘错题",
+        "category": "学习成长",
+        "xp": 2,
+        "method": "按次",
+        "description": "主动认领，家长确认后发放"
       }
     ],
     "兴趣爱好": [
@@ -391,14 +412,14 @@
       "description": ""
     },
     {
-      "name": "作业·日常作业",
+      "name": "作业·日常预习",
       "category": "学习成长",
       "xp": 2,
       "method": "按次",
       "description": "完成作业自动发放"
     },
     {
-      "name": "作业·暑假作业",
+      "name": "作业·日常复习",
       "category": "学习成长",
       "xp": 2,
       "method": "按次",
@@ -426,14 +447,14 @@
       "description": "记录一笔收入到财富/自由基金，动作记录低分值"
     },
     {
-      "name": "作业·特色作业",
+      "name": "作业·暑假作业",
       "category": "学习成长",
-      "xp": 3,
+      "xp": 2,
       "method": "按次",
       "description": "完成作业自动发放"
     },
     {
-      "name": "作业·家庭作业",
+      "name": "作业·特色作业",
       "category": "学习成长",
       "xp": 4,
       "method": "按次",
@@ -551,5 +572,76 @@
         "order": 15
       }
     ]
+  },
+  "teaching": {
+    "schoolYear": "2026-2027",
+    "currentSemester": "上学期",
+    "semesters": [
+      {
+        "label": "上学期",
+        "grade": "四年级",
+        "start": "2026-09-01",
+        "midterm": "2026-11-02",
+        "end": "2027-01-25",
+        "weeks": 22
+      },
+      {
+        "label": "下学期",
+        "grade": "四年级",
+        "start": "2027-03-01",
+        "midterm": "2027-05-03",
+        "end": "2027-07-05",
+        "weeks": 19
+      }
+    ],
+    "subjects": {
+      "语文": {
+        "version": "人教部编版",
+        "units": [
+          { "name": "第一单元·自然之美", "items": "观潮、走月亮、现代诗二首、繁星" },
+          { "name": "第二单元·提问策略", "items": "一个豆荚里的五粒豆、夜间飞行的秘密、呼风唤雨的世纪、蝴蝶的家" },
+          { "name": "第三单元·留心观察", "items": "古诗三首、爬山虎的脚、蟋蟀的住宅" },
+          { "name": "第四单元·神话故事", "items": "盘古开天地、精卫填海、普罗米修斯、女娲补天" },
+          { "name": "第五单元·习作·把一件事写清楚", "items": "麻雀、爬天都峰" },
+          { "name": "第六单元·成长故事", "items": "牛和鹅、一只窝囊的大老虎、陀螺" },
+          { "name": "第七单元·家国情怀", "items": "古诗三首、为中华之崛起而读书、梅兰芳蓄须、延安我把你追寻" },
+          { "name": "第八单元·历史传说", "items": "王戎不取道旁李、西门豹治邺、故事二则" }
+        ]
+      },
+      "数学": {
+        "version": "北师大版",
+        "units": [
+          { "name": "第一单元·认识更大的数", "items": "亿以内数的认识、近似数、十进制计数法" },
+          { "name": "第二单元·线与角", "items": "线的认识、相交与垂直、平移与平行、旋转与角、角的度量、画角" },
+          { "name": "第三单元·乘法", "items": "卫星运行时间、有多少名观众、神奇的计算工具、有趣的算式" },
+          { "name": "第四单元·运算律", "items": "买文具、加法交换律和乘法交换律、加法结合律、乘法结合律、乘法分配律" },
+          { "name": "第五单元·方向与位置", "items": "去图书馆、确定位置" },
+          { "name": "第六单元·除法", "items": "买文具、参观苗圃、秋游" },
+          { "name": "第七单元·生活中的负数", "items": "温度、正负数" },
+          { "name": "数学好玩", "items": "编码、数图形的学问" },
+          { "name": "第八单元·可能性", "items": "不确定性、摸球游戏" }
+        ]
+      },
+      "英语": {
+        "version": "沪教牛津版",
+        "units": [
+          { "name": "Module1·Getting to know you", "items": "Unit1 Meeting new people、Unit2 How do you feel?" },
+          { "name": "Module2·My family, my friends and me", "items": "Unit1 My friends、Unit2 My family、Unit3 My abilities" },
+          { "name": "Module3·Places and activities", "items": "Unit1 In my school、Unit2 Around my home、Unit3 In the street" },
+          { "name": "Module4·The natural world", "items": "Unit1 Weather、Unit2 Seasons、Unit3 Plants" }
+        ]
+      }
+    },
+    "timetable": {
+      "periods": 6,
+      "days": ["周一", "周二", "周三", "周四", "周五"],
+      "grid": {
+        "周一": ["语文", "数学", "英语", "科学", "体育", "音乐"],
+        "周二": ["数学", "语文", "英语", "美术", "体育", "道德与法治"],
+        "周三": ["语文", "数学", "英语", "科学", "音乐", "信息科技"],
+        "周四": ["数学", "语文", "英语", "体育", "美术", "道德与法治"],
+        "周五": ["语文", "数学", "英语", "科学", "书法", "劳动"]
+      }
+    }
   }
 }
