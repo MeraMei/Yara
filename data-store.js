@@ -73,8 +73,9 @@
   var GRADE_WEIGHT = { 'A+': 12, 'A': 11, 'B+': 10, 'B': 9, 'C+': 8, 'C': 7, 'D+': 6, 'D': 5 };
 
   // 作业类型 -> 默认 XP（需与 xpSources.json 中"作业·XX"任务分值完全一致）
+  // 作业类型统一为4种：日常预习2 / 日常复习2 / 暑假作业2 / 特色作业4（家庭作业合并到特色作业）
   var DEFAULT_HOMEWORK_XP = {
-    '日常作业': 2, '暑假作业': 2, '特色作业': 3, '家庭作业': 4, '阅读作业': 2, '练习作业': 3,
+    '日常预习': 2, '日常复习': 2, '暑假作业': 2, '特色作业': 4,
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -328,11 +329,19 @@
 
   // 从 GitHub raw 读取 JSON 文件
   DataStore.prototype._fetchRawJSON = function (filename) {
-    var url = GITHUB_RAW_BASE + '/data/' + filename;
-    return fetch(url, { cache: 'no-cache' })
+    // 优先读取本地 data/ 目录（本地预览），失败则回退到 GitHub 仓库（线上部署）
+    return fetch('data/' + filename, { cache: 'no-cache' })
       .then(function (resp) {
-        if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + resp.statusText + ' for ' + url);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + resp.statusText + ' for data/' + filename);
         return resp.json();
+      })
+      .catch(function () {
+        var url = GITHUB_RAW_BASE + '/data/' + filename;
+        return fetch(url, { cache: 'no-cache' })
+          .then(function (resp) {
+            if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + resp.statusText + ' for ' + url);
+            return resp.json();
+          });
       });
   };
 
@@ -427,6 +436,8 @@
       self._fetchRawJSON('xpSources.json').catch(function () { return []; }),
       self._fetchRawJSON('redeemRecords.json').catch(function () { return []; }),
       self._fetchRawJSON('diaryEntries.json').catch(function () { return []; }),
+      self._fetchRawJSON('aiWeeklyReports.json').catch(function () { return []; }),
+      self._fetchRawJSON('familyMeetings.json').catch(function () { return []; }),
     ]).then(function (results) {
       var child = results[0] || {};
       var calendar = results[1] || [];
@@ -438,6 +449,8 @@
       var xpSources = results[7] || [];
       var redeemRecords = results[8] || [];
       var diaryEntries = results[9] || [];
+      var aiWeeklyReports = results[10] || [];
+      var familyMeetings = results[11] || [];
 
       // 保存原始数据
       self._rawData = {
@@ -451,10 +464,12 @@
         xpSources: xpSources,
         redeemRecords: redeemRecords,
         diaryEntries: diaryEntries,
+        aiWeeklyReports: aiWeeklyReports,
+        familyMeetings: familyMeetings,
       };
 
       return self._buildDashboard(
-        child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries
+        child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings
       );
     });
   };
@@ -462,7 +477,7 @@
   // ── buildDashboard — 完整的数据聚合逻辑（与 server.js buildDashboard 一致） ──
 
   DataStore.prototype._buildDashboard = function (
-    child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries
+    child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings
   ) {
     var self = this;
 
@@ -546,6 +561,8 @@
       finance: processedFinance,
       config: processedConfig,
       diaryEntries: diaryEntries || [],
+      aiWeeklyReports: aiWeeklyReports || [],
+      familyMeetings: familyMeetings || [],
     };
   };
 
@@ -1009,7 +1026,7 @@
       title: title,
       cleanTitle: title,
       shortTitle: title,
-      homeworkType: rec.homeworkType || '作业·日常作业',
+      homeworkType: rec.homeworkType || '日常预习',
       module: module,
       modules: modules,
       dueDate: rec.dueDate || '',
@@ -1203,6 +1220,49 @@
   // 获取原始数据（用于修改后写回）
   DataStore.prototype.getRawData = function () {
     return this._rawData;
+  };
+
+  // 写入 AI 成长周报
+  DataStore.prototype.saveAiWeeklyReports = function (reports) {
+    var self = this;
+    var list = Array.isArray(reports) ? reports : [];
+    return self._writeFile('data/aiWeeklyReports.json', list, '更新 AI 成长周报').then(function () {
+      self._rawData.aiWeeklyReports = list;
+      if (self.data) self.data.aiWeeklyReports = list;
+      return self._rebuildDashboard();
+    });
+  };
+
+  // 写入家庭会议记录
+  DataStore.prototype.saveFamilyMeetings = function (meetings) {
+    var self = this;
+    var list = Array.isArray(meetings) ? meetings : [];
+    return self._writeFile('data/familyMeetings.json', list, '更新家庭会议记录').then(function () {
+      self._rawData.familyMeetings = list;
+      if (self.data) self.data.familyMeetings = list;
+      return self._rebuildDashboard();
+    });
+  };
+
+  // 追加一条家庭会议记录
+  DataStore.prototype.addFamilyMeeting = function (meeting) {
+    var self = this;
+    var list = (self._rawData.familyMeetings || []).slice();
+    var saved = {
+      id: meeting.id || ('fm_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)),
+      weekNumber: meeting.weekNumber || 0,
+      year: meeting.year || new Date().getFullYear(),
+      date: meeting.date || new Date().toISOString().slice(0, 10),
+      summary: meeting.summary || '',
+      discussion: meeting.discussion || '',
+      goal: meeting.goal || '',
+      goalCompleted: meeting.goalCompleted || false,
+      previousGoal: meeting.previousGoal || '',
+      previousGoalCompleted: meeting.previousGoalCompleted || false,
+      createdAt: meeting.createdAt || new Date().toISOString(),
+    };
+    list.unshift(saved);
+    return self.saveFamilyMeetings(list);
   };
 
   // ═══════════════════════════════════════════════════════════════

@@ -101,8 +101,8 @@
     "id": "recvrAkksu0UH9",
     "domain": "XP",
     "type": "XP获得",
-    "title": "作业·日常作业",
-    "taskName": "作业·日常作业",
+    "title": "作业·日常预习",
+    "taskName": "作业·日常预习",
     "taskCategory": "学习成长",
     "date": "2026-08-07",
     "datetime": "2026-08-07 05:14:41",
@@ -110,7 +110,7 @@
     "xpCategory": "学习成长",
     "reviewStatus": "已通过",
     "returnReason": "",
-    "description": "完成数学作业（日常作业）",
+    "description": "完成数学作业（日常预习）",
     "_hasValidName": true
   },
   {

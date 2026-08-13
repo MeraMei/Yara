@@ -3429,7 +3429,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .hw-subj.cn { background: linear-gradient(135deg, #fde8f0 0%, #fbd0de 100%); color: #d63068; }
     .hw-subj.math { background: linear-gradient(135deg, #e6f2ff 0%, #cce5ff 100%); color: #2b75e0; }
-    .hw-subj.en { background: linear-gradient(135deg, #e0faf0 0%, #c4f4de 100%); color: #289371; }
+    .hw-subj.en { background: linear-gradient(135deg, #f0eaff 0%, #dfd3fb 100%); color: #6d28d9; }
     .hw-subj.other { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); color: #475569; }
     /* 内容区 */
     .hw-content { min-width: 0; }
@@ -3554,7 +3554,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .sp-dot.cn { background: #F95D9F; }
     .sp-dot.math { background: #4A9EFF; }
-    .sp-dot.en { background: #3DD9A0; }
+    .sp-dot.en { background: #9255F5; }
     .sp-dot.other { background: var(--neutral-400); }
     .sp-num {
       font-size: 13px;
@@ -3574,7 +3574,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .sp-bar-fill.cn { background: #F95D9F; }
     .sp-bar-fill.math { background: #4A9EFF; }
-    .sp-bar-fill.en { background: #3DD9A0; }
+    .sp-bar-fill.en { background: #9255F5; }
     .sp-bar-fill.other { background: var(--neutral-400); }
 
     /* ════════ 学习能力雷达图（五芒星） ════════ */
@@ -3968,7 +3968,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .subj-dot.cn { background: #F95D9F; }
     .subj-dot.math { background: #4A9EFF; }
-    .subj-dot.en { background: #3DD9A0; }
+    .subj-dot.en { background: #9255F5; }
     .subj-dot.sci { background: var(--lav-500); }
     .subj-dot.other { background: var(--neutral-400); }
 
@@ -8787,7 +8787,7 @@ async function addStudyRecord(record) {
     cleanTitle: record.title || record.description || '',
     shortTitle: record.title || record.description || '',
     description: record.description || record.title || '',
-    homeworkType: record.homeworkType || '日常作业',
+    homeworkType: record.homeworkType || '日常预习',
     module: record.module || '',
     modules: (Array.isArray(record.modules) ? record.modules : (record.modules ? [record.modules] : [])).slice(),
     status: record.status || 'pending',
@@ -9787,10 +9787,10 @@ if (typeof window !== 'undefined') {
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="addTypeGroup">
-          <label class="choice-pill"><input type="radio" name="addType" value="日常作业" checked>日常</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="暑假作业">暑假</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="家庭作业">家庭</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="日常预习" checked>日常预习</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="日常复习">日常复习</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色作业</label>
         </div>
       </div>
       <div class="edit-field">
@@ -12839,7 +12839,7 @@ window.confirmRedeem = async function() {
 const RADAR_COLORS = {
   "语文": { main: "#F95D9F", light: "#fde8f0", stroke: "#d63068" },
   "数学": { main: "#4A9EFF", light: "#e6f2ff", stroke: "#2b75e0" },
-  "英语": { main: "#3DD9A0", light: "#e0faf0", stroke: "#289371" },
+  "英语": { main: "#9255F5", light: "#efe9ff", stroke: "#6d28d9" },
 };
 const RADAR_SUBJ_ICON = { "语文": "book-open", "数学": "calculator", "英语": "languages" };
 
@@ -13324,7 +13324,7 @@ async function renderStudy() {
 
     let points = [];
     let yLabels = [];
-    const subjectColor = { "语文": "#F95D9F", "数学": "#4A9EFF", "英语": "#3DD9A0" }[subject] || "#6366f1";
+    const subjectColor = { "语文": "#F95D9F", "数学": "#4A9EFF", "英语": "#9255F5" }[subject] || "#6366f1";
 
     if (hasScores) {
       // 有分数：用分数绘制折线图
@@ -15233,7 +15233,7 @@ function closeEditModal() {
 const ADD_HW_DUE_TYPES = new Set(["暑假作业", "特色作业"]);
 // 作业类型 → 对应 XP 任务名（与 xpSources 一致）
 const ADD_HW_TYPE_XP = {
-  "日常作业": 2, "暑假作业": 2, "特色作业": 3, "家庭作业": 4
+  "日常预习": 2, "日常复习": 2, "暑假作业": 2, "特色作业": 4
 };
 
 function getTodayVal() {
@@ -15243,7 +15243,7 @@ function getTodayVal() {
 
 function syncAddHomeworkDue() {
   // 根据作业类型联动截止日期：暑假/假期显示可填，日常/家庭锁定今天
-  const type = getRadioValue("addTypeGroup") || "日常作业";
+  const type = getRadioValue("addTypeGroup") || "日常预习";
   const wrap = document.getElementById("addDueFieldWrap");
   const input = document.getElementById("addHomeworkDueDate");
   const hint = document.getElementById("addDueHint");
@@ -15266,7 +15266,7 @@ function openAddHomeworkModal() {
   document.getElementById("addHomeworkTitle").value = "";
   document.getElementById("addHomeworkDueDate").value = getTodayVal();
   setRadioValue("addSubjectGroup", "语文");
-  setRadioValue("addTypeGroup", "日常作业");
+  setRadioValue("addTypeGroup", "日常预习");
   updateAddHomeworkModules("语文", []);
   syncAddHomeworkDue();
   modal.classList.add("show");
@@ -15312,7 +15312,7 @@ async function saveAddHomework() {
   const subject = getRadioValue("addSubjectGroup") || "语文";
   const modules = getCheckedAddHomeworkModules();
   const module = modules[0] || "";
-  const hwType = getRadioValue("addTypeGroup") || "日常作业";
+  const hwType = getRadioValue("addTypeGroup") || "日常预习";
   const today = getTodayVal();
   // 日期规则：日常/家庭默认今天写完；暑假/假期用所选（默认今天）
   const dueDate = ADD_HW_DUE_TYPES.has(hwType)
@@ -15664,11 +15664,11 @@ function initEditModal() {
 
   // 作业完成能量累加（客户端兜底，防止 API 瞬时不可用导致能量丢失）
   async function grantHomeworkCompletionXp(item, cfg) {
-    const hwType = item.homeworkType || "日常作业";
+    const hwType = item.homeworkType || "日常预习";
     const ruleList = (cfg && cfg.config && cfg.config.xpRuleList) || [];
     const rule = ruleList.find(r => r.name === "作业·" + hwType);
     // 优先从规则表查找，其次从默认映射表查找，最后回退到合理值
-    const _defaultMap = {'日常作业':2,'暑假作业':2,'特色作业':3,'家庭作业':4,'阅读作业':2,'练习作业':3};
+    const _defaultMap = {'日常预习':2,'日常复习':2,'暑假作业':2,'特色作业':4};
     const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (_defaultMap[hwType] || 2);
     const subject = item.subject || "其他";
     try {

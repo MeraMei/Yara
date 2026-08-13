@@ -177,13 +177,12 @@ const LEVEL_BADGES = [
 ];
 
 // 作业类型 → 默认 XP（需与 xpSources.json 中"作业·XX"任务分值完全一致）
+// 作业类型统一为4种：日常预习2 / 日常复习2 / 暑假作业2 / 特色作业4（家庭作业合并到特色作业）
 const DEFAULT_HOMEWORK_XP = {
-  "日常作业": 2,
+  "日常预习": 2,
+  "日常复习": 2,
   "暑假作业": 2,
-  "特色作业": 3,
-  "家庭作业": 4,
-  "阅读作业": 2,
-  "练习作业": 3,
+  "特色作业": 4,
 };
 
 // 配置-XP规则表 的 XP分类 单选字段合法选项（配置表不允许自定义选项）
@@ -342,9 +341,9 @@ async function autoGrantHomeworkXp(recordId) {
     const tRaw = rec["作业类型"];
     const tArr = Array.isArray(tRaw) ? tRaw : (tRaw ? [tRaw] : []);
     const tFirst = tArr[0];
-    let hwType = "日常作业";
-    if (tFirst && typeof tFirst === "object") hwType = tFirst.text || "日常作业";
-    else if (tFirst) hwType = String(tFirst).trim() || "日常作业";
+    let hwType = "日常预习";
+    if (tFirst && typeof tFirst === "object") hwType = tFirst.text || "日常预习";
+    else if (tFirst) hwType = String(tFirst).trim() || "日常预习";
 
     let subject = "其他";
     const sRaw = rec["学科"] || rec["科目"];
@@ -804,13 +803,13 @@ async function buildDashboard() {
     const modules = resolveLinkNamesArr(r["能力模块"], moduleIdToName);
     const primaryModule = modules.length > 0 ? modules[0] : inferModule(subject, title, r["说明"]);
     // 作业类型：已合并为纯文本字段（原关联字段兼容：取 text 或纯文本）
-    let homeworkType = "日常作业";
+    let homeworkType = "日常预习";
     {
       const htRaw = r["作业类型"];
       const htArr = Array.isArray(htRaw) ? htRaw : (htRaw ? [htRaw] : []);
       const htFirst = htArr[0];
-      if (htFirst && typeof htFirst === "object") homeworkType = htFirst.text || "日常作业";
-      else if (htFirst) homeworkType = String(htFirst).trim() || "日常作业";
+      if (htFirst && typeof htFirst === "object") homeworkType = htFirst.text || "日常预习";
+      else if (htFirst) homeworkType = String(htFirst).trim() || "日常预习";
     }
 
     return {
@@ -1293,6 +1292,16 @@ const server = http.createServer(async (req, res) => {
     serveStatic(res, file, "text/html; charset=utf-8");
     return;
   }
+  // 数据文件（JSON 等静态数据）
+  if (pathname.startsWith("/data/")) {
+    const file = pathname.slice(1);
+    const ext = path.extname(file);
+    const mime = ext === ".json" ? "application/json; charset=utf-8" :
+      "application/octet-stream";
+    serveStatic(res, file, mime);
+    return;
+  }
+
   if (pathname.startsWith("/assets/")) {
     const file = pathname.slice(1);
     const ext = path.extname(file);
@@ -1822,7 +1831,8 @@ const server = http.createServer(async (req, res) => {
 });
 
 function serveStatic(res, file, mime) {
-  const filePath = path.join(__dirname, file);
+  // 从仓库根目录（scripts/vendor 上两级）解析静态文件
+  const filePath = path.join(__dirname, "..", "..", file);
   fs.readFile(filePath, (err, data) => {
     if (err) {
       res.statusCode = 404;

@@ -3914,6 +3914,68 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--neutral-700);
     }
 
+    /* ════════ 学期末汇总面板（上半按科目 + 下半按学期） ════════ */
+    .exam-summary-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 4px 4px 14px;
+      border-bottom: 1px solid var(--neutral-100);
+      margin-bottom: 16px;
+    }
+    .exam-summary-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--neutral-800);
+    }
+    .exam-summary-title i { width: 16px; height: 16px; color: var(--lav-500); }
+    .exam-subject-section { padding: 0 4px 8px; }
+    .exam-semester-section {
+      padding: 8px 4px 4px;
+      border-top: 1px solid var(--neutral-100);
+      margin-top: 8px;
+    }
+
+    /* 学期末录入弹窗：成绩行 */
+    .semester-score-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .semester-score-row .sem-subject { flex: 1.4; min-width: 0; }
+    .semester-score-row .sem-grade { flex: 0.9; min-width: 0; }
+    .semester-score-row .sem-score {
+      flex: 0.8;
+      min-width: 0;
+      padding: 8px 10px;
+      border: 1px solid var(--neutral-200);
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--neutral-50);
+      color: var(--neutral-800);
+    }
+    .sem-row-del {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      border: none;
+      background: var(--neutral-100);
+      color: var(--neutral-500);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .sem-row-del:hover { background: var(--coral-50); color: var(--coral-600); }
+    .sem-row-del i { width: 14px; height: 14px; }
+
     /* ════════ 期末成绩 - 科目视图（新） ════════ */
     .exam-subject-view {
       display: flex;
@@ -5057,11 +5119,127 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       font-weight: 500;
     }
 
+    /* 各科成绩列表（本学期平时成绩） */
+    .score-list-section {
+      padding: 8px 20px 16px;
+      border-top: 1px solid var(--neutral-100);
+    }
+    .score-list-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sl-subject {
+      background: var(--neutral-50);
+      border: 1px solid var(--neutral-100);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .sl-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .sl-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--neutral-800);
+    }
+    .sl-count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--neutral-400);
+      font-weight: 600;
+    }
+    .sl-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .sl-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--neutral-100);
+      color: var(--neutral-600);
+    }
+    .sl-chip b { font-size: 12px; }
+    .sl-chip i {
+      font-style: normal;
+      font-size: 10px;
+      opacity: .75;
+    }
+    .sl-chip.grade-a-plus { background: #d1fae5; color: #065f46; }
+    .sl-chip.grade-a { background: #dbeafe; color: #1e40af; }
+    .sl-chip.grade-b-plus { background: #fef3c7; color: #92400e; }
+    .sl-chip.grade-b { background: #fee2e2; color: #991b1b; }
+
+    /* 平时成绩汇总（本学期） */
+    .score-summary-section {
+      padding: 8px 20px 16px;
+      border-top: 1px solid var(--neutral-100);
+    }
+    .score-summary-panel {
+      background: linear-gradient(135deg, rgba(255,255,255,.9) 0%, rgba(248,250,252,.7) 100%);
+      border: 1px solid var(--neutral-100);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .ss-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .ss-stat {
+      text-align: center;
+      background: var(--neutral-50);
+      border-radius: 10px;
+      padding: 10px 6px;
+    }
+    .ss-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--lav-600);
+      line-height: 1.1;
+    }
+    .ss-label {
+      font-size: 11px;
+      color: var(--neutral-500);
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .ss-dist {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+    }
+    .ss-dist-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--neutral-700);
+    }
+    .ss-dist-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
     @media (max-width: 640px) {
       .score-analysis-header { padding: 12px 14px 10px; }
       .score-trend-section { padding: 6px 14px 14px; }
       .error-modules-section { padding: 6px 14px 14px; }
       .practice-suggestion-section { padding: 6px 14px 16px; }
+      .score-list-section { padding: 6px 14px 14px; }
+      .score-summary-section { padding: 6px 14px 14px; }
       .subject-tab { padding: 6px 14px; font-size: 12px; }
       .semester-select { padding: 7px 12px; font-size: 12px; }
       .score-trend-chart { height: 150px; }
@@ -8149,6 +8327,126 @@ input[type="date"]:focus::-webkit-datetime-edit {
 .view{display:block; opacity:0; visibility:hidden; position:absolute; top:0; left:0; right:0; transition:opacity .35s ease, visibility .35s ease; pointer-events:none}
 .view.active{opacity:1; visibility:visible; position:relative; pointer-events:auto}
 
+    /* ════════ AI 成长周报（报告式 UI：白毛玻璃主卡 + 顶部彩条 + 数据可视化，无深色色块） ════════ */
+    .weekly-report-section { margin-top: 18px; }
+    /* 主卡 - 白毛玻璃 */
+    .wr-main { background: rgba(255,255,255,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.7); border-radius: 22px; padding: 24px 26px; box-shadow: 0 1px 3px rgba(30,28,26,.04), 0 6px 16px -8px rgba(30,28,26,.1); }
+    /* 报头（masthead） */
+    .wr-header { padding-bottom: 16px; border-bottom: 1px dashed rgba(30,28,26,.08); margin-bottom: 16px; }
+    .wr-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .wr-title { font: 800 19px var(--font-display); color: var(--neutral-900); display: flex; align-items: center; gap: 10px; letter-spacing: -.01em; }
+    .wr-date-range { font-size: 12px; font-weight: 600; color: var(--neutral-400); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+    .wr-week-select { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--neutral-100); background: var(--neutral-50); color: var(--neutral-600); cursor: pointer; }
+    /* AI 徽章 - 浅底深字 */
+    .ai-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; color: var(--lav-600, #7a3fd6); background: rgba(172,135,255,.12); letter-spacing: 0.02em; }
+    /* 历史周报 - 横向胶囊选择器（融入主卡内） */
+    .wr-history { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 12px 0 2px; margin-bottom: 2px; scrollbar-width: none; }
+    .wr-history::-webkit-scrollbar { display: none; }
+    .wr-history-item { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--neutral-50); border: 1px solid var(--neutral-100); font-size: 11px; font-weight: 700; color: var(--neutral-500); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
+    .wr-history-item:hover { background: var(--neutral-100); color: var(--neutral-700); }
+    .wr-history-item.active { color: var(--lav-600, #7a3fd6); background: rgba(172,135,255,.12); border-color: rgba(172,135,255,.3); }
+    .wr-history-item .wr-h-date { font-size: 10px; color: var(--neutral-400); }
+    /* 本周概览 - 执行摘要（报告式高亮块） */
+    .wr-summary { margin-top: 14px; background: linear-gradient(135deg, rgba(172,135,255,.10), rgba(253,216,50,.10)); border: 1px solid rgba(172,135,255,.16); border-radius: 14px; padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--neutral-700); }
+    .wr-summary::before { content: "📌 本周概览"; display: block; font-weight: 800; font-size: 11px; letter-spacing: .06em; color: var(--lav-600, #7a3fd6); margin-bottom: 6px; }
+    /* KPI 统计卡片 - 白毛玻璃 + 顶部彩条 + 趋势胶囊 */
+    .wr-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin: 18px 0; }
+    .wr-stat { position: relative; border-radius: 16px; padding: 16px 14px 14px; text-align: left; border: 1px solid rgba(255,255,255,.7); overflow: hidden; }
+    .wr-stat::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+    .wr-stat-energy { background: radial-gradient(120% 110% at 0% 0%, rgba(253,216,50,.30) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.16) 0%, transparent 55%), linear-gradient(165deg, rgba(255,254,240,.85) 0%, rgba(255,255,255,.62) 100%); }
+    .wr-stat-study { background: radial-gradient(120% 110% at 0% 0%, rgba(106,181,255,.28) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.20) 0%, transparent 55%), linear-gradient(165deg, rgba(245,250,255,.85) 0%, rgba(255,255,255,.62) 100%); }
+    .wr-stat-finance { background: radial-gradient(120% 110% at 0% 0%, rgba(248,131,121,.24) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(253,216,50,.26) 0%, transparent 55%), linear-gradient(165deg, rgba(255,247,244,.85) 0%, rgba(255,255,255,.62) 100%); }
+    .wr-stat-diary { background: radial-gradient(120% 110% at 0% 0%, rgba(241,120,163,.22) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.18) 0%, transparent 55%), linear-gradient(165deg, rgba(255,245,250,.85) 0%, rgba(255,255,255,.62) 100%); }
+    .wr-stat-energy::before { background: linear-gradient(90deg,#fdd832,#ffe760); }
+    .wr-stat-study::before { background: linear-gradient(90deg,#3e94f5,#6ab5ff); }
+    .wr-stat-finance::before { background: linear-gradient(90deg,#f96024,#ffab81); }
+    .wr-stat-diary::before { background: linear-gradient(90deg,#ea4d85,#f7a7c3); }
+    .wr-stat-top { display: flex; align-items: center; justify-content: space-between; }
+    .wr-stat-icon { font-size: 18px; line-height: 1; }
+    .wr-stat-trend { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.75); }
+    .wr-stat-val { font-size: 28px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin-top: 8px; }
+    .wr-stat-energy .wr-stat-val { color: #b8860b; }
+    .wr-stat-study .wr-stat-val { color: #3b8fe0; }
+    .wr-stat-finance .wr-stat-val { color: #e04a7e; }
+    .wr-stat-diary .wr-stat-val { color: #d63068; }
+    .wr-stat-label { font-size: 11px; font-weight: 700; color: var(--neutral-500); margin-top: 2px; }
+    /* 章节卡片 - 白毛玻璃 + 标题下细分隔线 */
+    .wr-chapter { margin-bottom: 14px; border-radius: 18px; background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.7); overflow: hidden; }
+    .wr-chapter-head { padding: 14px 18px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; color: var(--neutral-900); user-select: none; border-bottom: 1px solid rgba(30,28,26,.04); }
+    .wr-chapter-head:hover { background: rgba(30,28,26,.02); }
+    .wr-chapter-head .ch-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; display: inline-block; flex-shrink: 0; box-shadow: 0 0 0 4px rgba(30,28,26,.03); }
+    .wr-chapter-head .ch-arrow { font-size: 11px; color: var(--neutral-400); transition: transform .2s var(--easing-default); }
+    .wr-chapter-head.collapsed .ch-arrow { transform: rotate(-90deg); }
+    .wr-chapter-body { padding: 16px 18px 18px; font-size: 13px; color: #3d3936; line-height: 1.65; }
+    .wr-chapter-body.collapsed { display: none; }
+    /* 子区块标题 - 彩色圆点 + 细分隔线 */
+    .wr-sub { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--neutral-600); letter-spacing: .02em; margin: 16px 0 10px; }
+    .wr-sub:first-child { margin-top: 0; }
+    .wr-sub::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(30,28,26,.08), transparent); }
+    .wr-sub .wr-sub-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    /* 作业完成率 - 进度条 */
+    .wr-progress-row { margin-bottom: 12px; }
+    .wr-progress-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 5px; }
+    .wr-progress-head .wr-p-name { font-weight: 700; color: var(--neutral-700); }
+    .wr-progress-head .wr-p-val { font-weight: 800; font-size: 12px; }
+    .wr-progress-track { height: 8px; border-radius: 999px; background: rgba(30,28,26,.06); overflow: hidden; }
+    .wr-progress-fill { height: 100%; border-radius: 999px; transition: width .6s var(--easing-default); }
+    /* 成绩趋势 - 胶囊 */
+    .wr-trends { display: flex; flex-wrap: wrap; gap: 8px; }
+    .wr-trend-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.8); border: 1px solid rgba(30,28,26,.06); font-size: 12px; font-weight: 700; }
+    .wr-trend-chip .wr-t-arrow { font-weight: 800; }
+    /* 需要关注 - 警示胶囊 */
+    .wr-alert-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 10px; background: var(--colourful-sunny-coral-50); border: 1px solid rgba(249,96,36,.18); font-size: 12px; font-weight: 600; color: var(--colourful-sunny-coral-600); }
+    /* 行为画像 - 横向条形 */
+    .wr-beh-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .wr-beh-name { width: 76px; font-size: 12px; font-weight: 700; color: var(--neutral-600); flex-shrink: 0; }
+    .wr-beh-track { flex: 1; height: 8px; border-radius: 999px; background: rgba(30,28,26,.06); overflow: hidden; }
+    .wr-beh-fill { height: 100%; border-radius: 999px; }
+    .wr-beh-meta { width: 96px; text-align: right; font-size: 11px; font-weight: 700; color: var(--neutral-500); flex-shrink: 0; }
+    /* 故事卡片 - 浅底左彩条 */
+    .wr-story { background: var(--colourful-lavender-50); border-left: 3px solid var(--colourful-lavender-500); padding: 12px 14px; margin: 10px 0; border-radius: 0 12px 12px 0; font-size: 13px; }
+    .wr-story .wr-story-head { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 12px; color: var(--colourful-lavender-600); margin-bottom: 4px; }
+    .wr-story .parent-msg { color: var(--colourful-lavender-600); font-weight: 600; margin-top: 6px; font-size: 12px; background: rgba(255,255,255,.6); padding: 6px 10px; border-radius: 8px; }
+    /* 徽章 - 浅底深字 */
+    .wr-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: var(--colourful-butter-yellow-100); color: var(--colourful-butter-yellow-700); border: 1px solid rgba(224,188,24,.2); }
+    /* 心情晴雨表 - 胶囊 */
+    .wr-moods { display: flex; flex-wrap: wrap; gap: 8px; }
+    .wr-mood-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.8); border: 1px solid rgba(30,28,26,.06); font-size: 12px; font-weight: 700; }
+    .wr-mood-chip .wr-m-emoji { font-size: 16px; }
+    .wr-mood-chip .wr-m-count { color: var(--neutral-400); font-weight: 600; }
+    /* 最佳日记 - 引言卡 */
+    .wr-quote { background: linear-gradient(135deg, rgba(241,120,163,.08), rgba(172,135,255,.08)); border: 1px solid rgba(241,120,163,.16); border-radius: 14px; padding: 14px 16px; font-size: 13px; font-style: italic; color: var(--neutral-700); }
+    .wr-quote .wr-quote-meta { font-style: normal; font-size: 11px; color: var(--neutral-400); margin-top: 8px; font-weight: 600; }
+    /* 财商 / 活跃 - 状态胶囊 */
+    .wr-fin-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; background: var(--colourful-mint-green-50); border: 1px solid rgba(54,185,139,.18); font-size: 12px; font-weight: 700; color: var(--colourful-mint-green-600); }
+    /* 建议卡片 - 图标 + 标题 + 正文 */
+    .wr-suggestion { display: flex; gap: 10px; padding: 12px 14px; margin: 8px 0; border-radius: 12px; font-size: 13px; line-height: 1.6; }
+    .wr-suggestion .wr-s-ico { font-size: 16px; flex-shrink: 0; }
+    .wr-suggestion .wr-s-title { font-weight: 800; font-size: 12px; margin-bottom: 2px; }
+    .wr-suggestion.is-keep { background: var(--colourful-mint-green-50); border: 1px solid rgba(54,185,139,.16); }
+    .wr-suggestion.is-keep .wr-s-title { color: var(--colourful-mint-green-600); }
+    .wr-suggestion.is-improve { background: var(--colourful-butter-yellow-50); border: 1px solid rgba(224,188,24,.18); }
+    .wr-suggestion.is-improve .wr-s-title { color: var(--colourful-butter-yellow-600); }
+    .wr-suggestion.is-challenge { background: var(--colourful-lavender-50); border: 1px solid rgba(146,85,245,.16); }
+    .wr-suggestion.is-challenge .wr-s-title { color: var(--colourful-lavender-600); }
+    .wr-footer { margin-top: 18px; text-align: center; }
+    .wr-empty { padding: 40px; text-align: center; color: var(--neutral-400); }
+    @media (max-width: 640px) { .wr-stats { grid-template-columns: repeat(2,1fr); } .wr-main { padding: 16px; } .wr-beh-name { width: 64px; } .wr-beh-meta { width: 84px; } }
+    /* ════════ 家庭会议 ════════ */
+    .family-meeting-modal .modal { max-width: 560px; }
+    .fm-report-preview { background: rgba(124,58,237,0.03); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+    .fm-preview-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .fm-preview-content { font-size: 13px; color: #6b7280; line-height: 1.5; }
+    .fm-section { margin-bottom: 14px; }
+    .fm-section-label { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .fm-hint { font-size: 12px; color: #6b7280; margin-bottom: 6px; font-style: italic; }
+    /* ════════ 家庭会议历史 ════════ */
+    .fm-history { margin-top: 12px; }
+    .fm-history-item { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; }
+    .fm-history-week { font-size: 12px; font-weight: 700; color: #7c3aed; }
+    .fm-history-content { font-size: 13px; color: #374151; margin-top: 4px; }
+    @media (max-width: 640px) { .wr-stats { grid-template-columns: repeat(2,1fr); } }
+
   </style>
   <!-- 启动加载动画 -->
   <style>
@@ -8228,7 +8526,7 @@ const GITHUB_BRANCH = 'main';
 const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/data`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data`;
 
-const CACHE_KEY = "yara_growth_data_v7";
+const CACHE_KEY = "yara_growth_data_v9";
 const CHILD_CACHE_KEY = "yara_child_profile";
 const CALENDAR_CACHE_KEY = "yara_calendar_data";
 
@@ -8252,11 +8550,18 @@ function setGithubToken(token) {
 
 // 从 GitHub raw 读取 JSON 文件
 function fetchRawJSON(filename) {
-  const url = `${GITHUB_RAW_BASE}/${filename}`;
-  return fetch(url)
+  // 优先读取本地 data/ 目录（本地预览），失败则回退到 GitHub 仓库（线上部署）
+  return fetch(`data/${filename}`)
     .then(resp => {
-      if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for ${url}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for data/${filename}`);
       return resp.json();
+    })
+    .catch(() => {
+      const url = `${GITHUB_RAW_BASE}/${filename}`;
+      return fetch(url).then(resp => {
+        if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for ${url}`);
+        return resp.json();
+      });
     });
 }
 
@@ -8325,21 +8630,10 @@ async function loadData() {
 
   if (loadPromise) return loadPromise;
 
-  // 快速路径：从 localStorage 读取缓存，让页面秒开
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (raw) {
-      cachedData = JSON.parse(raw);
-      loadPromise = Promise.resolve(cachedData);
-      // 不在快速路径中调度 _backgroundRefresh()，避免与写操作产生竞态条件
-      return cachedData;
-    }
-  } catch (e) { /* ignore */ }
-
   loadPromise = (async () => {
     try {
-      // 并行加载所有数据文件
-      const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries] =
+      // 并行加载所有数据文件（fetchRawJSON 优先本地 data/，失败回退 GitHub）
+      const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings] =
         await Promise.all([
           fetchRawJSON('child.json').catch(() => null),
           fetchRawJSON('calendar.json').catch(() => []),
@@ -8351,20 +8645,23 @@ async function loadData() {
           fetchRawJSON('xpSources.json').catch(() => []),
           fetchRawJSON('redeemRecords.json').catch(() => []),
           fetchRawJSON('diaryEntries.json').catch(() => []),
+          fetchRawJSON('aiWeeklyReports.json').catch(() => []),
+          fetchRawJSON('familyMeetings.json').catch(() => []),
         ]);
 
       // 合并为 dashboard 结构（与飞书版 getDashboard() 返回结构一致）
       const dashboard = buildDashboard(
         child || {}, calendar || [], levels || [],
         xpRecords || [], finance || null, study || null,
-        config || null, xpSources || [], redeemRecords || [], diaryEntries || []
+        config || null, xpSources || [], redeemRecords || [], diaryEntries || [],
+        aiWeeklyReports || [], familyMeetings || []
       );
 
       cachedData = dashboard;
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
       return cachedData;
     } catch (err) {
-      console.warn('GitHub 数据加载失败，尝试 localStorage 缓存:', err.message);
+      console.warn('数据加载失败，尝试 localStorage 缓存:', err.message);
       // 回退到 localStorage 缓存
       try {
         const raw = localStorage.getItem(CACHE_KEY);
@@ -8396,7 +8693,7 @@ async function _backgroundRefresh() {
     // 始终尝试从 GitHub 拉取最新数据，与本地缓存做比对
     // 无变化时仅更新缓存不触发重渲染，有变化时自动更新 UI
     if (genAtStart !== _dataGen) return;
-    const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries] =
+    const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings] =
       await Promise.all([
         fetchRawJSON('child.json').catch(() => null),
         fetchRawJSON('calendar.json').catch(() => []),
@@ -8408,11 +8705,14 @@ async function _backgroundRefresh() {
         fetchRawJSON('xpSources.json').catch(() => []),
         fetchRawJSON('redeemRecords.json').catch(() => []),
         fetchRawJSON('diaryEntries.json').catch(() => []),
+        fetchRawJSON('aiWeeklyReports.json').catch(() => []),
+        fetchRawJSON('familyMeetings.json').catch(() => []),
       ]);
     const dashboard = buildDashboard(
       child || {}, calendar || [], levels || [],
       xpRecords || [], finance || null, study || null,
-      config || null, xpSources || [], redeemRecords || [], diaryEntries || []
+      config || null, xpSources || [], redeemRecords || [], diaryEntries || [],
+      aiWeeklyReports || [], familyMeetings || []
     );
     // 如果后台刷新期间发生了写入操作（_dataGen 已变化），则跳过，
     // 避免 CDN 旧数据覆盖用户写入的最新数据
@@ -8469,7 +8769,7 @@ function refreshData(localOnly) {
 
 // ── 构建 dashboard 数据结构（与 server.js 的 buildDashboard 对应） ──
 
-function buildDashboard(child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries) {
+function buildDashboard(child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings) {
   // 计算总 XP
   const verifiedXp = xpRecords.filter(r => r.reviewStatus === '已通过');
   const totalXP = verifiedXp.reduce((sum, r) => sum + (Number(r.xp) || 0), 0);
@@ -8544,6 +8844,8 @@ function buildDashboard(child, calendar, levels, xpRecords, finance, study, conf
     finance: processedFinance,
     config: processedConfig,
     diaryEntries: diaryEntries || [],
+    aiWeeklyReports: aiWeeklyReports || [],
+    familyMeetings: familyMeetings || [],
   };
 }
 
@@ -9730,6 +10032,38 @@ if (typeof window !== 'undefined') {
         </div>
       </section>
 
+  <!-- ════════ AI 成长周报 ════════ -->
+  <section class="weekly-report-section" id="weeklyReportSection" style="display:none">
+    <div class="wr-main">
+      <div class="wr-header">
+        <div class="wr-title-row">
+          <div class="wr-title">
+            <span class="ai-badge">AI</span>
+            <span id="wrTitle">第 -- 周成长周报</span>
+          </div>
+          <div class="wr-actions">
+            <select class="wr-week-select" id="wrWeekSelect" onchange="switchWeeklyReport(this.value)">
+              <option value="">本周周报</option>
+            </select>
+          </div>
+        </div>
+        <div class="wr-date-range" id="wrDateRange"></div>
+        <div class="wr-history" id="wrHistoryList"></div>
+        <div class="wr-summary" id="wrSummary">加载中...</div>
+      </div>
+      <div class="wr-stats" id="wrStats"></div>
+      <div class="wr-chapters" id="wrChapters"></div>
+      <div class="wr-empty" id="wrEmpty" style="display:none">
+        <div class="empty-state"><i data-lucide="file-text"></i><div>本周报告将在周日晚上生成 ✨</div></div>
+      </div>
+      <div class="wr-footer" id="wrFooter" style="display:none">
+        <button class="btn-primary" onclick="openFamilyMeeting()">
+          <i data-lucide="users"></i> 一起开个家庭会议
+        </button>
+      </div>
+    </div>
+  </section>
+
     </div>
   </main>
   </section>
@@ -9902,11 +10236,9 @@ if (typeof window !== 'undefined') {
         <div class="section-head">
           <div class="section-title"><i data-lucide="award"></i>成绩分析</div>
           <div class="exam-head-actions">
-            <button class="exam-eval-btn" onclick="openAddEvalModal()"><i data-lucide="star"></i>期末评价</button>
             <div class="exam-view-toggle" id="examViewToggle">
-              <button class="active" data-view="analysis"><i data-lucide="line-chart"></i>成绩分析</button>
-              <button data-view="subject"><i data-lucide="book-open"></i>按科目</button>
-              <button data-view="semester"><i data-lucide="calendar"></i>按学期</button>
+              <button class="active" data-view="analysis"><i data-lucide="line-chart"></i>平时成绩</button>
+              <button data-view="summary"><i data-lucide="calendar"></i>学期末汇总</button>
             </div>
           </div>
         </div>
@@ -9948,16 +10280,43 @@ if (typeof window !== 'undefined') {
             </div>
           </div>
 
+          <div class="score-list-section">
+            <div class="section-subtitle">各科成绩列表</div>
+            <div id="scoreListPanel" class="score-list-panel">
+            </div>
+          </div>
+
+          <div class="score-summary-section">
+            <div class="section-subtitle">平时成绩汇总</div>
+            <div id="scoreSummaryPanel" class="score-summary-panel">
+            </div>
+          </div>
+
           <div class="practice-suggestion-section">
-            <div class="section-subtitle">练习关联建议</div>
+            <div class="section-subtitle">分析建议</div>
             <div id="practiceSuggestionList" class="practice-suggestion-list">
             </div>
           </div>
         </div>
 
-        <!-- 原有期末成绩面板（保留，切换视图时显示） -->
+        <!-- 学期末汇总面板（上半按科目 + 下半按学期叠加） -->
         <div class="card-panel" id="examPanel" style="display:none">
-          <div class="empty-state"><i data-lucide="bar-chart-2"></i><div>加载中...</div></div>
+          <div class="exam-summary-head">
+            <div class="exam-summary-title"><i data-lucide="calendar"></i>学期末汇总</div>
+            <button class="exam-eval-btn" onclick="openAddSemesterModal()"><i data-lucide="star"></i>学期末录入</button>
+          </div>
+          <div class="exam-subject-section">
+            <div class="section-subtitle">按科目</div>
+            <div id="examSubjectContent">
+              <div class="empty-state"><i data-lucide="bar-chart-2"></i><div>加载中...</div></div>
+            </div>
+          </div>
+          <div class="exam-semester-section">
+            <div class="section-subtitle">按学期</div>
+            <div id="examSemesterContent">
+              <div class="empty-state"><i data-lucide="bar-chart-2"></i><div>加载中...</div></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -10381,7 +10740,42 @@ if (typeof window !== 'undefined') {
     </div>
   </div>
 
-  
+  <!-- 学期末录入弹窗（期末成绩 + 期末评价 合并录入） -->
+  <div class="modal-overlay" id="addSemesterModal" onclick="if(event.target===this)closeAddSemesterModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="star"></i>学期末录入</div>
+        <button class="modal-close" onclick="closeAddSemesterModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-field">
+          <label>学期</label>
+          <select class="semester-select" id="semesterEvalSemester"></select>
+        </div>
+        <div class="edit-field">
+          <label>期末成绩（各科）</label>
+          <div id="semesterScoreRows"></div>
+          <button type="button" class="btn ghost mini" onclick="addSemesterScoreRow()" style="margin-top:8px"><i data-lucide="plus" style="width:13px;height:13px"></i> 添加科目</button>
+        </div>
+        <div class="edit-field">
+          <label>老师评语（选填）</label>
+          <textarea id="semesterTeacherComment" placeholder="老师说了什么…"></textarea>
+        </div>
+        <div class="edit-field">
+          <label>家长评语（选填）</label>
+          <textarea id="semesterParentComment" placeholder="家长想对孩子说什么…"></textarea>
+        </div>
+        <div class="edit-field">
+          <label>日期</label>
+          <input type="date" id="semesterEvalDate" />
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-secondary" onclick="closeAddSemesterModal()">取消</button>
+        <button class="btn-primary" id="submitSemesterEval">保存</button>
+      </div>
+    </div>
+  </div>
 
 
   <!-- 对账弹窗 -->
@@ -10584,6 +10978,62 @@ if (typeof window !== 'undefined') {
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeRejectXpModal()">取消</button>
         <button class="btn-confirm" onclick="confirmRejectXp()"><i data-lucide="check" style="width:14px;height:14px;vertical-align:middle"></i>确认退回</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 家庭会议弹窗 ════════ -->
+  <div class="modal-overlay" id="familyMeetingModal">
+    <div class="modal family-meeting-modal">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="users"></i>第 <span id="fmWeekNumber">--</span> 周家庭会议</div>
+        <button class="modal-close" onclick="closeFamilyMeeting()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="fm-report-preview" id="fmReportPreview">
+          <div class="fm-preview-title">📋 本周成长周报摘要</div>
+          <div id="fmPreviewContent" class="fm-preview-content"></div>
+        </div>
+        <div class="fm-section">
+          <div class="fm-section-label">1️⃣ 回顾 · 你同意周报说的吗？</div>
+          <div class="fm-hint">引导语："AI 说你数学进步了，你觉得呢？"</div>
+          <textarea class="form-textarea" id="fmSummary" rows="2" placeholder="讨论要点（选填）"></textarea>
+        </div>
+        <div class="fm-section">
+          <div class="fm-section-label">2️⃣ 讨论 · 有什么需要一起聊聊的？</div>
+          <div class="fm-hint">引导语："AI 说阅读完成率偏低，需要妈妈怎么帮你？"</div>
+          <textarea class="form-textarea" id="fmDiscussion" rows="2" placeholder="讨论内容（选填）"></textarea>
+        </div>
+        <div class="fm-section">
+          <div class="fm-section-label">3️⃣ 定目标 · 下周的一个小目标</div>
+          <div class="fm-hint" id="fmPreviousGoalHint"></div>
+          <textarea class="form-textarea" id="fmGoal" rows="2" placeholder="定一个小目标（选填）"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeFamilyMeeting()">取消</button>
+        <button class="btn-confirm" onclick="submitFamilyMeeting()">✅ 完成家庭会议</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 认真投入审批 · 家长留言弹窗 ════════ -->
+  <div class="modal-overlay" id="approveCommentModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="heart"></i>孩子写了一段话</div>
+        <button class="modal-close" onclick="closeApproveCommentModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">💬 你想对她说什么吗？</label>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:8px">孩子认真投入了，你的回应会让她很受鼓励 ✨ <span style="color:#6b7280">（可选，可跳过）</span></div>
+          <textarea class="form-textarea" id="approveCommentText" rows="3" placeholder="例如：我看到你做题没有放弃，妈妈很为你骄傲 ❤️"></textarea>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeApproveCommentModal()">跳过</button>
+        <button class="btn-confirm" onclick="confirmApproveWithComment()">通过并留言</button>
       </div>
     </div>
   </div>
@@ -12387,6 +12837,7 @@ function getPlanetXp(verifiedXpRecords) {
 
 async function renderHome() {
   const cfg = await loadAppData();
+  window.__lastCfg = cfg;
   const xp = getLevelProgress(cfg);
   const homework = cfg.study?.homework || {};
   const pendingCount = cfg.pendingCount || (cfg.recentRecords || []).filter(r => r.status === "pending").length;
@@ -12754,9 +13205,366 @@ async function renderHome() {
   if (window.SemesterCalendar && window.SemesterCalendar.renderSemesterBar) {
     window.SemesterCalendar.renderSemesterBar();
   }
+
+  // ═══ AI 成长周报 ═══
+  renderAiWeeklyReport(cfg);
 }
 
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// AI 成长周报渲染
+// ═══════════════════════════════════════════════════════════════
+function setDateRange(report) {
+  var el = document.getElementById("wrDateRange");
+  if (!el) return;
+  if (!report) { el.textContent = ""; return; }
+  var date = report.date || report.generatedAt || "";
+  var d = date ? new Date(date) : null;
+  var range = "";
+  if (d && !isNaN(d.getTime())) {
+    var start = new Date(d); start.setDate(start.getDate() - 6);
+    var fmt = function (x) { return (x.getMonth() + 1) + "." + x.getDate(); };
+    range = fmt(start) + " - " + fmt(d) + " · " + (report.year || "") + "年";
+  } else {
+    range = date ? String(date).slice(0, 10) : "";
+  }
+  el.textContent = "📅 " + range;
+}
+
+function buildWrStatsHtml(stats) {
+  var trendMeta = {
+    up: { t: "↑", c: "var(--colourful-mint-green-600)", l: "较上周" },
+    down: { t: "↓", c: "var(--colourful-sunny-coral-600)", l: "较上周" },
+    stable: { t: "→", c: "var(--muted-foreground)", l: "持平" }
+  };
+  var statMeta = [
+    { key: "energy", label: "能量值", unit: "XP", cls: "energy", icon: "⚡" },
+    { key: "study", label: "学业投入", unit: "%", cls: "study", icon: "📚" },
+    { key: "finance", label: "财商习惯", unit: "%", cls: "finance", icon: "💰" },
+    { key: "diary", label: "日记篇数", unit: "篇", cls: "diary", icon: "✏️" }
+  ];
+  return statMeta.map(function (item) {
+    var s = stats[item.key] || {};
+    var val = s.value || 0;
+    var trend = s.trend || "stable";
+    var diff = s.diff || 0;
+    var tm = trendMeta[trend] || trendMeta.stable;
+    var trendTxt = trend === "stable" ? "持平" : (tm.t + " " + (diff > 0 ? "+" : "") + diff);
+    return '<div class="wr-stat wr-stat-' + item.cls + '"><div class="wr-stat-top"><span class="wr-stat-icon">' + item.icon + '</span><span class="wr-stat-trend" style="color:' + tm.c + '">' + trendTxt + '</span></div><div class="wr-stat-val">' + val + '<span style="font-size:13px;color:var(--muted-foreground);font-weight:400;margin-left:2px">' + item.unit + '</span></div><div class="wr-stat-label">' + item.label + '</div></div>';
+  }).join("");
+}
+
+function renderAiWeeklyReport(cfg) {
+  const section = document.getElementById("weeklyReportSection");
+  if (!section) return;
+  const reports = cfg.aiWeeklyReports || [];
+  const currentReport = reports.length > 0 ? reports[reports.length - 1] : null;
+  if (!currentReport) {
+    section.style.display = "";
+    window.__wrCurrentIndex = undefined;
+    document.getElementById("wrEmpty").style.display = "";
+    document.getElementById("wrTitle").textContent = "第 -- 周成长周报";
+    document.getElementById("wrDateRange").textContent = "";
+    document.getElementById("wrSummary").textContent = "";
+    document.getElementById("wrStats").innerHTML = "";
+    document.getElementById("wrChapters").innerHTML = "";
+    document.getElementById("wrFooter").style.display = "none";
+    populateWeekSelect(reports);
+    return;
+  }
+  section.style.display = "";
+  window.__wrCurrentIndex = reports.length - 1;
+  document.getElementById("wrEmpty").style.display = "none";
+  document.getElementById("wrFooter").style.display = "";
+  document.getElementById("wrTitle").textContent = "第 " + currentReport.weekNumber + " 周成长周报";
+  setDateRange(currentReport);
+  document.getElementById("wrSummary").textContent = currentReport.summary || "";
+  // 渲染四个统计卡片（报告式 KPI：顶部彩条 + 趋势胶囊）
+  document.getElementById("wrStats").innerHTML = buildWrStatsHtml(currentReport.stats || {});
+  // 渲染可折叠章节
+  renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(currentReport));
+  renderChapter("chapterBehavior", "⭐ 行为与习惯", renderBehaviorContent(currentReport));
+  renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(currentReport));
+  // 渲染建议
+  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(currentReport));
+  populateWeekSelect(reports);
+  if (window.lucide) refreshIcons(20);
+}
+
+function renderChapter(id, title, content) {
+  var container = document.getElementById("wrChapters");
+  if (!container) return;
+  var existing = document.getElementById(id);
+  if (existing) existing.remove();
+  var div = document.createElement("div");
+  div.className = "wr-chapter";
+  div.id = id;
+  var dotMap = { chapterAcademic: "#3b8fe0", chapterBehavior: "#4a9b7b", chapterEmotion: "#d63068", chapterSuggestions: "#b8860b" };
+  var dot = dotMap[id] || "#7a3fd6";
+  // 默认全部展开（不再加 collapsed）
+  div.innerHTML = '<div class="wr-chapter-head" onclick="toggleChapter(this)"><span><span class="ch-dot" style="background:' + dot + '"></span>' + title + '</span><span class="ch-arrow">▼</span></div><div class="wr-chapter-body">' + content + '</div>';
+  container.appendChild(div);
+}
+
+function toggleChapter(head) {
+  var body = head.nextElementSibling;
+  if (body) body.classList.toggle("collapsed");
+  head.classList.toggle("collapsed");
+}
+
+function renderAcademicContent(report) {
+  var aca = report.academic || {};
+  var hw = aca.homework || {};
+  var subjects = hw.subjects || [];
+  var html = "";
+  var subjColor = { "数学": "#3e94f5", "语文": "#ea4d85", "英语": "#9255f5" };
+  if (subjects.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#3e94f5"></span>作业完成率</div>';
+    subjects.forEach(function (s) {
+      var pct = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
+      var color = subjColor[s.name] || (s.alert === "low" ? "var(--colourful-sunny-coral-500)" : "var(--colourful-mint-green-500)");
+      html += '<div class="wr-progress-row"><div class="wr-progress-head"><span class="wr-p-name">' + s.name + '</span><span class="wr-p-val" style="color:' + color + '">' + s.completed + '/' + s.total + ' · ' + pct + '%</span></div><div class="wr-progress-track"><div class="wr-progress-fill" style="width:' + pct + '%;background:linear-gradient(90deg,' + color + ',' + color + 'cc)"></div></div></div>';
+    });
+  }
+  var trends = aca.trends || [];
+  if (trends.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#4a9b7b"></span>成绩趋势</div><div class="wr-trends">';
+    var trendText = { up: "📈 上升", down: "📉 下降", stable: "➡️ 稳定", wave: "🔀 波动" };
+    var trendColor = { up: "var(--colourful-mint-green-600)", down: "var(--colourful-sunny-coral-600)", stable: "var(--neutral-500)", wave: "var(--colourful-butter-yellow-600)" };
+    trends.forEach(function (t) {
+      html += '<span class="wr-trend-chip"><span class="wr-t-arrow" style="color:' + (trendColor[t.trend] || "var(--neutral-500)") + '">' + (trendText[t.trend] || t.trend) + '</span><span style="color:var(--neutral-400);font-weight:600">' + t.subject + ' · ' + t.lastGrade + '</span></span>';
+    });
+    html += '</div>';
+  }
+  var weakMods = aca.weakModules || [];
+  if (weakMods.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#f96024"></span>需要关注</div><div class="wr-trends">';
+    weakMods.forEach(function (m) {
+      html += '<span class="wr-alert-chip">⚠️ ' + m.subject + '·' + m.module + ' 未完成 ' + m.incomplete + ' 项</span>';
+    });
+    html += '</div>';
+  }
+  if (!html) html = '<div style="color:#6b7280;font-size:13px">暂无数据</div>';
+  return html;
+}
+
+function renderBehaviorContent(report) {
+  var beh = report.behavior || {};
+  var profile = beh.profile || [];
+  var html = "";
+  var maxCount = 1;
+  profile.forEach(function (p) { if (p.count > maxCount) maxCount = p.count; });
+  var palette = ["#3e94f5", "#ea4d85", "#9255f5", "#36b98b", "#f96024", "#fdd832"];
+  if (profile.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#9255f5"></span>本周行为画像</div>';
+    profile.forEach(function (p, i) {
+      var w = Math.max(8, Math.round((p.count / maxCount) * 100));
+      var c = palette[i % palette.length];
+      html += '<div class="wr-beh-row"><span class="wr-beh-name">' + p.category + '</span><span class="wr-beh-track"><span class="wr-beh-fill" style="width:' + w + '%;background:linear-gradient(90deg,' + c + ',' + c + 'bb)"></span></span><span class="wr-beh-meta">' + p.count + '次 · +' + p.xp + 'XP</span></div>';
+    });
+  }
+  var stories = beh.effortStories || [];
+  if (stories.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fdd832"></span>认真投入亮点</div>';
+    stories.slice(0, 3).forEach(function (s) {
+      html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.subject || "") + ' · ' + (s.date || "") + '</div><div>' + (s.story || "") + '</div>' + (s.reviewerComment ? '<div class="parent-msg">💬 ' + s.reviewerComment + "</div>" : "") + "</div>";
+    });
+    if (stories.length > 3) html += '<div style="font-size:12px;color:var(--muted-foreground);margin-top:6px">还有 ' + (stories.length - 3) + " 条精彩瞬间</div>";
+  }
+  var badge = beh.badge || {};
+  if (badge.earned) {
+    var badgeText = badge.type === "small_perseverance" ? "🏅 小坚持" : "🏆 大毅力";
+    html += '<div style="margin-top:12px"><span class="wr-badge">' + badgeText + ' · 连续 ' + badge.days + ' 天</span></div>';
+  }
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无数据</div>';
+  return html;
+}
+
+function renderEmotionContent(report) {
+  var emo = report.emotion || {};
+  var html = "";
+  html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#ea4d85"></span>日记活跃度</div>';
+  var diaryMap = { active: "🔥 活跃", normal: "✅ 正常", low: "💤 减少" };
+  html += '<div class="wr-fin-chip" style="background:var(--colourful-candy-pink-50);border-color:rgba(234,77,133,.16);color:var(--colourful-candy-pink-600)">' + (diaryMap[emo.diaryTrend] || "✅ 正常") + ' · 本周 ' + (emo.diaryCount || 0) + ' 篇</div>';
+  var moods = emo.moodDistribution || {};
+  var moodKeys = Object.keys(moods);
+  if (moodKeys.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fdd832"></span>心情晴雨表</div><div class="wr-moods">';
+    moodKeys.forEach(function (k) {
+      var emoji = k === "开心" ? "😊" : k === "难过" ? "😢" : k === "生气" ? "😡" : k === "兴奋" ? "😄" : k === "平静" ? "😌" : k === "惊喜" ? "🤩" : "😐";
+      html += '<span class="wr-mood-chip"><span class="wr-m-emoji">' + emoji + '</span>' + k + '<span class="wr-m-count">' + moods[k] + '次</span></span>';
+    });
+    html += '</div>';
+  }
+  var best = emo.bestDiary || {};
+  if (best.snippet) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#9255f5"></span>本周最佳日记</div>';
+    html += '<div class="wr-quote">"' + best.snippet + '"<div class="wr-quote-meta">· ' + (best.date || "") + ' · 四要素 ' + (best.elements || 0) + '/4</div></div>';
+  }
+  if (emo.financeStatus) {
+    var finMap = { good: "🟢 理性消费", watch: "🟡 需要关注", alert: "🔴 冲动消费" };
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#36b98b"></span>财商习惯</div>';
+    html += '<div class="wr-fin-chip">' + (finMap[emo.financeStatus] || "🟢 理性消费") + ' · 值得率 ' + (emo.financeWorthIt || 0) + '%</div>';
+  }
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无数据</div>';
+  return html;
+}
+
+function renderSuggestionContent(report) {
+  var sug = report.suggestions || {};
+  var html = "";
+  if (sug.keep) html += '<div class="wr-suggestion is-keep"><span class="wr-s-ico">✅</span><div><div class="wr-s-title">继续保持</div>' + sug.keep + '</div></div>';
+  if (sug.improve) html += '<div class="wr-suggestion is-improve"><span class="wr-s-ico">🎯</span><div><div class="wr-s-title">重点改进</div>' + sug.improve + '</div></div>';
+  if (sug.challenge) html += '<div class="wr-suggestion is-challenge"><span class="wr-s-ico">🎮</span><div><div class="wr-s-title">趣味挑战</div>' + sug.challenge + '</div></div>';
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无建议</div>';
+  return html;
+}
+
+function populateWeekSelect(reports) {
+  var sel = document.getElementById("wrWeekSelect");
+  if (!sel) return;
+  var currentHtml = '<option value="">本周周报</option>';
+  if (reports && reports.length > 0) {
+    for (var i = reports.length - 1; i >= 0; i--) {
+      var r = reports[i];
+      currentHtml += '<option value="' + i + '">第 ' + r.weekNumber + ' 周周报</option>';
+    }
+  }
+  sel.innerHTML = currentHtml;
+  // 渲染历史周报 - 横向胶囊选择器（融入主卡内）
+  var list = document.getElementById("wrHistoryList");
+  if (!list) return;
+  if (!reports || reports.length === 0) {
+    list.innerHTML = '<div class="wr-history-item" style="cursor:default">暂无历史周报</div>';
+    return;
+  }
+  var cur = (window.__wrCurrentIndex === undefined || window.__wrCurrentIndex === null) ? (reports.length - 1) : window.__wrCurrentIndex;
+  var html = '<div class="wr-history-item' + (cur === undefined || cur === null ? " active" : "") + '" onclick="selectHistoryWeek(-1)">本周</div>';
+  for (var j = reports.length - 1; j >= 0; j--) {
+    var r2 = reports[j];
+    var active = (j === cur) ? " active" : "";
+    var dateStr = (r2.generatedAt || r2.date) ? String(r2.generatedAt || r2.date).slice(0, 10) : "";
+    html += '<div class="wr-history-item' + active + '" onclick="selectHistoryWeek(' + j + ')"><span class="wr-h-week">第 ' + r2.weekNumber + ' 周</span><span class="wr-h-date">' + dateStr + '</span></div>';
+  }
+  list.innerHTML = html;
+}
+
+function selectHistoryWeek(index) {
+  if (index === -1) {
+    window.__wrCurrentIndex = undefined;
+    renderAiWeeklyReport(window.__lastCfg || {});
+    return;
+  }
+  window.__wrCurrentIndex = index;
+  var reports = ((window.__lastCfg || {}).aiWeeklyReports || []);
+  var report = reports[index];
+  if (report) {
+    displayWeeklyReport(report, reports, index);
+    var sel = document.getElementById("wrWeekSelect");
+    if (sel) sel.value = String(index);
+  }
+}
+
+function switchWeeklyReport(index) {
+  if (!index) {
+    window.__wrCurrentIndex = undefined;
+    renderAiWeeklyReport(window.__lastCfg || {});
+    return;
+  }
+  var idx = parseInt(index, 10);
+  var reports = ((window.__lastCfg || {}).aiWeeklyReports || []);
+  var report = reports[idx];
+  if (report) displayWeeklyReport(report, reports, idx);
+}
+
+function displayWeeklyReport(report, allReports, index) {
+  if (!report) return;
+  if (index !== undefined && index !== null) window.__wrCurrentIndex = index;
+  document.getElementById("wrEmpty").style.display = "none";
+  document.getElementById("wrFooter").style.display = "";
+  document.getElementById("wrTitle").textContent = "第 " + report.weekNumber + " 周成长周报";
+  setDateRange(report);
+  document.getElementById("wrSummary").textContent = report.summary || "";
+  document.getElementById("wrStats").innerHTML = buildWrStatsHtml(report.stats || {});
+  document.getElementById("wrChapters").innerHTML = "";
+  renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(report));
+  renderChapter("chapterBehavior", "⭐ 行为与习惯", renderBehaviorContent(report));
+  renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(report));
+  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(report));
+  populateWeekSelect(allReports || []);
+  if (window.lucide) refreshIcons(20);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 家庭会议
+// ═══════════════════════════════════════════════════════════════
+function openFamilyMeeting() {
+  var cfg = window.__lastCfg || {};
+  var reports = cfg.aiWeeklyReports || [];
+  var currentReport = reports.length > 0 ? reports[reports.length - 1] : null;
+  if (!currentReport) { showToast("还没有成长周报，请先等待周报生成", false); return; }
+  document.getElementById("fmWeekNumber").textContent = currentReport.weekNumber;
+  var previewEl = document.getElementById("fmPreviewContent");
+  if (previewEl) previewEl.textContent = currentReport.summary || "暂无";
+  // 检查上周目标
+  var meetings = cfg.familyMeetings || [];
+  var lastMeeting = meetings.length > 0 ? meetings[0] : null;
+  var hintEl = document.getElementById("fmPreviousGoalHint");
+  if (hintEl) {
+    if (lastMeeting && lastMeeting.goal) {
+      var checked = lastMeeting.goalCompleted ? "✅ 已完成" : "⏳ 尚未标记";
+      hintEl.innerHTML = '上周目标："' + lastMeeting.goal + '" · ' + checked + '<br>引导语："这周的目标完成了吗？"';
+    } else {
+      hintEl.textContent = '引导语："AI 建议下周重点做什么？你想选哪个？"';
+    }
+  }
+  document.getElementById("fmSummary").value = "";
+  document.getElementById("fmDiscussion").value = "";
+  document.getElementById("fmGoal").value = "";
+  document.getElementById("familyMeetingModal").classList.add("active");
+  refreshIcons(50);
+}
+
+function closeFamilyMeeting() {
+  document.getElementById("familyMeetingModal").classList.remove("active");
+}
+
+async function submitFamilyMeeting() {
+  var cfg = window.__lastCfg || {};
+  var reports = cfg.aiWeeklyReports || [];
+  var currentReport = reports.length > 0 ? reports[reports.length - 1] : null;
+  if (!currentReport) return;
+  var summary = document.getElementById("fmSummary").value.trim();
+  var discussion = document.getElementById("fmDiscussion").value.trim();
+  var goal = document.getElementById("fmGoal").value.trim();
+  var meetings = cfg.familyMeetings || [];
+  var lastMeeting = meetings.length > 0 ? meetings[0] : null;
+  var btn = document.querySelector("#familyMeetingModal .btn-confirm");
+  btn.disabled = true;
+  btn.textContent = "保存中…";
+  try {
+    await window.DataStore.addFamilyMeeting({
+      weekNumber: currentReport.weekNumber,
+      year: currentReport.year || new Date().getFullYear(),
+      date: new Date().toISOString().slice(0, 10),
+      summary: summary,
+      discussion: discussion,
+      goal: goal,
+      previousGoal: lastMeeting ? lastMeeting.goal : "",
+      previousGoalCompleted: lastMeeting ? lastMeeting.goalCompleted : false,
+    });
+    await window.DataStore.refreshData(true);
+    closeFamilyMeeting();
+    showToast("✅ 家庭会议记录已保存！", true);
+  } catch (e) {
+    console.error("保存家庭会议失败:", e);
+    showToast("❌ 保存失败: " + (e.message || "未知错误"), false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✅ 完成家庭会议";
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // MODULE: render-xp.js
 // ═══════════════════════════════════════════════════════════
 
@@ -13050,9 +13858,17 @@ async function renderXp() {
 
   if (xpRulesEl) {
     // 按版块（分类）渲染卡片，展示：频次 · 单次默认XP · 已获得XP，每版块默认展示 5 条
+    // 过滤掉"自动打卡/自动发放"的项目（作业·自动完成、财务自动积分），保留手动认领/手动打分任务
     const LIMIT = 5;
+    const isAutoTask = (t) => {
+      const d = String(t.description || "");
+      const n = String(t.name || "");
+      const m = String(t.method || "");
+      // 自动发放（作业完成自动加分、财务自动积分）不在此展示；认真投入为主动认领手动任务，保留
+      return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0;
+    };
     const cards = allCats.map(cat => {
-      const tasks = xpRulesCfg[cat] || [];
+      const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
       const earned = catAgg[cat] ? catAgg[cat].xp : 0;
       const count = catAgg[cat] ? catAgg[cat].count : 0;
       const p = WCPALETTE[cat] || WCPALETTE["学习成长"];
@@ -13247,7 +14063,17 @@ function bindHomeTrendTabs() {
 // ══════════════════════════════════════
 // XP 审批 & 操作
 // ══════════════════════════════════════
-window.approveXpRecord = async function(btn, recordId) {
+window.approveXpRecord = async function(btn, recordId, recordEl) {
+  // 检查是否为认真投入任务
+  const card = recordEl || (btn ? btn.closest('.recent-card') : null);
+  const titleEl = card ? card.querySelector('.rc-title') : null;
+  const title = titleEl ? titleEl.textContent : '';
+  const isEffort = title.indexOf('认真投入') >= 0;
+  // 如果待批准的是认真投入，打开带留言的审批弹窗
+  if (isEffort) {
+    openApproveWithComment(btn, recordId);
+    return;
+  }
   // 二次确认，防止误触导致多条记录被处理
   if (!confirm("确认「通过」这一条记录？此操作只对该条生效，不会影响其他记录。")) return;
   if (btn) { btn.disabled = true; btn.classList.add("busy"); }
@@ -13327,6 +14153,66 @@ window.rejectXpRecord = async function(btn, recordId, reason) {
     if (btn) { btn.disabled = false; btn.classList.remove("busy"); }
   }
 };
+
+// ═══════════════════════════════════════════════════════════════
+// 认真投入审批 + 家长留言
+// ═══════════════════════════════════════════════════════════════
+let _approveRecordId = null;
+let _approveBtn = null;
+
+function openApproveWithComment(btn, recordId) {
+  _approveRecordId = recordId;
+  _approveBtn = btn;
+  document.getElementById("approveCommentText").value = "";
+  document.getElementById("approveCommentModal").classList.add("active");
+  refreshIcons(50);
+}
+
+function closeApproveCommentModal() {
+  _approveRecordId = null;
+  _approveBtn = null;
+  document.getElementById("approveCommentModal").classList.remove("active");
+}
+
+async function confirmApproveWithComment() {
+  const id = _approveRecordId;
+  const btn = _approveBtn;
+  const comment = document.getElementById("approveCommentText").value.trim();
+  if (!id) return;
+  closeApproveCommentModal();
+  // 审批通过
+  if (btn) { btn.disabled = true; btn.classList.add("busy"); }
+  const strip = document.getElementById("xpRecordsStrip");
+  const prevScroll = strip ? strip.scrollLeft : 0;
+  try {
+    var updateData = { status: "verified" };
+    // 如果家长写了留言，存入
+    if (comment) updateData.reviewerComment = comment;
+    await window.DataStore.updateXpRecord(id, updateData);
+    await window.DataStore.refreshData(true);
+    await renderXp();
+    const stripAfter = document.getElementById("xpRecordsStrip");
+    if (stripAfter && prevScroll) stripAfter.scrollLeft = prevScroll;
+    const card = stripAfter ? stripAfter.querySelector('.recent-card[data-record-id="' + id + '"]') : null;
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    refreshIcons(50);
+    if (comment) {
+      showToast("✅ 已通过，你的留言已同步到记录中 ❤️", true);
+    } else {
+      showToast("✅ 已通过该条记录，能量已到账", true);
+    }
+  } catch (e) {
+    console.error("审批失败:", e);
+    const msg = e.message || "";
+    if (msg.indexOf("GitHub Token") >= 0 || msg.indexOf("Token") >= 0) {
+      showTokenRequiredToast();
+    } else {
+      showToast("❌ 审批失败: " + msg, false);
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.classList.remove("busy"); }
+  }
+}
 
 // 权益兑换弹窗
 window.openRedeemConfirm = function(encodedName, levelName) {
@@ -13819,6 +14705,35 @@ async function renderStudy() {
   let currentScoreSubject = "语文";
   let currentScoreSemester = "";
 
+  // 科目配置与等级样式（外层作用域，供平时成绩列表/汇总与学期末视图共用）
+  const scoreSubjConfig = {
+    "语文": { cls: "cn", order: 1 },
+    "数学": { cls: "math", order: 2 },
+    "英语": { cls: "en", order: 3 },
+    "科学": { cls: "sci", order: 4 },
+    "道法": { cls: "other", order: 5 },
+    "道德与法治": { cls: "other", order: 5 },
+    "音乐": { cls: "other", order: 6 },
+    "体育": { cls: "other", order: 7 },
+    "美术": { cls: "other", order: 8 },
+    "劳动": { cls: "other", order: 9 },
+    "综合实践": { cls: "other", order: 10 },
+    "综合实践活动": { cls: "other", order: 10 },
+    "心理": { cls: "other", order: 11 },
+    "心理健康": { cls: "other", order: 11 },
+    "信息技术": { cls: "other", order: 12 },
+    "信息科技": { cls: "other", order: 12 },
+    "书法": { cls: "other", order: 13 },
+  };
+  function getSubjCfg(name) { return scoreSubjConfig[name] || { cls: "other", order: 99 }; }
+  function getGradeCls(g) {
+    if (g === "A+") return "grade-a-plus";
+    if (g === "A") return "grade-a";
+    if (g === "B+") return "grade-b-plus";
+    if (g === "B") return "grade-b";
+    return "grade-a";
+  }
+
   // 学期标签排序辅助函数：返回学期的"顺序值"（越大越新）
   function _semesterOrder(label) {
     const gradeCn = { "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10 };
@@ -14281,6 +15196,8 @@ async function renderStudy() {
         renderScoreTrendChart(currentScoreSubject, currentScoreSemester);
         renderErrorModules(currentScoreSubject);
         renderPracticeSuggestions(currentScoreSubject);
+        renderScoreList(currentScoreSemester);
+        renderScoreSummary(currentScoreSemester);
       });
     }
 
@@ -14302,6 +15219,95 @@ async function renderStudy() {
     renderScoreTrendChart(currentScoreSubject, currentScoreSemester);
     renderErrorModules(currentScoreSubject);
     renderPracticeSuggestions(currentScoreSubject);
+    renderScoreList(currentScoreSemester);
+    renderScoreSummary(currentScoreSemester);
+  }
+
+  // ════════ 7.5.1 各科成绩列表（本学期平时成绩） ════════
+  function renderScoreList(semesterLabel) {
+    const panel = document.getElementById("scoreListPanel");
+    if (!panel) return;
+
+    // 本学期平时成绩（排除期末）
+    const semRecords = examRecords.filter(r =>
+      (r.semesterLabel === semesterLabel) && r.examType !== "期末"
+    );
+
+    if (semRecords.length === 0) {
+      panel.innerHTML = emptyStateHTML("clipboard-list", "本学期暂无平时成绩记录", 90);
+      return;
+    }
+
+    const subjOrder = { "语文": 1, "数学": 2, "英语": 3, "科学": 4 };
+    const bySubj = groupBy(semRecords, "subject");
+    const subjects = Object.keys(bySubj).sort((a, b) => (subjOrder[a] || 99) - (subjOrder[b] || 99));
+
+    panel.innerHTML = subjects.map(sub => {
+      const records = [...bySubj[sub]].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      const typeCn = { "单元测试": "单元", "日常测验": "日常", "月考": "月考", "期中": "期中" };
+      const chips = records.map(r => `
+        <span class="sl-chip ${getGradeCls(r.grade)}" title="${r.title || r.examType || ""}">
+          ${typeCn[r.examType] || r.examType || "成绩"}
+          <b>${r.grade}</b>${r.score != null ? `<i>${r.score}分</i>` : ""}
+        </span>
+      `).join("");
+      return `
+        <div class="sl-subject">
+          <div class="sl-head">
+            <span class="subj-dot ${getSubjCfg(sub).cls}"></span>
+            <span class="sl-name">${sub}</span>
+            <span class="sl-count">${records.length} 次</span>
+          </div>
+          <div class="sl-chips">${chips}</div>
+        </div>`;
+    }).join("");
+  }
+
+  // ════════ 7.5.2 平时成绩汇总（本学期） ════════
+  function renderScoreSummary(semesterLabel) {
+    const panel = document.getElementById("scoreSummaryPanel");
+    if (!panel) return;
+
+    const semRecords = examRecords.filter(r =>
+      (r.semesterLabel === semesterLabel) && r.examType !== "期末"
+    );
+
+    if (semRecords.length === 0) {
+      panel.innerHTML = emptyStateHTML("pie-chart", "暂无汇总数据", 90);
+      return;
+    }
+
+    const gradeOrder = ["A+", "A", "B+", "B", "C+", "C", "D+", "D"];
+    const gradeColors = { "A+": "#10b981", "A": "#6366f1", "B+": "#f59e0b", "B": "#ef4444" };
+    const counts = {};
+    semRecords.forEach(r => { if (r.grade) counts[r.grade] = (counts[r.grade] || 0) + 1; });
+    const total = semRecords.length;
+    const goodCount = (counts["A+"] || 0) + (counts["A"] || 0);
+    const goodRate = Math.round((goodCount / total) * 100);
+
+    const dist = gradeOrder.filter(g => counts[g]).map(g => `
+      <div class="ss-dist-item">
+        <span class="ss-dist-dot" style="background:${gradeColors[g] || "#94a3b8"}"></span>
+        <span class="ss-dist-text">${g} · ${counts[g]}次</span>
+      </div>
+    `).join("");
+
+    panel.innerHTML = `
+      <div class="ss-grid">
+        <div class="ss-stat">
+          <div class="ss-num">${total}</div>
+          <div class="ss-label">平时成绩</div>
+        </div>
+        <div class="ss-stat">
+          <div class="ss-num">${goodCount}</div>
+          <div class="ss-label">A及以上</div>
+        </div>
+        <div class="ss-stat">
+          <div class="ss-num">${goodRate}%</div>
+          <div class="ss-label">优良率</div>
+        </div>
+      </div>
+      <div class="ss-dist">${dist}</div>`;
   }
 
   // ════════ 8. 期末成绩 ════════
@@ -14311,38 +15317,14 @@ async function renderStudy() {
     const evaluations = study.evaluations || [];
 
     if (examRecords.length === 0) {
-      examPanel.innerHTML = emptyStateHTML("bar-chart-2", "暂无期末成绩数据");
+      const subjContent = document.getElementById("examSubjectContent");
+      if (subjContent) subjContent.innerHTML = emptyStateHTML("bar-chart-2", "暂无期末成绩数据");
+      const semContent = document.getElementById("examSemesterContent");
+      if (semContent) semContent.innerHTML = emptyStateHTML("bar-chart-2", "暂无期末成绩数据");
       if (scoreAnalysisPanel) {
         scoreAnalysisPanel.innerHTML = emptyStateHTML("bar-chart-2", "暂无成绩数据");
       }
     } else {
-      const subjConfig = {
-        "语文": { cls: "cn", order: 1 },
-        "数学": { cls: "math", order: 2 },
-        "英语": { cls: "en", order: 3 },
-        "科学": { cls: "sci", order: 4 },
-        "道法": { cls: "other", order: 5 },
-        "道德与法治": { cls: "other", order: 5 },
-        "音乐": { cls: "other", order: 6 },
-        "体育": { cls: "other", order: 7 },
-        "美术": { cls: "other", order: 8 },
-        "劳动": { cls: "other", order: 9 },
-        "综合实践": { cls: "other", order: 10 },
-        "综合实践活动": { cls: "other", order: 10 },
-        "心理": { cls: "other", order: 11 },
-        "心理健康": { cls: "other", order: 11 },
-        "信息技术": { cls: "other", order: 12 },
-        "信息科技": { cls: "other", order: 12 },
-        "书法": { cls: "other", order: 13 },
-      };
-      function getSubjCfg(name) { return subjConfig[name] || { cls: "other", order: 99 }; }
-      function getGradeCls(g) {
-        if (g === "A+") return "grade-a-plus";
-        if (g === "A") return "grade-a";
-        if (g === "B+") return "grade-b-plus";
-        if (g === "B") return "grade-b";
-        return "grade-a";
-      }
       const semOrder = { "第一学期": 1, "第二学期": 2 };
       const gradeCn = { "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10 };
       function semesterOrder(r) {
@@ -14429,7 +15411,8 @@ async function renderStudy() {
         }
 
         html += `</div>`;
-        examPanel.innerHTML = html;
+        const contentEl = document.getElementById("examSubjectContent");
+        if (contentEl) contentEl.innerHTML = html;
         refreshIcons(0);
       }
 
@@ -14575,34 +15558,37 @@ async function renderStudy() {
           html += `</div>`;
       });
       html += `</div>`;
-      examPanel.innerHTML = html;
+      const contentEl = document.getElementById("examSemesterContent");
+      if (contentEl) contentEl.innerHTML = html;
       refreshIcons(0);
     }
 
       renderSubjectView();
+      renderSemesterView();
       renderScoreAnalysis();
-
-      // 三视图切换：成绩分析 / 按科目 / 按学期
-      function switchExamView(view) {
-        const analysisPanel = document.getElementById("scoreAnalysisPanel");
-        const examP = document.getElementById("examPanel");
-        if (view === "analysis") {
-          if (analysisPanel) analysisPanel.style.display = "block";
-          if (examP) examP.style.display = "none";
-        } else {
-          if (analysisPanel) analysisPanel.style.display = "none";
-          if (examP) examP.style.display = "block";
-          if (view === "subject") renderSubjectView();
-          else renderSemesterView();
-        }
-      }
-
-      initTabGroup("#examViewToggle button", "view", view => {
-        switchExamView(view);
-      }, "analysis");
-      // 初始显示成绩分析视图
-      switchExamView("analysis");
     }
+
+    // 双视图切换：平时成绩 / 学期末汇总（无论是否有数据均可用）
+    function switchExamView(view) {
+      const analysisPanel = document.getElementById("scoreAnalysisPanel");
+      const examP = document.getElementById("examPanel");
+      if (view === "analysis") {
+        if (analysisPanel) analysisPanel.style.display = "block";
+        if (examP) examP.style.display = "none";
+      } else {
+        if (analysisPanel) analysisPanel.style.display = "none";
+        if (examP) examP.style.display = "block";
+        if (typeof renderSubjectView === "function") renderSubjectView();
+        if (typeof renderSemesterView === "function") renderSemesterView();
+      }
+    }
+
+    initTabGroup("#examViewToggle button", "view", view => {
+      switchExamView(view);
+    }, "analysis");
+
+    // 初始显示平时成绩视图
+    switchExamView("analysis");
   }
 }
 
@@ -16524,6 +17510,128 @@ function initScoreEvalModals() {
   if (eSave) eSave.addEventListener("click", submitEvaluation);
   const eSel = document.getElementById("evalSemester");
   if (eSel) populateScoreSemesterOptions(eSel);
+  // 学期末录入弹窗（成绩 + 评价合并）
+  const smModal = document.getElementById("addSemesterModal");
+  if (smModal) smModal.addEventListener("click", function(e) { if (e.target === smModal) closeAddSemesterModal(); });
+  const smSave = document.getElementById("submitSemesterEval");
+  if (smSave) smSave.addEventListener("click", submitSemesterEval);
+  const smSel = document.getElementById("semesterEvalSemester");
+  if (smSel) populateScoreSemesterOptions(smSel);
+}
+
+// ════════ 学期末录入（期末成绩 + 期末评价 合并） ════════
+const SEMESTER_SUBJECTS = ["语文", "数学", "英语", "科学", "道德与法治", "音乐", "体育", "美术", "劳动", "综合实践活动", "信息科技", "书法", "心理健康"];
+const SEMESTER_GRADES = ["A+", "A", "B+", "B", "C+", "C", "D+", "D"];
+
+function semesterSubjectOptions(selected) {
+  return SEMESTER_SUBJECTS.map(s =>
+    `<option value="${s}" ${s === selected ? "selected" : ""}>${s}</option>`
+  ).join("");
+}
+function semesterGradeOptions(selected) {
+  return SEMESTER_GRADES.map(g =>
+    `<option value="${g}" ${g === selected ? "selected" : ""}>${g}</option>`
+  ).join("");
+}
+
+function addSemesterScoreRow(subject, grade) {
+  const box = document.getElementById("semesterScoreRows");
+  if (!box) return;
+  const row = document.createElement("div");
+  row.className = "semester-score-row";
+  row.innerHTML = `
+    <select class="semester-select sem-subject">${semesterSubjectOptions(subject)}</select>
+    <select class="semester-select sem-grade">${semesterGradeOptions(grade)}</select>
+    <input type="number" class="sem-score" placeholder="分数" min="0" max="100" />
+    <button type="button" class="sem-row-del" onclick="this.parentElement.remove()"><i data-lucide="x"></i></button>
+  `;
+  box.appendChild(row);
+  refreshIcons(0);
+}
+
+function openAddSemesterModal() {
+  const modal = document.getElementById("addSemesterModal");
+  if (!modal) return;
+  document.getElementById("semesterTeacherComment").value = "";
+  document.getElementById("semesterParentComment").value = "";
+  document.getElementById("semesterEvalDate").value = getTodayVal();
+  populateScoreSemesterOptions(document.getElementById("semesterEvalSemester"));
+  const box = document.getElementById("semesterScoreRows");
+  if (box) box.innerHTML = "";
+  // 默认预置语数英三行
+  addSemesterScoreRow("语文");
+  addSemesterScoreRow("数学");
+  addSemesterScoreRow("英语");
+  modal.classList.add("active");
+  refreshIcons(0);
+}
+
+function closeAddSemesterModal() {
+  const modal = document.getElementById("addSemesterModal");
+  if (modal) modal.classList.remove("active");
+}
+
+async function submitSemesterEval() {
+  const semester = document.getElementById("semesterEvalSemester") ? document.getElementById("semesterEvalSemester").value : "";
+  const date = document.getElementById("semesterEvalDate").value || getTodayVal();
+  const teacher = document.getElementById("semesterTeacherComment").value.trim();
+  const parent = document.getElementById("semesterParentComment").value.trim();
+  const rows = Array.from(document.querySelectorAll("#semesterScoreRows .semester-score-row"));
+
+  // 收集有效的成绩行（科目 + 等级）
+  const scores = rows.map(row => ({
+    subject: row.querySelector(".sem-subject").value,
+    grade: row.querySelector(".sem-grade").value,
+    score: row.querySelector(".sem-score").value,
+  })).filter(r => r.subject && r.grade);
+
+  if (scores.length === 0 && !teacher && !parent) {
+    showToast("请至少填写一门期末成绩或评语", false);
+    return;
+  }
+
+  const btn = document.getElementById("submitSemesterEval");
+  const original = btn.textContent;
+  btn.textContent = "保存中…"; btn.disabled = true;
+  try {
+    // 1) 逐科写入期末成绩
+    for (const s of scores) {
+      await DataStore.addScoreRecord({
+        subject: s.subject,
+        grade: s.grade,
+        examType: "期末",
+        title: "期末",
+        date,
+        errorModules: [],
+        errorModule: "",
+        score: s.score ? Number(s.score) : null,
+        semesterLabel: semester,
+      });
+    }
+    // 2) 写入期末评价（若有评语）
+    if (teacher || parent) {
+      await DataStore.addEvaluationRecord({
+        semester,
+        teacherComment: teacher,
+        parentComment: parent,
+        date,
+      });
+    }
+    closeAddSemesterModal();
+    await DataStore.refreshData(true);
+    if (typeof renderStudy === "function") await renderStudy();
+    if (typeof renderScoreAnalysis === "function") await renderScoreAnalysis();
+    refreshIcons(50);
+    const n = scores.length;
+    showToast(`✅ 已录入${n ? n + "科期末成绩" : "期末评价"}${teacher || parent ? " + 评语" : ""}`, true);
+  } catch (e) {
+    console.error("学期末录入失败:", e);
+    const errMsg = (e && e.message) || "";
+    if (errMsg.indexOf("Token") >= 0 || errMsg.indexOf("token") >= 0) showTokenRequiredToast();
+    else showToast("✖ 保存失败，请重试", false);
+  } finally {
+    btn.textContent = original; btn.disabled = false;
+  }
 }
 
 async function saveEdit() {
