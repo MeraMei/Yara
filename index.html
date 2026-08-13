@@ -195,7 +195,6 @@ body {
   background-attachment: fixed;
   font-size: 14px;
   line-height: 1.55;
-  padding-bottom: 80px;
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; border: 0; cursor: pointer; }
@@ -11520,6 +11519,9 @@ if (typeof window !== "undefined") {
     function openXpModal() {
       populateXpTaskSelectPage().then(() => {
         document.getElementById("addXpModalPage").classList.add("active");
+        // 恢复按钮状态（防止上次提交成功后未重置导致"提交中..."卡住）
+        const btn = document.querySelector("#addXpModalPage .btn-confirm");
+        if (btn) { btn.textContent = "添加 XP"; btn.disabled = false; }
         refreshIcons(50);
       });
     }
