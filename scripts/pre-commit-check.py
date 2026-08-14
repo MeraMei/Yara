@@ -32,6 +32,8 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX = os.path.join(ROOT, "index.html")
+APP_JS = os.path.join(ROOT, "app.js")
+STYLE_CSS = os.path.join(ROOT, "style.css")
 SETTINGS = os.path.join(ROOT, "system-settings.html")
 DATA_DIR = os.path.join(ROOT, "data")
 
@@ -90,18 +92,27 @@ def main():
     # ─────────────────────────────────────────────
     # B. 交互可用性：所有 onclick 函数都有定义
     # ─────────────────────────────────────────────
-    def check_functions(path, label):
+    def check_functions(path, label, extra_defs_sources=None):
         html = read(path)
         calls = set()
         for m in re.finditer(r'on(?:click|change|input|submit)="\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(', html):
             calls.add(m.group(1))
-        # window.xxx = function / function xxx / const xxx = () => / xxx: function
+        # 从 HTML 中提取函数定义
         defs = set()
         defs |= set(re.findall(r'\bfunction\s+([A-Za-z_]\w*)\s*\(', html))
         defs |= set(re.findall(r'\bwindow\.([A-Za-z_]\w*)\s*=(?:\s*async)?\s*function', html))
         defs |= set(re.findall(r'\b(?:const|let|var)\s+([A-Za-z_]\w*)\s*=\s*(?:async\s*)?function', html))
         defs |= set(re.findall(r'^\s*([A-Za-z_]\w*)\s*:\s*function\b', html, re.M))
         defs |= set(re.findall(r'\b(?:const|let|var)\s+([A-Za-z_]\w*)\s*=\s*(?:async\s*)?\(', html))
+        # 从外部 JS 文件中提取函数定义（外置化后函数定义在 app.js 中）
+        if extra_defs_sources:
+            for src_path in extra_defs_sources:
+                src_content = read(src_path)
+                defs |= set(re.findall(r'\bfunction\s+([A-Za-z_]\w*)\s*\(', src_content))
+                defs |= set(re.findall(r'\bwindow\.([A-Za-z_]\w*)\s*=(?:\s*async)?\s*function', src_content))
+                defs |= set(re.findall(r'\b(?:const|let|var)\s+([A-Za-z_]\w*)\s*=\s*(?:async\s*)?function', src_content))
+                defs |= set(re.findall(r'^\s*([A-Za-z_]\w*)\s*:\s*function\b', src_content, re.M))
+                defs |= set(re.findall(r'\b(?:const|let|var)\s+([A-Za-z_]\w*)\s*=\s*(?:async\s*)?\(', src_content))
         # 过滤 JS 保留字/非函数名（如 onclick="if(...)" 中 if 是关键字）
         reserved = {"if", "void", "return", "for", "while", "switch", "new", "typeof", "delete", "function"}
         undef = sorted(c for c in calls if c not in defs and c not in reserved)
@@ -109,7 +120,7 @@ def main():
                f"未定义: {', '.join(undef)}" if undef else "全部有定义")
 
     if not only_files or "index.html" in only_files:
-        check_functions(INDEX, "index.html")
+        check_functions(INDEX, "index.html", extra_defs_sources=[APP_JS])
     if not only_files or "system-settings.html" in only_files:
         check_functions(SETTINGS, "system-settings.html")
 
@@ -158,7 +169,7 @@ def main():
     # ─────────────────────────────────────────────
     # D. 样式健壮性：CSS 变量无缺失引用
     # ─────────────────────────────────────────────
-    def check_css_vars(path, label):
+    def check_css_vars(path, label, extra_defs_sources=None):
         html = read(path)
         # used/safe 均带 -- 前缀（var(--x)），defined 必须同样带 -- 前缀，三者才能直接取差集
         used = set(re.findall(r'var\((--[a-zA-Z0-9-]+)', html))
@@ -166,6 +177,14 @@ def main():
         block = re.search(r':root\s*\{([^}]*)\}', html)
         if block:
             defined |= set(re.findall(r'(--[a-zA-Z0-9-]+)\s*:', block.group(1)))
+        # 从外部 CSS 文件中提取变量定义（外置化后变量定义在 style.css 中）
+        if extra_defs_sources:
+            for src_path in extra_defs_sources:
+                src_content = read(src_path)
+                defined |= set(re.findall(r'(?:^|\s)(--[a-zA-Z0-9-]+)\s*:', src_content))
+                src_root = re.search(r':root\s*\{([^}]*)\}', src_content)
+                if src_root:
+                    defined |= set(re.findall(r'(--[a-zA-Z0-9-]+)\s*:', src_root.group(1)))
         # 带内置回退值的（var(--x, fallback)）可安全降级
         safe = set(re.findall(r'var\((--[a-zA-Z0-9-]+)\s*,\s*[^)]+\)', html))
         missing = sorted(v for v in used if v not in defined and v not in safe)
@@ -173,7 +192,7 @@ def main():
                f"缺失: {', '.join(missing)}" if missing else "无")
 
     if not only_files or "index.html" in only_files:
-        check_css_vars(INDEX, "index.html")
+        check_css_vars(INDEX, "index.html", extra_defs_sources=[STYLE_CSS])
     if not only_files or "system-settings.html" in only_files:
         check_css_vars(SETTINGS, "system-settings.html")
 
@@ -185,9 +204,11 @@ def main():
         token_key_s = set(re.findall(r'GITHUB_TOKEN_KEY\s*=\s*"([^"]+)"', settings)) or \
                       set(re.findall(r'localStorage\.(?:getItem|setItem|removeItem)\("([^"]+)"', settings))
         index = read(INDEX)
-        token_key_i = set(re.findall(r'localStorage\.(?:getItem|setItem)\("([^"]+)"\s*,\s*github_token|github_token', index))
-        # 主站用 'github_token' 字面量
-        index_uses = "github_token" in index
+        app_js = read(APP_JS)
+        combined = index + app_js
+        token_key_i = set(re.findall(r'localStorage\.(?:getItem|setItem)\("([^"]+)"\s*,\s*github_token|github_token', combined))
+        # 主站用 'github_token' 字面量（可能在 index.html 或 app.js 中）
+        index_uses = "github_token" in index or "github_token" in app_js
         settings_uses = any("github_token" in str(k) for k in token_key_s)
         report("E", "E1 Token key 主站使用 'github_token'", index_uses,
                "主站未引用 github_token" if not index_uses else "OK")
