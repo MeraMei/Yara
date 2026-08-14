@@ -1,1 +1,137 @@
-[]
+[
+  {
+    "id": "wr_mssop8yp",
+    "weekNumber": 33,
+    "year": 2026,
+    "date": "2026-08-14",
+    "generatedAt": "2026-08-14T08:27:37",
+    "summary": "本周总体表现良好，数据完整，继续保持良好习惯。",
+    "stats": {
+      "energy": {
+        "value": 29,
+        "trend": "down",
+        "diff": 20
+      },
+      "study": {
+        "value": 0,
+        "trend": "down",
+        "diff": 80
+      },
+      "finance": {
+        "value": 100,
+        "trend": "up",
+        "diff": 100
+      },
+      "diary": {
+        "value": 1,
+        "trend": "up",
+        "diff": 1
+      }
+    },
+    "academic": {
+      "homework": {
+        "subjects": []
+      },
+      "trends": [
+        {
+          "subject": "语文",
+          "trend": "up",
+          "lastGrade": "A+"
+        },
+        {
+          "subject": "数学",
+          "trend": "stable",
+          "lastGrade": "A+"
+        },
+        {
+          "subject": "英语",
+          "trend": "stable",
+          "lastGrade": "A+"
+        },
+        {
+          "subject": "科学",
+          "trend": "stable",
+          "lastGrade": "A"
+        },
+        {
+          "subject": "道德与法治",
+          "trend": "stable",
+          "lastGrade": "A+"
+        },
+        {
+          "subject": "信息科技",
+          "trend": "up",
+          "lastGrade": "A"
+        },
+        {
+          "subject": "体育",
+          "trend": "up",
+          "lastGrade": "A"
+        },
+        {
+          "subject": "音乐",
+          "trend": "stable",
+          "lastGrade": "A"
+        },
+        {
+          "subject": "美术",
+          "trend": "stable",
+          "lastGrade": "A+"
+        },
+        {
+          "subject": "书法",
+          "trend": "stable",
+          "lastGrade": "A+"
+        },
+        {
+          "subject": "心理健康",
+          "trend": "stable",
+          "lastGrade": "A"
+        },
+        {
+          "subject": "综合实践活动",
+          "trend": "stable",
+          "lastGrade": "A"
+        },
+        {
+          "subject": "劳动",
+          "trend": "stable",
+          "lastGrade": "A"
+        }
+      ],
+      "weakModules": []
+    },
+    "behavior": {
+      "profile": [
+        {
+          "category": "未知",
+          "count": 5,
+          "xp": 29
+        }
+      ],
+      "effortStories": [],
+      "badge": {
+        "earned": false
+      }
+    },
+    "emotion": {
+      "diaryTrend": "low",
+      "diaryCount": 1,
+      "moodDistribution": {
+        "😊": 1
+      },
+      "bestDiary": {
+        "snippet": "我帮助新怡姐姐卖东西了，还跟小伙伴玩了，特别开心，我们在荡秋千那里摆摊，我就帮欣怡姐姐卖东西来了，欣怡姐姐让他看他问了我就告诉他这个的价格，我们配合的很默契，然后又来了很多人，他们都在这里买的东西，然后他们就不想走了，干脆直接在这里这跟我们...",
+        "date": "2026-08-11",
+        "elements": 2
+      },
+      "financeStatus": "good",
+      "financeWorthIt": 100
+    },
+    "suggestions": {
+      "keep": "继续保持规律作息和良好的作业习惯",
+      "improve": "坚持写日记，记录每日感受和成长",
+      "challenge": "周末尝试一项新的兴趣活动，完成可获额外 XP 奖励"
+    }
+  }
+]
