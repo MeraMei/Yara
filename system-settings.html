@@ -963,7 +963,7 @@ body {
     <div class="tabp" data-p="rule">
       <div class="card">
         <div class="card-title">✅ 任务规则 <span style="font-size:12px;color:var(--colourful-neutral-500);font-weight:700">· 手动 18 条 · 默认记录 7 条</span></div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:14px"><button class="btn primary mini">＋ 新增规则</button></div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px"><button class="btn primary mini" onclick="openAddRuleModal()">＋ 新增规则</button></div>
 
         <!-- 默认记录 · 自动发放（单独列出） -->
         <div class="def-card">
@@ -981,54 +981,8 @@ body {
           <div class="def-note">说明：以上为操作时自动发放的默认分值，无需手动勾选。<b>成绩录入 +2，勾选失分模块再 +1</b>；<b>写日记（完整四要素+感受 +10，否则 +6）</b>每天仅加一次；<b>花销复盘每笔 +2，当日累计封顶 +10</b>；<b>财务进账 +2（仅动作记录）</b>。均计入对应板块的能量值，不与其他板块串扰。</div>
         </div>
 
-        <div class="rule-grid">
-          <!-- 学习成长 -->
-          <div class="rule-card">
-            <div class="rule-head"><span class="r-dot" style="background:#82d632"></span><b>学习成长</b><span class="r-n">8 条</span><button class="btn ghost mini rule-edit">编辑</button></div>
-            <div class="rule-list">
-              <div class="rule-item"><span class="ri-ic ic-learn">🏆</span><div class="ri-t"><b>学习进步 · 金牌学生</b><span>期末综合表现荣誉</span></div><span class="ri-xp">+15<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">✅</span><div class="ri-t"><b>60 分钟内完成作业</b><span>高效专注</span></div><span class="ri-xp">+6<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">📖</span><div class="ri-t"><b>每天阅读 30 分钟</b><span>课外阅读习惯</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">✏️</span><div class="ri-t"><b>语数英额外练习</b><span>主动加练</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">🖌️</span><div class="ri-t"><b>练字 20 分钟以上</b><span>书写练习</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">💪</span><div class="ri-t"><b>认真投入 · 遇到难题没放弃</b><span>主动认领 · 家长确认</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">🧩</span><div class="ri-t"><b>认真投入 · 独立完成不会的题</b><span>主动认领 · 家长确认</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-learn">🔁</span><div class="ri-t"><b>认真投入 · 主动复盘错题</b><span>主动认领 · 家长确认</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-            </div>
-          </div>
-
-          <!-- 能力成长 -->
-          <div class="rule-card">
-            <div class="rule-head"><span class="r-dot" style="background:#fdd832"></span><b>能力成长</b><span class="r-n">6 条</span><button class="btn ghost mini rule-edit">编辑</button></div>
-            <div class="rule-list">
-              <div class="rule-item"><span class="ri-ic ic-ability">🧹</span><div class="ri-t"><b>主动做家务</b><span>力所能及分担</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-ability">🛏️</span><div class="ri-t"><b>收拾自己卧室</b><span>床和书桌</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-ability">🧦</span><div class="ri-t"><b>洗小内裤 / 袜子</b><span>自理能力</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-ability">🚿</span><div class="ri-t"><b>独立洗澡吹头发</b><span>生活自理</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-ability">💬</span><div class="ri-t"><b>与父母沟通近期成长</b><span>亲子沟通</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-ability">📊</span><div class="ri-t"><b>财务能力分析</b><span>对账反思</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-            </div>
-          </div>
-
-          <!-- 身体成长 -->
-          <div class="rule-card">
-            <div class="rule-head"><span class="r-dot" style="background:#36b98b"></span><b>身体成长</b><span class="r-n">4 条</span><button class="btn ghost mini rule-edit">编辑</button></div>
-            <div class="rule-list">
-              <div class="rule-item"><span class="ri-ic ic-body">🍎</span><div class="ri-t"><b>照顾好自己</b><span>营养均衡 · 午休</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-body">⏳</span><div class="ri-t"><b>每天跳绳 200 个或 3 分钟</b><span>体能锻炼</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-body">🌙</span><div class="ri-t"><b>10 点前关灯睡觉</b><span>规律作息</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-body">⚽</span><div class="ri-t"><b>锻炼身体 / 户外 30 分钟</b><span>户外活动</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-            </div>
-          </div>
-
-          <!-- 兴趣爱好 -->
-          <div class="rule-card">
-            <div class="rule-head"><span class="r-dot" style="background:#f96024"></span><b>兴趣爱好</b><span class="r-n">2 条</span><button class="btn ghost mini rule-edit">编辑</button></div>
-            <div class="rule-list">
-              <div class="rule-item"><span class="ri-ic ic-hobby">🎨</span><div class="ri-t"><b>精美作品发布至线上</b><span>作品展示</span></div><span class="ri-xp">+10<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-              <div class="rule-item"><span class="ri-ic ic-hobby">✏️</span><div class="ri-t"><b>画画、手工作品</b><span>创意表达</span></div><span class="ri-xp">+5<small>XP</small></span><span class="ri-ops"><button class="btn ghost mini">编辑</button><button class="btn ghost mini">删除</button></span></div>
-            </div>
-          </div>
+        <div class="rule-grid" id="ruleGrid">
+          <div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-neutral-400);font-size:13px">正在加载任务规则…</div>
         </div>
 
         <div style="margin-top:20px;padding-top:16px;border-top:1px dashed var(--neutral-200);display:flex;flex-wrap:wrap;gap:10px;align-items:center">
@@ -1140,6 +1094,85 @@ body {
       </button>
     </div>
     <div id="recalcResult" style="display:none;margin-top:16px;padding:12px;background:var(--colourful-success-50);border-radius:10px;font-size:13px;color:var(--colourful-success-700);line-height:1.6"></div>
+  </div>
+</div>
+
+<!-- 任务规则编辑弹窗 -->
+<div class="modal-overlay" id="ruleModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div class="modal-content" style="background:var(--colourful-surface-50);border-radius:16px;padding:28px 32px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.12);position:relative;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-size:18px;font-weight:700;color:var(--neutral-800)" id="ruleModalTitle">✏️ 编辑任务</div>
+      <button onclick="closeRuleModal()" class="btn ghost mini" style="font-size:18px;width:32px;height:32px;border-radius:50%">✕</button>
+    </div>
+    <div style="display:grid;gap:14px">
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--neutral-600);display:block;margin-bottom:6px">任务名称</label>
+        <input id="ruleName" type="text" placeholder="例如：每天阅读 30 分钟" style="width:100%;padding:10px 12px;border:1px solid var(--neutral-200);border-radius:10px;font-size:14px;outline:none;background:#fff" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--neutral-600);display:block;margin-bottom:6px">所属分类</label>
+          <select id="ruleCategory" style="width:100%;padding:10px 12px;border:1px solid var(--neutral-200);border-radius:10px;font-size:14px;outline:none;background:#fff">
+            <option value="学习成长">学习成长</option>
+            <option value="能力成长">能力成长</option>
+            <option value="身体成长">身体成长</option>
+            <option value="兴趣爱好">兴趣爱好</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--neutral-600);display:block;margin-bottom:6px">分值（XP）</label>
+          <input id="ruleXp" type="number" min="0" max="100" placeholder="5" style="width:100%;padding:10px 12px;border:1px solid var(--neutral-200);border-radius:10px;font-size:14px;outline:none;background:#fff" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--neutral-600);display:block;margin-bottom:6px">发放方式</label>
+          <select id="ruleMethod" style="width:100%;padding:10px 12px;border:1px solid var(--neutral-200);border-radius:10px;font-size:14px;outline:none;background:#fff">
+            <option value="按次">按次</option>
+            <option value="按天">按天</option>
+            <option value="自动发放">自动发放</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--neutral-600);display:block;margin-bottom:6px">图标</label>
+          <select id="ruleIcon" style="width:100%;padding:10px 12px;border:1px solid var(--neutral-200);border-radius:10px;font-size:14px;outline:none;background:#fff">
+            <option value="⭐">⭐ 星星</option>
+            <option value="🏆">🏆 奖杯</option>
+            <option value="✅">✅ 对勾</option>
+            <option value="📖">📖 书本</option>
+            <option value="✏️">✏️ 铅笔</option>
+            <option value="🖌️">🖌️ 画笔</option>
+            <option value="💪">💪 力量</option>
+            <option value="🧩">🧩 拼图</option>
+            <option value="🔁">🔁 循环</option>
+            <option value="🧹">🧹 扫帚</option>
+            <option value="🛏️">🛏️ 床</option>
+            <option value="🧦">🧦 袜子</option>
+            <option value="🚿">🚿 淋浴</option>
+            <option value="💬">💬 对话</option>
+            <option value="📊">📊 图表</option>
+            <option value="🍎">🍎 苹果</option>
+            <option value="⏳">⏳ 沙漏</option>
+            <option value="🌙">🌙 月亮</option>
+            <option value="⚽">⚽ 足球</option>
+            <option value="🎨">🎨 调色板</option>
+            <option value="💰">💰 金钱</option>
+            <option value="📓">📓 日记</option>
+            <option value="🎯">🎯 目标</option>
+            <option value="🔥">🔥 火焰</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--neutral-600);display:block;margin-bottom:6px">说明（可选）</label>
+        <input id="ruleDesc" type="text" placeholder="例如：主动认领，家长确认后发放" style="width:100%;padding:10px 12px;border:1px solid var(--neutral-200);border-radius:10px;font-size:14px;outline:none;background:#fff" />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+      <button class="btn ghost" onclick="closeRuleModal()">取消</button>
+      <button class="btn primary" onclick="saveRule()">保存</button>
+    </div>
+    <div id="ruleResult" style="display:none;margin-top:14px;padding:12px;background:var(--colourful-success-50);border-radius:10px;font-size:13px;color:var(--colourful-success-700);line-height:1.6"></div>
   </div>
 </div>
 
@@ -1481,6 +1514,219 @@ function recalcXp(mode) {
       btns.forEach(function(b) { b.disabled = false; });
     });
 }
+
+/* ════════ 任务规则 · 动态渲染 & 编辑 ════════ */
+var _ruleData = null; // 缓存 config.json 的 xpRules
+
+// 分类 → 颜色/图标映射
+var _ruleMeta = {
+  '学习成长': { dot: '#82d632', ic: 'ic-learn', icon: '📖' },
+  '能力成长': { dot: '#fdd832', ic: 'ic-ability', icon: '🌟' },
+  '身体成长': { dot: '#36b98b', ic: 'ic-body', icon: '💪' },
+  '兴趣爱好': { dot: '#f96024', ic: 'ic-hobby', icon: '🎨' }
+};
+
+// 根据任务名猜图标
+function guessIcon(name) {
+  var map = {
+    '🏆': ['金牌', '进步', '荣誉'],
+    '✅': ['完成作业', '60分钟'],
+    '📖': ['阅读', '读书'],
+    '✏️': ['练习', '额外', '写作', '画画'],
+    '🖌️': ['练字', '书法'],
+    '💪': ['认真投入', '遇到难题', '难题'],
+    '🧩': ['独立', '不会的题'],
+    '🔁': ['复盘', '错题'],
+    '🧹': ['家务'],
+    '🛏️': ['卧室', '收拾'],
+    '🧦': ['袜子', '内裤'],
+    '🚿': ['洗澡', '吹头发'],
+    '💬': ['沟通', '父母'],
+    '📊': ['财务', '分析'],
+    '🍎': ['照顾', '营养'],
+    '⏳': ['跳绳'],
+    '🌙': ['关灯', '睡觉'],
+    '⚽': ['锻炼', '户外'],
+    '🎨': ['作品', '发布'],
+    '💰': ['进账', '财富'],
+    '📓': ['日记'],
+    '🎯': ['成绩'],
+    '🔥': ['坚持']
+  };
+  for (var icon in map) {
+    if (map[icon].some(function(k) { return name.indexOf(k) > -1; })) return icon;
+  }
+  return '⭐';
+}
+
+// 渲染规则网格
+function renderRuleGrid() {
+  var grid = document.getElementById('ruleGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-neutral-400);font-size:13px">正在加载任务规则…</div>';
+
+  fetchRawJSON('config.json').then(function(config) {
+    if (!config || !config.xpRules) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-neutral-500);font-size:13px">暂无任务规则配置</div>';
+      return;
+    }
+    _ruleData = config.xpRules;
+    var cats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
+    var html = '';
+    cats.forEach(function(cat) {
+      var rules = _ruleData[cat] || [];
+      var meta = _ruleMeta[cat] || { dot: '#888', ic: 'ic-learn', icon: '📖' };
+      var dotColor = meta.dot;
+      html += '<div class="rule-card">';
+      html += '<div class="rule-head"><span class="r-dot" style="background:' + dotColor + '"></span><b>' + cat + '</b><span class="r-n">' + rules.length + ' 条</span></div>';
+      html += '<div class="rule-list">';
+      rules.forEach(function(item, idx) {
+        var icon = guessIcon(item.name);
+        var desc = item.description || '';
+        html += '<div class="rule-item" data-cat="' + cat + '" data-idx="' + idx + '">';
+        html += '<span class="ri-ic ' + meta.ic + '">' + icon + '</span>';
+        html += '<div class="ri-t"><b>' + item.name + '</b>' + (desc ? '<span>' + desc + '</span>' : '') + '</div>';
+        html += '<span class="ri-xp">+' + item.xp + '<small>XP</small></span>';
+        html += '<span class="ri-ops"><button class="btn ghost mini" onclick="openEditRuleModal(\'' + cat + '\',' + idx + ')">编辑</button><button class="btn ghost mini" onclick="deleteRule(\'' + cat + '\',' + idx + ')">删除</button></span>';
+        html += '</div>';
+      });
+      html += '</div></div>';
+    });
+    grid.innerHTML = html;
+  }).catch(function() {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-sunny-coral-500);font-size:13px">⚠️ 加载失败，请检查网络</div>';
+  });
+}
+
+// 打开编辑弹窗
+function openEditRuleModal(cat, idx) {
+  var rules = _ruleData[cat] || [];
+  var item = rules[idx];
+  if (!item) return;
+  document.getElementById('ruleModalTitle').textContent = '✏️ 编辑任务';
+  document.getElementById('ruleName').value = item.name || '';
+  document.getElementById('ruleCategory').value = cat;
+  document.getElementById('ruleXp').value = item.xp || 0;
+  document.getElementById('ruleMethod').value = item.method || '按次';
+  document.getElementById('ruleIcon').value = guessIcon(item.name) || '⭐';
+  document.getElementById('ruleDesc').value = item.description || '';
+  document.getElementById('ruleResult').style.display = 'none';
+  document.getElementById('ruleModal').dataset.cat = cat;
+  document.getElementById('ruleModal').dataset.idx = idx;
+  document.getElementById('ruleModal').style.display = 'flex';
+}
+
+// 打开新增弹窗
+function openAddRuleModal() {
+  document.getElementById('ruleModalTitle').textContent = '➕ 新增任务';
+  document.getElementById('ruleName').value = '';
+  document.getElementById('ruleCategory').value = '学习成长';
+  document.getElementById('ruleXp').value = 5;
+  document.getElementById('ruleMethod').value = '按次';
+  document.getElementById('ruleIcon').value = '⭐';
+  document.getElementById('ruleDesc').value = '';
+  document.getElementById('ruleResult').style.display = 'none';
+  delete document.getElementById('ruleModal').dataset.cat;
+  delete document.getElementById('ruleModal').dataset.idx;
+  document.getElementById('ruleModal').style.display = 'flex';
+}
+
+// 关闭弹窗
+function closeRuleModal() {
+  document.getElementById('ruleModal').style.display = 'none';
+}
+
+// 保存规则
+function saveRule() {
+  var modal = document.getElementById('ruleModal');
+  var name = document.getElementById('ruleName').value.trim();
+  var cat = document.getElementById('ruleCategory').value;
+  var xp = parseInt(document.getElementById('ruleXp').value) || 0;
+  var method = document.getElementById('ruleMethod').value;
+  var desc = document.getElementById('ruleDesc').value.trim();
+  var resultEl = document.getElementById('ruleResult');
+
+  if (!name) { showToast('请填写任务名称', false); return; }
+  if (xp <= 0) { showToast('分值必须大于 0', false); return; }
+
+  var isEdit = modal.dataset.cat !== undefined;
+  var oldCat = isEdit ? modal.dataset.cat : null;
+  var idx = isEdit ? parseInt(modal.dataset.idx) : -1;
+
+  resultEl.style.display = 'none';
+
+  // 先加载完整 config 再修改
+  fetchRawJSON('config.json').then(function(config) {
+    if (!config) { showToast('无法加载配置', false); return; }
+    if (!config.xpRules) config.xpRules = {};
+    if (!config.xpRules[cat]) config.xpRules[cat] = [];
+
+    if (isEdit) {
+      // 如果改了分类，需要从旧分类移除
+      if (oldCat !== cat) {
+        if (config.xpRules[oldCat]) {
+          var removed = config.xpRules[oldCat].splice(idx, 1);
+          config.xpRules[cat].push({ name: name, category: cat, xp: xp, method: method, description: desc });
+        }
+      } else {
+        config.xpRules[cat][idx] = { name: name, category: cat, xp: xp, method: method, description: desc };
+      }
+    } else {
+      config.xpRules[cat].push({ name: name, category: cat, xp: xp, method: method, description: desc });
+    }
+
+    // 同步 xpRuleList
+    config.xpRuleList = [];
+    var cats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
+    cats.forEach(function(c) {
+      (config.xpRules[c] || []).forEach(function(item) {
+        config.xpRuleList.push(item);
+      });
+    });
+
+    return writeGithubFile('config.json', config, isEdit ? '编辑任务: ' + name : '新增任务: ' + name);
+  }).then(function() {
+    showToast(isEdit ? '✅ 任务已更新' : '✅ 任务已添加');
+    closeRuleModal();
+    // 重新渲染
+    setTimeout(renderRuleGrid, 500);
+  }).catch(function(err) {
+    resultEl.style.display = '';
+    resultEl.innerHTML = '❌ 保存失败: ' + (err.message || '未知错误');
+    resultEl.style.background = 'var(--colourful-warning-50)';
+    resultEl.style.color = 'var(--colourful-sunny-coral-600)';
+  });
+}
+
+// 删除规则
+function deleteRule(cat, idx) {
+  if (!confirm('确定要删除此任务规则吗？')) return;
+  fetchRawJSON('config.json').then(function(config) {
+    if (!config || !config.xpRules || !config.xpRules[cat]) { showToast('数据异常', false); return; }
+    var name = config.xpRules[cat][idx] && config.xpRules[cat][idx].name;
+    config.xpRules[cat].splice(idx, 1);
+    // 同步猫会清理空分类
+    if (config.xpRules[cat].length === 0) delete config.xpRules[cat];
+    // 重新生成 xpRuleList
+    config.xpRuleList = [];
+    ['学习成长', '能力成长', '身体成长', '兴趣爱好'].forEach(function(c) {
+      (config.xpRules[c] || []).forEach(function(item) {
+        config.xpRuleList.push(item);
+      });
+    });
+    return writeGithubFile('config.json', config, '删除任务: ' + (name || ''));
+  }).then(function() {
+    showToast('✅ 已删除');
+    setTimeout(renderRuleGrid, 500);
+  }).catch(function(err) {
+    showToast('删除失败: ' + (err.message || '未知错误'), false);
+  });
+}
+
+// 页面加载时渲染规则
+document.addEventListener('DOMContentLoaded', function() {
+  renderRuleGrid();
+});
 </script>
 <div class="toast" id="settingsToast"></div>
 </body>
