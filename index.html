@@ -459,7 +459,7 @@
             </div>
           </div>
           <div class="planet-actions">
-            <button class="planet-btn mn" onclick="openReconcileModal()"><i data-lucide="refresh-cw"></i>花销复盘</button>
+            <button class="planet-btn mn" onclick="openReconcileModal()"><i data-lucide="refresh-cw"></i>财务分析</button>
             <button class="planet-btn mn" onclick="openFinanceEntryModal()"><i data-lucide="coins"></i>财务进账</button>
           </div>
         </div>
@@ -894,7 +894,7 @@
   <div class="modal-overlay" id="reconcileModal" onclick="if(event.target===this)closeReconcileModal()">
     <div class="modal-card">
       <div class="modal-head">
-        <div class="modal-title" id="reconcileModalTitle">自由基金对账</div>
+        <div class="modal-title" id="reconcileModalTitle">财务分析</div>
         <button class="modal-close" onclick="closeReconcileModal()">
           <i data-lucide="x" style="width:16px;height:16px"></i>
         </button>
@@ -953,7 +953,7 @@
     </div>
   </div>
 
-  <!-- ════════ 财务进账弹窗（财富星球 · 关联 XP） ════════ -->
+  <!-- ════════ 财务进账弹窗（仅记录动作，不关联 XP） ════════ -->
   <div class="modal-overlay" id="financeEntryModal" onclick="if(event.target===this)closeFinanceEntryModal()">
     <div class="modal-card">
       <div class="modal-head">

@@ -1753,7 +1753,7 @@ if (typeof window !== "undefined") {
       categories.forEach(cat => {
         const groupEl = document.getElementById("xpGroupPage-" + cat);
         if (!groupEl) return;
-        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·"));
+        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·") && t.method !== "自动发放");
         groupEl.innerHTML = tasks.map(t =>
           `<option value="${t.name}" data-xp="${t.xp}" data-category="${cat}">${t.name} (+${t.xp}XP)</option>`
         ).join("");
@@ -1898,7 +1898,7 @@ if (typeof window !== "undefined") {
 /* ===== Script block 6 (original lines 3298-3780) ===== */
 
 
-  // ════════ 自由基金对账功能（财务复盘：多笔拆分 + 自动算差额 + 每次 +10 XP） ════════
+  // ════════ 财务分析（复盘即财务分析：多笔拆分 + 自动算差额 + 每笔 +2 XP，当日封顶 10 XP） ════════
 
   // 全局变量：当前自由基金余额
   let currentFreeBalance = 0;
@@ -1919,7 +1919,7 @@ if (typeof window !== "undefined") {
 
   // 打开新增弹窗
   function openReconcileModal() {
-    document.getElementById("reconcileModalTitle").textContent = "自由基金对账 · 复盘";
+    document.getElementById("reconcileModalTitle").textContent = "财务分析";
     document.getElementById("submitBtn").textContent = "确认记录";
     document.getElementById("reconcileForm").reset();
     setRecMode('balance');
@@ -1961,7 +1961,7 @@ if (typeof window !== "undefined") {
     document.getElementById("reconcileModal").classList.remove("active");
   }
 
-  // ════════ 财务进账（财富星球：仅收入 + 存入账户 + 关联 XP） ════════
+  // ════════ 财务进账（仅记录动作，不关联 XP） ════════
   let _finAccount = "wealth";
   function openFinanceEntryModal() {
     _finAccount = "wealth";
@@ -1997,24 +1997,13 @@ if (typeof window !== "undefined") {
         description: source,
         date,
       });
-      // 财务进账（财务进账只是动作记录，分值低：2 XP）
-      // ⚠️ XP 记录的日期 = 录入时间（今天），不是交易日期
-      const _entryRule = (cachedData?.config?.xpRuleList || []).find(r => r.name === "财务进账");
-      const _entryXp = (_entryRule && Number(_entryRule.xp)) ? Number(_entryRule.xp) : 2;
-      await window.DataStore.addXpRecord({
-        taskName: "财务进账",
-        description: `记录收入：${source}（${_finAccount === "free" ? "自由基金" : "财富基金"}）¥${amount}`,
-        date: new Date().toISOString().slice(0, 10),
-        status: "verified",
-        xp: _entryXp,
-        xpCategory: "能力成长",
-      });
+      // 财务进账（仅记录动作，不关联 XP）
       closeFinanceEntryModal();
-      // 不调用 refreshData()：DataStore.addFinanceRecord 和 addXpRecord 已更新 cachedData，
+      // 不调用 refreshData()：DataStore.addFinanceRecord 已更新 cachedData，
       // 直接重渲染即可，避免重新加载 CDN 数据导致缓存覆盖
       await renderMoney();
       if (window.lucide) refreshIcons(50);
-      alert(`✅ 已记录进账 ¥${amount} 到${_finAccount === "free" ? "自由基金" : "财富基金"}，获得 +${_entryXp} XP 🎉`);
+      alert(`✅ 已记录进账 ¥${amount} 到${_finAccount === "free" ? "自由基金" : "财富基金"}`);
     } catch (err) {
       console.error("财务进账失败:", err);
       handleWriteError(err, "提交失败，请稍后重试");
@@ -2264,22 +2253,22 @@ if (typeof window !== "undefined") {
         });
       }
 
-      // 本次花销复盘：每笔复盘记录 +2 XP，当日累计封顶 10 XP（两种模式均可多次叠加）
+      // 本次财务分析（复盘即财务分析）：每笔复盘记录 +2 XP，当日累计封顶 10 XP（两种模式均可多次叠加）
       // ⚠️ XP 记录的日期 = 录入时间（今天），不是交易日期
       const _todayStr = new Date().toISOString().slice(0, 10);
-      const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="花销复盘"});
+      const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
       const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 2;
       const _capXp = 10;
       // 只统计已通过的复盘记录，按录入时间（todayStr）封顶
       const _todayReviewed = (cachedData?.xpRecords || []).filter(function(r){
-        return r.taskName === "花销复盘" && getDateStr(r) === _todayStr && r.reviewStatus === "已通过";
+        return r.taskName === "财务能力分析" && getDateStr(r) === _todayStr && r.reviewStatus === "已通过";
       }).reduce(function(s,r){ return s + (Number(r.xp)||0); }, 0);
       const _rawXp = entries.length * _perRecXp;
       const _financeXp = Math.max(0, Math.min(_rawXp, _capXp - _todayReviewed));
       if (_financeXp > 0) {
         await window.DataStore.addXpRecord({
-          taskName: "花销复盘",
-          description: `完成一次花销复盘（${recMode === "item" ? "逐笔" : "余额"} · ${entries.length} 笔明细）`,
+          taskName: "财务能力分析",
+          description: `完成一次财务分析（${recMode === "item" ? "逐笔" : "余额"} · ${entries.length} 笔明细）`,
           date: _todayStr,
           status: "verified",
           xp: _financeXp,
@@ -2292,7 +2281,7 @@ if (typeof window !== "undefined") {
       // 直接重渲染即可，避免重新加载 CDN 数据导致缓存覆盖
       await renderMoney();
       if (window.lucide) refreshIcons(50);
-      alert(`已记录 ${entries.length} 笔财务流水，完成一次花销复盘，+${_financeXp} XP（当日复盘累计封顶 ${_capXp} XP）🎉`);
+      alert(`已记录 ${entries.length} 笔财务流水，完成一次财务分析，+${_financeXp} XP（当日复盘累计封顶 ${_capXp} XP）🎉`);
     } catch (e) {
       console.error("提交失败:", e);
       handleWriteError(e, "提交失败，请稍后重试");
@@ -8479,15 +8468,7 @@ async function checkAndAddWeeklyAllowance() {
       category: "零花钱", description: "每周零花钱", worthIt: "值得",
       reason: "系统每周五自动发放零花钱",
     });
-    // 关联 XP（财务进账动作记录低分值）
-    const _cfg2 = window.__lastData || (cachedData || await loadAppData());
-    const _entryRule = (_cfg2?.config?.xpRuleList || []).find(r => r.name === "财务进账");
-    const _entryXp = (_entryRule && Number(_entryRule.xp)) ? Number(_entryRule.xp) : 2;
-    await window.DataStore.addXpRecord({
-      taskName: "财务进账",
-      description: "系统每周五自动发放零花钱：¥18",
-      date: dateStr, status: "verified", xp: _entryXp, xpCategory: "能力成长",
-    });
+    // 财务进账（仅记录动作，不关联 XP）
   } catch (e) {
     console.warn("零花钱自动发放失败:", e);
   }
