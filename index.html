@@ -8326,114 +8326,108 @@ input[type="date"]:focus::-webkit-datetime-edit {
 .view{display:block; opacity:0; visibility:hidden; position:absolute; top:0; left:0; right:0; transition:opacity .35s ease, visibility .35s ease; pointer-events:none}
 .view.active{opacity:1; visibility:visible; position:relative; pointer-events:auto}
 
-    /* ════════ AI 成长周报（报告式 UI：白毛玻璃主卡 + 顶部彩条 + 数据可视化，无深色色块） ════════ */
+    /* ════════ AI 成长周报（彩色浅色毛玻璃风格） ════════ */
     .weekly-report-section { margin-top: 18px; }
-    /* 主卡 - 白毛玻璃 */
-    .wr-main { background: rgba(255,255,255,.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.7); border-radius: 22px; padding: 24px 26px; box-shadow: 0 1px 3px rgba(30,28,26,.04), 0 6px 16px -8px rgba(30,28,26,.1); }
-    /* 报头（masthead） */
-    .wr-header { padding-bottom: 16px; border-bottom: 1px dashed rgba(30,28,26,.08); margin-bottom: 16px; }
+    .wr-main { background: rgba(255,255,255,.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.8); border-radius: 24px; padding: 22px 24px; box-shadow: 0 2px 12px rgba(172,135,255,.08), 0 8px 24px -12px rgba(30,28,26,.12); }
+    .wr-header { padding-bottom: 14px; border-bottom: 1px solid rgba(172,135,255,.10); margin-bottom: 14px; }
     .wr-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .wr-title { font: 800 19px var(--font-display); color: var(--neutral-900); display: flex; align-items: center; gap: 10px; letter-spacing: -.01em; }
-    .wr-date-range { font-size: 12px; font-weight: 600; color: var(--neutral-400); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
-    .wr-week-select { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--neutral-100); background: var(--neutral-50); color: var(--neutral-600); cursor: pointer; }
-    /* AI 徽章 - 浅底深字 */
-    .ai-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; color: var(--lav-600, #7a3fd6); background: rgba(172,135,255,.12); letter-spacing: 0.02em; }
-    /* 历史周报 - 横向胶囊选择器（融入主卡内） */
-    .wr-history { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 12px 0 2px; margin-bottom: 2px; scrollbar-width: none; }
+    .wr-title { font: 600 18px var(--font-display); color: var(--neutral-700); display: flex; align-items: center; gap: 8px; letter-spacing: -.01em; }
+    .wr-date-range { font-size: 12px; font-weight: 500; color: var(--colourful-lavender-400); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+    .wr-date-range::before { content: "📅"; }
+    .wr-week-select { font-size: 11px; font-weight: 500; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(172,135,255,.15); background: rgba(255,255,255,.7); color: var(--colourful-lavender-500); cursor: pointer; backdrop-filter: blur(8px); }
+    .ai-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: #b88af5; background: rgba(184,138,245,.15); border: 1px solid rgba(184,138,245,.2); letter-spacing: 0.02em; }
+    .wr-history { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 10px 0 2px; margin-bottom: 2px; scrollbar-width: none; }
     .wr-history::-webkit-scrollbar { display: none; }
-    .wr-history-item { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: var(--neutral-50); border: 1px solid var(--neutral-100); font-size: 11px; font-weight: 700; color: var(--neutral-500); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; }
-    .wr-history-item:hover { background: var(--neutral-100); color: var(--neutral-700); }
-    .wr-history-item.active { color: var(--lav-600, #7a3fd6); background: rgba(172,135,255,.12); border-color: rgba(172,135,255,.3); }
-    .wr-history-item .wr-h-date { font-size: 10px; color: var(--neutral-400); }
-    /* 本周概览 - 执行摘要（报告式高亮块） */
-    .wr-summary { margin-top: 14px; background: linear-gradient(135deg, rgba(172,135,255,.10), rgba(253,216,50,.10)); border: 1px solid rgba(172,135,255,.16); border-radius: 14px; padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--neutral-700); }
-    .wr-summary::before { content: "📌 本周概览"; display: block; font-weight: 800; font-size: 11px; letter-spacing: .06em; color: var(--lav-600, #7a3fd6); margin-bottom: 6px; }
-    /* KPI 统计卡片 - 白毛玻璃 + 顶部彩条 + 趋势胶囊 */
-    .wr-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin: 18px 0; }
-    .wr-stat { position: relative; border-radius: 16px; padding: 16px 14px 14px; text-align: left; border: 1px solid rgba(255,255,255,.7); overflow: hidden; }
-    .wr-stat::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
-    .wr-stat-energy { background: radial-gradient(120% 110% at 0% 0%, rgba(253,216,50,.30) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.16) 0%, transparent 55%), linear-gradient(165deg, rgba(255,254,240,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .wr-stat-study { background: radial-gradient(120% 110% at 0% 0%, rgba(106,181,255,.28) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.20) 0%, transparent 55%), linear-gradient(165deg, rgba(245,250,255,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .wr-stat-finance { background: radial-gradient(120% 110% at 0% 0%, rgba(248,131,121,.24) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(253,216,50,.26) 0%, transparent 55%), linear-gradient(165deg, rgba(255,247,244,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .wr-stat-diary { background: radial-gradient(120% 110% at 0% 0%, rgba(241,120,163,.22) 0%, transparent 60%), radial-gradient(110% 110% at 100% 100%, rgba(172,135,255,.18) 0%, transparent 55%), linear-gradient(165deg, rgba(255,245,250,.85) 0%, rgba(255,255,255,.62) 100%); }
-    .wr-stat-energy::before { background: linear-gradient(90deg,#fdd832,#ffe760); }
-    .wr-stat-study::before { background: linear-gradient(90deg,#3e94f5,#6ab5ff); }
-    .wr-stat-finance::before { background: linear-gradient(90deg,#f96024,#ffab81); }
-    .wr-stat-diary::before { background: linear-gradient(90deg,#ea4d85,#f7a7c3); }
-    .wr-stat-top { display: flex; align-items: center; justify-content: space-between; }
+    .wr-history-item { flex: 0 0 auto; display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.6); border: 1px solid rgba(184,138,245,.12); font-size: 10px; font-weight: 500; color: var(--neutral-500); cursor: pointer; white-space: nowrap; transition: background .15s, color .15s; backdrop-filter: blur(6px); }
+    .wr-history-item:hover { background: rgba(184,138,245,.08); color: var(--colourful-lavender-500); }
+    .wr-history-item.active { color: var(--colourful-lavender-500); background: rgba(184,138,245,.12); border-color: rgba(184,138,245,.2); }
+    .wr-history-item .wr-h-date { font-size: 9px; color: var(--neutral-400); }
+    /* 本周概览 - 浅色毛玻璃 */
+    .wr-summary { margin-top: 12px; background: rgba(255,255,255,.5); backdrop-filter: blur(12px); border: 1px solid rgba(184,138,245,.12); border-radius: 16px; padding: 14px 16px; font-size: 14px; line-height: 1.7; font-weight: 500; color: var(--neutral-600); }
+    .wr-summary::before { content: "🌟 本周小结"; display: block; font-weight: 600; font-size: 10px; letter-spacing: .04em; color: var(--colourful-lavender-400); margin-bottom: 6px; }
+    /* KPI 统计卡片 - 浅色毛玻璃 + 柔和彩色 */
+    .wr-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin: 16px 0; }
+    .wr-stat { position: relative; border-radius: 18px; padding: 14px 14px 12px; text-align: left; border: 1px solid rgba(255,255,255,.8); overflow: hidden; backdrop-filter: blur(8px); }
+    .wr-stat::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 18px 18px 0 0; }
+    .wr-stat-energy { background: rgba(255,254,240,.5); }
+    .wr-stat-study { background: rgba(245,250,255,.5); }
+    .wr-stat-finance { background: rgba(255,247,244,.5); }
+    .wr-stat-diary { background: rgba(255,245,250,.5); }
+    .wr-stat-energy::before { background: linear-gradient(90deg,#fdd832cc,#ffe76088); }
+    .wr-stat-study::before { background: linear-gradient(90deg,#7bb8f7cc,#a8d4ff88); }
+    .wr-stat-finance::before { background: linear-gradient(90deg,#fba07acc,#ffc8b088); }
+    .wr-stat-diary::before { background: linear-gradient(90deg,#f28dafcc,#f7bdd088); }
+    .wr-stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
     .wr-stat-icon { font-size: 18px; line-height: 1; }
-    .wr-stat-trend { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.75); }
-    .wr-stat-val { font-size: 28px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin-top: 8px; }
-    .wr-stat-energy .wr-stat-val { color: #b8860b; }
-    .wr-stat-study .wr-stat-val { color: #3b8fe0; }
-    .wr-stat-finance .wr-stat-val { color: #e04a7e; }
-    .wr-stat-diary .wr-stat-val { color: #d63068; }
-    .wr-stat-label { font-size: 11px; font-weight: 700; color: var(--neutral-500); margin-top: 2px; }
-    /* 章节卡片 - 白毛玻璃 + 标题下细分隔线 */
-    .wr-chapter { margin-bottom: 14px; border-radius: 18px; background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.7); overflow: hidden; }
-    .wr-chapter-head { padding: 14px 18px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 800; color: var(--neutral-900); user-select: none; border-bottom: 1px solid rgba(30,28,26,.04); }
-    .wr-chapter-head:hover { background: rgba(30,28,26,.02); }
-    .wr-chapter-head .ch-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; display: inline-block; flex-shrink: 0; box-shadow: 0 0 0 4px rgba(30,28,26,.03); }
-    .wr-chapter-head .ch-arrow { font-size: 11px; color: var(--neutral-400); transition: transform .2s var(--easing-default); }
+    .wr-stat-trend { font-size: 9px; font-weight: 500; padding: 2px 7px; border-radius: 999px; background: rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+    .wr-stat-val { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+    .wr-stat-energy .wr-stat-val { color: #d4a843; }
+    .wr-stat-study .wr-stat-val { color: #7bb8f7; }
+    .wr-stat-finance .wr-stat-val { color: #f28daf; }
+    .wr-stat-diary .wr-stat-val { color: #f28daf; }
+    .wr-stat-label { font-size: 11px; font-weight: 500; color: var(--neutral-400); margin-top: 2px; }
+    /* 章节卡片 - 浅色毛玻璃 */
+    .wr-chapter { margin-bottom: 12px; border-radius: 18px; background: rgba(255,255,255,.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.7); overflow: hidden; }
+    .wr-chapter-head { padding: 12px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--neutral-700); user-select: none; border-bottom: 1px solid rgba(184,138,245,.08); }
+    .wr-chapter-head:hover { background: rgba(184,138,245,.04); }
+    .wr-chapter-head .ch-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; display: inline-block; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(184,138,245,.08); }
+    .wr-chapter-head .ch-arrow { font-size: 10px; color: var(--neutral-300); transition: transform .2s var(--easing-default); }
     .wr-chapter-head.collapsed .ch-arrow { transform: rotate(-90deg); }
-    .wr-chapter-body { padding: 16px 18px 18px; font-size: 13px; color: #3d3936; line-height: 1.65; }
+    .wr-chapter-body { padding: 14px 16px 16px; font-size: 13px; color: var(--neutral-600); line-height: 1.7; }
     .wr-chapter-body.collapsed { display: none; }
-    /* 子区块标题 - 彩色圆点 + 细分隔线 */
-    .wr-sub { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--neutral-600); letter-spacing: .02em; margin: 16px 0 10px; }
+    /* 子区块标题 */
+    .wr-sub { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--neutral-500); letter-spacing: .02em; margin: 14px 0 8px; }
     .wr-sub:first-child { margin-top: 0; }
-    .wr-sub::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(30,28,26,.08), transparent); }
-    .wr-sub .wr-sub-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .wr-sub::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(184,138,245,.12), transparent); }
+    .wr-sub .wr-sub-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     /* 作业完成率 - 进度条 */
-    .wr-progress-row { margin-bottom: 12px; }
-    .wr-progress-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 5px; }
-    .wr-progress-head .wr-p-name { font-weight: 700; color: var(--neutral-700); }
-    .wr-progress-head .wr-p-val { font-weight: 800; font-size: 12px; }
-    .wr-progress-track { height: 8px; border-radius: 999px; background: rgba(30,28,26,.06); overflow: hidden; }
+    .wr-progress-row { margin-bottom: 10px; }
+    .wr-progress-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; }
+    .wr-progress-head .wr-p-name { font-weight: 600; color: var(--neutral-600); }
+    .wr-progress-head .wr-p-val { font-weight: 600; font-size: 12px; }
+    .wr-progress-track { height: 8px; border-radius: 999px; background: rgba(184,138,245,.08); overflow: hidden; }
     .wr-progress-fill { height: 100%; border-radius: 999px; transition: width .6s var(--easing-default); }
-    /* 成绩趋势 - 胶囊 */
-    .wr-trends { display: flex; flex-wrap: wrap; gap: 8px; }
-    .wr-trend-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.8); border: 1px solid rgba(30,28,26,.06); font-size: 12px; font-weight: 700; }
-    .wr-trend-chip .wr-t-arrow { font-weight: 800; }
-    /* 需要关注 - 警示胶囊 */
-    .wr-alert-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 10px; background: var(--colourful-sunny-coral-50); border: 1px solid rgba(249,96,36,.18); font-size: 12px; font-weight: 600; color: var(--colourful-sunny-coral-600); }
-    /* 行为画像 - 横向条形 */
-    .wr-beh-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .wr-beh-name { width: 76px; font-size: 12px; font-weight: 700; color: var(--neutral-600); flex-shrink: 0; }
-    .wr-beh-track { flex: 1; height: 8px; border-radius: 999px; background: rgba(30,28,26,.06); overflow: hidden; }
-    .wr-beh-fill { height: 100%; border-radius: 999px; }
-    .wr-beh-meta { width: 96px; text-align: right; font-size: 11px; font-weight: 700; color: var(--neutral-500); flex-shrink: 0; }
-    /* 故事卡片 - 浅底左彩条 */
-    .wr-story { background: var(--colourful-lavender-50); border-left: 3px solid var(--colourful-lavender-500); padding: 12px 14px; margin: 10px 0; border-radius: 0 12px 12px 0; font-size: 13px; }
-    .wr-story .wr-story-head { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 12px; color: var(--colourful-lavender-600); margin-bottom: 4px; }
-    .wr-story .parent-msg { color: var(--colourful-lavender-600); font-weight: 600; margin-top: 6px; font-size: 12px; background: rgba(255,255,255,.6); padding: 6px 10px; border-radius: 8px; }
-    /* 徽章 - 浅底深字 */
-    .wr-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: var(--colourful-butter-yellow-100); color: var(--colourful-butter-yellow-700); border: 1px solid rgba(224,188,24,.2); }
-    /* 心情晴雨表 - 胶囊 */
-    .wr-moods { display: flex; flex-wrap: wrap; gap: 8px; }
-    .wr-mood-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.8); border: 1px solid rgba(30,28,26,.06); font-size: 12px; font-weight: 700; }
+    /* 成绩趋势 - 彩色胶囊 */
+    .wr-trends { display: flex; flex-wrap: wrap; gap: 6px; }
+    .wr-trend-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.5); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.7); font-size: 11px; font-weight: 600; }
+    .wr-trend-chip .wr-t-arrow { font-weight: 700; }
+    .wr-alert-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 10px; background: rgba(249,96,36,.06); backdrop-filter: blur(6px); border: 1px solid rgba(249,96,36,.12); font-size: 11px; font-weight: 500; color: var(--colourful-sunny-coral-500); }
+    /* 行为画像 - 彩色能量条 + 浅色毛玻璃效果 */
+    .wr-beh-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .wr-beh-name { width: 86px; font-size: 13px; font-weight: 600; color: var(--neutral-600); flex-shrink: 0; }
+    .wr-beh-track { flex: 1; height: 14px; border-radius: 999px; background: rgba(184,138,245,.08); overflow: hidden; position: relative; }
+    .wr-beh-fill { display: block; height: 100%; border-radius: 999px; min-width: 10px; transition: width .6s var(--easing-default); position: relative; }
+    .wr-beh-fill::after { content: ""; position: absolute; top: 2px; left: 5px; right: 50%; height: 4px; border-radius: 999px; background: rgba(255,255,255,.3); }
+    .wr-beh-meta { width: 60px; text-align: right; font-size: 12px; font-weight: 600; color: var(--neutral-400); flex-shrink: 0; }
+    /* 故事卡片 - 浅色毛玻璃 */
+    .wr-story { background: rgba(184,138,245,.06); backdrop-filter: blur(6px); border-left: 2px solid rgba(184,138,245,.25); padding: 10px 12px; margin: 8px 0; border-radius: 0 12px 12px 0; font-size: 12px; color: var(--neutral-600); }
+    .wr-story .wr-story-head { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 11px; color: var(--colourful-lavender-400); margin-bottom: 3px; }
+    /* 徽章 */
+    .wr-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 999px; background: rgba(253,216,50,.15); color: #c4a030; border: 1px solid rgba(253,216,50,.2); backdrop-filter: blur(6px); }
+    /* 心情晴雨表 */
+    .wr-moods { display: flex; flex-wrap: wrap; gap: 6px; }
+    .wr-mood-chip { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 12px; background: rgba(255,255,255,.5); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,.7); font-size: 12px; font-weight: 600; }
     .wr-mood-chip .wr-m-emoji { font-size: 16px; }
-    .wr-mood-chip .wr-m-count { color: var(--neutral-400); font-weight: 600; }
+    .wr-mood-chip .wr-m-count { color: var(--neutral-400); font-weight: 500; }
     /* 最佳日记 - 引言卡 */
-    .wr-quote { background: linear-gradient(135deg, rgba(241,120,163,.08), rgba(172,135,255,.08)); border: 1px solid rgba(241,120,163,.16); border-radius: 14px; padding: 14px 16px; font-size: 13px; font-style: italic; color: var(--neutral-700); }
-    .wr-quote .wr-quote-meta { font-style: normal; font-size: 11px; color: var(--neutral-400); margin-top: 8px; font-weight: 600; }
-    /* 财商 / 活跃 - 状态胶囊 */
-    .wr-fin-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 12px; background: var(--colourful-mint-green-50); border: 1px solid rgba(54,185,139,.18); font-size: 12px; font-weight: 700; color: var(--colourful-mint-green-600); }
-    /* 建议卡片 - 图标 + 标题 + 正文 */
-    .wr-suggestion { display: flex; gap: 10px; padding: 12px 14px; margin: 8px 0; border-radius: 12px; font-size: 13px; line-height: 1.6; }
-    .wr-suggestion .wr-s-ico { font-size: 16px; flex-shrink: 0; }
-    .wr-suggestion .wr-s-title { font-weight: 800; font-size: 12px; margin-bottom: 2px; }
-    .wr-suggestion.is-keep { background: var(--colourful-mint-green-50); border: 1px solid rgba(54,185,139,.16); }
-    .wr-suggestion.is-keep .wr-s-title { color: var(--colourful-mint-green-600); }
-    .wr-suggestion.is-improve { background: var(--colourful-butter-yellow-50); border: 1px solid rgba(224,188,24,.18); }
-    .wr-suggestion.is-improve .wr-s-title { color: var(--colourful-butter-yellow-600); }
-    .wr-suggestion.is-challenge { background: var(--colourful-lavender-50); border: 1px solid rgba(146,85,245,.16); }
-    .wr-suggestion.is-challenge .wr-s-title { color: var(--colourful-lavender-600); }
-    .wr-suggestion.is-commitment { background: var(--colourful-success-50); border: 1px solid rgba(34,197,94,.16); }
-    .wr-suggestion.is-commitment .wr-s-title { color: var(--colourful-success-600); }
-    .wr-section-divider { height: 1px; background: var(--neutral-200); margin: 14px 0; }
-    .wr-footer { margin-top: 18px; text-align: center; }
-    .wr-empty { padding: 40px; text-align: center; color: var(--neutral-400); }
-    @media (max-width: 640px) { .wr-stats { grid-template-columns: repeat(2,1fr); } .wr-main { padding: 16px; } .wr-beh-name { width: 64px; } .wr-beh-meta { width: 84px; } }
+    .wr-quote { background: rgba(255,255,255,.4); backdrop-filter: blur(8px); border: 1px solid rgba(242,141,175,.12); border-radius: 14px; padding: 12px 14px; font-size: 13px; font-style: italic; color: var(--neutral-600); }
+    .wr-quote .wr-quote-meta { font-style: normal; font-size: 10px; color: var(--neutral-400); margin-top: 6px; font-weight: 500; }
+    /* 财商状态 */
+    .wr-fin-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 12px; background: rgba(54,185,139,.08); backdrop-filter: blur(6px); border: 1px solid rgba(54,185,139,.12); font-size: 12px; font-weight: 600; color: var(--colourful-mint-green-500); }
+    /* 建议卡片 - 浅色毛玻璃风格 */
+    .wr-suggestion { display: flex; gap: 8px; padding: 12px 14px; margin: 6px 0; border-radius: 14px; font-size: 13px; line-height: 1.6; }
+    .wr-suggestion .wr-s-ico { font-size: 18px; flex-shrink: 0; }
+    .wr-suggestion .wr-s-title { font-weight: 600; font-size: 12px; margin-bottom: 2px; }
+    .wr-suggestion.is-keep { background: rgba(54,185,139,.06); backdrop-filter: blur(6px); border: 1px solid rgba(54,185,139,.12); }
+    .wr-suggestion.is-keep .wr-s-title { color: var(--colourful-mint-green-500); }
+    .wr-suggestion.is-improve { background: rgba(253,216,50,.06); backdrop-filter: blur(6px); border: 1px solid rgba(253,216,50,.12); }
+    .wr-suggestion.is-improve .wr-s-title { color: #c4a030; }
+    .wr-suggestion.is-challenge { background: rgba(184,138,245,.06); backdrop-filter: blur(6px); border: 1px solid rgba(184,138,245,.12); }
+    .wr-suggestion.is-challenge .wr-s-title { color: var(--colourful-lavender-400); }
+    .wr-section-divider { height: 1px; background: rgba(184,138,245,.08); margin: 12px 0; }
+    .wr-footer { margin-top: 16px; text-align: center; }
+    .wr-empty { padding: 30px; text-align: center; color: var(--neutral-400); }
+    @media (max-width: 640px) { .wr-stats { grid-template-columns: repeat(2,1fr); gap: 8px; } .wr-main { padding: 14px; } .wr-beh-name { width: 70px; font-size: 12px; } .wr-beh-meta { width: 50px; font-size: 11px; } .wr-stat-val { font-size: 22px; } .wr-stat { padding: 12px 12px 10px; } }
     /* ════════ 家庭会议 ════════ */
     .family-meeting-modal .modal { max-width: 560px; }
     .fm-report-preview { background: rgba(124,58,237,0.03); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
@@ -13280,15 +13274,15 @@ function setDateRange(report) {
 
 function buildWrStatsHtml(stats) {
   var trendMeta = {
-    up: { t: "↑", c: "var(--colourful-mint-green-600)", l: "较上周" },
-    down: { t: "↓", c: "var(--colourful-sunny-coral-600)", l: "较上周" },
-    stable: { t: "→", c: "var(--muted-foreground)", l: "持平" }
+    up: { t: "↑", c: "var(--colourful-mint-green-500)", l: "较上周" },
+    down: { t: "↓", c: "var(--colourful-sunny-coral-400)", l: "较上周" },
+    stable: { t: "→", c: "var(--neutral-400)", l: "持平" }
   };
   var statMeta = [
     { key: "energy", label: "能量值", unit: "XP", cls: "energy", icon: "⚡" },
-    { key: "study", label: "学业投入", unit: "%", cls: "study", icon: "📚" },
-    { key: "finance", label: "财商习惯", unit: "%", cls: "finance", icon: "💰" },
-    { key: "diary", label: "日记篇数", unit: "篇", cls: "diary", icon: "✏️" }
+    { key: "study", label: "学习记录", unit: "项", cls: "study", icon: "📚" },
+    { key: "finance", label: "花销", unit: "元", cls: "finance", icon: "💰" },
+    { key: "diary", label: "日记", unit: "篇", cls: "diary", icon: "✏️" }
   ];
   return statMeta.map(function (item) {
     var s = stats[item.key] || {};
@@ -13297,7 +13291,14 @@ function buildWrStatsHtml(stats) {
     var diff = s.diff || 0;
     var tm = trendMeta[trend] || trendMeta.stable;
     var trendTxt = trend === "stable" ? "持平" : (tm.t + " " + (diff > 0 ? "+" : "") + diff);
-    return '<div class="wr-stat wr-stat-' + item.cls + '"><div class="wr-stat-top"><span class="wr-stat-icon">' + item.icon + '</span><span class="wr-stat-trend" style="color:' + tm.c + '">' + trendTxt + '</span></div><div class="wr-stat-val">' + val + '<span style="font-size:13px;color:var(--muted-foreground);font-weight:400;margin-left:2px">' + item.unit + '</span></div><div class="wr-stat-label">' + item.label + '</div></div>';
+    var valHtml;
+    if (s.hasData === false) {
+      valHtml = '<span style="font-size:12px;color:var(--neutral-400);font-weight:400">--</span>';
+      trendTxt = "";
+    } else {
+      valHtml = val + '<span style="font-size:11px;color:var(--neutral-400);font-weight:400;margin-left:2px">' + item.unit + '</span>';
+    }
+    return '<div class="wr-stat wr-stat-' + item.cls + '"><div class="wr-stat-top"><span class="wr-stat-icon">' + item.icon + '</span><span class="wr-stat-trend" style="color:' + tm.c + '">' + trendTxt + '</span></div><div class="wr-stat-val">' + valHtml + '</div><div class="wr-stat-label">' + item.label + '</div></div>';
   }).join("");
 }
 
@@ -13328,12 +13329,13 @@ function renderAiWeeklyReport(cfg) {
   document.getElementById("wrSummary").textContent = currentReport.summary || "";
   // 渲染四个统计卡片（报告式 KPI：顶部彩条 + 趋势胶囊）
   document.getElementById("wrStats").innerHTML = buildWrStatsHtml(currentReport.stats || {});
-  // 渲染可折叠章节
+  // 渲染可折叠章节（孩子友好：闪光点在前，正向积极）
+  renderChapter("chapterGrowth", "⭐ 本周闪光点", renderGrowthContent(currentReport));
+  renderChapter("chapterBehavior", "🎯 行为与习惯", renderBehaviorContent(currentReport));
   renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(currentReport));
-  renderChapter("chapterBehavior", "⭐ 行为与习惯", renderBehaviorContent(currentReport));
   renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(currentReport));
   // 渲染建议
-  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(currentReport, cfg.familyMeetings));
+  renderChapter("chapterSuggestions", "🎯 下周小目标", renderSuggestionContent(currentReport, cfg.familyMeetings));
   populateWeekSelect(reports);
   if (window.lucide) refreshIcons(20);
 }
@@ -13346,8 +13348,8 @@ function renderChapter(id, title, content) {
   var div = document.createElement("div");
   div.className = "wr-chapter";
   div.id = id;
-  var dotMap = { chapterAcademic: "#3b8fe0", chapterBehavior: "#4a9b7b", chapterEmotion: "#d63068", chapterSuggestions: "#b8860b" };
-  var dot = dotMap[id] || "#7a3fd6";
+  var dotMap = { chapterAcademic: "#7bb8f7", chapterBehavior: "#7cd4b0", chapterEmotion: "#f28daf", chapterSuggestions: "#d4a843" };
+  var dot = dotMap[id] || "#b88af5";
   // 默认全部展开（不再加 collapsed）
   div.innerHTML = '<div class="wr-chapter-head" onclick="toggleChapter(this)"><span><span class="ch-dot" style="background:' + dot + '"></span>' + title + '</span><span class="ch-arrow">▼</span></div><div class="wr-chapter-body">' + content + '</div>';
   container.appendChild(div);
@@ -13364,9 +13366,9 @@ function renderAcademicContent(report) {
   var hw = aca.homework || {};
   var subjects = hw.subjects || [];
   var html = "";
-  var subjColor = { "数学": "#3e94f5", "语文": "#ea4d85", "英语": "#9255f5" };
+  var subjColor = { "数学": "#7bb8f7", "语文": "#f28daf", "英语": "#b88af5" };
   if (subjects.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#3e94f5"></span>作业完成率</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#7bb8f7"></span>作业完成率</div>';
     subjects.forEach(function (s) {
       var pct = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
       var color = subjColor[s.name] || (s.alert === "low" ? "var(--colourful-sunny-coral-500)" : "var(--colourful-mint-green-500)");
@@ -13375,9 +13377,9 @@ function renderAcademicContent(report) {
   }
   var trends = aca.trends || [];
   if (trends.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#4a9b7b"></span>成绩趋势</div><div class="wr-trends">';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#7cd4b0"></span>成绩趋势</div><div class="wr-trends">';
     var trendText = { up: "📈 上升", down: "📉 下降", stable: "➡️ 稳定", wave: "🔀 波动" };
-    var trendColor = { up: "var(--colourful-mint-green-600)", down: "var(--colourful-sunny-coral-600)", stable: "var(--neutral-500)", wave: "var(--colourful-butter-yellow-600)" };
+    var trendColor = { up: "var(--colourful-mint-green-500)", down: "var(--colourful-sunny-coral-400)", stable: "var(--neutral-400)", wave: "var(--colourful-butter-yellow-500)" };
     trends.forEach(function (t) {
       html += '<span class="wr-trend-chip"><span class="wr-t-arrow" style="color:' + (trendColor[t.trend] || "var(--neutral-500)") + '">' + (trendText[t.trend] || t.trend) + '</span><span style="color:var(--neutral-400);font-weight:600">' + t.subject + ' · ' + t.lastGrade + '</span></span>';
     });
@@ -13385,13 +13387,17 @@ function renderAcademicContent(report) {
   }
   var weakMods = aca.weakModules || [];
   if (weakMods.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#f96024"></span>需要关注</div><div class="wr-trends">';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fba07a"></span>需要关注</div><div class="wr-trends">';
     weakMods.forEach(function (m) {
       html += '<span class="wr-alert-chip">⚠️ ' + m.subject + '·' + m.module + ' 未完成 ' + m.incomplete + ' 项</span>';
     });
     html += '</div>';
   }
-  if (!html) html = '<div style="color:#6b7280;font-size:13px">暂无数据</div>';
+  // 孩子友好空状态：用 data 里的 emptyHint
+  if (!html) {
+    var hint = aca.emptyHint || '这周还没记录学习呢～下周记得完成作业，每完成一项就+5XP哦💪';
+    html = '<div style="padding:20px 0;text-align:center"><div style="font-size:40px;margin-bottom:10px">📚</div><div style="font-size:15px;font-weight:700;color:var(--neutral-600);line-height:1.6">' + hint + '</div></div>';
+  }
   return html;
 }
 
@@ -13399,20 +13405,21 @@ function renderBehaviorContent(report) {
   var beh = report.behavior || {};
   var profile = beh.profile || [];
   var html = "";
-  var maxCount = 1;
-  profile.forEach(function (p) { if (p.count > maxCount) maxCount = p.count; });
-  var palette = ["#3e94f5", "#ea4d85", "#9255f5", "#36b98b", "#f96024", "#fdd832"];
+  var maxXp = 1;
+  profile.forEach(function (p) { if (p.xp > maxXp) maxXp = p.xp; });
+  var palette = ["#7bb8f7", "#f28daf", "#b88af5", "#7cd4b0", "#fba07a", "#fee680"];
   if (profile.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#9255f5"></span>本周行为画像</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#b88af5"></span>本周能量条</div>';
     profile.forEach(function (p, i) {
-      var w = Math.max(8, Math.round((p.count / maxCount) * 100));
+      var w = Math.max(15, Math.round((p.xp / maxXp) * 100));
       var c = palette[i % palette.length];
-      html += '<div class="wr-beh-row"><span class="wr-beh-name">' + p.category + '</span><span class="wr-beh-track"><span class="wr-beh-fill" style="width:' + w + '%;background:linear-gradient(90deg,' + c + ',' + c + 'bb)"></span></span><span class="wr-beh-meta">' + p.count + '次 · +' + p.xp + 'XP</span></div>';
+      var icons = ["🌟", "💪", "🎨", "🏃", "🔥", "⭐"];
+      html += '<div class="wr-beh-row"><span class="wr-beh-name">' + icons[i % icons.length] + p.category + '</span><span class="wr-beh-track"><span class="wr-beh-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="wr-beh-meta">+' + p.xp + 'XP</span></div>';
     });
   }
   var stories = beh.effortStories || [];
   if (stories.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fdd832"></span>认真投入亮点</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fee680"></span>认真投入亮点</div>';
     stories.slice(0, 3).forEach(function (s) {
       html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.subject || "") + ' · ' + (s.date || "") + '</div><div>' + (s.story || "") + '</div>' + (s.reviewerComment ? '<div class="parent-msg">💬 ' + s.reviewerComment + "</div>" : "") + "</div>";
     });
@@ -13423,20 +13430,20 @@ function renderBehaviorContent(report) {
     var badgeText = badge.type === "small_perseverance" ? "🏅 小坚持" : "🏆 大毅力";
     html += '<div style="margin-top:12px"><span class="wr-badge">' + badgeText + ' · 连续 ' + badge.days + ' 天</span></div>';
   }
-  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无数据</div>';
+  if (!html) html = '<div style="padding:20px 0;text-align:center"><div style="font-size:36px;margin-bottom:8px">🎯</div><div style="font-size:14px;font-weight:700;color:var(--neutral-500)">还没有行为记录，快去打卡吧</div></div>';
   return html;
 }
 
 function renderEmotionContent(report) {
   var emo = report.emotion || {};
   var html = "";
-  html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#ea4d85"></span>日记活跃度</div>';
+  html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#f28daf"></span>日记活跃度</div>';
   var diaryMap = { active: "🔥 活跃", normal: "✅ 正常", low: "💤 减少" };
-  html += '<div class="wr-fin-chip" style="background:var(--colourful-candy-pink-50);border-color:rgba(234,77,133,.16);color:var(--colourful-candy-pink-600)">' + (diaryMap[emo.diaryTrend] || "✅ 正常") + ' · 本周 ' + (emo.diaryCount || 0) + ' 篇</div>';
+  html += '<div class="wr-fin-chip" style="background:rgba(242,141,175,.08);border-color:rgba(242,141,175,.12);color:var(--colourful-candy-pink-400)">' + (diaryMap[emo.diaryTrend] || "✅ 正常") + ' · 本周 ' + (emo.diaryCount || 0) + ' 篇</div>';
   var moods = emo.moodDistribution || {};
   var moodKeys = Object.keys(moods);
   if (moodKeys.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fdd832"></span>心情晴雨表</div><div class="wr-moods">';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fee680"></span>心情晴雨表</div><div class="wr-moods">';
     moodKeys.forEach(function (k) {
       var emoji = k === "开心" ? "😊" : k === "难过" ? "😢" : k === "生气" ? "😡" : k === "兴奋" ? "😄" : k === "平静" ? "😌" : k === "惊喜" ? "🤩" : "😐";
       html += '<span class="wr-mood-chip"><span class="wr-m-emoji">' + emoji + '</span>' + k + '<span class="wr-m-count">' + moods[k] + '次</span></span>';
@@ -13445,12 +13452,12 @@ function renderEmotionContent(report) {
   }
   var best = emo.bestDiary || {};
   if (best.snippet) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#9255f5"></span>本周最佳日记</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#b88af5"></span>本周最佳日记</div>';
     html += '<div class="wr-quote">"' + best.snippet + '"<div class="wr-quote-meta">· ' + (best.date || "") + ' · 四要素 ' + (best.elements || 0) + '/4</div></div>';
   }
   if (emo.financeStatus) {
     var finMap = { good: "🟢 理性消费", watch: "🟡 需要关注", alert: "🔴 冲动消费" };
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#36b98b"></span>财商习惯</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#7cd4b0"></span>财商习惯</div>';
     html += '<div class="wr-fin-chip">' + (finMap[emo.financeStatus] || "🟢 理性消费") + ' · 值得率 ' + (emo.financeWorthIt || 0) + '%</div>';
   }
   if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无数据</div>';
@@ -13460,8 +13467,8 @@ function renderEmotionContent(report) {
 function renderSuggestionContent(report, familyMeetings) {
   var sug = report.suggestions || {};
   var html = "";
-  if (sug.keep) html += '<div class="wr-suggestion is-keep"><span class="wr-s-ico">✅</span><div><div class="wr-s-title">继续保持</div>' + sug.keep + '</div></div>';
-  if (sug.improve) html += '<div class="wr-suggestion is-improve"><span class="wr-s-ico">🎯</span><div><div class="wr-s-title">重点改进</div>' + sug.improve + '</div></div>';
+  if (sug.keep) html += '<div class="wr-suggestion is-keep"><span class="wr-s-ico">🏆</span><div><div class="wr-s-title">成就达成</div>' + sug.keep + '</div></div>';
+  if (sug.improve) html += '<div class="wr-suggestion is-improve"><span class="wr-s-ico">🎯</span><div><div class="wr-s-title">试试看</div>' + sug.improve + '</div></div>';
   if (sug.challenge) html += '<div class="wr-suggestion is-challenge"><span class="wr-s-ico">🎮</span><div><div class="wr-s-title">趣味挑战</div>' + sug.challenge + '</div></div>';
   // 每周约定：从家庭会议中获取
   var meetings = (familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
@@ -13485,6 +13492,21 @@ function renderSuggestionContent(report, familyMeetings) {
     }
   }
   if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无建议</div>';
+  return html;
+}
+
+// 成长档案（孩子友好：只展示本周亮点，不放家长向的负面诊断）
+function renderGrowthContent(report) {
+  var g = report.growth || {};
+  var html = "";
+  var pu = g.profileUpdate || {};
+  if (pu.highlights && pu.highlights.length > 0) {
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#fee680"></span>本周闪光点</div>';
+    pu.highlights.forEach(function(h) {
+      html += '<div style="font-size:13px;color:var(--neutral-600);padding:3px 0;display:flex;align-items:center;gap:6px"><span style="color:var(--colourful-butter-yellow-500)">⭐</span>' + h + '</div>';
+    });
+  }
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">本周还没有记录，快去打卡吧</div>';
   return html;
 }
 
@@ -13555,10 +13577,11 @@ function displayWeeklyReport(report, allReports, index) {
   document.getElementById("wrSummary").textContent = report.summary || "";
   document.getElementById("wrStats").innerHTML = buildWrStatsHtml(report.stats || {});
   document.getElementById("wrChapters").innerHTML = "";
+  renderChapter("chapterGrowth", "⭐ 本周闪光点", renderGrowthContent(report));
   renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(report));
-  renderChapter("chapterBehavior", "⭐ 行为与习惯", renderBehaviorContent(report));
+  renderChapter("chapterBehavior", "🎯 行为与习惯", renderBehaviorContent(report));
   renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(report));
-  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(report, (window.__lastCfg || {}).familyMeetings));
+  renderChapter("chapterSuggestions", "🎯 下周小目标", renderSuggestionContent(report, (window.__lastCfg || {}).familyMeetings));
   populateWeekSelect(allReports || []);
   if (window.lucide) refreshIcons(20);
 }

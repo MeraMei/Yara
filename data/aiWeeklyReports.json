@@ -1,26 +1,27 @@
 [
   {
-    "id": "wr_mssop8yp",
+    "id": "wr_q4ijco8o",
     "weekNumber": 33,
     "year": 2026,
     "date": "2026-08-14",
-    "generatedAt": "2026-08-14T08:27:37",
-    "summary": "本周总体表现良好，数据完整，继续保持良好习惯。",
+    "generatedAt": "2026-08-14T13:42:57.741Z",
+    "summary": "第33周，Yara收获了24点能量，写了1篇日记，最棒的是「说到做到、遵守约定」！",
     "stats": {
       "energy": {
-        "value": 29,
+        "value": 24,
         "trend": "down",
-        "diff": 20
+        "diff": 25
       },
       "study": {
         "value": 0,
         "trend": "down",
-        "diff": 80
+        "diff": 9,
+        "hasData": false
       },
       "finance": {
-        "value": 100,
+        "value": 265,
         "trend": "up",
-        "diff": 100
+        "diff": 265
       },
       "diary": {
         "value": 1,
@@ -32,81 +33,22 @@
       "homework": {
         "subjects": []
       },
-      "trends": [
-        {
-          "subject": "语文",
-          "trend": "up",
-          "lastGrade": "A+"
-        },
-        {
-          "subject": "数学",
-          "trend": "stable",
-          "lastGrade": "A+"
-        },
-        {
-          "subject": "英语",
-          "trend": "stable",
-          "lastGrade": "A+"
-        },
-        {
-          "subject": "科学",
-          "trend": "stable",
-          "lastGrade": "A"
-        },
-        {
-          "subject": "道德与法治",
-          "trend": "stable",
-          "lastGrade": "A+"
-        },
-        {
-          "subject": "信息科技",
-          "trend": "up",
-          "lastGrade": "A"
-        },
-        {
-          "subject": "体育",
-          "trend": "up",
-          "lastGrade": "A"
-        },
-        {
-          "subject": "音乐",
-          "trend": "stable",
-          "lastGrade": "A"
-        },
-        {
-          "subject": "美术",
-          "trend": "stable",
-          "lastGrade": "A+"
-        },
-        {
-          "subject": "书法",
-          "trend": "stable",
-          "lastGrade": "A+"
-        },
-        {
-          "subject": "心理健康",
-          "trend": "stable",
-          "lastGrade": "A"
-        },
-        {
-          "subject": "综合实践活动",
-          "trend": "stable",
-          "lastGrade": "A"
-        },
-        {
-          "subject": "劳动",
-          "trend": "stable",
-          "lastGrade": "A"
-        }
-      ],
-      "weakModules": []
+      "trends": [],
+      "weakModules": [],
+      "hasData": false,
+      "emptyHint": "这周还没记录学习呢～下周记得完成作业，每完成一项就+5XP哦💪"
     },
     "behavior": {
       "profile": [
         {
-          "category": "未知",
-          "count": 5,
-          "xp": 29
+          "category": "习惯养成",
+          "count": 1,
+          "xp": 10
+        },
+        {
+          "category": "能力成长",
+          "count": 3,
+          "xp": 14
         }
       ],
       "effortStories": [],
@@ -121,17 +63,28 @@
         "😊": 1
       },
       "bestDiary": {
-        "snippet": "我帮助新怡姐姐卖东西了，还跟小伙伴玩了，特别开心，我们在荡秋千那里摆摊，我就帮欣怡姐姐卖东西来了，欣怡姐姐让他看他问了我就告诉他这个的价格，我们配合的很默契，然后又来了很多人，他们都在这里买的东西，然后他们就不想走了，干脆直接在这里这跟我们...",
+        "snippet": "我帮助新怡姐姐卖东西了，还跟小伙伴玩了，特别开心，我们在荡秋千那里摆摊，我就帮欣怡姐姐卖东西来了，欣怡姐姐让他看他问了我...",
         "date": "2026-08-11",
-        "elements": 2
+        "elements": 5
       },
-      "financeStatus": "good",
-      "financeWorthIt": 100
+      "financeStatus": "watch",
+      "financeWorthIt": 67
     },
     "suggestions": {
-      "keep": "继续保持规律作息和良好的作业习惯",
-      "improve": "坚持写日记，记录每日感受和成长",
-      "challenge": "周末尝试一项新的兴趣活动，完成可获额外 XP 奖励"
+      "keep": "成就达成：「能力成长」本周获得14XP，太棒了！继续加油，你就是最闪亮的小星星⭐",
+      "improve": "试试看：多写几篇日记，把每天的快乐都记下来，以后翻看超有意思的～ 花钱小任务：买之前先问问自己「我真的好喜欢它吗？」，选到真正喜欢的东西才最开心～",
+      "challenge": "趣味挑战：和爸爸妈妈一起散步30分钟，边走边聊开心的事，完成后+5XP！🚶‍♀️"
+    },
+    "growth": {
+      "profileUpdate": {
+        "highlights": [
+          "说到做到、遵守约定",
+          "财务进账",
+          "写日记：写作四要素+感受",
+          "花销复盘"
+        ],
+        "date": "2026-08-14"
+      }
     }
   }
 ]
