@@ -1259,6 +1259,8 @@
       goalCompleted: meeting.goalCompleted || false,
       previousGoal: meeting.previousGoal || '',
       previousGoalCompleted: meeting.previousGoalCompleted || false,
+      commitments: meeting.commitments || [],
+      previousCommitments: meeting.previousCommitments || [],
       createdAt: meeting.createdAt || new Date().toISOString(),
     };
     list.unshift(saved);

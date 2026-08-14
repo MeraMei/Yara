@@ -97,14 +97,14 @@
       {
         "name": "60分钟内 完成作业",
         "category": "学习成长",
-        "xp": 8,
+        "xp": 6,
         "method": "按次",
         "description": ""
       },
       {
         "name": "学习进步 - 金牌学生",
         "category": "学习成长",
-        "xp": 30,
+        "xp": 15,
         "method": "按次",
         "description": ""
       },
@@ -160,21 +160,21 @@
       {
         "name": "认真投入 - 遇到难题没有马上放弃",
         "category": "学习成长",
-        "xp": 2,
+        "xp": 5,
         "method": "按次",
         "description": "主动认领，家长确认后发放"
       },
       {
         "name": "认真投入 - 独立完成以前不会的题",
         "category": "学习成长",
-        "xp": 2,
+        "xp": 5,
         "method": "按次",
         "description": "主动认领，家长确认后发放"
       },
       {
         "name": "认真投入 - 主动复盘错题",
         "category": "学习成长",
-        "xp": 2,
+        "xp": 5,
         "method": "按次",
         "description": "主动认领，家长确认后发放"
       }
@@ -199,7 +199,7 @@
       {
         "name": "照顾好自己（营养均衡、午休）",
         "category": "身体成长",
-        "xp": 8,
+        "xp": 5,
         "method": "按次",
         "description": ""
       },
@@ -257,7 +257,7 @@
       {
         "name": "与父母沟通自己近期成长",
         "category": "能力成长",
-        "xp": 8,
+        "xp": 5,
         "method": "按次",
         "description": ""
       },
@@ -282,17 +282,11 @@
         "method": "自动发放",
         "description": "记录一笔收入到财富/自由基金，动作记录低分值"
       },
-      {
-        "name": "说到做到、遵守约定",
-        "category": "能力成长",
-        "xp": 10,
-        "method": "按次",
-        "description": ""
-      },
+      
       {
         "name": "写日记：写作四要素+感受",
         "category": "能力成长",
-        "xp": 10,
+        "xp": 8,
         "method": "按次",
         "description": ""
       }
@@ -302,14 +296,14 @@
     {
       "name": "60分钟内 完成作业",
       "category": "学习成长",
-      "xp": 8,
+      "xp": 6,
       "method": "按次",
       "description": ""
     },
     {
       "name": "学习进步 - 金牌学生",
       "category": "学习成长",
-      "xp": 30,
+      "xp": 15,
       "method": "按次",
       "description": ""
     },
@@ -335,6 +329,55 @@
       "description": ""
     },
     {
+      "name": "作业·日常预习",
+      "category": "学习成长",
+      "xp": 2,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "作业·日常复习",
+      "category": "学习成长",
+      "xp": 2,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "作业·暑假作业",
+      "category": "学习成长",
+      "xp": 2,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "作业·特色作业",
+      "category": "学习成长",
+      "xp": 4,
+      "method": "按次",
+      "description": "完成作业自动发放"
+    },
+    {
+      "name": "认真投入 - 遇到难题没有马上放弃",
+      "category": "学习成长",
+      "xp": 5,
+      "method": "按次",
+      "description": "主动认领，家长确认后发放"
+    },
+    {
+      "name": "认真投入 - 独立完成以前不会的题",
+      "category": "学习成长",
+      "xp": 5,
+      "method": "按次",
+      "description": "主动认领，家长确认后发放"
+    },
+    {
+      "name": "认真投入 - 主动复盘错题",
+      "category": "学习成长",
+      "xp": 5,
+      "method": "按次",
+      "description": "主动认领，家长确认后发放"
+    },
+    {
       "name": "将自己的精美作品发布至线上",
       "category": "兴趣爱好",
       "xp": 10,
@@ -351,7 +394,7 @@
     {
       "name": "照顾好自己（营养均衡、午休）",
       "category": "身体成长",
-      "xp": 8,
+      "xp": 5,
       "method": "按次",
       "description": ""
     },
@@ -407,23 +450,9 @@
     {
       "name": "与父母沟通自己近期成长",
       "category": "能力成长",
-      "xp": 8,
+      "xp": 5,
       "method": "按次",
       "description": ""
-    },
-    {
-      "name": "作业·日常预习",
-      "category": "学习成长",
-      "xp": 2,
-      "method": "按次",
-      "description": "完成作业自动发放"
-    },
-    {
-      "name": "作业·日常复习",
-      "category": "学习成长",
-      "xp": 2,
-      "method": "按次",
-      "description": "完成作业自动发放"
     },
     {
       "name": "财务能力分析",
@@ -447,30 +476,9 @@
       "description": "记录一笔收入到财富/自由基金，动作记录低分值"
     },
     {
-      "name": "作业·暑假作业",
-      "category": "学习成长",
-      "xp": 2,
-      "method": "按次",
-      "description": "完成作业自动发放"
-    },
-    {
-      "name": "作业·特色作业",
-      "category": "学习成长",
-      "xp": 4,
-      "method": "按次",
-      "description": "完成作业自动发放"
-    },
-    {
-      "name": "说到做到、遵守约定",
-      "category": "能力成长",
-      "xp": 10,
-      "method": "按次",
-      "description": ""
-    },
-    {
       "name": "写日记：写作四要素+感受",
       "category": "能力成长",
-      "xp": 10,
+      "xp": 8,
       "method": "按次",
       "description": ""
     }

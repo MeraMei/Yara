@@ -8428,6 +8428,9 @@ input[type="date"]:focus::-webkit-datetime-edit {
     .wr-suggestion.is-improve .wr-s-title { color: var(--colourful-butter-yellow-600); }
     .wr-suggestion.is-challenge { background: var(--colourful-lavender-50); border: 1px solid rgba(146,85,245,.16); }
     .wr-suggestion.is-challenge .wr-s-title { color: var(--colourful-lavender-600); }
+    .wr-suggestion.is-commitment { background: var(--colourful-success-50); border: 1px solid rgba(34,197,94,.16); }
+    .wr-suggestion.is-commitment .wr-s-title { color: var(--colourful-success-600); }
+    .wr-section-divider { height: 1px; background: var(--neutral-200); margin: 14px 0; }
     .wr-footer { margin-top: 18px; text-align: center; }
     .wr-empty { padding: 40px; text-align: center; color: var(--neutral-400); }
     @media (max-width: 640px) { .wr-stats { grid-template-columns: repeat(2,1fr); } .wr-main { padding: 16px; } .wr-beh-name { width: 64px; } .wr-beh-meta { width: 84px; } }
@@ -9116,9 +9119,10 @@ async function addXpRecord(record) {
     taskName: record.taskName || record.title || '',
     taskCategory: record.xpCategory || record.type || '',
     date: record.date || todayStr(),
-    // datetime 记录实际创建时间，用于基于操作时间的统计（如财富页面的今日/本周获得）
     datetime: new Date().toISOString().slice(0, 19).replace('T', ' '),
     xp: Number(record.xp) || 0,
+    baseXp: Number(record.baseXp) || 0,
+    commitmentBonus: !!record.commitmentBonus,
     xpCategory: record.xpCategory || record.type || '',
     reviewStatus: record.status === 'verified' ? '已通过' : record.status === 'returned' ? '已退回' : '待确认',
     returnReason: record.returnReason || '',
@@ -10917,6 +10921,16 @@ if (typeof window !== 'undefined') {
           <label class="form-label">备注说明 <span style="color:var(--colourful-error-600)">*</span></label>
           <textarea class="form-textarea" id="xpDescPage" rows="3" placeholder="请详细说明这次XP的具体来源和情况"></textarea>
         </div>
+        <div class="form-group" style="margin-top:12px;padding:12px 14px;background:var(--colourful-success-50);border-radius:10px;border:1px solid var(--colourful-success-200)">
+          <label class="checkbox-label" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+            <input type="checkbox" id="xpCommitmentCheck" style="width:18px;height:18px;margin-top:2px;accent-color:var(--colourful-success-500);cursor:pointer" onchange="onCommitmentCheckChange()" />
+            <div>
+              <span style="font-weight:600;color:var(--colourful-success-700);font-size:14px">🤝 这是我承诺要做到的事</span>
+              <span style="display:block;font-size:12px;color:var(--colourful-success-500);margin-top:2px">说到做到！家长确认后额外 +2 XP 认可承诺</span>
+            </div>
+          </label>
+          <div id="xpCommitmentHint" style="display:none;margin-top:8px;padding:8px 10px;background:var(--colourful-success-100);border-radius:8px;font-size:12px;color:var(--colourful-success-700);line-height:1.5"></div>
+        </div>
       </div>
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeXpModal()">取消</button>
@@ -11004,9 +11018,10 @@ if (typeof window !== 'undefined') {
           <textarea class="form-textarea" id="fmDiscussion" rows="2" placeholder="讨论内容（选填）"></textarea>
         </div>
         <div class="fm-section">
-          <div class="fm-section-label">3️⃣ 定目标 · 下周的一个小目标</div>
+          <div class="fm-section-label">3️⃣ 定目标 · 下周约定清单</div>
           <div class="fm-hint" id="fmPreviousGoalHint"></div>
-          <textarea class="form-textarea" id="fmGoal" rows="2" placeholder="定一个小目标（选填）"></textarea>
+          <div id="fmCommitmentList" style="margin-bottom:8px"></div>
+          <button type="button" class="btn-link" onclick="addCommitmentRow()" style="font-size:12px"><i data-lucide="plus" style="width:12px;height:12px;vertical-align:middle"></i> 再加一条约定</button>
         </div>
       </div>
       <div class="modal-foot">
@@ -11516,12 +11531,33 @@ if (typeof window !== "undefined") {
       document.getElementById("xpCategoryPage").value = opt?.dataset?.category || "";
     }
 
+    function onCommitmentCheckChange() {
+      var hint = document.getElementById("xpCommitmentHint");
+      var checked = document.getElementById("xpCommitmentCheck").checked;
+      if (!checked) { hint.style.display = "none"; return; }
+      // 从家庭会议中获取本周约定
+      var cfg = window.__lastCfg || {};
+      var meetings = (cfg.familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
+      if (meetings.length > 0) {
+        var meeting = meetings[0];
+        var texts = meeting.commitments.map(function(c) { return c.text; });
+        hint.innerHTML = '📋 <b>本周约定参考</b><br>' + texts.map(function(t) { return '· ' + t; }).join('<br>') + '<br><span style="font-size:11px;color:var(--colourful-success-500)">💡 如果正在完成本周约定，勾选此框，通过后额外 +2 XP</span>';
+        hint.style.display = "";
+      } else {
+        hint.innerHTML = '💡 还没有本周约定？<a href="javascript:void(0)" onclick="closeXpModal();openFamilyMeeting()" style="color:var(--colourful-success-600);text-decoration:underline">去家庭会议定一个</a>';
+        hint.style.display = "";
+      }
+    }
+
     function openXpModal() {
       populateXpTaskSelectPage().then(() => {
         document.getElementById("addXpModalPage").classList.add("active");
         // 恢复按钮状态（防止上次提交成功后未重置导致"提交中..."卡住）
         const btn = document.querySelector("#addXpModalPage .btn-confirm");
         if (btn) { btn.textContent = "添加 XP"; btn.disabled = false; }
+        // 重置承诺复选框
+        document.getElementById("xpCommitmentCheck").checked = false;
+        document.getElementById("xpCommitmentHint").style.display = "none";
         refreshIcons(50);
       });
     }
@@ -11575,7 +11611,8 @@ if (typeof window !== "undefined") {
     function submitAddXpPage() {
       const taskName = document.getElementById("xpTaskSelectPage").value;
       const description = document.getElementById("xpDescPage").value.trim();
-      const xpValue = document.getElementById("xpValuePage").value;
+      const xpValue = parseInt(document.getElementById("xpValuePage").value, 10) || 0;
+      const isCommitment = document.getElementById("xpCommitmentCheck").checked;
       if (!taskName) { alert("请选择 XP 任务"); return; }
       if (!description) { alert("请填写备注说明"); return; }
 
@@ -11584,10 +11621,16 @@ if (typeof window !== "undefined") {
       btn.textContent = "提交中...";
       btn.disabled = true;
 
+      // 承诺加成：额外 +2 XP
+      const bonusXp = isCommitment ? 2 : 0;
+      const totalXp = xpValue + bonusXp;
+
       DataStore.addXpRecord({
         taskName,
-        xp: parseInt(xpValue, 10) || 0,
-        description,
+        xp: totalXp,
+        baseXp: xpValue,
+        commitmentBonus: isCommitment,
+        description: isCommitment ? description + " [承诺兑现]" : description,
         status: "pending",
       }).then(async () => {
         await DataStore.refreshData(true);
@@ -11598,7 +11641,10 @@ if (typeof window !== "undefined") {
         document.getElementById("xpValuePage").value = "";
         document.getElementById("xpCategoryPage").value = "";
         document.getElementById("xpDescPage").value = "";
-        showToast(`✅ 已提交，待确认 ${pending} 条`, true);
+        document.getElementById("xpCommitmentCheck").checked = false;
+        document.getElementById("xpCommitmentHint").style.display = "none";
+        const msg = isCommitment ? `✅ 已提交承诺任务，待确认 ${pending} 条（含承诺加成 +2 XP）` : `✅ 已提交，待确认 ${pending} 条`;
+        showToast(msg, true);
         return renderXp();
       }).then(() => {
         refreshIcons(50);
@@ -13287,7 +13333,7 @@ function renderAiWeeklyReport(cfg) {
   renderChapter("chapterBehavior", "⭐ 行为与习惯", renderBehaviorContent(currentReport));
   renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(currentReport));
   // 渲染建议
-  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(currentReport));
+  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(currentReport, cfg.familyMeetings));
   populateWeekSelect(reports);
   if (window.lucide) refreshIcons(20);
 }
@@ -13411,12 +13457,33 @@ function renderEmotionContent(report) {
   return html;
 }
 
-function renderSuggestionContent(report) {
+function renderSuggestionContent(report, familyMeetings) {
   var sug = report.suggestions || {};
   var html = "";
   if (sug.keep) html += '<div class="wr-suggestion is-keep"><span class="wr-s-ico">✅</span><div><div class="wr-s-title">继续保持</div>' + sug.keep + '</div></div>';
   if (sug.improve) html += '<div class="wr-suggestion is-improve"><span class="wr-s-ico">🎯</span><div><div class="wr-s-title">重点改进</div>' + sug.improve + '</div></div>';
   if (sug.challenge) html += '<div class="wr-suggestion is-challenge"><span class="wr-s-ico">🎮</span><div><div class="wr-s-title">趣味挑战</div>' + sug.challenge + '</div></div>';
+  // 每周约定：从家庭会议中获取
+  var meetings = (familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
+  if (meetings.length > 0) {
+    // 找到与当前周报同周或最近一周的会议
+    var currentWeek = report.weekNumber;
+    var matched = meetings.filter(function(m) { return m.weekNumber === currentWeek; });
+    var meeting = matched.length > 0 ? matched[0] : meetings[0];
+    if (meeting && meeting.commitments && meeting.commitments.length > 0) {
+      var done = meeting.commitments.filter(function(c) { return c.completed; }).length;
+      var total = meeting.commitments.length;
+      html += '<div class="wr-section-divider"></div>';
+      html += '<div class="wr-suggestion is-commitment"><span class="wr-s-ico">🤝</span><div><div class="wr-s-title">📝 每周约定</div>';
+      meeting.commitments.forEach(function(c, i) {
+        var statusIcon = c.completed ? '✅' : '⏳';
+        var statusStyle = c.completed ? 'color:var(--colourful-mint-green-600)' : 'color:var(--neutral-500)';
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;' + statusStyle + ';font-size:13px"><span>' + statusIcon + '</span><span style="flex:1">' + c.text + '</span>' + (c.completed ? '<span style="font-size:11px;color:var(--colourful-mint-green-500)">已兑现 +2XP</span>' : '') + '</div>';
+      });
+      html += '<div style="margin-top:6px;font-size:12px;color:var(--neutral-400);border-top:1px dashed var(--neutral-200);padding-top:6px">完成约定可获额外 +2 XP 认可 · 下次家庭会议回顾</div>';
+      html += '</div></div>';
+    }
+  }
   if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px">暂无建议</div>';
   return html;
 }
@@ -13491,14 +13558,31 @@ function displayWeeklyReport(report, allReports, index) {
   renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(report));
   renderChapter("chapterBehavior", "⭐ 行为与习惯", renderBehaviorContent(report));
   renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(report));
-  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(report));
+  renderChapter("chapterSuggestions", "🎯 下周建议", renderSuggestionContent(report, (window.__lastCfg || {}).familyMeetings));
   populateWeekSelect(allReports || []);
   if (window.lucide) refreshIcons(20);
 }
 
 // ═══════════════════════════════════════════════════════════════
+// 家庭会议 — 承诺行增删
+function addCommitmentRow(value) {
+  var list = document.getElementById("fmCommitmentList");
+  if (!list) return;
+  var existing = list.querySelectorAll(".fm-commitment-row").length;
+  if (existing >= 5) { showToast("最多设置 5 条约定", false); return; }
+  var div = document.createElement("div");
+  div.className = "fm-commitment-row";
+  div.style.cssText = "display:flex;gap:8px;margin-bottom:6px;align-items:center";
+  div.innerHTML = '<input type="text" class="form-input" style="flex:1;font-size:13px" placeholder="例如：每天阅读30分钟" value="' + (value || "") + '" /><button type="button" class="btn ghost mini" onclick="removeCommitmentRow(this)" style="color:var(--colourful-error-500);flex-shrink:0">✕</button>';
+  list.appendChild(div);
+  if (window.lucide) refreshIcons(20);
+}
+function removeCommitmentRow(btn) {
+  var row = btn.closest(".fm-commitment-row");
+  if (row) row.remove();
+}
+
 // 家庭会议
-// ═══════════════════════════════════════════════════════════════
 function openFamilyMeeting() {
   var cfg = window.__lastCfg || {};
   var reports = cfg.aiWeeklyReports || [];
@@ -13507,21 +13591,26 @@ function openFamilyMeeting() {
   document.getElementById("fmWeekNumber").textContent = currentReport.weekNumber;
   var previewEl = document.getElementById("fmPreviewContent");
   if (previewEl) previewEl.textContent = currentReport.summary || "暂无";
-  // 检查上周目标
+  // 检查上周承诺
   var meetings = cfg.familyMeetings || [];
   var lastMeeting = meetings.length > 0 ? meetings[0] : null;
   var hintEl = document.getElementById("fmPreviousGoalHint");
   if (hintEl) {
-    if (lastMeeting && lastMeeting.goal) {
-      var checked = lastMeeting.goalCompleted ? "✅ 已完成" : "⏳ 尚未标记";
-      hintEl.innerHTML = '上周目标："' + lastMeeting.goal + '" · ' + checked + '<br>引导语："这周的目标完成了吗？"';
+    if (lastMeeting && lastMeeting.commitments && lastMeeting.commitments.length > 0) {
+      var done = lastMeeting.commitments.filter(function(c) { return c.completed; }).length;
+      var total = lastMeeting.commitments.length;
+      hintEl.innerHTML = '上周约定：' + done + '/' + total + ' 完成 · <span style="color:' + (done === total ? 'var(--colourful-mint-green-600)' : 'var(--colourful-sunny-coral-600)') + '">' + (done === total ? "✅ 全部完成！" : "⏳ 继续加油") + '</span><br><span style="font-size:12px;color:#6b7280">上次约定：' + lastMeeting.commitments.map(function(c) { return c.text; }).join("、") + '</span>';
     } else {
-      hintEl.textContent = '引导语："AI 建议下周重点做什么？你想选哪个？"';
+      hintEl.textContent = '引导语："这周你想给自己定什么约定？从周报建议里选一个？"';
     }
   }
+  // 重置表单
   document.getElementById("fmSummary").value = "";
   document.getElementById("fmDiscussion").value = "";
-  document.getElementById("fmGoal").value = "";
+  document.getElementById("fmCommitmentList").innerHTML = "";
+  // 默认给 2 条空行
+  addCommitmentRow();
+  addCommitmentRow();
   document.getElementById("familyMeetingModal").classList.add("active");
   refreshIcons(50);
 }
@@ -13537,7 +13626,13 @@ async function submitFamilyMeeting() {
   if (!currentReport) return;
   var summary = document.getElementById("fmSummary").value.trim();
   var discussion = document.getElementById("fmDiscussion").value.trim();
-  var goal = document.getElementById("fmGoal").value.trim();
+  // 收集承诺列表
+  var rows = document.querySelectorAll("#fmCommitmentList .fm-commitment-row input");
+  var commitments = [];
+  rows.forEach(function(inp) {
+    var val = inp.value.trim();
+    if (val) commitments.push({ text: val, completed: false });
+  });
   var meetings = cfg.familyMeetings || [];
   var lastMeeting = meetings.length > 0 ? meetings[0] : null;
   var btn = document.querySelector("#familyMeetingModal .btn-confirm");
@@ -13550,13 +13645,12 @@ async function submitFamilyMeeting() {
       date: new Date().toISOString().slice(0, 10),
       summary: summary,
       discussion: discussion,
-      goal: goal,
-      previousGoal: lastMeeting ? lastMeeting.goal : "",
-      previousGoalCompleted: lastMeeting ? lastMeeting.goalCompleted : false,
+      commitments: commitments,
+      previousCommitments: lastMeeting ? lastMeeting.commitments : [],
     });
     await window.DataStore.refreshData(true);
     closeFamilyMeeting();
-    showToast("✅ 家庭会议记录已保存！", true);
+    showToast("✅ 家庭会议记录已保存！" + (commitments.length > 0 ? " 已约定 " + commitments.length + " 件事" : ""), true);
   } catch (e) {
     console.error("保存家庭会议失败:", e);
     showToast("❌ 保存失败: " + (e.message || "未知错误"), false);
@@ -14083,6 +14177,24 @@ window.approveXpRecord = async function(btn, recordId, recordEl) {
   const strip = document.getElementById("xpRecordsStrip");
   const prevScroll = strip ? strip.scrollLeft : 0;
   try {
+    // 检查是否为承诺兑现记录，如果是则同步标记家庭会议约定完成
+    const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === recordId);
+    if (record && record.commitmentBonus) {
+      const meetings = (cachedData && cachedData.familyMeetings || []);
+      const meeting = meetings.find(m => m.commitments && m.commitments.length > 0);
+      if (meeting && meeting.commitments) {
+        const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
+        if (targetText) {
+          for (var ci = 0; ci < meeting.commitments.length; ci++) {
+            if (!meeting.commitments[ci].completed && meeting.commitments[ci].text === targetText) {
+              meeting.commitments[ci].completed = true;
+              break;
+            }
+          }
+          await window.DataStore.saveFamilyMeetings(meetings);
+        }
+      }
+    }
     await window.DataStore.updateXpRecord(recordId, { status: "verified" });
     await window.DataStore.refreshData(true);
     await renderXp();
@@ -14187,6 +14299,24 @@ async function confirmApproveWithComment() {
   const strip = document.getElementById("xpRecordsStrip");
   const prevScroll = strip ? strip.scrollLeft : 0;
   try {
+    // 检查是否为承诺兑现记录，如果是则同步标记家庭会议约定完成
+    const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === id);
+    if (record && record.commitmentBonus) {
+      const meetings = (cachedData && cachedData.familyMeetings || []);
+      const meeting = meetings.find(m => m.commitments && m.commitments.length > 0);
+      if (meeting && meeting.commitments) {
+        const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
+        if (targetText) {
+          for (var ci = 0; ci < meeting.commitments.length; ci++) {
+            if (!meeting.commitments[ci].completed && meeting.commitments[ci].text === targetText) {
+              meeting.commitments[ci].completed = true;
+              break;
+            }
+          }
+          await window.DataStore.saveFamilyMeetings(meetings);
+        }
+      }
+    }
     var updateData = { status: "verified" };
     // 如果家长写了留言，存入
     if (comment) updateData.reviewerComment = comment;
