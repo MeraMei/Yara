@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_msvxev5ci9cj9d",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "写日记：写作四要素+感受",
+    "taskName": "写日记：写作四要素+感受",
+    "taskCategory": "能力成长",
+    "date": "2026-08-16",
+    "datetime": "2026-08-16 14:54:47",
+    "xp": 10,
+    "baseXp": 0,
+    "commitmentBonus": false,
+    "xpCategory": "能力成长",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "能量记录（写到了时间、地点、人物、事件、感受）",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mss5062lccr9db",
     "domain": "XP",
     "type": "XP获得",
