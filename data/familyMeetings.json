@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "fm_msvmdp8vw2ws02",
+    "weekNumber": 33,
+    "year": 2026,
+    "date": "2026-08-16",
+    "summary": "",
+    "discussion": "",
+    "goal": "",
+    "goalCompleted": false,
+    "previousGoal": "",
+    "previousGoalCompleted": false,
+    "commitments": [],
+    "previousCommitments": [],
+    "createdAt": "2026-08-16T09:45:57.775Z"
+  }
+]
