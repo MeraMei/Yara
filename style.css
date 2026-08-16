@@ -1065,6 +1065,16 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
   .page-actions { flex-direction: column; }
   .page-actions .btn { justify-content: center; }
   .reading-calendar { overflow-x: auto; }
+  /* 日记模块移动端 */
+  .diary-main { grid-template-columns: 1fr; }
+  .diary-stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .diary-stat b { font-size: 16px; }
+  .diary-stat { padding: 10px 4px; }
+  .diary-wall-modal { margin: 10px; max-width: 100%; }
+  .dw-timeline { padding-left: 28px; }
+  .dw-day { left: -52px; font-size: 12px; width: 20px; }
+  .dw-dot { left: -22px; width: 10px; height: 10px; }
+  .dw-timeline::before { left: 8px; }
 }
 
 /* ═══════════════════════════════════════
@@ -1365,7 +1375,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
   font-weight: 800;
   color: #508e1c;
 }
-/* 右栏：最近日记（卡片网格） */
+/* 右栏：最近日记（卡片列表） */
 .diary-right {
   display: flex;
   flex-direction: column;
@@ -1378,25 +1388,47 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
   margin: 0;
 }
 .diary-tl {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 .diary-empty {
-  grid-column: 1 / -1;
   text-align: center;
   color: #9aa8a0;
   font-size: 13px;
-  padding: 18px 0;
+  padding: 24px 12px;
+  background: rgba(255,255,255,.5);
+  border-radius: 12px;
+  border: 1px dashed #d7e8dc;
+}
+.diary-empty-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.diary-empty-text {
+  font-weight: 700;
+  color: #7a8a82;
+  margin-bottom: 4px;
+}
+.diary-empty-sub {
+  font-size: 11px;
+  color: #a8b5ad;
 }
 .diary-tl .dl-item {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 6px;
   background: #fff;
-  border-radius: 12px;
-  padding: 10px 12px;
+  border-radius: 14px;
+  padding: 12px 14px;
   border: 1px solid #eef2ef;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  cursor: pointer;
+}
+.diary-tl .dl-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(130,214,50,.15);
+  border-color: #c9ebb0;
 }
 .diary-tl .dl-head {
   display: flex;
@@ -1409,22 +1441,234 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
   color: #508e1c;
 }
 .diary-tl .dl-mood {
-  font-size: 16px;
+  font-size: 18px;
+}
+.diary-tl .dl-hits {
+  font-size: 10px;
+  color: #9aa8a0;
+  background: #f6faf7;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
 }
 .diary-tl .dl-text {
   font-size: 13px;
   color: #5c5650;
-  line-height: 1.5;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.diary-tl .dl-meta {
+.diary-tl .dl-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+.diary-tl .dl-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.dl-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.dl-tag.ok { color: #1e8a68; background: #e0faf0; }
+.dl-tag.no { color: #c9a227; background: #fff9e0; }
+.diary-tl .dl-xp {
   font-size: 11px;
-  color: #8f9b94;
+  font-weight: 800;
+  color: #508e1c;
+  background: #eefdd9;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
-.diary-tl .dl-meta .ok { color: #1e8a68; font-weight: 600; }
-.diary-tl .dl-meta .no { color: #c9a227; font-weight: 600; }
+.diary-view-all {
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(130,214,50,.10), rgba(253,216,50,.10));
+  border: 1px dashed rgba(130,214,50,.4);
+  color: #508e1c;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.diary-view-all:hover {
+  background: linear-gradient(135deg, rgba(130,214,50,.18), rgba(253,216,50,.18));
+  border-color: rgba(130,214,50,.6);
+}
 /* 写日记弹窗 */
 .modal.diary-modal { max-width: 560px; width: 100%; }
 .diary-modal .modal-body { max-height: 62vh; overflow-y: auto; }
+
+/* ════════ 日记墙弹窗 ════════ */
+.diary-wall-modal { max-width: 680px; width: 100%; }
+.diary-wall-body { max-height: 70vh; overflow-y: auto; padding: 8px 4px 8px 8px; }
+.diary-wall-list { display: flex; flex-direction: column; gap: 20px; }
+.dw-month { }
+.dw-month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 8px;
+  margin-bottom: 4px;
+  border-bottom: 2px solid #eef2ef;
+}
+.dw-month-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #5c5650;
+}
+.dw-month-meta {
+  font-size: 11px;
+  color: #8f9b94;
+  background: #f6faf7;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.dw-timeline {
+  position: relative;
+  padding-left: 36px;
+}
+.dw-timeline::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(180deg, #eefdd9, #eef2ef);
+  border-radius: 2px;
+}
+.dw-item {
+  position: relative;
+  margin-bottom: 12px;
+}
+.dw-item:last-child { margin-bottom: 0; }
+.dw-dot {
+  position: absolute;
+  left: -30px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #82d632;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #eefdd9;
+}
+.dw-day {
+  position: absolute;
+  left: -64px;
+  top: 10px;
+  width: 24px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 800;
+  color: #508e1c;
+}
+.dw-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px solid #eef2ef;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.dw-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.dw-mood { font-size: 20px; }
+.dw-xp {
+  font-size: 11px;
+  font-weight: 800;
+  color: #508e1c;
+  background: #eefdd9;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.dw-text {
+  font-size: 13px;
+  color: #5c5650;
+  line-height: 1.6;
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.dw-hits {
+  font-size: 10px;
+  color: #9aa8a0;
+  background: #f6faf7;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+.dw-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ════════ 日记详情弹窗 ════════ */
+.diary-detail-modal { max-width: 560px; width: 100%; }
+.diary-detail-body { max-height: 72vh; overflow-y: auto; padding: 8px; }
+.dd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eef2ef;
+}
+.dd-date { font-size: 14px; font-weight: 800; color: #508e1c; }
+.dd-mood { font-size: 14px; color: #5c5650; display: flex; align-items: center; gap: 4px; }
+.dd-mood-label { font-size: 13px; }
+.dd-hits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.dd-hit {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f6faf7;
+  color: #5c5650;
+  font-weight: 600;
+}
+.dd-content {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #3a3a3a;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 16px;
+  min-height: 60px;
+}
+.dd-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid #eef2ef;
+}
+.dd-tags .dl-tag { font-size: 11px; padding: 3px 10px; }
 .diary-moods {
   display: flex;
   gap: 8px;
@@ -2500,6 +2744,58 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--lav-600, #7a3fd6); background: rgba(172,135,255,.1);
       border: 1px dashed rgba(172,135,255,.4); border-radius: 14px; padding: 10px; cursor: pointer;
     }
+    .tt-quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .tt-quick-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      border-radius: 14px; padding: 11px 10px; font-size: 13px; font-weight: 800;
+      cursor: pointer; border: 1px solid transparent; transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .tt-quick-btn:active { transform: scale(.97); }
+    .tt-quick-btn.xp {
+      color: var(--coral-600, #e04a15); background: linear-gradient(135deg, rgba(255,214,102,.35), rgba(249,96,36,.16));
+      border-color: rgba(249,96,36,.35);
+    }
+    .tt-quick-btn.diary {
+      color: var(--lav-600, #7a3fd6); background: linear-gradient(135deg, rgba(172,135,255,.18), rgba(146,85,245,.10));
+      border-color: rgba(172,135,255,.4);
+    }
+    .tt-quick-btn i { width: 16px; height: 16px; }
+    .tt-challenge {
+      margin-top: 12px; border-radius: 14px; padding: 11px 13px;
+      background: linear-gradient(135deg, rgba(253,216,50,.16), rgba(172,135,255,.12));
+      border: 1px dashed rgba(172,135,255,.45);
+    }
+    .tt-challenge-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .tt-challenge-title { font-size: 12px; font-weight: 800; color: var(--lav-600, #7a3fd6); }
+    .tt-challenge-edit { font-size: 10px; font-weight: 700; color: var(--neutral-500, #8a8178); background: none; border: none; cursor: pointer; padding: 2px 4px; }
+    .tt-challenge-edit:hover { color: var(--lav-600, #7a3fd6); }
+    .tt-challenge-list { display: grid; gap: 6px; }
+    .tt-challenge-item {
+      display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
+      color: var(--neutral-800, #3a3632); padding: 7px 10px; border-radius: 10px;
+      background: rgba(255,255,255,.7); border: 1px solid rgba(172,135,255,.25);
+    }
+    .tt-challenge-item .tt-c-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lav-500, #9255f5); flex: none; }
+    .tt-challenge-item .tt-c-xp { margin-left: auto; font-size: 10px; font-weight: 800; color: var(--mint-600, #4a9b7b); flex: none; }
+    .tt-challenge-item.done { opacity: .6; }
+    .tt-challenge-item.done .tt-c-dot { background: var(--mint-600, #4a9b7b); }
+    .tt-challenge-item.done .tt-c-name { text-decoration: line-through; color: var(--neutral-500, #8a8178); }
+    .challenge-intro { padding: 12px 14px; border-radius: 12px; background: linear-gradient(135deg, rgba(253,216,50,.16), rgba(172,135,255,.12)); border: 1px solid rgba(172,135,255,.3); margin-bottom: 14px; }
+    .challenge-intro-t { font-size: 14px; font-weight: 800; color: var(--neutral-900); }
+    .challenge-intro-s { font-size: 12px; color: var(--neutral-500, #8a8178); margin-top: 3px; }
+    .challenge-list { display: grid; gap: 8px; max-height: 46vh; overflow-y: auto; padding-right: 2px; }
+    .challenge-item {
+      display: flex; align-items: center; gap: 10px; padding: 11px 13px; border-radius: 12px;
+      background: var(--neutral-50); border: 1.5px solid var(--neutral-100); cursor: pointer;
+      transition: border-color .12s ease, background .12s ease;
+    }
+    .challenge-item:hover { border-color: var(--lav-300, #c4b5fd); }
+    .challenge-item.sel { border-color: var(--lav-500, #9255f5); background: rgba(172,135,255,.10); }
+    .challenge-item .ch-cat { font-size: 10px; font-weight: 800; color: var(--neutral-500, #8a8178); background: rgba(30,28,26,.05); padding: 2px 8px; border-radius: 999px; flex: none; }
+    .challenge-item .ch-name { font-size: 13px; font-weight: 700; color: var(--neutral-900); flex: 1; min-width: 0; }
+    .challenge-item .ch-xp { font-size: 11px; font-weight: 800; color: var(--mint-600, #4a9b7b); flex: none; }
+    .challenge-item .ch-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #cfc8c0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; flex: none; }
+    .challenge-item.sel .ch-check { background: var(--lav-500, #9255f5); border-color: var(--lav-500, #9255f5); }
     .tt-empty { text-align: center; font-size: 12px; font-weight: 700; color: var(--neutral-400); padding: 18px 0; }
 
     /* ════════ 学期滤镜条（顶部 · 时间视角 · 看数据的视角） ════════ */
@@ -8316,8 +8612,8 @@ input[type="date"]:focus::-webkit-datetime-edit {
 }
 
 /* ════════ 单页视图切换 (SPA) ════════ */
-.view{display:block; opacity:0; visibility:hidden; position:absolute; top:0; left:0; right:0; transition:opacity .35s ease, visibility .35s ease; pointer-events:none}
-.view.active{opacity:1; visibility:visible; position:relative; pointer-events:auto}
+.view{height:0; overflow:hidden; opacity:0; visibility:hidden; position:absolute; top:0; left:0; right:0; transition:opacity .35s ease, visibility .35s ease; pointer-events:none}
+.view.active{height:auto; overflow:visible; opacity:1; visibility:visible; position:relative; pointer-events:auto}
 
     /* ════════ AI 成长周报（彩色浅色毛玻璃风格） ════════ */
     .weekly-report-section { margin-top: 18px; }

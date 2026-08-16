@@ -366,8 +366,37 @@
       });
   };
 
-  // 通过 GitHub REST API 写入 JSON 文件
+  // 本地模式探测（本地测试服务器 /api/ping，结果缓存）
+  DataStore.prototype._isLocalMode = function () {
+    var self = this;
+    if (self._localModeChecked) return Promise.resolve(self._localMode);
+    return fetch('/api/ping', { method: 'GET' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) { self._localMode = !!(d && d.ok); self._localModeChecked = true; return self._localMode; })
+      .catch(function () { self._localMode = false; self._localModeChecked = true; return false; });
+  };
+
+  // 写入 JSON 文件（本地优先，回退 GitHub）
   DataStore.prototype._writeFile = function (path, content, message) {
+    var self = this;
+    return self._isLocalMode().then(function (local) {
+      if (local) {
+        // 本地测试：写入本地 data/ 目录，无需 Token
+        return fetch('/api/write', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: path, content: content, message: message || ('更新数据: ' + path) }),
+        }).then(function (resp) {
+          if (!resp.ok) throw new Error('本地写入失败: ' + resp.status);
+          return resp.json();
+        });
+      }
+      return self._writeFileRemote(path, content, message);
+    });
+  };
+
+  // 远程写入（GitHub REST API，需 Token）
+  DataStore.prototype._writeFileRemote = function (path, content, message) {
     var token = this._getToken();
     if (!token) {
       return Promise.reject(new Error('请先设置 GitHub Token'));
@@ -1003,6 +1032,7 @@
       xp: Number(rule.xp) || 0,
       method: rule.method || '按次',
       description: rule.description || '',
+      _manual: true, // 标记为手动新增，打卡时单独分组展示
     };
     var list = (config.xpRuleList || []).slice();
     list.push(newRule);

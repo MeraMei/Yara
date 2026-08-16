@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Yara的小宇宙中心 🌌</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23fdd832'/%3E%3C/svg%3E" />
   <style>
@@ -7866,9 +7869,22 @@ const GITHUB_BRANCH = 'main';
 const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/data`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data`;
 
-const CACHE_KEY = "yara_growth_data_v6";
+const CACHE_KEY = "yara_growth_data_v7";
 const CHILD_CACHE_KEY = "yara_child_profile";
 const CALENDAR_CACHE_KEY = "yara_calendar_data";
+
+// ── 缓存清理：删除所有旧版本缓存，确保加载最新数据 ──
+(function clearOldCaches() {
+  try {
+    var keys = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf("yara_growth_data_v") === 0 && k !== CACHE_KEY) keys.push(k);
+    }
+    keys.forEach(function (k) { localStorage.removeItem(k); });
+    if (keys.length) console.log("已清理旧缓存:", keys.join(", "));
+  } catch (e) { /* ignore */ }
+})();
 
 let cachedData = null;
 let loadPromise = null;
@@ -10033,10 +10049,12 @@ if (typeof window !== 'undefined') {
           <label class="form-label">选择 XP 任务 <span style="color:var(--colourful-error-600)">*</span></label>
           <select class="form-select" id="xpTaskSelectPage" onchange="onXpTaskChangePage()">
             <option value="">-- 请选择任务 --</option>
+            <optgroup label="📌 本周约定" id="xpGroupPage-本周约定"></optgroup>
             <optgroup label="学习成长" id="xpGroupPage-学习成长"></optgroup>
             <optgroup label="兴趣爱好" id="xpGroupPage-兴趣爱好"></optgroup>
             <optgroup label="身体成长" id="xpGroupPage-身体成长"></optgroup>
             <optgroup label="能力成长" id="xpGroupPage-能力成长"></optgroup>
+            <optgroup label="➕ 手动新增" id="xpGroupPage-手动新增"></optgroup>
           </select>
           <div style="margin-top:8px;text-align:right">
             <button type="button" class="btn-link" onclick="openNewTaskModalPage()">
@@ -10583,15 +10601,72 @@ if (typeof window !== "undefined") {
     async function populateXpTaskSelectPage() {
       const cfg = await loadAppData();
       const xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
-      const categories = ["学习成长", "兴趣爱好", "身体成长", "能力成长"];
+      const categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+      // 获取本周约定
+      const meetings = (cfg.familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
+      const meeting = meetings.length > 0 ? meetings[0] : null;
+      const activeCommitments = meeting ? meeting.commitments.filter(function(c) { return !c.completed; }) : [];
+      // 分类：关联任务池的约定（linked） vs 自由填写（非linked）
+      const linkedCommitments = activeCommitments.filter(c => c.linked);
+      const freeCommitments = activeCommitments.filter(c => !c.linked);
+      // 关联任务池的约定按分类分组
+      const linkedByCat = {};
+      linkedCommitments.forEach(c => {
+        const cat = c.category || "能力成长";
+        if (!linkedByCat[cat]) linkedByCat[cat] = [];
+        linkedByCat[cat].push(c);
+      });
+      // ── 本周约定分组：只放自由填写的约定（📝） ──
+      const commitmentGroup = document.getElementById("xpGroupPage-本周约定");
+      if (commitmentGroup) {
+        if (freeCommitments.length > 0) {
+          commitmentGroup.innerHTML = freeCommitments.map(c => {
+            const cat = c.category || "能力成长";
+            const xp = c.xp || 5;
+            return `<option value="${c.text}" data-xp="${xp}" data-category="${cat}" data-commitment="1" data-linked="0" data-taskname="${c.text}">📝 ${c.text} (+${xp}XP)</option>`;
+          }).join("");
+        } else {
+          commitmentGroup.innerHTML = `<option value="" disabled>${linkedCommitments.length > 0 ? '🎉 本周约定全部完成！' : '还没有约定，去家庭会议定一个'}</option>`;
+        }
+      }
+      // ── 每个分类：先显示本周约定关联的任务（🔗 排最前），再显示任务池其他任务 ──
       categories.forEach(cat => {
         const groupEl = document.getElementById("xpGroupPage-" + cat);
         if (!groupEl) return;
-        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·"));
-        groupEl.innerHTML = tasks.map(t =>
+        const linked = linkedByCat[cat] || [];
+        const linkedNames = new Set(linked.map(c => c.taskName || c.text));
+        // 任务池任务：排除自动发放、排除手动新增（单独分组）、排除已被约定关联的任务（避免重复）
+        const tasks = (xpRules[cat] || []).filter(t =>
+          !t.name.startsWith("作业·") && t.method !== "自动发放" && !t._manual && !linkedNames.has(t.name)
+        );
+        // 关联约定任务排最前
+        const linkedHtml = linked.map(c => {
+          const xp = c.xp || 5;
+          const taskName = c.taskName || c.text;
+          return `<option value="${taskName}" data-xp="${xp}" data-category="${cat}" data-commitment="1" data-linked="1" data-taskname="${taskName}">🔗 ${c.text} (+${xp}XP)</option>`;
+        }).join("");
+        const otherHtml = tasks.map(t =>
           `<option value="${t.name}" data-xp="${t.xp}" data-category="${cat}">${t.name} (+${t.xp}XP)</option>`
         ).join("");
+        groupEl.innerHTML = linkedHtml + otherHtml;
       });
+      // ── 手动新增分组：所有手动新增的任务单独放一起 ──
+      const manualGroup = document.getElementById("xpGroupPage-手动新增");
+      if (manualGroup) {
+        const manualTasks = [];
+        categories.forEach(cat => {
+          (xpRules[cat] || []).forEach(t => {
+            if (t._manual) manualTasks.push({ name: t.name, xp: t.xp, category: cat });
+          });
+        });
+        if (manualTasks.length > 0) {
+          manualGroup.innerHTML = manualTasks.map(t =>
+            `<option value="${t.name}" data-xp="${t.xp}" data-category="${t.category}">${t.name} (+${t.xp}XP)</option>`
+          ).join("");
+        } else {
+          manualGroup.innerHTML = `<option value="" disabled>还没有手动新增的任务</option>`;
+        }
+      }
     }
 
     function onXpTaskChangePage() {
@@ -12521,33 +12596,64 @@ async function renderXp() {
   let totalAvailableTasks = 0;
 
   if (xpRulesEl) {
+    const LIMIT = 5;
+    const isAutoTask = (t) => {
+      const d = String(t.description || "");
+      const n = String(t.name || "");
+      const m = String(t.method || "");
+      return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0;
+    };
     const cards = allCats.map(cat => {
-      const tasks = xpRulesCfg[cat] || [];
+      const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
       const earned = catAgg[cat] ? catAgg[cat].xp : 0;
+      const count = catAgg[cat] ? catAgg[cat].count : 0;
       const p = WCPALETTE[cat] || WCPALETTE["学习成长"];
       totalAvailableTasks += tasks.length;
+      const xps = tasks.map(t => Number(t.xp) || 0);
+      const minXp = xps.length ? Math.min(...xps) : 0;
+      const maxXp = xps.length ? Math.max(...xps) : 0;
+      const xpRange = xps.length ? (minXp === maxXp ? `${minXp} XP` : `${minXp}~${maxXp} XP`) : "--";
+      const showAll = tasks.length <= LIMIT;
+      const visible = showAll ? tasks : tasks.slice(0, LIMIT);
+      const hidden = showAll ? [] : tasks.slice(LIMIT);
+      const itemHtml = (t) => `
+        <div class="exc-task">
+          <span class="exc-task-name">${t.name}</span>
+          <span class="exc-task-xp" style="color:${p.color};background:${p.bg}">+${t.xp} XP</span>
+        </div>`;
       return `
         <div class="earn-xp-card">
           <div class="exc-head">
             <span class="exc-title">
               <span class="exc-dot" style="background:${p.dot}"></span>${cat}
             </span>
-            <span class="exc-earned">已赚 <b style="color:${p.color}">${earned}</b> XP</span>
+            <span class="exc-earned" style="color:${p.color}">已获得 <b style="color:${p.color}">+${earned}</b> XP</span>
+          </div>
+          <div class="exc-stats">
+            <span class="exc-stat"><i data-lucide="repeat"></i>锻炼 <b>${count}</b> 次</span>
+            <span class="exc-stat"><i data-lucide="star"></i>单次默认 <b>${xpRange}</b></span>
           </div>
           ${tasks.length === 0 ? `<div style="font-size:12px;color:var(--neutral-400);padding:8px 0">暂无可用任务</div>` : `
           <div class="exc-tasks">
-            ${tasks.map(t => `
-              <div class="exc-task">
-                <span class="exc-task-name">${t.name}</span>
-                <span class="exc-task-xp" style="color:${p.color};background:${p.bg}">+${t.xp} XP</span>
-              </div>
-            `).join("")}
-          </div>`}
+            ${visible.map(itemHtml).join("")}
+            ${hidden.length ? `<div class="exc-tasks-more xp-rules-more-${cat}" style="display:none">${hidden.map(itemHtml).join("")}</div>` : ""}
+          </div>
+          ${hidden.length ? `<button class="expand-btn" data-cat="${cat}" onclick="toggleXpRules('${cat}')"><span>展开更多（${hidden.length}）</span></button>` : ""}`}
         </div>`;
     }).join("");
     xpRulesEl.innerHTML = cards;
   }
   setText("earnXpTotal", `${totalAvailableTasks} 个可用任务`);
+
+  // 如何积累XP：每个版块展开 / 收起更多任务
+  window.toggleXpRules = function (cat) {
+    const more = document.querySelector(".xp-rules-more-" + cat);
+    const btn = document.querySelector('.expand-btn[data-cat="' + cat + '"]');
+    if (!more || !btn) return;
+    const isHidden = more.style.display === "none" || !more.style.display;
+    more.style.display = isHidden ? "block" : "none";
+    btn.textContent = isHidden ? "收起" : "展开更多";
+  };
 
   // ════════ 我的日记本 ════════
   await renderDiary();

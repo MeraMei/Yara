@@ -40,9 +40,22 @@ const GITHUB_BRANCH = 'main';
 const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/data`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data`;
 
-const CACHE_KEY = "yara_growth_data_v9";
+const CACHE_KEY = "yara_growth_data_v10";
 const CHILD_CACHE_KEY = "yara_child_profile";
 const CALENDAR_CACHE_KEY = "yara_calendar_data";
+
+// ── 缓存清理：删除所有旧版本缓存，确保加载最新数据 ──
+(function clearOldCaches() {
+  try {
+    var keys = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf("yara_growth_data_v") === 0 && k !== CACHE_KEY) keys.push(k);
+    }
+    keys.forEach(function (k) { localStorage.removeItem(k); });
+    if (keys.length) console.log("已清理旧缓存:", keys.join(", "));
+  } catch (e) { /* ignore */ }
+})();
 
 let cachedData = null;
 let loadPromise = null;
@@ -99,8 +112,37 @@ function getFileSHA(path) {
     .then(data => data && data.sha ? data.sha : null);
 }
 
-// 写入 JSON 文件到 GitHub
+// ── 本地模式探测（本地测试服务器 /api/ping，结果缓存） ──
+let _localModeChecked = false;
+let _localMode = false;
+function isLocalMode() {
+  if (_localModeChecked) return Promise.resolve(_localMode);
+  return fetch('/api/ping', { method: 'GET' })
+    .then(r => (r.ok ? r.json() : null))
+    .then(d => { _localMode = !!(d && d.ok); _localModeChecked = true; return _localMode; })
+    .catch(() => { _localMode = false; _localModeChecked = true; return false; });
+}
+
+// 写入 JSON 文件（本地优先，回退 GitHub）
 function writeGithubFile(path, content, message) {
+  return isLocalMode().then(local => {
+    if (local) {
+      // 本地测试：写入本地 data/ 目录，无需 Token
+      return fetch('/api/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path, content, message: message || ('更新数据: ' + path) }),
+      }).then(resp => {
+        if (!resp.ok) throw new Error('本地写入失败: ' + resp.status);
+        return resp.json();
+      });
+    }
+    return writeGithubFileRemote(path, content, message);
+  });
+}
+
+// 远程写入（GitHub REST API，需 Token）
+function writeGithubFileRemote(path, content, message) {
   const token = getGithubToken();
   if (!token) {
     return Promise.reject(new Error('请先设置 GitHub Token'));
@@ -208,7 +250,9 @@ async function _backgroundRefresh() {
   } else {
     window.__dataCache = await loadData();
   }
-  await renderAll(window.__dataCache);
+  // 数据刷新完成后，通知 boot() 注册的监听器重渲染当前视图
+  // （不再调用不存在的 renderAll，避免遗留报错）
+  window.dispatchEvent(new CustomEvent("yara-data-refreshed"));
 }
 
 // 数据版本号，用于视图缓存：每次数据刷新时递增，渲染函数凭此判断是否需要重绘
@@ -446,6 +490,11 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
+// 把 Date 对象格式化为 YYYY-MM-DD 字符串（用于日期比较）
+function formatDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
 function generateId(prefix) {
   return (prefix || 'rec_') + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
@@ -655,6 +704,55 @@ async function addDiaryEntry(entry) {
   return saved;
 }
 
+// ── 家庭会议记录存取 ──
+
+// 读取家庭会议列表（优先缓存，缓存为空时从 GitHub 拉取）
+async function loadFamilyMeetings() {
+  if (cachedData && Array.isArray(cachedData.familyMeetings) && cachedData.familyMeetings.length > 0) {
+    return cachedData.familyMeetings;
+  }
+  const raw = await fetchRawJSON('familyMeetings.json').catch(() => []);
+  if (cachedData && Array.isArray(raw) && raw.length > 0) {
+    cachedData.familyMeetings = raw;
+  }
+  return raw;
+}
+
+// 写入整份家庭会议列表
+async function saveFamilyMeetings(meetings) {
+  _dataGen++;
+  const list = Array.isArray(meetings) ? meetings : [];
+  await writeGithubFile('familyMeetings.json', list, '更新家庭会议记录');
+  if (cachedData) cachedData.familyMeetings = list;
+  _persistCache();
+  return list;
+}
+
+// 追加一条家庭会议记录
+async function addFamilyMeeting(meeting) {
+  _dataGen++;
+  const current = await loadFamilyMeetings();
+  const list = Array.isArray(current) ? current.slice() : [];
+  const saved = {
+    id: meeting.id || generateId('fm_'),
+    weekNumber: meeting.weekNumber || 0,
+    year: meeting.year || new Date().getFullYear(),
+    date: meeting.date || todayStr(),
+    summary: meeting.summary || '',
+    discussion: meeting.discussion || '',
+    goal: meeting.goal || '',
+    goalCompleted: !!meeting.goalCompleted,
+    previousGoal: meeting.previousGoal || '',
+    previousGoalCompleted: !!meeting.previousGoalCompleted,
+    commitments: meeting.commitments || [],
+    previousCommitments: meeting.previousCommitments || [],
+    createdAt: meeting.createdAt || new Date().toISOString(),
+  };
+  list.unshift(saved);
+  await saveFamilyMeetings(list);
+  return saved;
+}
+
 // ── AI 式智能分析：从自由正文判断是否自然写出时间/地点/人物/事件/感受 ──
 const DIARY_TIME_WORDS = ["今天","昨天","前天","早上","早晨","清晨","上午","中午","下午","傍晚","晚上","夜里","白天","放学后","下课","午休","睡前","回家后","周末","星期","假期","暑假","寒假","刚才","时候","然后","后来","之后","现在","刚刚","一会儿","每天","有一天","有一次","首先","接着","最后","那时","这时候","那几天","每天"];
 const DIARY_PLACE_WORDS = ["在","公园","操场","教室","学校","家里","家","超市","商场","广场","图书馆","医院","房间","阳台","厨房","外面","楼下","小区","车上","公交","地铁","饭店","餐厅","书店","游乐园","动物园","海边","山里","老家","奶奶家","外婆家","园","场","站"];
@@ -813,43 +911,196 @@ async function submitDiary() {
   }
 }
 
-// 渲染日记本：统计 + 本周打卡条 + 最近日记卡片网格
+// 渲染日记本：统计 + 本周打卡条 + 最近日记卡片 + 查看全部
 async function renderDiary() {
   const moduleEl = document.getElementById("diaryModule");
   if (!moduleEl) return;
-  // 优先使用 loadDiaryEntries（它会在缓存为空时回退到 GitHub），避免缓存损坏导致不显示
   let entries = await DataStore.loadDiaryEntries().catch(() => []);
   if (!Array.isArray(entries) || entries.length === 0) {
     const cfg = await DataStore.loadData();
     entries = (cfg.diaryEntries || []).slice();
   }
   entries = entries.slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  // 保存主页最近记录数据，供详情弹窗索引
+  _diaryHomeEntries = entries;
   const totalCount = entries.length;
   const streak = calcDiaryStreak(entries);
+  const bestStreak = calcDiaryBestStreak(entries);
   const totalDiaryXp = entries.reduce((sum, d) => sum + (Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6)), 0);
   setText("diaryStats", `已写 ${totalCount} 篇 · 连续 ${streak} 天 · 累计 ${totalDiaryXp} XP`);
   setText("dStatCount", totalCount);
   setText("dStatStreak", streak);
+  setText("dStatXp", totalDiaryXp);
+  setText("dStatBest", bestStreak);
   renderDiaryStrip(entries);
+
   const tl = document.getElementById("diaryTimeline");
   if (!tl) return;
+
   if (entries.length === 0) {
-    tl.innerHTML = `<div class="diary-empty">还没有记录，记下第一笔吧 ✨</div>`;
-  } else {
-    tl.innerHTML = entries.slice(0, 6).map(d => {
-      const hits = d.hits || [];
-      const metaFour = d.completeFour ? `<span class="ok">${hits.filter(h => h !== "感受").length}/4 要素 ✓</span>` : `<span class="no">${hits.filter(h => h !== "感受").length}/4 要素</span>`;
-      const metaFeel = d.completeFeel ? `<span class="ok">感受 ✓</span>` : `<span class="no">感受缺</span>`;
-      const xp = Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6);
-      const hitsTxt = hits.length ? `<span class="dl-hits">写到：${hits.join(" · ")}</span>` : "";
-      return `<div class="dl-item">
-        <div class="dl-head"><span class="dl-date">${formatDiaryDate(d.date)}</span><span class="dl-mood">${d.mood || "📝"}</span></div>
-        ${hitsTxt}
-        ${d.content ? `<div class="dl-text">${escapeHtmlReason(d.content)}</div>` : ""}
-        <div class="dl-meta">${metaFour} · ${metaFeel} · +${xp} XP</div>
-      </div>`;
-    }).join("");
+    tl.innerHTML = `<div class="diary-empty">
+      <div class="diary-empty-icon">📖</div>
+      <div class="diary-empty-text">还没有记录，记下第一笔吧 ✨</div>
+      <div class="diary-empty-sub">写日记能锻炼写作能力，还能拿 XP 哦</div>
+    </div>`;
+    const moreBtn = document.getElementById("diaryViewAllBtn");
+    if (moreBtn) moreBtn.style.display = "none";
+    return;
   }
+
+  // 主页默认显示最近 4 篇，点击"查看全部"打开完整日记墙
+  const PREVIEW_COUNT = 4;
+  const previewEntries = entries.slice(0, PREVIEW_COUNT);
+  const hasMore = entries.length > PREVIEW_COUNT;
+
+  tl.innerHTML = previewEntries.map((d, idx) => renderDiaryCard(d, idx)).join("");
+
+  const moreBtn = document.getElementById("diaryViewAllBtn");
+  if (moreBtn) {
+    if (hasMore) {
+      moreBtn.style.display = "";
+      moreBtn.innerHTML = `<i data-lucide="book-open"></i> 查看全部 ${totalCount} 篇日记 →`;
+      moreBtn.onclick = () => openDiaryWallModal(entries);
+    } else {
+      moreBtn.style.display = "none";
+    }
+  }
+  refreshIcons(0);
+}
+
+function renderDiaryCard(d, idx) {
+  const hits = d.hits || [];
+  const fourCount = hits.filter(h => h !== "感受").length;
+  const metaFour = d.completeFour
+    ? `<span class="dl-tag ok">${fourCount}/4 要素 ✓</span>`
+    : `<span class="dl-tag no">${fourCount}/4 要素</span>`;
+  const metaFeel = d.completeFeel
+    ? `<span class="dl-tag ok">感受 ✓</span>`
+    : `<span class="dl-tag no">感受缺</span>`;
+  const xp = Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6);
+  const hitsTxt = hits.length ? `<div class="dl-hits">写到：${hits.join(" · ")}</div>` : "";
+  const content = d.content || "";
+  const isLong = content.length > 60;
+  const displayContent = isLong ? content.slice(0, 60) + "…" : content;
+  return `<div class="dl-item" data-idx="${idx}" onclick="openDiaryDetailModal(${idx})">
+    <div class="dl-head">
+      <span class="dl-date">${formatDiaryDate(d.date)}</span>
+      <span class="dl-mood" title="${d.moodLabel || d.mood || ''}">${d.mood || "📝"}</span>
+    </div>
+    ${hitsTxt}
+    ${content ? `<div class="dl-text">${escapeHtmlReason(displayContent)}</div>` : ""}
+    <div class="dl-foot">
+      <div class="dl-tags">${metaFour} ${metaFeel}</div>
+      <div class="dl-xp">+${xp} XP</div>
+    </div>
+  </div>`;
+}
+
+// ════════ 日记墙弹窗：查看全部日记，按月分组时间线 ════════
+let _diaryWallEntries = [];
+let _diaryHomeEntries = [];
+function openDiaryWallModal(entries) {
+  _diaryWallEntries = entries || [];
+  const modal = document.getElementById("diaryWallModal");
+  const listEl = document.getElementById("diaryWallList");
+  if (!modal || !listEl) return;
+
+  // 按月分组
+  const groups = {};
+  _diaryWallEntries.forEach(d => {
+    const monthKey = (d.date || "").slice(0, 7); // YYYY-MM
+    if (!groups[monthKey]) groups[monthKey] = [];
+    groups[monthKey].push(d);
+  });
+
+  const months = Object.keys(groups).sort().reverse();
+  let html = "";
+  months.forEach(monthKey => {
+    const monthEntries = groups[monthKey];
+    const [y, m] = monthKey.split("-");
+    const monthXp = monthEntries.reduce((s, d) => s + (Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6)), 0);
+    html += `<div class="dw-month">
+      <div class="dw-month-head">
+        <span class="dw-month-title">${y}年${parseInt(m,10)}月</span>
+        <span class="dw-month-meta">${monthEntries.length} 篇 · +${monthXp} XP</span>
+      </div>
+      <div class="dw-timeline">
+        ${monthEntries.map(d => {
+          const day = (d.date || "").slice(8, 10);
+          const hits = d.hits || [];
+          const fourCount = hits.filter(h => h !== "感受").length;
+          const xp = Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6);
+          const content = d.content || "";
+          return `<div class="dw-item">
+            <div class="dw-dot"></div>
+            <div class="dw-day">${parseInt(day,10)}</div>
+            <div class="dw-card" onclick="openDiaryDetailModal(${_diaryWallEntries.indexOf(d)})">
+              <div class="dw-card-head">
+                <span class="dw-mood">${d.mood || "📝"}</span>
+                <span class="dw-xp">+${xp} XP</span>
+              </div>
+              ${content ? `<div class="dw-text">${escapeHtmlReason(content)}</div>` : ""}
+              ${hits.length ? `<div class="dw-hits">写到：${hits.join(" · ")}</div>` : ""}
+              <div class="dw-tags">
+                <span class="dl-tag ${d.completeFour ? 'ok' : 'no'}">${fourCount}/4 要素${d.completeFour ? ' ✓' : ''}</span>
+                <span class="dl-tag ${d.completeFeel ? 'ok' : 'no'}">感受${d.completeFeel ? ' ✓' : '缺'}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+  });
+
+  listEl.innerHTML = html || `<div class="diary-empty">还没有日记记录</div>`;
+  modal.classList.add("active");
+  refreshIcons(0);
+}
+
+function closeDiaryWallModal() {
+  const modal = document.getElementById("diaryWallModal");
+  if (modal) modal.classList.remove("active");
+}
+
+// ════════ 日记详情弹窗：查看单篇完整内容 ════════
+let _diaryDetailEntries = [];
+function openDiaryDetailModal(idx) {
+  const modal = document.getElementById("diaryDetailModal");
+  const body = document.getElementById("diaryDetailBody");
+  if (!modal || !body) return;
+  // 优先用日记墙数据，否则从主页最近记录取
+  let entries = _diaryWallEntries.length ? _diaryWallEntries : _diaryHomeEntries;
+  const d = entries[idx];
+  if (!d) return;
+  const hits = d.hits || [];
+  const fourCount = hits.filter(h => h !== "感受").length;
+  const xp = Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6);
+  const hitsTxt = hits.length ? `<div class="dd-hits">写到：${hits.map(h => `<span class="dd-hit">${h}</span>`).join("")}</div>` : "";
+  const mood = d.mood || "📝";
+  // 只有存在文字版心情描述（且与表情不同）时才显示，避免出现两个相同表情
+  const moodLabel = d.moodLabel || "";
+  const moodLabelHtml = (moodLabel && moodLabel !== mood)
+    ? `<span class="dd-mood-label">${escapeHtmlReason(moodLabel)}</span>`
+    : "";
+  body.innerHTML = `
+    <div class="dd-head">
+      <div class="dd-date">${formatDiaryDate(d.date)}</div>
+      <div class="dd-mood">${mood} ${moodLabelHtml}</div>
+    </div>
+    ${hitsTxt}
+    <div class="dd-content">${escapeHtmlReason(d.content || "（这篇日记没有写内容）")}</div>
+    <div class="dd-tags">
+      <span class="dl-tag ${d.completeFour ? 'ok' : 'no'}">${fourCount}/4 要素${d.completeFour ? ' ✓' : ''}</span>
+      <span class="dl-tag ${d.completeFeel ? 'ok' : 'no'}">感受${d.completeFeel ? ' ✓' : '缺'}</span>
+      <span class="dl-tag ok">+${xp} XP</span>
+    </div>`;
+  modal.classList.add("active");
+  refreshIcons(0);
+}
+
+function closeDiaryDetailModal() {
+  const modal = document.getElementById("diaryDetailModal");
+  if (modal) modal.classList.remove("active");
 }
 
 // 渲染最近 7 天打卡条（今天倒推 6 天，共 7 个圆点）
@@ -889,6 +1140,27 @@ function calcDiaryStreak(entries) {
   return streak;
 }
 
+// 计算历史最长连续天数
+function calcDiaryBestStreak(entries) {
+  if (!entries || entries.length === 0) return 0;
+  const dates = [...new Set(entries.map(d => d.date))].sort();
+  if (dates.length === 0) return 0;
+  let best = 1, current = 1;
+  const pad = (n) => String(n).padStart(2, "0");
+  for (let i = 1; i < dates.length; i++) {
+    const prev = new Date(dates[i-1]);
+    const cur = new Date(dates[i]);
+    const diff = Math.round((cur - prev) / (1000 * 60 * 60 * 24));
+    if (diff === 1) {
+      current++;
+      best = Math.max(best, current);
+    } else {
+      current = 1;
+    }
+  }
+  return best;
+}
+
 // 格式化日记日期：YYYY-MM-DD → 今天/昨天/M月D日
 function formatDiaryDate(date) {
   if (!date) return "";
@@ -912,6 +1184,7 @@ async function addXpRule(rule) {
     xp: Number(rule.xp) || 0,
     method: rule.method || '按次',
     description: rule.description || '',
+    _manual: true, // 标记为手动新增，打卡时单独分组展示
   };
   const config = await fetchRawJSON('config.json').catch(() => ({ xpRuleList: [], xpRules: {} }));
   if (!config.xpRuleList) config.xpRuleList = [];
@@ -1341,6 +1614,10 @@ if (typeof window !== 'undefined') {
     loadDiaryEntries,
     saveDiaryEntries,
     addDiaryEntry,
+    // 家庭会议
+    loadFamilyMeetings,
+    saveFamilyMeetings,
+    addFamilyMeeting,
     // GitHub 专属
     getGithubToken,
     hasGithubToken,
@@ -1750,14 +2027,71 @@ if (typeof window !== "undefined") {
       const cfg = await loadAppData();
       const xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
       const categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+      // 获取本周约定
+      const meetings = (cfg.familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
+      const meeting = meetings.length > 0 ? meetings[0] : null;
+      const activeCommitments = meeting ? meeting.commitments.filter(function(c) { return !c.completed; }) : [];
+      // 分类：关联任务池的约定（linked） vs 自由填写（非linked）
+      const linkedCommitments = activeCommitments.filter(c => c.linked);
+      const freeCommitments = activeCommitments.filter(c => !c.linked);
+      // 关联任务池的约定按分类分组
+      const linkedByCat = {};
+      linkedCommitments.forEach(c => {
+        const cat = c.category || "能力成长";
+        if (!linkedByCat[cat]) linkedByCat[cat] = [];
+        linkedByCat[cat].push(c);
+      });
+      // ── 本周约定分组：只放自由填写的约定（📝） ──
+      const commitmentGroup = document.getElementById("xpGroupPage-本周约定");
+      if (commitmentGroup) {
+        if (freeCommitments.length > 0) {
+          commitmentGroup.innerHTML = freeCommitments.map(c => {
+            const cat = c.category || "能力成长";
+            const xp = c.xp || 5;
+            return `<option value="${c.text}" data-xp="${xp}" data-category="${cat}" data-commitment="1" data-linked="0" data-taskname="${c.text}">📝 ${c.text} (+${xp}XP)</option>`;
+          }).join("");
+        } else {
+          commitmentGroup.innerHTML = `<option value="" disabled>${linkedCommitments.length > 0 ? '🎉 本周约定全部完成！' : '还没有约定，去家庭会议定一个'}</option>`;
+        }
+      }
+      // ── 每个分类：先显示本周约定关联的任务（🔗 排最前），再显示任务池其他任务 ──
       categories.forEach(cat => {
         const groupEl = document.getElementById("xpGroupPage-" + cat);
         if (!groupEl) return;
-        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·") && t.method !== "自动发放");
-        groupEl.innerHTML = tasks.map(t =>
+        const linked = linkedByCat[cat] || [];
+        const linkedNames = new Set(linked.map(c => c.taskName || c.text));
+        // 任务池任务：排除自动发放、排除手动新增（单独分组）、排除已被约定关联的任务（避免重复）
+        const tasks = (xpRules[cat] || []).filter(t =>
+          !t.name.startsWith("作业·") && t.method !== "自动发放" && !t._manual && !linkedNames.has(t.name)
+        );
+        // 关联约定任务排最前
+        const linkedHtml = linked.map(c => {
+          const xp = c.xp || 5;
+          const taskName = c.taskName || c.text;
+          return `<option value="${taskName}" data-xp="${xp}" data-category="${cat}" data-commitment="1" data-linked="1" data-taskname="${taskName}">🔗 ${c.text} (+${xp}XP)</option>`;
+        }).join("");
+        const otherHtml = tasks.map(t =>
           `<option value="${t.name}" data-xp="${t.xp}" data-category="${cat}">${t.name} (+${t.xp}XP)</option>`
         ).join("");
+        groupEl.innerHTML = linkedHtml + otherHtml;
       });
+      // ── 手动新增分组：所有手动新增的任务单独放一起 ──
+      const manualGroup = document.getElementById("xpGroupPage-手动新增");
+      if (manualGroup) {
+        const manualTasks = [];
+        categories.forEach(cat => {
+          (xpRules[cat] || []).forEach(t => {
+            if (t._manual) manualTasks.push({ name: t.name, xp: t.xp, category: cat });
+          });
+        });
+        if (manualTasks.length > 0) {
+          manualGroup.innerHTML = manualTasks.map(t =>
+            `<option value="${t.name}" data-xp="${t.xp}" data-category="${t.category}">${t.name} (+${t.xp}XP)</option>`
+          ).join("");
+        } else {
+          manualGroup.innerHTML = `<option value="" disabled>还没有手动新增的任务</option>`;
+        }
+      }
     }
 
     function onXpTaskChangePage() {
@@ -1777,7 +2111,11 @@ if (typeof window !== "undefined") {
       if (meetings.length > 0) {
         var meeting = meetings[0];
         var texts = meeting.commitments.map(function(c) { return c.text; });
-        hint.innerHTML = '📋 <b>本周约定参考</b><br>' + texts.map(function(t) { return '· ' + t; }).join('<br>') + '<br><span style="font-size:11px;color:var(--colourful-success-500)">💡 如果正在完成本周约定，勾选此框，通过后额外 +2 XP</span>';
+        var linkedTexts = meeting.commitments.filter(function(c) { return c.linked; }).map(function(c) { return c.text; });
+        var extra = linkedTexts.length > 0
+          ? '<br><span style="font-size:11px;color:var(--colourful-success-500)">💡 任务池关联的约定（' + linkedTexts.join("、") + '）打卡即自动完成，无需勾选此框</span>'
+          : '';
+        hint.innerHTML = '📋 <b>本周约定参考</b><br>' + texts.map(function(t) { return '· ' + t; }).join('<br>') + extra + '<br><span style="font-size:11px;color:var(--colourful-success-500)">💡 如果正在完成自由填写的约定，勾选此框，通过后按约定奖励 XP</span>';
         hint.style.display = "";
       } else {
         hint.innerHTML = '💡 还没有本周约定？<a href="javascript:void(0)" onclick="closeXpModal();openFamilyMeeting()" style="color:var(--colourful-success-600);text-decoration:underline">去家庭会议定一个</a>';
@@ -1799,6 +2137,80 @@ if (typeof window !== "undefined") {
     }
     function closeXpModal() {
       document.getElementById("addXpModalPage").classList.remove("active");
+    }
+
+    // ════════ 我的挑战（孩子自己选每周目标） ════════
+    let _challengeSelected = [];
+
+    async function openChallengeModal() {
+      const cfg = await loadAppData();
+      const xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
+      const categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+      // 当前已选（来自 child.weeklyGoals）
+      const weeklyGoals = (cfg.child && cfg.child.weeklyGoals) || [];
+      _challengeSelected = weeklyGoals.map(g => g.name);
+      const listEl = document.getElementById("challengeList");
+      if (!listEl) return;
+      let html = "";
+      categories.forEach(cat => {
+        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·") && t.method !== "自动发放");
+        if (tasks.length === 0) return;
+        html += `<div style="font-size:11px;font-weight:800;color:var(--neutral-500,#8a8178);margin:10px 2px 6px">${cat}</div>`;
+        tasks.forEach(t => {
+          const sel = _challengeSelected.includes(t.name) ? " sel" : "";
+          html += `<div class="challenge-item${sel}" data-name="${t.name}" data-cat="${cat}" data-xp="${t.xp}" onclick="toggleChallengeItem(this)">
+            <span class="ch-check">✓</span>
+            <span class="ch-cat">${cat}</span>
+            <span class="ch-name">${t.name}</span>
+            <span class="ch-xp">+${t.xp} XP</span>
+          </div>`;
+        });
+      });
+      listEl.innerHTML = html;
+      document.getElementById("challengeModal").classList.add("active");
+      refreshIcons(50);
+    }
+
+    function toggleChallengeItem(el) {
+      const name = el.getAttribute("data-name");
+      if (el.classList.contains("sel")) {
+        el.classList.remove("sel");
+        _challengeSelected = _challengeSelected.filter(n => n !== name);
+      } else {
+        if (_challengeSelected.length >= 3) { showToast("最多选 3 个挑战哦，先完成再换新的 💪", false); return; }
+        el.classList.add("sel");
+        _challengeSelected.push(name);
+      }
+    }
+
+    function closeChallengeModal() {
+      document.getElementById("challengeModal").classList.remove("active");
+    }
+
+    async function saveChallengeGoals() {
+      if (_challengeSelected.length === 0) { showToast("选 1-3 个你想挑战的事吧 ✨", false); return; }
+      const cfg = await loadAppData();
+      const xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
+      const goals = _challengeSelected.map(name => {
+        for (const cat of Object.keys(xpRules)) {
+          const found = (xpRules[cat] || []).find(t => t.name === name);
+          if (found) return { name: found.name, category: found.category || cat, xp: Number(found.xp) || 0 };
+        }
+        return { name, category: "", xp: 0 };
+      });
+      const child = Object.assign({}, cfg.child || {});
+      child.weeklyGoals = goals;
+      try {
+        await window.DataStore.updateChildData(child);
+        await window.DataStore.refreshData(true);
+        closeChallengeModal();
+        showToast("🎯 挑战定好啦！去首页看看你的目标吧", true);
+        if (window.__viewRendered && window.__viewRendered.home) { window.__viewRendered.home = false; }
+        renderHome();
+      } catch (e) {
+        console.error("保存挑战失败:", e);
+        showToast("❌ 保存失败: " + (e.message || "未知错误"), false);
+      }
     }
     function openNewTaskModalPage() {
       document.getElementById("newTaskNamePage").value = "";
@@ -1845,10 +2257,13 @@ if (typeof window !== "undefined") {
     }
 
     function submitAddXpPage() {
-      const taskName = document.getElementById("xpTaskSelectPage").value;
+      const selectEl = document.getElementById("xpTaskSelectPage");
+      const taskName = selectEl.value;
+      const selectedOpt = selectEl.options[selectEl.selectedIndex];
       const description = document.getElementById("xpDescPage").value.trim();
       const xpValue = parseInt(document.getElementById("xpValuePage").value, 10) || 0;
-      const isCommitment = document.getElementById("xpCommitmentCheck").checked;
+      const isCommitmentCheck = document.getElementById("xpCommitmentCheck").checked;
+      const isCommitmentTask = selectedOpt && selectedOpt.dataset?.commitment === "1";
       if (!taskName) { alert("请选择 XP 任务"); return; }
       if (!description) { alert("请填写备注说明"); return; }
 
@@ -1857,7 +2272,8 @@ if (typeof window !== "undefined") {
       btn.textContent = "提交中...";
       btn.disabled = true;
 
-      // 承诺加成：额外 +2 XP
+      // 如果选的是本周约定任务，自动启用承诺加成 +2 XP
+      const isCommitment = isCommitmentCheck || isCommitmentTask;
       const bonusXp = isCommitment ? 2 : 0;
       const totalXp = xpValue + bonusXp;
 
@@ -1869,6 +2285,34 @@ if (typeof window !== "undefined") {
         description: isCommitment ? description + " [承诺兑现]" : description,
         status: "pending",
       }).then(async () => {
+        // 打卡即完成约定：如果该任务是本周约定，自动标记完成
+        // 1. 关联任务池的约定：通过 taskName 匹配
+        // 2. 自由填写的约定：通过 text 匹配（从本周约定选的）
+        try {
+          const cfgNow = window.__lastCfg || {};
+          const meetings = cfgNow.familyMeetings || [];
+          const linkedTaskName = selectedOpt?.dataset?.taskname || taskName;
+          const meeting = meetings.find(m => m.commitments && m.commitments.some(c => {
+            if (c.completed) return false;
+            if (c.linked && c.taskName === linkedTaskName) return true;
+            if (isCommitmentTask && !c.linked && c.text === taskName) return true;
+            return false;
+          }));
+          if (meeting) {
+            let changed = false;
+            meeting.commitments.forEach(c => {
+              if (c.completed) return;
+              if (c.linked && c.taskName === linkedTaskName) { c.completed = true; changed = true; }
+              else if (isCommitmentTask && !c.linked && c.text === taskName) { c.completed = true; changed = true; }
+            });
+            if (changed) {
+              await window.DataStore.saveFamilyMeetings(meetings);
+              showToast("🎯 完成了一项约定！继续加油", true);
+            }
+          }
+        } catch (e) {
+          console.error("自动标记约定完成失败:", e);
+        }
         await DataStore.refreshData(true);
         const cfg = await DataStore.loadData();
         const pending = cfg.pendingCount || (cfg.recentRecords || []).filter(r => r.status === "pending").length;
@@ -3356,6 +3800,40 @@ async function renderHome() {
     }
   }
 
+  // ── 我的挑战（孩子自己选的每周目标 · 优先展示） ──
+  const ttChallengeEl = document.getElementById("ttChallenge");
+  const ttChallengeListEl = document.getElementById("ttChallengeList");
+  if (ttChallengeEl && ttChallengeListEl) {
+    const weeklyGoals = (cfg.child && cfg.child.weeklyGoals) || [];
+    if (weeklyGoals.length > 0) {
+      // 判断本周目标是否已完成：本周内是否有对应任务名的打卡记录
+      const weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - 6);
+      const weekStartStr = formatDate(weekStart);
+      const xpRecs = (cfg.xpRecords || []).filter(r => {
+        const d = getDateStr(r);
+        return d >= weekStartStr && d <= todayStr;
+      });
+      const doneNames = new Set(xpRecs.map(r => r.taskName));
+      ttChallengeListEl.innerHTML = weeklyGoals.map(g => {
+        const done = doneNames.has(g.name);
+        return `<div class="tt-challenge-item${done ? " done" : ""}">
+          <span class="tt-c-dot"></span>
+          <span class="tt-c-name">${g.name}</span>
+          <span class="tt-c-xp">${done ? "✓ 完成" : "+" + (g.xp || 0) + " XP"}</span>
+        </div>`;
+      }).join("");
+      ttChallengeEl.style.display = "";
+    } else {
+      // 还没选目标：显示引导入口，点击可打开挑战弹窗
+      ttChallengeListEl.innerHTML = `<div class="tt-challenge-item" style="cursor:pointer" onclick="openChallengeModal()">
+        <span class="tt-c-dot" style="background:var(--warning,#efaa17)"></span>
+        <span class="tt-c-name" style="color:var(--neutral-600,#6b6259)">还没选这周的挑战？点我挑 2-3 个想做的事 ✨</span>
+        <span class="tt-c-xp" style="color:var(--lav-600,#7a3fd6)">去选择</span>
+      </div>`;
+      ttChallengeEl.style.display = "";
+    }
+  }
+
   // ═══ 3. 我的信息卡 ═══
   function setVal(el, val, emptyText) {
     if (!el) return;
@@ -3445,6 +3923,9 @@ async function renderHome() {
 
   // ═══ AI 成长周报 ═══
   renderAiWeeklyReport(cfg);
+
+  // ═══ 能量日记 ═══
+  await renderDiary();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3522,15 +4003,66 @@ function renderAiWeeklyReport(cfg) {
   document.getElementById("wrTitle").textContent = "第 " + currentReport.weekNumber + " 周成长周报";
   setDateRange(currentReport);
   document.getElementById("wrSummary").textContent = currentReport.summary || "";
+
+  // ── 实时计算本周行为数据（打卡后立即更新到周记） ──
+  // 用本周的真实 XP 记录覆盖预生成的 behavior 数据，确保打卡后周记同步更新
+  var today = new Date();
+  var weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - 6);
+  var weekStartStr = formatDate(weekStart);
+  var todayStrVal = todayStr();
+  var weekXpRecs = (cfg.xpRecords || []).filter(function(r) {
+    var d = getDateStr(r);
+    return d >= weekStartStr && d <= todayStrVal;
+  });
+  // 按分类汇总 XP
+  var catMap = {};
+  var catOrder = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+  var effortStories = [];
+  weekXpRecs.forEach(function(r) {
+    var cat = r.xpCategory || r.taskCategory || "其他";
+    if (!catMap[cat]) catMap[cat] = { category: cat, count: 0, xp: 0 };
+    catMap[cat].count += 1;
+    catMap[cat].xp += Number(r.xp) || 0;
+    // 有备注说明的记录作为"认真投入亮点"
+    if (r.description && r.description.trim() && r.description.trim().length >= 2) {
+      effortStories.push({
+        subject: r.taskName || "",
+        date: getDateStr(r),
+        story: r.description,
+      });
+    }
+  });
+  // 按预设顺序排列分类，保证显示稳定
+  var realtimeProfile = [];
+  catOrder.forEach(function(cat) {
+    if (catMap[cat]) realtimeProfile.push(catMap[cat]);
+  });
+  // 加上预设分类之外的其他分类
+  for (var catKey in catMap) {
+    if (catOrder.indexOf(catKey) < 0) realtimeProfile.push(catMap[catKey]);
+  }
+  // 用实时数据覆盖预生成的 behavior（仅覆盖 profile 和 effortStories，保留 badge 等其他字段）
+  var enhancedReport = Object.assign({}, currentReport);
+  enhancedReport.behavior = Object.assign({}, currentReport.behavior || {}, {
+    profile: realtimeProfile.length > 0 ? realtimeProfile : (currentReport.behavior && currentReport.behavior.profile) || [],
+    effortStories: effortStories.length > 0 ? effortStories : (currentReport.behavior && currentReport.behavior.effortStories) || [],
+  });
+  // 更新统计卡片里的能量值（用本周实时 XP 总数）
+  var realtimeStats = Object.assign({}, currentReport.stats || {});
+  var weekTotalXp = weekXpRecs.reduce(function(sum, r) { return sum + (Number(r.xp) || 0); }, 0);
+  if (realtimeStats.energy && weekTotalXp > 0) {
+    realtimeStats.energy = Object.assign({}, realtimeStats.energy, { value: weekTotalXp });
+  }
+
   // 渲染四个统计卡片（报告式 KPI：顶部彩条 + 趋势胶囊）
-  document.getElementById("wrStats").innerHTML = buildWrStatsHtml(currentReport.stats || {});
+  document.getElementById("wrStats").innerHTML = buildWrStatsHtml(realtimeStats);
   // 渲染可折叠章节（孩子友好：闪光点在前，正向积极）
-  renderChapter("chapterGrowth", "⭐ 本周闪光点", renderGrowthContent(currentReport));
-  renderChapter("chapterBehavior", "🎯 行为与习惯", renderBehaviorContent(currentReport));
-  renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(currentReport));
-  renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(currentReport));
+  renderChapter("chapterGrowth", "⭐ 本周闪光点", renderGrowthContent(enhancedReport));
+  renderChapter("chapterBehavior", "🎯 行为与习惯", renderBehaviorContent(enhancedReport));
+  renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(enhancedReport));
+  renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(enhancedReport));
   // 渲染建议
-  renderChapter("chapterSuggestions", "🎯 下周小目标", renderSuggestionContent(currentReport, cfg.familyMeetings));
+  renderChapter("chapterSuggestions", "🎯 下周小目标", renderSuggestionContent(enhancedReport, cfg.familyMeetings));
   populateWeekSelect(reports);
   if (window.lucide) refreshIcons(20);
 }
@@ -3680,9 +4212,13 @@ function renderSuggestionContent(report, familyMeetings) {
       meeting.commitments.forEach(function(c, i) {
         var statusIcon = c.completed ? '✅' : '⏳';
         var statusStyle = c.completed ? 'color:var(--colourful-mint-green-600)' : 'color:var(--neutral-500)';
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;' + statusStyle + ';font-size:13px"><span>' + statusIcon + '</span><span style="flex:1">' + c.text + '</span>' + (c.completed ? '<span style="font-size:11px;color:var(--colourful-mint-green-500)">已兑现 +2XP</span>' : '') + '</div>';
+        var xpTag = '';
+        if (c.completed) {
+          xpTag = (c.xp > 0) ? '<span style="font-size:11px;color:var(--colourful-mint-green-500)">已兑现 +' + c.xp + 'XP</span>' : '<span style="font-size:11px;color:var(--colourful-mint-green-500)">已兑现</span>';
+        }
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;' + statusStyle + ';font-size:13px"><span>' + statusIcon + '</span><span style="flex:1">' + c.text + '</span>' + xpTag + '</div>';
       });
-      html += '<div style="margin-top:6px;font-size:12px;color:var(--neutral-400);border-top:1px dashed var(--neutral-200);padding-top:6px">完成约定可获额外 +2 XP 认可 · 下次家庭会议回顾</div>';
+      html += '<div style="margin-top:6px;font-size:12px;color:var(--neutral-400);border-top:1px dashed var(--neutral-200);padding-top:6px">约定奖励由家庭会议时商定 · 下次家庭会议回顾</div>';
       html += '</div></div>';
     }
   }
@@ -3783,17 +4319,39 @@ function displayWeeklyReport(report, allReports, index) {
 
 // ═══════════════════════════════════════════════════════════════
 // 家庭会议 — 承诺行增删
-function addCommitmentRow(value) {
+// 两种模式：linked（从任务池选，打卡即完成）/ free（自由填写，不关联打卡）
+function addCommitmentRow(value, linked) {
   var list = document.getElementById("fmCommitmentList");
   if (!list) return;
   var existing = list.querySelectorAll(".fm-commitment-row").length;
-  if (existing >= 5) { showToast("最多设置 5 条约定", false); return; }
+  if (existing >= 10) { showToast("最多设置 10 条约定", false); return; }
   var div = document.createElement("div");
   div.className = "fm-commitment-row";
   div.style.cssText = "display:flex;gap:8px;margin-bottom:6px;align-items:center";
-  div.innerHTML = '<input type="text" class="form-input" style="flex:1;font-size:13px" placeholder="例如：每天阅读30分钟" value="' + (value || "") + '" /><button type="button" class="btn ghost mini" onclick="removeCommitmentRow(this)" style="color:var(--colourful-error-500);flex-shrink:0">✕</button>';
+  if (linked) {
+    // 从任务池选：下拉选择任务，选中后自动带出分类和 XP
+    var cfg = window.__lastCfg || {};
+    var xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
+    var categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+    var opts = ['<option value="">-- 从任务池选一条 --</option>'];
+    categories.forEach(function(cat) {
+      var tasks = (xpRules[cat] || []).filter(function(t) { return !t.name.startsWith("作业·") && t.method !== "自动发放"; });
+      if (tasks.length === 0) return;
+      opts.push('<optgroup label="' + cat + '">');
+      tasks.forEach(function(t) {
+        opts.push('<option value="' + t.name + '" data-cat="' + cat + '" data-xp="' + (t.xp || 0) + '">' + t.name + '（+' + (t.xp || 0) + ' XP）</option>');
+      });
+      opts.push('</optgroup>');
+    });
+    div.innerHTML = '<select class="form-input fm-commitment-select" style="flex:1;font-size:13px;padding:8px 10px">' + opts.join("") + '</select><button type="button" class="btn ghost mini" onclick="removeCommitmentRow(this)" style="color:var(--colourful-error-500);flex-shrink:0">✕</button>';
+  } else {
+    div.innerHTML = '<input type="text" class="form-input fm-free-input" style="flex:1;font-size:13px" placeholder="例如：每天阅读30分钟" value="' + (value || "") + '" /><input type="number" class="form-input fm-free-xp" min="0" max="20" placeholder="奖励XP" title="奖励积分（可选，不填则不给积分）" style="width:80px;font-size:13px;text-align:center;flex-shrink:0" /><button type="button" class="btn ghost mini" onclick="removeCommitmentRow(this)" style="color:var(--colourful-error-500);flex-shrink:0">✕</button>';
+  }
   list.appendChild(div);
   if (window.lucide) refreshIcons(20);
+}
+function addFreeCommitmentRow() {
+  addCommitmentRow("", false);
 }
 function removeCommitmentRow(btn) {
   var row = btn.closest(".fm-commitment-row");
@@ -3819,16 +4377,16 @@ function openFamilyMeeting() {
       var total = lastMeeting.commitments.length;
       hintEl.innerHTML = '上周约定：' + done + '/' + total + ' 完成 · <span style="color:' + (done === total ? 'var(--colourful-mint-green-600)' : 'var(--colourful-sunny-coral-600)') + '">' + (done === total ? "✅ 全部完成！" : "⏳ 继续加油") + '</span><br><span style="font-size:12px;color:#6b7280">上次约定：' + lastMeeting.commitments.map(function(c) { return c.text; }).join("、") + '</span>';
     } else {
-      hintEl.textContent = '引导语："这周你想给自己定什么约定？从周报建议里选一个？"';
+      hintEl.textContent = '引导语："这周你想给自己定什么小约定？"';
     }
   }
   // 重置表单
   document.getElementById("fmSummary").value = "";
   document.getElementById("fmDiscussion").value = "";
   document.getElementById("fmCommitmentList").innerHTML = "";
-  // 默认给 2 条空行
-  addCommitmentRow();
-  addCommitmentRow();
+  // 默认给 1 条任务池选择 + 1 条自由填写
+  addCommitmentRow("", true);
+  addCommitmentRow("", false);
   document.getElementById("familyMeetingModal").classList.add("active");
   refreshIcons(50);
 }
@@ -3844,12 +4402,30 @@ async function submitFamilyMeeting() {
   if (!currentReport) return;
   var summary = document.getElementById("fmSummary").value.trim();
   var discussion = document.getElementById("fmDiscussion").value.trim();
-  // 收集承诺列表
-  var rows = document.querySelectorAll("#fmCommitmentList .fm-commitment-row input");
+  // 收集承诺列表（区分 linked 任务池约定 / free 自由填写）
+  var rows = document.querySelectorAll("#fmCommitmentList .fm-commitment-row");
   var commitments = [];
-  rows.forEach(function(inp) {
-    var val = inp.value.trim();
-    if (val) commitments.push({ text: val, completed: false });
+  rows.forEach(function(row) {
+    var select = row.querySelector(".fm-commitment-select");
+    if (select) {
+      // 任务池关联模式
+      var opt = select.options[select.selectedIndex];
+      var name = opt && opt.value ? opt.value : "";
+      if (!name) return;
+      var cat = opt.getAttribute("data-cat") || "";
+      var xp = parseInt(opt.getAttribute("data-xp") || "0", 10) || 0;
+      commitments.push({ text: name, taskName: name, category: cat, xp: xp, completed: false, linked: true });
+    } else {
+      // 自由填写模式：积分可选，不填则无积分
+      var inp = row.querySelector(".fm-free-input");
+      var val = inp ? inp.value.trim() : "";
+      if (val) {
+        var xpInp = row.querySelector(".fm-free-xp");
+        var xpVal = xpInp ? parseInt(xpInp.value, 10) : 0;
+        if (isNaN(xpVal) || xpVal < 0) xpVal = 0;
+        commitments.push({ text: val, completed: false, linked: false, xp: xpVal });
+      }
+    }
   });
   var meetings = cfg.familyMeetings || [];
   var lastMeeting = meetings.length > 0 ? meetings[0] : null;
@@ -3868,13 +4444,13 @@ async function submitFamilyMeeting() {
     });
     await window.DataStore.refreshData(true);
     closeFamilyMeeting();
-    showToast("✅ 家庭会议记录已保存！" + (commitments.length > 0 ? " 已约定 " + commitments.length + " 件事" : ""), true);
+    showToast("🎉 庆祝会记录已保存！" + (commitments.length > 0 ? " 已约定 " + commitments.length + " 件事" : ""), true);
   } catch (e) {
     console.error("保存家庭会议失败:", e);
     showToast("❌ 保存失败: " + (e.message || "未知错误"), false);
   } finally {
     btn.disabled = false;
-    btn.textContent = "✅ 完成家庭会议";
+    btn.textContent = "🎉 完成庆祝会";
   }
 }
 
@@ -4518,6 +5094,7 @@ async function confirmApproveWithComment() {
   const prevScroll = strip ? strip.scrollLeft : 0;
   try {
     // 检查是否为承诺兑现记录，如果是则同步标记家庭会议约定完成
+    // 注意：linked（任务池关联）约定在打卡提交时已自动标记完成，这里只处理 free（自由填写）约定
     const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === id);
     if (record && record.commitmentBonus) {
       const meetings = (cachedData && cachedData.familyMeetings || []);
@@ -4526,8 +5103,9 @@ async function confirmApproveWithComment() {
         const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
         if (targetText) {
           for (var ci = 0; ci < meeting.commitments.length; ci++) {
-            if (!meeting.commitments[ci].completed && meeting.commitments[ci].text === targetText) {
-              meeting.commitments[ci].completed = true;
+            const c = meeting.commitments[ci];
+            if (!c.completed && !c.linked && c.text === targetText) {
+              c.completed = true;
               break;
             }
           }

@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Yara的小宇宙中心 🌌</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23fdd832'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="style.css">
@@ -104,6 +107,17 @@
           <div class="tt-goal-foot"><span id="ttGoalDone">已完成 -- / --</span><span id="ttGoalHint">先把重要的事做完</span></div>
         </div>
         <div class="tt-list" id="ttList"><div class="tt-empty">正在整理今天的任务…</div></div>
+        <div class="tt-challenge" id="ttChallenge" style="display:none">
+          <div class="tt-challenge-head">
+            <span class="tt-challenge-title">🎯 我的挑战</span>
+            <button class="tt-challenge-edit" onclick="openChallengeModal()">换一换</button>
+          </div>
+          <div class="tt-challenge-list" id="ttChallengeList"></div>
+        </div>
+        <div class="tt-quick-actions">
+          <button class="tt-quick-btn xp" onclick="openXpModal()"><i data-lucide="zap"></i>能量打卡</button>
+          <button class="tt-quick-btn diary" onclick="openDiaryModal()"><i data-lucide="book-open"></i>能量日记</button>
+        </div>
         <div class="tt-add" onclick="switchView('study')">＋ 添加今日任务</div>
       </section>
 
@@ -223,6 +237,8 @@
               <div class="diary-stats-grid">
                 <div class="diary-stat"><b id="dStatCount">0</b><span>累计记录</span></div>
                 <div class="diary-stat"><b id="dStatStreak">0</b><span>连续天数</span></div>
+                <div class="diary-stat"><b id="dStatXp">0</b><span>累计 XP</span></div>
+                <div class="diary-stat"><b id="dStatBest">--</b><span>最长连续</span></div>
               </div>
               <div class="diary-checkin">
                 <h4>📅 本周打卡</h4>
@@ -232,6 +248,7 @@
             <div class="diary-right">
               <h4>🕘 最近记录</h4>
               <div class="diary-tl" id="diaryTimeline"><div class="diary-empty">还没有记录，记下第一笔吧 ✨</div></div>
+              <button class="diary-view-all" id="diaryViewAllBtn" style="display:none"><i data-lucide="book-open"></i> 查看全部日记 →</button>
             </div>
           </div>
         </div>
@@ -1005,10 +1022,12 @@
         <div class="form-group">
           <label class="form-label">选择 XP 任务 <span style="color:var(--colourful-error-600)">*</span></label>
           <select class="form-select" id="xpTaskSelectPage" onchange="onXpTaskChangePage()">
+            <optgroup label="📌 本周约定" id="xpGroupPage-本周约定"></optgroup>
             <optgroup label="学习成长" id="xpGroupPage-学习成长"></optgroup>
             <optgroup label="兴趣爱好" id="xpGroupPage-兴趣爱好"></optgroup>
             <optgroup label="身体成长" id="xpGroupPage-身体成长"></optgroup>
             <optgroup label="能力成长" id="xpGroupPage-能力成长"></optgroup>
+            <optgroup label="➕ 手动新增" id="xpGroupPage-手动新增"></optgroup>
           </select>
           <div style="margin-top:8px;text-align:right">
             <button type="button" class="btn-link" onclick="openNewTaskModalPage()">
@@ -1044,6 +1063,27 @@
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeXpModal()">取消</button>
         <button class="btn-confirm" onclick="submitAddXpPage()">添加 XP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 我的挑战弹窗（孩子自己选本周目标） ════════ -->
+  <div class="modal-overlay" id="challengeModal">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="target"></i>我的挑战</div>
+        <button class="modal-close" onclick="closeChallengeModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="challenge-intro">
+          <div class="challenge-intro-t">这周你想挑战什么？</div>
+          <div class="challenge-intro-s">从下面选 2-3 件你想做到的事，选中的会出现在首页，完成会更有成就感 ✨</div>
+        </div>
+        <div id="challengeList" class="challenge-list"><div class="tt-empty">正在加载任务…</div></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeChallengeModal()">取消</button>
+        <button class="btn-confirm" onclick="saveChallengeGoals()">✅ 定下我的挑战</button>
       </div>
     </div>
   </div>
@@ -1084,6 +1124,37 @@
     </div>
   </div>
 
+  <!-- ════════ 日记墙弹窗：全部日记时间线 ════════ -->
+  <div class="modal-overlay" id="diaryWallModal">
+    <div class="modal diary-wall-modal">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="book-open-check"></i>我的日记墙</div>
+        <button class="modal-close" onclick="closeDiaryWallModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body diary-wall-body">
+        <div id="diaryWallList" class="diary-wall-list"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeDiaryWallModal()">关闭</button>
+        <button class="btn-confirm" onclick="closeDiaryWallModal();openDiaryModal()"><i data-lucide="pen-tool" style="width:14px;height:14px;vertical-align:middle"></i> 写新日记</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 日记详情弹窗：查看单篇完整内容 ════════ -->
+  <div class="modal-overlay" id="diaryDetailModal">
+    <div class="modal diary-detail-modal">
+      <div class="modal-head">
+        <div class="modal-title"><i data-lucide="book-open"></i>日记详情</div>
+        <button class="modal-close" onclick="closeDiaryDetailModal()"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body diary-detail-body" id="diaryDetailBody"></div>
+      <div class="modal-foot">
+        <button class="btn-cancel" onclick="closeDiaryDetailModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ════════ 退回 XP 记录弹窗 ════════ -->
   <div class="modal-overlay" id="rejectXpModal">
     <div class="modal">
@@ -1104,38 +1175,42 @@
     </div>
   </div>
 
-  <!-- ════════ 家庭会议弹窗 ════════ -->
+  <!-- ════════ 家庭会议弹窗（共同庆祝版） ════════ -->
   <div class="modal-overlay" id="familyMeetingModal">
     <div class="modal family-meeting-modal">
       <div class="modal-head">
-        <div class="modal-title"><i data-lucide="users"></i>第 <span id="fmWeekNumber">--</span> 周家庭会议</div>
+        <div class="modal-title"><i data-lucide="users"></i>第 <span id="fmWeekNumber">--</span> 周家庭庆祝会</div>
         <button class="modal-close" onclick="closeFamilyMeeting()"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
         <div class="fm-report-preview" id="fmReportPreview">
-          <div class="fm-preview-title">📋 本周成长周报摘要</div>
+          <div class="fm-preview-title">🌟 这周你做到了什么</div>
           <div id="fmPreviewContent" class="fm-preview-content"></div>
         </div>
         <div class="fm-section">
-          <div class="fm-section-label">1️⃣ 回顾 · 你同意周报说的吗？</div>
-          <div class="fm-hint">引导语："AI 说你数学进步了，你觉得呢？"</div>
-          <textarea class="form-textarea" id="fmSummary" rows="2" placeholder="讨论要点（选填）"></textarea>
+          <div class="fm-section-label">1️⃣ 孩子说 · 这周最开心/最有成就感的事</div>
+          <div class="fm-hint">引导语："这周你觉得自己哪件事做得最棒？"</div>
+          <textarea class="form-textarea" id="fmSummary" rows="2" placeholder="孩子想说的话（选填）"></textarea>
         </div>
         <div class="fm-section">
-          <div class="fm-section-label">2️⃣ 讨论 · 有什么需要一起聊聊的？</div>
-          <div class="fm-hint">引导语："AI 说阅读完成率偏低，需要妈妈怎么帮你？"</div>
-          <textarea class="form-textarea" id="fmDiscussion" rows="2" placeholder="讨论内容（选填）"></textarea>
+          <div class="fm-section-label">2️⃣ 家长说 · 我看到了你的努力</div>
+          <div class="fm-hint">引导语："妈妈/爸爸看到你…，为你骄傲"（具体、真诚的鼓励）</div>
+          <textarea class="form-textarea" id="fmDiscussion" rows="2" placeholder="家长想对孩子说的话（选填）"></textarea>
         </div>
         <div class="fm-section">
-          <div class="fm-section-label">3️⃣ 定目标 · 下周约定清单</div>
+          <div class="fm-section-label">3️⃣ 一起定 · 下周的小约定</div>
           <div class="fm-hint" id="fmPreviousGoalHint"></div>
           <div id="fmCommitmentList" style="margin-bottom:8px"></div>
-          <button type="button" class="btn-link" onclick="addCommitmentRow()" style="font-size:12px"><i data-lucide="plus" style="width:12px;height:12px;vertical-align:middle"></i> 再加一条约定</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn-link" onclick="addCommitmentRow('', true)" style="font-size:12px"><i data-lucide="plus" style="width:12px;height:12px;vertical-align:middle"></i> 从任务池选一条</button>
+            <button type="button" class="btn-link" onclick="addFreeCommitmentRow()" style="font-size:12px"><i data-lucide="edit-3" style="width:12px;height:12px;vertical-align:middle"></i> 自己写一条</button>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--neutral-500,#8a8178)">💡 从任务池选的约定，孩子完成该任务打卡后自动标记完成（+任务自带 XP）；自己写的约定可自定义奖励积分（不填则无积分）。</div>
         </div>
       </div>
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeFamilyMeeting()">取消</button>
-        <button class="btn-confirm" onclick="submitFamilyMeeting()">✅ 完成家庭会议</button>
+        <button class="btn-confirm" onclick="submitFamilyMeeting()">🎉 完成庆祝会</button>
       </div>
     </div>
   </div>
@@ -1235,6 +1310,6 @@
   
 
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=20260816-v4"></script>
 </body>
 </html>
