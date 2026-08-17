@@ -40,7 +40,7 @@ const GITHUB_BRANCH = 'main';
 const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/data`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data`;
 
-const CACHE_KEY = "yara_growth_data_v10";
+const CACHE_KEY = "yara_growth_data_v11";
 const CHILD_CACHE_KEY = "yara_child_profile";
 const CALENDAR_CACHE_KEY = "yara_calendar_data";
 
@@ -343,6 +343,7 @@ function buildDashboard(child, calendar, levels, xpRecords, finance, study, conf
       taskName: r.taskName,
       description: r.description,
       returnReason: r.returnReason,
+      commitmentBonus: !!r.commitmentBonus,
     })),
     study: processedStudy,
     finance: processedFinance,
@@ -2784,7 +2785,6 @@ const CAT_COLORS = {
   "兴趣爱好": "#f96024",
   "身体成长": "#36b98b",
   "能力成长": "#fdd832",
-  "说到做到、遵守约定": "#9255f5",
 };
 
 const WCPALETTE = {
@@ -2792,12 +2792,11 @@ const WCPALETTE = {
   "兴趣爱好": { color: "#b93a13", bg: "#fff7f2", dot: "#f96024" },
   "身体成长": { color: "#21755b", bg: "#e0faf0", dot: "#36b98b" },
   "能力成长": { color: "#9a7b00", bg: "#fffde5", dot: "#fdd832" },
-  "说到做到、遵守约定": { color: "#7d3c98", bg: "#f5eefb", dot: "#9255f5" },
 };
 
 // 三大板块 ←→ XP分类 映射：整个系统分能量/知识/财务三个板块，各板块操作都积累能量（XP）
 const MODULE_XP_TAG = {
-  energy:   { label: "能量板块", cats: ["身体成长", "兴趣爱好", "说到做到、遵守约定"] },
+  energy:   { label: "能量板块", cats: ["身体成长", "兴趣爱好"] },
   knowledge:{ label: "知识板块", cats: ["学习成长"] },
   finance:  { label: "财务板块", cats: ["能力成长"] },
 };
@@ -4524,9 +4523,9 @@ async function renderXp() {
     catAgg[cat].count += 1;
   });
 
-  // 五维数据（确保五个分类都存在）
-  const allCats = ["学习成长", "能力成长", "身体成长", "兴趣爱好", "说到做到、遵守约定"];
-  const CAT_ICONS = { "学习成长": "📚", "能力成长": "🧠", "身体成长": "🏃", "兴趣爱好": "🎨", "说到做到、遵守约定": "🤝" };
+  // 四维数据（确保四个分类都存在）
+  const allCats = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+  const CAT_ICONS = { "学习成长": "📚", "能力成长": "🧠", "身体成长": "🏃", "兴趣爱好": "🎨" };
   const dims = allCats.map(cat => ({
     name: cat,
     count: catAgg[cat]?.count || 0,
@@ -4619,6 +4618,7 @@ async function renderXp() {
         const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#9255f5";
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
         const isPending = record.status === "pending";
+        const isCommitment = !!record.commitmentBonus;
         return `
         <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}" style="--cat-color:${catColor}">
           <div class="rc-top">
@@ -4629,6 +4629,7 @@ async function renderXp() {
           </div>
           <div class="rc-meta">
             ${category ? `<span class="rc-cat" style="background:${catColor}18;color:${catColor}">${category}</span>` : ""}
+            ${isCommitment ? `<span class="rc-cat rc-cat-commit" style="background:#e8f5e9;color:#2e7d32">🤝 承诺</span>` : ""}
             <span>${dateShort}</span>
           </div>
           ${record.description ? `<div class="rc-desc">${escapeHtmlReason(record.description)}</div>` : ""}
