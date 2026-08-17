@@ -967,18 +967,11 @@ body {
 
         <!-- 默认记录 · 自动发放（单独列出） -->
         <div class="def-card">
-          <div class="def-head"><span class="r-dot"></span><b>默认记录 · 自动发放</b><span class="def-tag">⚙️ 自动加分</span><span class="r-n">8 条</span></div>
-          <div class="def-grid">
-            <div class="def-item"><span class="ri-ic ic-learn">📝</span><div class="ri-t"><b>作业 · 日常预习</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">📚</span><div class="ri-t"><b>作业 · 日常复习</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">🏖️</span><div class="ri-t"><b>作业 · 暑假作业</b><span>完成作业自动发放</span></div><span class="ri-xp">+2<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">🎨</span><div class="ri-t"><b>作业 · 特色作业</b><span>完成作业自动发放（含家庭作业）</span></div><span class="ri-xp">+4<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-learn">🎯</span><div class="ri-t"><b>成绩录入</b><span>录入成绩自动发放</span></div><span class="ri-xp">+2~3<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-ability">📓</span><div class="ri-t"><b>写日记 · 能量记录</b><span>写日记自动发放</span></div><span class="ri-xp">+6~10<small>XP</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-coral">🔄</span><div class="ri-t"><b>财务能力分析（复盘）</b><span>每笔分析记录 · 当日封顶</span></div><span class="ri-xp">+2<small>XP/笔</small></span></div>
-            <div class="def-item"><span class="ri-ic ic-coral">💰</span><div class="ri-t"><b>财务进账</b><span>记录一笔收入存到指定基金（无 XP）</span></div><span class="ri-xp" style="color:var(--neutral-400)">-</span></div>
+          <div class="def-head"><span class="r-dot"></span><b>默认记录 · 自动发放</b><span class="def-tag">⚙️ 自动加分</span><span class="r-n" id="defCount">8 条</span></div>
+          <div class="def-grid" id="defGrid">
+            <div style="grid-column:1/-1;text-align:center;padding:16px;color:var(--colourful-neutral-400);font-size:13px">正在加载…</div>
           </div>
-          <div class="def-note">说明：以上为操作时自动发放的默认分值，无需手动勾选。<b>成绩录入 +2，勾选失分模块再 +1</b>；<b>写日记（完整四要素+感受 +10，否则 +6）</b>每天仅加一次；<b>财务能力分析（复盘）每笔 +2，当日累计封顶 +10</b>；<b>财务进账仅记录动作，无 XP</b>。均计入对应板块的能量值，不与其他板块串扰。</div>
+          <div class="def-note" id="defNote">说明：以上为操作时自动发放的默认分值，均从 config.json 实时读取，与前台发放一致。成绩录入 +2，勾选失分模块再 +1；写日记每天仅加一次；财务能力分析（复盘）当日累计封顶 +10；财务进账仅记录动作。均计入对应板块的能量值，不与其他板块串扰。</div>
         </div>
 
         <div class="rule-grid" id="ruleGrid">
@@ -1723,9 +1716,71 @@ function deleteRule(cat, idx) {
   });
 }
 
+// 渲染"默认记录 · 自动发放"网格（从 config.json 实时读取，与前台发放保持一致）
+function renderDefGrid() {
+  var grid = document.getElementById('defGrid');
+  if (!grid) return;
+  fetchRawJSON('config.json').then(function(config) {
+    var rules = (config && config.xpRules) ? config.xpRules : {};
+    // 从各分类中查找自动发放任务
+    var defs = [];
+    var findRule = function(name) {
+      for (var cat in rules) {
+        var found = (rules[cat] || []).find(function(t) { return t.name === name; });
+        if (found) return found;
+      }
+      return null;
+    };
+    // 作业类（学习成长）
+    var hwTypes = [
+      { name: '作业·日常预习', icon: '📝', desc: '完成作业自动发放' },
+      { name: '作业·日常复习', icon: '📚', desc: '完成作业自动发放' },
+      { name: '作业·暑假作业', icon: '🏖️', desc: '完成作业自动发放' },
+      { name: '作业·特色作业', icon: '🎨', desc: '完成作业自动发放（含家庭作业）' },
+    ];
+    hwTypes.forEach(function(h) {
+      var r = findRule(h.name);
+      defs.push({ name: h.name, icon: h.icon, desc: h.desc, xp: r ? (Number(r.xp) || 0) : 0, cls: 'ic-learn' });
+    });
+    // 成绩录入（固定默认值，config 无对应任务）
+    defs.push({ name: '成绩录入', icon: '🎯', desc: '录入成绩自动发放', xp: null, xpText: '+2~3', cls: 'ic-learn' });
+    // 写日记（能力成长）
+    var diary = findRule('写日记：写作四要素+感受');
+    defs.push({ name: '写日记 · 能量记录', icon: '📓', desc: '写日记自动发放', xp: diary ? (Number(diary.xp) || 0) : 0, cls: 'ic-ability' });
+    // 财务能力分析（复盘）
+    var fin = findRule('财务能力分析');
+    defs.push({ name: '财务能力分析（复盘）', icon: '🔄', desc: '每笔分析记录 · 当日封顶', xp: fin ? (Number(fin.xp) || 0) : 0, xpUnit: 'XP/笔', cls: 'ic-coral' });
+    // 财务进账
+    var entry = findRule('财务进账');
+    defs.push({ name: '财务进账', icon: '💰', desc: '记录一笔收入存到指定基金', xp: entry ? (Number(entry.xp) || 0) : 0, cls: 'ic-coral' });
+    // 花销复盘
+    var review = findRule('花销复盘');
+    defs.push({ name: '花销复盘', icon: '🧾', desc: '完成一次花销复盘', xp: review ? (Number(review.xp) || 0) : 0, cls: 'ic-coral' });
+
+    var html = '';
+    defs.forEach(function(d) {
+      var xpHtml;
+      if (d.xpText) {
+        xpHtml = '<span class="ri-xp">' + d.xpText + '<small>XP</small></span>';
+      } else if (d.xp > 0) {
+        xpHtml = '<span class="ri-xp">+' + d.xp + '<small>' + (d.xpUnit || 'XP') + '</small></span>';
+      } else {
+        xpHtml = '<span class="ri-xp" style="color:var(--neutral-400)">-</span>';
+      }
+      html += '<div class="def-item"><span class="ri-ic ' + d.cls + '">' + d.icon + '</span><div class="ri-t"><b>' + d.name + '</b><span>' + d.desc + '</span></div>' + xpHtml + '</div>';
+    });
+    grid.innerHTML = html;
+    var countEl = document.getElementById('defCount');
+    if (countEl) countEl.textContent = defs.length + ' 条';
+  }).catch(function() {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:16px;color:var(--colourful-sunny-coral-500);font-size:13px">⚠️ 加载失败</div>';
+  });
+}
+
 // 页面加载时渲染规则
 document.addEventListener('DOMContentLoaded', function() {
   renderRuleGrid();
+  renderDefGrid();
 });
 </script>
 <div class="toast" id="settingsToast"></div>

@@ -8363,8 +8363,10 @@ async function submitScore() {
       score: scoreVal ? Number(scoreVal) : null,
       semesterLabel: semesterVal || "",
     });
-    // 固定 XP：录入 +2，勾选失分模块再 +1
-    const baseXp = 2;
+    // 成绩录入 XP：从系统配置读取（config.json xpRuleList 中"成绩录入"的 xp），勾选失分模块再 +1
+    const cfgNow = await DataStore.loadData();
+    const scoreRule = ((cfgNow.config && cfgNow.config.xpRuleList) || []).find(r => r.name === "成绩录入");
+    const baseXp = scoreRule && Number(scoreRule.xp) ? Number(scoreRule.xp) : 2;
     const extraXp = errorModules.length > 0 ? 1 : 0;
     await DataStore.addXpRecord({
       taskName: "成绩录入",
