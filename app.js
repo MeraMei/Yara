@@ -840,9 +840,6 @@ async function submitDiary() {
   const analysis = analyzeDiaryElements(content);
   const completeFour = analysis.completeFour;
   const completeFeel = !!mood || analysis.completeFeel;
-  // 阶梯式评分：5/5 要素 → 10 XP，4/5 → 8 XP，3/5 → 6 XP，少于 3 → 4 XP
-  const hitCount = analysis.hits.length;
-  const xp = hitCount >= 5 ? 10 : hitCount >= 4 ? 8 : hitCount >= 3 ? 6 : 4;
   const btn = document.querySelector("#diaryModalPage .btn-confirm");
   const original = btn.textContent;
   btn.textContent = "保存中..."; btn.disabled = true;
@@ -855,10 +852,12 @@ async function submitDiary() {
       completeFour,
       completeFeel,
       hits: analysis.hits,
-      xp,
     });
     // 2. 发放 XP（同日去重：当天已有"写日记"记录则不重复发放）
     const cfg = await DataStore.loadData();
+    // 读取系统配置的日记 XP 值（config.json 中"写日记：写作四要素+感受"的 xp），不再硬编码
+    const diaryTask = ((cfg.config && cfg.config.xpRules && cfg.config.xpRules["能力成长"]) || []).find(t => t.name === "写日记：写作四要素+感受");
+    const xp = diaryTask ? (Number(diaryTask.xp) || 8) : 8;
     const already = (cfg.xpRecords || []).find(r =>
       r.taskName === "写日记：写作四要素+感受" && getDateStr(r) === todayStr());
     let awardedXp = 0;
@@ -884,8 +883,8 @@ async function submitDiary() {
     const missing = all5.filter(k => !analysis.hits.includes(k));
     // 阶梯式评分的提示语
     let hint = "";
-    if (hitCount >= 5) hint = "五要素齐全，拿满分！🎉";
-    else if (hitCount >= 4) hint = `就差${missing.join("、")}了，下次写出来拿 10 XP！`;
+    if (analysis.hits.length >= 5) hint = "五要素齐全，拿满分！🎉";
+    else if (analysis.hits.length >= 4) hint = `就差${missing.join("、")}了，下次写出来拿更高 XP！`;
     else if (missing.length) hint = `下次把${missing.join("、")}也写出来拿更多 XP 哦 ✍️`;
     // 3. 提交成功后明确提示：积分 + 保存成功状态
     if (awardedXp > 0) {

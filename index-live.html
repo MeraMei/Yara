@@ -8616,7 +8616,6 @@ async function submitDiary() {
   const analysis = analyzeDiaryElements(content);
   const completeFour = analysis.completeFour;
   const completeFeel = !!mood || analysis.completeFeel;
-  const xp = (completeFour && completeFeel) ? 10 : 6;
   const btn = document.querySelector("#diaryModalPage .btn-confirm");
   const original = btn.textContent;
   btn.textContent = "保存中..."; btn.disabled = true;
@@ -8632,6 +8631,9 @@ async function submitDiary() {
     });
     // 2. 发放 XP（同日去重：当天已有"写日记"记录则不重复发放）
     const cfg = await DataStore.loadData();
+    // 读取系统配置的日记 XP 值（config.json 中"写日记：写作四要素+感受"的 xp），不再硬编码
+    const diaryTask = ((cfg.config && cfg.config.xpRules && cfg.config.xpRules["能力成长"]) || []).find(t => t.name === "写日记：写作四要素+感受");
+    const xp = diaryTask ? (Number(diaryTask.xp) || 8) : 8;
     const already = (cfg.xpRecords || []).find(r =>
       r.taskName === "写日记：写作四要素+感受" && getDateStr(r) === todayStr());
     let awardedXp = 0;
@@ -8690,7 +8692,7 @@ async function renderDiary() {
   const entries = (cfg.diaryEntries || []).slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
   const totalCount = entries.length;
   const streak = calcDiaryStreak(entries);
-  const totalDiaryXp = entries.reduce((sum, d) => sum + ((d.completeFour && d.completeFeel) ? 10 : 6), 0);
+  const totalDiaryXp = entries.reduce((sum, d) => sum + (Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6)), 0);
   setText("diaryStats", `已写 ${totalCount} 篇 · 连续 ${streak} 天 · 累计 ${totalDiaryXp} XP`);
   setText("dStatCount", totalCount);
   setText("dStatStreak", streak);
@@ -8704,7 +8706,7 @@ async function renderDiary() {
       const hits = d.hits || [];
       const metaFour = d.completeFour ? `<span class="ok">四要素 ✓</span>` : `<span class="no">四要素不全</span>`;
       const metaFeel = d.completeFeel ? `<span class="ok">感受 ✓</span>` : `<span class="no">感受缺</span>`;
-      const xp = (d.completeFour && d.completeFeel) ? 10 : 6;
+      const xp = Number(d.xp) || ((d.completeFour && d.completeFeel) ? 10 : 6);
       const hitsTxt = hits.length ? `<span class="dl-hits">写到：${hits.join(" · ")}</span>` : "";
       return `<div class="dl-item">
         <div class="dl-head"><span class="dl-date">${formatDiaryDate(d.date)}</span><span class="dl-mood">${d.mood || "📝"}</span></div>
