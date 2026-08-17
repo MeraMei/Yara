@@ -5345,48 +5345,66 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       background: var(--neutral-200);
       border-radius: 3px;
     }
+    .recent-strip-toggle {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--coral-600);
+      background: rgba(255,255,255,.7);
+      border: 1px dashed var(--coral-300);
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s ease;
+    }
+    .recent-strip-toggle:hover { background: var(--coral-50); }
     .recent-card {
       flex: 0 0 240px;
       scroll-snap-align: start;
-      border-radius: 16px;
-      padding: 14px;
-      background: rgba(255,255,255,.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(231,229,225,.6);
-      box-shadow: 0 1px 2px rgba(30,28,26,.03), 0 4px 12px -6px rgba(30,28,26,.08);
+      border-radius: 14px;
+      padding: 14px 14px 14px 18px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      transition: transform .15s ease, box-shadow .15s ease;
+      gap: 6px;
+      transition: transform .2s ease, box-shadow .2s ease;
       position: relative;
-      overflow: hidden;
+      min-height: 118px;
     }
     .recent-card::before {
       content: "";
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 4px;
+      bottom: 0;
+      width: 4px;
+      border-radius: 14px 0 0 14px;
+      background: var(--cat-color, #9255f5);
     }
     .recent-card .rc-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
     }
     .recent-card .rc-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
       display: grid;
       place-items: center;
       flex-shrink: 0;
-      font-size: 14px;
+      font-size: 13px;
+      margin-top: 1px;
     }
     .recent-card .rc-title {
-      font-weight: 800;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 13px;
       color: var(--neutral-900);
       line-height: 1.35;
       flex: 1;
@@ -5399,24 +5417,31 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .recent-card .rc-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
+      gap: 6px;
+      font-size: 11px;
       color: var(--neutral-500);
       font-weight: 600;
+      flex-wrap: wrap;
     }
     .recent-card .rc-cat {
-      padding: 3px 9px;
+      padding: 2px 8px;
       border-radius: 999px;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 10px;
       flex-shrink: 0;
+      letter-spacing: .02em;
     }
     .recent-card .rc-desc {
-      font-size: 12px;
-      color: var(--neutral-600);
-      line-height: 1.5;
+      font-size: 11px;
+      color: var(--neutral-500);
+      line-height: 1.45;
       white-space: pre-wrap;
       word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex: 1;
     }
     .recent-card .rc-desc-return {
       color: var(--pink-700, #e25563);
@@ -5431,16 +5456,17 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       border-top: 1px solid var(--neutral-50);
     }
     .recent-card .rc-xp {
-      font: 800 18px var(--font-display);
+      font: 800 16px var(--font-display);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -.02em;
     }
     .recent-card .rc-status {
       display: inline-block;
-      padding: 3px 9px;
-      border-radius: 8px;
-      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.4;
     }
     .recent-card .rc-status.pending { background: var(--yellow-100); color: var(--yellow-700); }
     .recent-card .rc-status.verified { background: var(--mint-100); color: var(--mint-700); }
@@ -5451,16 +5477,16 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .recent-card .rc-approve-btn,
     .recent-card .rc-reject-btn {
-      height: 28px;
-      padding: 0 10px;
+      height: 26px;
+      padding: 0 9px;
       border: none;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       font-family: inherit;
       transition: all .15s;
@@ -5483,8 +5509,8 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .recent-card .rc-approve-btn i,
     .recent-card .rc-reject-btn i {
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
     }
     .recent-card .rc-approve-btn:disabled,
     .recent-card .rc-reject-btn:disabled {
@@ -5495,6 +5521,10 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .recent-card .rc-approve-btn.busy,
     .recent-card .rc-reject-btn.busy {
       pointer-events: none;
+    }
+    .recent-card.pending-card {
+      border-color: var(--yellow-200, #fde68a);
+      box-shadow: 0 0 0 1px rgba(251,191,36,.15), 0 4px 12px rgba(0,0,0,.04);
     }
 
     /* ════════ 等级权益（3级展示 + 色系） ════════ */
@@ -6078,16 +6108,26 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .earn-xp-card {
       padding: 16px;
       border-radius: 18px;
-      background: rgba(255,255,255,.78);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(231,229,225,.6);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
+      position: relative;
+      overflow: hidden;
+    }
+    .earn-xp-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cat-color, #9255f5), transparent 80%);
     }
     .earn-xp-card .exc-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .earn-xp-card .exc-title {
       font-weight: 800;
@@ -6103,34 +6143,36 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       flex-shrink: 0;
     }
     .earn-xp-card .exc-earned {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
       font-size: 11px;
       font-weight: 700;
       color: var(--neutral-500);
     }
+    .earn-xp-card .exc-earned-label {
+      font-size: 10px;
+      color: var(--neutral-400);
+      margin-right: 2px;
+    }
     .earn-xp-card .exc-earned b {
-      color: var(--neutral-900);
-      font: 800 13px var(--font-display);
+      font: 800 16px var(--font-display);
+      letter-spacing: -.02em;
+    }
+    .earn-xp-card .exc-earned-unit {
+      font-size: 10px;
+      color: var(--neutral-400);
     }
     .earn-xp-card .exc-tasks {
       display: flex;
       flex-direction: column;
       gap: 2px;
-      margin-top: 10px;
-      max-height: 100px;
-      overflow-y: auto;
-      padding-right: 6px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--neutral-200) transparent;
+      margin-top: 8px;
     }
-    .earn-xp-card .exc-tasks::-webkit-scrollbar {
-      width: 6px;
-    }
-    .earn-xp-card .exc-tasks::-webkit-scrollbar-thumb {
-      background: var(--neutral-200);
-      border-radius: 999px;
-    }
-    .earn-xp-card .exc-tasks::-webkit-scrollbar-track {
-      background: transparent;
+    .earn-xp-card .exc-tasks-more {
+      border-top: 1px dashed var(--neutral-100);
+      margin-top: 2px;
+      padding-top: 2px;
     }
     .earn-xp-card .exc-task {
       display: flex;
@@ -6146,13 +6188,12 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--neutral-800);
       font-weight: 600;
       flex: 1;
+      min-width: 0;
     }
     .earn-xp-card .exc-task-xp {
       flex-shrink: 0;
       font-size: 12px;
       font-weight: 800;
-      color: var(--mint-600);
-      background: var(--mint-50);
       padding: 2px 9px;
       border-radius: 999px;
     }
@@ -9424,6 +9465,7 @@ if (typeof window !== 'undefined') {
           <span class="recent-strip-count" id="pendingCount">待确认 -- 条</span>
         </div>
         <div class="recent-strip" id="xpRecordsStrip"></div>
+        <button class="recent-strip-toggle" id="xpRecordsToggle" style="display:none" onclick="toggleXpRecords()">展示更多</button>
       </section>
 
       <!-- ════════ 如何积累XP ════════ -->
@@ -12470,21 +12512,34 @@ async function renderXp() {
     return pa - pb;
   });
   const stripEl = document.getElementById("xpRecordsStrip");
+  const recExpand = window.__xpRecordsExpanded || false;
   if (stripEl) {
     if (allRecords.length === 0) {
       stripEl.innerHTML = `<div style="padding:24px;color:var(--neutral-400);font-size:13px;font-weight:600">暂无记录</div>`;
     } else {
-      // 重建前保留横向滚动位置，避免整段重建后视口回弹
-      const prevScrollLeft = stripEl.scrollLeft;
-      stripEl.innerHTML = sortedRecords.map((record, idx) => {
+      // 默认铺满 3 行（列数随视口自适应：PC 3列 / 平板 2列 / 移动 1列），待确认的始终展示在前并完整显示
+      const COLS = window.innerWidth > 900 ? 3 : (window.innerWidth > 560 ? 2 : 1);
+      const ROWS = 3;
+      const DEFAULT_CNT = COLS * ROWS;
+      const pendingRecords = sortedRecords.filter(r => r.status === "pending");
+      const others = sortedRecords.filter(r => r.status !== "pending");
+      let visibleRecords;
+      if (recExpand) {
+        visibleRecords = sortedRecords;
+      } else {
+        const pendingCount = pendingRecords.length;
+        const slots = Math.max(0, DEFAULT_CNT - pendingCount);
+        visibleRecords = pendingRecords.concat(others.slice(0, slots));
+      }
+      const hasMore = allRecords.length > visibleRecords.length;
+      const cardHtml = (record) => {
         const status = statusMap[record.status] || { text: record.status, cls: "pending", icon: "clock" };
         const category = record.type || record.taskCategory || "";
         const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#9255f5";
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
         const isPending = record.status === "pending";
         return `
-        <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}">
-          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${catColor}"></div>
+        <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}" style="--cat-color:${catColor}">
           <div class="rc-top">
             <div class="rc-icon" style="background:${catColor}18;color:${catColor}">
               <i data-lucide="${status.icon}"></i>
@@ -12507,11 +12562,30 @@ async function renderXp() {
             <span class="rc-status ${status.cls}">${status.text}</span>`}
           </div>
         </div>`;
-      }).join("");
+      };
+      // 重建前保留横向滚动位置，避免整段重建后视口回弹
+      const prevScrollLeft = stripEl.scrollLeft;
+      stripEl.innerHTML = cardHtml(visibleRecords[0]) + (visibleRecords.length > 1 ? visibleRecords.slice(1).map(cardHtml).join("") : "");
       // 恢复横向滚动位置，避免 viewport 回弹
       if (prevScrollLeft) stripEl.scrollLeft = prevScrollLeft;
+      // 展示更多 / 收起按钮
+      const toggleBtn = document.getElementById("xpRecordsToggle");
+      if (toggleBtn) {
+        if (recExpand || hasMore) {
+          toggleBtn.style.display = "block";
+          toggleBtn.textContent = recExpand ? "收起" : `展示更多（${allRecords.length - visibleRecords.length} 条）`;
+        } else {
+          toggleBtn.style.display = "none";
+        }
+      }
     }
   }
+
+  // 能量记录：展开 / 收起
+  window.toggleXpRecords = function () {
+    window.__xpRecordsExpanded = !window.__xpRecordsExpanded;
+    renderXp();
+  };
 
   // ════════ 等级权益（全部等级 + 横向滑动） ════════
   const journeyEl = document.getElementById("levelJourney");
@@ -12608,53 +12682,51 @@ async function renderXp() {
     const cards = allCats.map(cat => {
       const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
       const earned = catAgg[cat] ? catAgg[cat].xp : 0;
-      const count = catAgg[cat] ? catAgg[cat].count : 0;
       const p = WCPALETTE[cat] || WCPALETTE["学习成长"];
       totalAvailableTasks += tasks.length;
-      const xps = tasks.map(t => Number(t.xp) || 0);
-      const minXp = xps.length ? Math.min(...xps) : 0;
-      const maxXp = xps.length ? Math.max(...xps) : 0;
-      const xpRange = xps.length ? (minXp === maxXp ? `${minXp} XP` : `${minXp}~${maxXp} XP`) : "--";
-      const showAll = tasks.length <= LIMIT;
-      const visible = showAll ? tasks : tasks.slice(0, LIMIT);
-      const hidden = showAll ? [] : tasks.slice(LIMIT);
+      // 默认展示前 5 条，超出部分通过"展开更多"查看
+      const visible = tasks.slice(0, LIMIT);
+      const hidden = tasks.slice(LIMIT);
       const itemHtml = (t) => `
         <div class="exc-task">
           <span class="exc-task-name">${t.name}</span>
           <span class="exc-task-xp" style="color:${p.color};background:${p.bg}">+${t.xp} XP</span>
         </div>`;
       return `
-        <div class="earn-xp-card">
+        <div class="earn-xp-card" data-cat="${cat}" style="--cat-color:${p.dot}">
           <div class="exc-head">
             <span class="exc-title">
               <span class="exc-dot" style="background:${p.dot}"></span>${cat}
             </span>
-            <span class="exc-earned" style="color:${p.color}">已获得 <b style="color:${p.color}">+${earned}</b> XP</span>
-          </div>
-          <div class="exc-stats">
-            <span class="exc-stat"><i data-lucide="repeat"></i>锻炼 <b>${count}</b> 次</span>
-            <span class="exc-stat"><i data-lucide="star"></i>单次默认 <b>${xpRange}</b></span>
+            <span class="exc-earned">
+              <span class="exc-earned-label">已获得</span>
+              <b style="color:${p.color}">+${earned}</b>
+              <span class="exc-earned-unit">XP</span>
+            </span>
           </div>
           ${tasks.length === 0 ? `<div style="font-size:12px;color:var(--neutral-400);padding:8px 0">暂无可用任务</div>` : `
           <div class="exc-tasks">
             ${visible.map(itemHtml).join("")}
-            ${hidden.length ? `<div class="exc-tasks-more xp-rules-more-${cat}" style="display:none">${hidden.map(itemHtml).join("")}</div>` : ""}
+            ${hidden.length ? `<div class="exc-tasks-more" style="display:none">${hidden.map(itemHtml).join("")}</div>` : ""}
           </div>
-          ${hidden.length ? `<button class="expand-btn" data-cat="${cat}" onclick="toggleXpRules('${cat}')"><span>展开更多（${hidden.length}）</span></button>` : ""}`}
+          ${hidden.length ? `<button type="button" class="expand-btn" data-cat="${cat}" onclick="toggleXpRules('${cat}')"><span>展开更多（${hidden.length} 条）</span></button>` : ""}`}
         </div>`;
     }).join("");
     xpRulesEl.innerHTML = cards;
   }
   setText("earnXpTotal", `${totalAvailableTasks} 个可用任务`);
 
-  // 如何积累XP：每个版块展开 / 收起更多任务
+  // 展开/收起 XP 任务列表（超出 5 条的部分）
   window.toggleXpRules = function (cat) {
-    const more = document.querySelector(".xp-rules-more-" + cat);
-    const btn = document.querySelector('.expand-btn[data-cat="' + cat + '"]');
+    const card = document.querySelector('.earn-xp-card[data-cat="' + cat + '"]');
+    if (!card) return;
+    const more = card.querySelector(".exc-tasks-more");
+    const btn = card.querySelector(".expand-btn");
     if (!more || !btn) return;
     const isHidden = more.style.display === "none" || !more.style.display;
     more.style.display = isHidden ? "block" : "none";
-    btn.textContent = isHidden ? "收起" : "展开更多";
+    const count = more.querySelectorAll(".exc-task").length;
+    btn.querySelector("span").textContent = isHidden ? "收起" : `展开更多（${count} 条）`;
   };
 
   // ════════ 我的日记本 ════════

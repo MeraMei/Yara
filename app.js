@@ -4596,8 +4596,10 @@ async function renderXp() {
     if (allRecords.length === 0) {
       stripEl.innerHTML = `<div style="padding:24px;color:var(--neutral-400);font-size:13px;font-weight:600">暂无记录</div>`;
     } else {
-      // 默认铺满 3 行（3 列 × 3 行 = 9 条），待确认的始终展示在前并完整显示
-      const COLS = 3, ROWS = 3, DEFAULT_CNT = COLS * ROWS;
+      // 默认铺满 3 行（列数随视口自适应：PC 3列 / 平板 2列 / 移动 1列），待确认的始终展示在前并完整显示
+      const COLS = window.innerWidth > 900 ? 3 : (window.innerWidth > 560 ? 2 : 1);
+      const ROWS = 3;
+      const DEFAULT_CNT = COLS * ROWS;
       const pendingRecords = sortedRecords.filter(r => r.status === "pending");
       const others = sortedRecords.filter(r => r.status !== "pending");
       let visibleRecords;
@@ -4616,8 +4618,7 @@ async function renderXp() {
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
         const isPending = record.status === "pending";
         return `
-        <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}">
-          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:${catColor}"></div>
+        <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}" style="--cat-color:${catColor}">
           <div class="rc-top">
             <div class="rc-icon" style="background:${catColor}18;color:${catColor}">
               <i data-lucide="${status.icon}"></i>
@@ -4647,7 +4648,7 @@ async function renderXp() {
       if (toggleBtn) {
         if (recExpand || hasMore) {
           toggleBtn.style.display = "block";
-          toggleBtn.textContent = recExpand ? "收回" : `展示更多（${allRecords.length - DEFAULT_CNT} 条）`;
+          toggleBtn.textContent = recExpand ? "收起" : `展示更多（${allRecords.length - visibleRecords.length} 条）`;
         } else {
           toggleBtn.style.display = "none";
         }
@@ -4759,54 +4760,51 @@ async function renderXp() {
     const cards = allCats.map(cat => {
       const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
       const earned = catAgg[cat] ? catAgg[cat].xp : 0;
-      const count = catAgg[cat] ? catAgg[cat].count : 0;
       const p = WCPALETTE[cat] || WCPALETTE["学习成长"];
       totalAvailableTasks += tasks.length;
-      // 单次默认XP范围（该分类下所有任务的分值区间）
-      const xps = tasks.map(t => Number(t.xp) || 0);
-      const minXp = xps.length ? Math.min(...xps) : 0;
-      const maxXp = xps.length ? Math.max(...xps) : 0;
-      const xpRange = xps.length ? (minXp === maxXp ? `${minXp} XP` : `${minXp}~${maxXp} XP`) : "--";
-      const showAll = tasks.length <= LIMIT;
-      const visible = showAll ? tasks : tasks.slice(0, LIMIT);
-      const hidden = showAll ? [] : tasks.slice(LIMIT);
+      // 默认展示前 5 条，超出部分通过"展开更多"查看
+      const visible = tasks.slice(0, LIMIT);
+      const hidden = tasks.slice(LIMIT);
       const itemHtml = (t) => `
         <div class="exc-task">
           <span class="exc-task-name">${t.name}</span>
           <span class="exc-task-xp" style="color:${p.color};background:${p.bg}">+${t.xp} XP</span>
         </div>`;
       return `
-        <div class="earn-xp-card">
+        <div class="earn-xp-card" data-cat="${cat}" style="--cat-color:${p.dot}">
           <div class="exc-head">
             <span class="exc-title">
               <span class="exc-dot" style="background:${p.dot}"></span>${cat}
             </span>
-            <span class="exc-earned" style="color:${p.color}">已获得 <b style="color:${p.color}">+${earned}</b> XP</span>
-          </div>
-          <div class="exc-stats">
-            <span class="exc-stat"><i data-lucide="repeat"></i>锻炼 <b>${count}</b> 次</span>
-            <span class="exc-stat"><i data-lucide="star"></i>单次默认 <b>${xpRange}</b></span>
+            <span class="exc-earned">
+              <span class="exc-earned-label">已获得</span>
+              <b style="color:${p.color}">+${earned}</b>
+              <span class="exc-earned-unit">XP</span>
+            </span>
           </div>
           ${tasks.length === 0 ? `<div style="font-size:12px;color:var(--neutral-400);padding:8px 0">暂无可用任务</div>` : `
           <div class="exc-tasks">
             ${visible.map(itemHtml).join("")}
-            ${hidden.length ? `<div class="exc-tasks-more xp-rules-more-${cat}" style="display:none">${hidden.map(itemHtml).join("")}</div>` : ""}
+            ${hidden.length ? `<div class="exc-tasks-more" style="display:none">${hidden.map(itemHtml).join("")}</div>` : ""}
           </div>
-          ${hidden.length ? `<button class="expand-btn" data-cat="${cat}" onclick="toggleXpRules('${cat}')"><span>展开更多（${hidden.length}）</span></button>` : ""}`}
+          ${hidden.length ? `<button type="button" class="expand-btn" data-cat="${cat}" onclick="toggleXpRules('${cat}')"><span>展开更多（${hidden.length} 条）</span></button>` : ""}`}
         </div>`;
     }).join("");
     xpRulesEl.innerHTML = cards;
   }
   setText("earnXpTotal", `${totalAvailableTasks} 个可用任务`);
 
-  // 如何积累XP：每个版块展开 / 收起更多任务
+  // 展开/收起 XP 任务列表（超出 5 条的部分）
   window.toggleXpRules = function (cat) {
-    const more = document.querySelector(".xp-rules-more-" + cat);
-    const btn = document.querySelector('.expand-btn[data-cat="' + cat + '"]');
+    const card = document.querySelector('.earn-xp-card[data-cat="' + cat + '"]');
+    if (!card) return;
+    const more = card.querySelector(".exc-tasks-more");
+    const btn = card.querySelector(".expand-btn");
     if (!more || !btn) return;
     const isHidden = more.style.display === "none" || !more.style.display;
     more.style.display = isHidden ? "block" : "none";
-    btn.textContent = isHidden ? "收起" : "展开更多";
+    const count = more.querySelectorAll(".exc-task").length;
+    btn.querySelector("span").textContent = isHidden ? "收起" : `展开更多（${count} 条）`;
   };
 
   // ════════ 我的日记本 ════════

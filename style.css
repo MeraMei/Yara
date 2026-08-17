@@ -5975,45 +5975,46 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .recent-strip-toggle:hover { background: var(--coral-50); }
     .recent-card {
       min-width: 0;
-      border-radius: 16px;
-      padding: 14px;
-      background: rgba(255,255,255,.8);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(231,229,225,.6);
-      box-shadow: 0 1px 2px rgba(30,28,26,.03), 0 4px 12px -6px rgba(30,28,26,.08);
+      border-radius: 14px;
+      padding: 14px 14px 14px 18px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      transition: transform .15s ease, box-shadow .15s ease;
+      gap: 6px;
+      transition: transform .2s ease, box-shadow .2s ease;
       position: relative;
-      overflow: hidden;
+      min-height: 118px;
     }
     .recent-card::before {
       content: "";
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 4px;
+      bottom: 0;
+      width: 4px;
+      border-radius: 14px 0 0 14px;
+      background: var(--cat-color, #9255f5);
     }
     .recent-card .rc-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
     }
     .recent-card .rc-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
       display: grid;
       place-items: center;
       flex-shrink: 0;
-      font-size: 14px;
+      font-size: 13px;
+      margin-top: 1px;
     }
     .recent-card .rc-title {
-      font-weight: 800;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 13px;
       color: var(--neutral-900);
       line-height: 1.35;
       flex: 1;
@@ -6026,24 +6027,31 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .recent-card .rc-meta {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
+      gap: 6px;
+      font-size: 11px;
       color: var(--neutral-500);
       font-weight: 600;
+      flex-wrap: wrap;
     }
     .recent-card .rc-cat {
-      padding: 3px 9px;
+      padding: 2px 8px;
       border-radius: 999px;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 10px;
       flex-shrink: 0;
+      letter-spacing: .02em;
     }
     .recent-card .rc-desc {
-      font-size: 12px;
-      color: var(--neutral-600);
-      line-height: 1.5;
+      font-size: 11px;
+      color: var(--neutral-500);
+      line-height: 1.45;
       white-space: pre-wrap;
       word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex: 1;
     }
     .recent-card .rc-desc-return {
       color: var(--pink-700, #e25563);
@@ -6058,19 +6066,20 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       border-top: 1px solid var(--neutral-50);
     }
     .recent-card .rc-xp {
-      font: 800 18px var(--font-display);
+      font: 800 16px var(--font-display);
       font-variant-numeric: tabular-nums;
+      letter-spacing: -.02em;
     }
     .recent-card .rc-status {
       display: inline-block;
-      padding: 3px 9px;
-      border-radius: 8px;
-      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.4;
     }
     .recent-card .rc-status.pending { background: var(--yellow-100); color: var(--yellow-700); }
-    .recent-card .rc-status.verified { background: var(--mint-100); color: var(--mint-700); }
+    .recent-card .rc-status.verified { background: var(--green-50); color: var(--green-600); }
     .recent-card .rc-status.returned { background: var(--pink-100); color: var(--pink-700); }
     .recent-card .rc-actions {
       display: flex;
@@ -6078,27 +6087,27 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .recent-card .rc-approve-btn,
     .recent-card .rc-reject-btn {
-      height: 28px;
-      padding: 0 10px;
+      height: 26px;
+      padding: 0 9px;
       border: none;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       font-family: inherit;
       transition: all .15s;
     }
     .recent-card .rc-approve-btn {
-      background: var(--mint-100);
-      color: var(--mint-600);
+      background: var(--green-50);
+      color: var(--green-600);
     }
     .recent-card .rc-approve-btn:hover {
-      background: var(--mint-200);
-      color: var(--mint-700);
+      background: var(--green-100);
+      color: var(--green-700);
     }
     .recent-card .rc-reject-btn {
       background: var(--pink-100);
@@ -6110,8 +6119,8 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .recent-card .rc-approve-btn i,
     .recent-card .rc-reject-btn i {
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
     }
     .recent-card .rc-approve-btn:disabled,
     .recent-card .rc-reject-btn:disabled {
@@ -6122,6 +6131,10 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .recent-card .rc-approve-btn.busy,
     .recent-card .rc-reject-btn.busy {
       pointer-events: none;
+    }
+    .recent-card.pending-card {
+      border-color: var(--yellow-200, #fde68a);
+      box-shadow: 0 0 0 1px rgba(251,191,36,.15), 0 4px 12px rgba(0,0,0,.04);
     }
 
     /* ════════ 等级权益（3级展示 + 色系） ════════ */
@@ -6705,16 +6718,26 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .earn-xp-card {
       padding: 16px;
       border-radius: 18px;
-      background: rgba(255,255,255,.78);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(231,229,225,.6);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
+      position: relative;
+      overflow: hidden;
+    }
+    .earn-xp-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--cat-color, #9255f5), transparent 80%);
     }
     .earn-xp-card .exc-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .earn-xp-card .exc-title {
       font-weight: 800;
@@ -6730,53 +6753,36 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       flex-shrink: 0;
     }
     .earn-xp-card .exc-earned {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
       font-size: 11px;
       font-weight: 700;
       color: var(--neutral-500);
     }
+    .earn-xp-card .exc-earned-label {
+      font-size: 10px;
+      color: var(--neutral-400);
+      margin-right: 2px;
+    }
     .earn-xp-card .exc-earned b {
-      color: var(--neutral-900);
-      font: 800 13px var(--font-display);
+      font: 800 16px var(--font-display);
+      letter-spacing: -.02em;
     }
-    .earn-xp-card .exc-stats {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 8px 0 4px;
+    .earn-xp-card .exc-earned-unit {
+      font-size: 10px;
+      color: var(--neutral-400);
     }
-    .earn-xp-card .exc-stat {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--neutral-600);
-      background: var(--neutral-100);
-      padding: 4px 10px;
-      border-radius: 999px;
-    }
-    .earn-xp-card .exc-stat i { width: 13px; height: 13px; }
-    .earn-xp-card .exc-stat b { font: 800 12px var(--font-display); color: var(--neutral-900); }
     .earn-xp-card .exc-tasks {
       display: flex;
       flex-direction: column;
       gap: 2px;
-      margin-top: 10px;
-      max-height: 100px;
-      overflow-y: auto;
-      padding-right: 6px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--neutral-200) transparent;
+      margin-top: 8px;
     }
-    .earn-xp-card .exc-tasks::-webkit-scrollbar {
-      width: 6px;
-    }
-    .earn-xp-card .exc-tasks::-webkit-scrollbar-thumb {
-      background: var(--neutral-200);
-      border-radius: 999px;
-    }
-    .earn-xp-card .exc-tasks::-webkit-scrollbar-track {
-      background: transparent;
+    .earn-xp-card .exc-tasks-more {
+      border-top: 1px dashed var(--neutral-100);
+      margin-top: 2px;
+      padding-top: 2px;
     }
     .earn-xp-card .exc-task {
       display: flex;
@@ -6792,13 +6798,12 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--neutral-800);
       font-weight: 600;
       flex: 1;
+      min-width: 0;
     }
     .earn-xp-card .exc-task-xp {
       flex-shrink: 0;
       font-size: 12px;
       font-weight: 800;
-      color: var(--mint-600);
-      background: var(--mint-50);
       padding: 2px 9px;
       border-radius: 999px;
     }
@@ -6810,10 +6815,9 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .freq-card {
       padding: 16px;
       border-radius: 18px;
-      background: rgba(255,255,255,.78);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(231,229,225,.6);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
       margin-bottom: 16px;
     }
     .freq-head {

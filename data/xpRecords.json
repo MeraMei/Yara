@@ -12,10 +12,11 @@
     "baseXp": 0,
     "commitmentBonus": false,
     "xpCategory": "能力成长",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "能量记录（写到了时间、地点、人物、事件、感受）",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mss5062lccr9db",
