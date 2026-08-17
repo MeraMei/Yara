@@ -2323,6 +2323,8 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .id-sem-title i { width: 16px; height: 16px; color: var(--colourful-butter-yellow-600); }
     /* 学期卡内的小分隔点（避开全局 .dot 的 40px 图标样式） */
     .sem-dot { display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: var(--neutral-300, #c9c4bc); flex: none; }
+    /* 沙漏图标：在底部文字行 */
+    .sem-hourglass { width: 13px; height: 13px; color: var(--colourful-butter-yellow-600, #f5b301); flex: none; }
     .id-sem-info {
       display: flex;
       align-items: center;
@@ -2345,6 +2347,15 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       font-weight: 700;
       color: var(--neutral-500, #8a8178);
       margin-top: 9px;
+      align-items: center;
+    }
+    /* 底部文字行右侧：倒计时文字（推到最右） */
+    .id-sem-foot #semBarProgress {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--lav-700, #6a2fd6);
+      white-space: nowrap;
     }
 
     /* 身份卡右侧栏：学期进度（开学进度 / 开学倒计时） */

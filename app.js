@@ -1794,6 +1794,7 @@ function getCurrentSemesterInfo(date) {
         semesterName: s1.name,
         semesterShortName: s1.shortName,
         weekNum: weekNum,
+        dayInWeek: (daysPassed % 7) + 1,
         isBreak: false,
         breakType: null,
         breakStart: null,
@@ -1851,6 +1852,7 @@ function getCurrentSemesterInfo(date) {
         semesterName: s2.name,
         semesterShortName: s2.shortName,
         weekNum: weekNum,
+        dayInWeek: (daysPassed % 7) + 1,
         isBreak: false,
         breakType: null,
         breakStart: null,
@@ -1948,12 +1950,12 @@ function renderSemesterBar() {
   if (titleEl) {
     titleEl.innerHTML = `${info.academicYear} <b>${info.semesterShortName || info.semesterName}</b>`;
   }
-  // 状态：假期显示"暑假中/寒假中"，开学显示"第X周"
+  // 状态：假期显示"假期中"，开学显示"第X周"
   if (weekEl) {
-    weekEl.textContent = info.isBreak ? `${info.breakName}中` : `第${info.weekNum}周`;
+    weekEl.textContent = info.isBreak ? "假期中" : `第${info.weekNum}周`;
   }
 
-  // 底部小字：最左 = 开学/假期开始时间，最右 = 距开学天数或距期中/期末周数
+  // 时间轴三栏：左边 = 第X周第X天，中间 = 沙漏图标，右边 = 距开学/期中/期末天数
   let dateText = "";
   let progressText = "";
   let fillPercent = 0;
@@ -1963,26 +1965,36 @@ function renderSemesterBar() {
     const total = info.breakTotalDays || (info.daysUntilStart + 1);
     const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
     fillPercent = Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
-    // 最左：寒暑假开始时间
-    dateText = `${info.breakName}开始 ${_fmtMD(info.breakStart)}`;
-    progressText = `⏳ 距离开学还有 ${info.daysUntilStart} 天`;
+    // 左边：第X周第X天（假期周次，从假期开始算）
+    const breakWeek = Math.floor(elapsed / 7) + 1;
+    const breakDay = (elapsed % 7) + 1;
+    dateText = `第${breakWeek}周第${breakDay}天`;
+    // 右边：还有X天就开学啦！
+    progressText = `还有${info.daysUntilStart}天就开学啦！`;
   } else {
     // 开学后：按学期进度填充
     fillPercent = info.progressPercent;
-    // 最左：开学时间
-    dateText = `开学时间 ${_fmtMD(info.startDate)}`;
+    // 左边：第X周第X天（学期周次）
+    dateText = `第${info.weekNum}周第${info.dayInWeek || 1}天`;
+    // 右边：还有X天就 期中/期末啦！
+    let examLabel = "";
+    let examDays = 0;
     if (info.daysUntilMidTerm > 0) {
-      progressText = `距期中 ${Math.ceil(info.daysUntilMidTerm / 7)} 周`;
-    } else if (info.daysUntilFinal > 0) {
-      progressText = `距期末 ${Math.ceil(info.daysUntilFinal / 7)} 周`;
+      examLabel = "期中";
+      examDays = info.daysUntilMidTerm;
     } else {
-      progressText = "复习考试周";
+      examLabel = "期末";
+      examDays = info.daysUntilFinal;
     }
+    progressText = `还有${examDays}天就${examLabel}啦！`;
   }
 
   if (dateEl) dateEl.textContent = dateText;
   if (progressEl) progressEl.textContent = progressText;
   if (fillEl) fillEl.style.width = fillPercent + "%";
+
+  // 刷新沙漏图标
+  if (typeof refreshIcons === "function") refreshIcons(0);
 }
 
 // 日期 "YYYY-MM-DD" → "X月X日"
