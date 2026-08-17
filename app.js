@@ -2784,6 +2784,7 @@ const CAT_COLORS = {
   "兴趣爱好": "#f96024",
   "身体成长": "#36b98b",
   "能力成长": "#fdd832",
+  "说到做到、遵守约定": "#9255f5",
 };
 
 const WCPALETTE = {
@@ -2791,11 +2792,12 @@ const WCPALETTE = {
   "兴趣爱好": { color: "#b93a13", bg: "#fff7f2", dot: "#f96024" },
   "身体成长": { color: "#21755b", bg: "#e0faf0", dot: "#36b98b" },
   "能力成长": { color: "#9a7b00", bg: "#fffde5", dot: "#fdd832" },
+  "说到做到、遵守约定": { color: "#7d3c98", bg: "#f5eefb", dot: "#9255f5" },
 };
 
 // 三大板块 ←→ XP分类 映射：整个系统分能量/知识/财务三个板块，各板块操作都积累能量（XP）
 const MODULE_XP_TAG = {
-  energy:   { label: "能量板块", cats: ["身体成长", "兴趣爱好"] },
+  energy:   { label: "能量板块", cats: ["身体成长", "兴趣爱好", "说到做到、遵守约定"] },
   knowledge:{ label: "知识板块", cats: ["学习成长"] },
   finance:  { label: "财务板块", cats: ["能力成长"] },
 };
@@ -4522,9 +4524,9 @@ async function renderXp() {
     catAgg[cat].count += 1;
   });
 
-  // 四维数据（确保四个分类都存在）
-  const allCats = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
-  const CAT_ICONS = { "学习成长": "📚", "能力成长": "🧠", "身体成长": "🏃", "兴趣爱好": "🎨" };
+  // 五维数据（确保五个分类都存在）
+  const allCats = ["学习成长", "能力成长", "身体成长", "兴趣爱好", "说到做到、遵守约定"];
+  const CAT_ICONS = { "学习成长": "📚", "能力成长": "🧠", "身体成长": "🏃", "兴趣爱好": "🎨", "说到做到、遵守约定": "🤝" };
   const dims = allCats.map(cat => ({
     name: cat,
     count: catAgg[cat]?.count || 0,
