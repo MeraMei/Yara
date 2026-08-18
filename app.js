@@ -1939,7 +1939,6 @@ function renderSemesterBar() {
   const titleEl = document.getElementById("semBarTitle");
   const weekEl = document.getElementById("semBarWeek");
   const dateEl = document.getElementById("semBarDate");
-  const progressEl = document.getElementById("semBarProgress");
   const fillEl = document.getElementById("semBarFill");
   const trackEl = document.querySelector(".sem-bar-track");
 
@@ -1950,14 +1949,19 @@ function renderSemesterBar() {
   if (titleEl) {
     titleEl.innerHTML = `${info.academicYear} <b>${info.semesterShortName || info.semesterName}</b>`;
   }
-  // 状态：假期显示"假期中"，开学显示"第X周"
+  // 状态：统一显示"第X周"（不写假期中/寒假/暑假等文字）
   if (weekEl) {
-    weekEl.textContent = info.isBreak ? "假期中" : `第${info.weekNum}周`;
+    if (info.isBreak) {
+      const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
+      const breakWeek = Math.floor(elapsed / 7) + 1;
+      weekEl.textContent = `第${breakWeek}周`;
+    } else {
+      weekEl.textContent = `第${info.weekNum}周`;
+    }
   }
 
-  // 时间轴三栏：左边 = 第X周第X天，中间 = 沙漏图标，右边 = 距开学/期中/期末天数
+  // 底部文字行：只保留 第X周第X天 + 沙漏图标（不写开学/期中/期末倒计时）
   let dateText = "";
-  let progressText = "";
   let fillPercent = 0;
 
   if (info.isBreak) {
@@ -1969,28 +1973,14 @@ function renderSemesterBar() {
     const breakWeek = Math.floor(elapsed / 7) + 1;
     const breakDay = (elapsed % 7) + 1;
     dateText = `第${breakWeek}周第${breakDay}天`;
-    // 右边：还有X天就开学啦！
-    progressText = `还有${info.daysUntilStart}天就开学啦！`;
   } else {
     // 开学后：按学期进度填充
     fillPercent = info.progressPercent;
     // 左边：第X周第X天（学期周次）
     dateText = `第${info.weekNum}周第${info.dayInWeek || 1}天`;
-    // 右边：还有X天就 期中/期末啦！
-    let examLabel = "";
-    let examDays = 0;
-    if (info.daysUntilMidTerm > 0) {
-      examLabel = "期中";
-      examDays = info.daysUntilMidTerm;
-    } else {
-      examLabel = "期末";
-      examDays = info.daysUntilFinal;
-    }
-    progressText = `还有${examDays}天就${examLabel}啦！`;
   }
 
   if (dateEl) dateEl.textContent = dateText;
-  if (progressEl) progressEl.textContent = progressText;
   if (fillEl) fillEl.style.width = fillPercent + "%";
 
   // 刷新沙漏图标

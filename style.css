@@ -2349,14 +2349,6 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       margin-top: 9px;
       align-items: center;
     }
-    /* 底部文字行右侧：倒计时文字（推到最右） */
-    .id-sem-foot #semBarProgress {
-      margin-left: auto;
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--lav-700, #6a2fd6);
-      white-space: nowrap;
-    }
 
     /* 身份卡右侧栏：学期进度（开学进度 / 开学倒计时） */
     .id-side {
