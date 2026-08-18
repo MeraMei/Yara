@@ -8252,6 +8252,8 @@ function initSubmitHomeworkModal() {
   if (modal) modal.addEventListener("click", function(e) {
     if (e.target === modal) closeSubmitHomeworkModal();
   });
+  // 初始化选择胶囊（作业类型/完成用时/错题数等静态选项），否则选项无法点击
+  if (typeof initChoicePills === "function") initChoicePills();
 }
 
 /* ════════ 录入成绩弹窗 ════════ */
