@@ -16,7 +16,7 @@
         "taskName": "每天阅读30分钟",
         "category": "学习成长",
         "xp": 5,
-        "completed": false,
+        "completed": true,
         "linked": true
       },
       {
