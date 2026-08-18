@@ -8464,8 +8464,8 @@ function getDefaultCalendarData() {
   ];
 }
 
-function saveCalendarData(data) {
-  try { localStorage.setItem(CALENDAR_CACHE_KEY, JSON.stringify(data)); } catch (e) {}
+function saveCalendarDataDirect(data) {
+  try { localStorage.setItem("yara_calendar_data", JSON.stringify(data)); } catch (e) {}
   writeGithubFile('calendar.json', data, '更新校历数据')
     .catch(err => console.error('同步校历到 GitHub 失败:', err));
   return true;
@@ -9217,7 +9217,7 @@ if (typeof window !== 'undefined') {
     refreshData,
     saveChildData,
     loadChildData,
-    saveCalendarData,
+    saveCalendarData: saveCalendarDataDirect,
     loadCalendarData,
     updateChildData,
     addXpRecord,
@@ -10370,19 +10370,13 @@ function getCalendarData() {
 // ── 保存校历数据 ──
 function saveCalendarData(data) {
   try {
-    if (window.DataStore && window.DataStore.saveCalendarData) {
-      return window.DataStore.saveCalendarData(data);
-    }
-  } catch (e) {
-    console.warn("通过 DataStore 保存校历失败:", e);
-  }
-  try {
     localStorage.setItem("yara_calendar_data", JSON.stringify(data));
-    return true;
   } catch (e) {
     console.error("保存校历数据失败:", e);
-    return false;
   }
+  writeGithubFile('calendar.json', data, '更新校历数据')
+    .catch(err => console.error('同步校历到 GitHub 失败:', err));
+  return true;
 }
 
 // ── 根据日期获取当前学年/学期/周次信息 ──
@@ -10780,9 +10774,14 @@ if (typeof window !== "undefined") {
     }
 
     function submitAddXpPage() {
-      const taskName = document.getElementById("xpTaskSelectPage").value;
+      const selectEl = document.getElementById("xpTaskSelectPage");
+      const taskName = selectEl.value;
+      const selectedOpt = selectEl.options[selectEl.selectedIndex];
       const description = document.getElementById("xpDescPage").value.trim();
-      const xpValue = document.getElementById("xpValuePage").value;
+      const xpValue = parseInt(document.getElementById("xpValuePage").value, 10) || 0;
+      const commitmentCheckEl = document.getElementById("xpCommitmentCheck");
+      const isCommitmentCheck = commitmentCheckEl ? commitmentCheckEl.checked : false;
+      const isCommitmentTask = selectedOpt && selectedOpt.dataset && selectedOpt.dataset.commitment === "1";
       if (!taskName) { alert("请选择 XP 任务"); return; }
       if (!description) { alert("请填写备注说明"); return; }
 
@@ -10791,12 +10790,45 @@ if (typeof window !== "undefined") {
       btn.textContent = "提交中...";
       btn.disabled = true;
 
+      // 如果选的是本周约定任务，自动启用承诺加成 +2 XP
+      const isCommitment = isCommitmentCheck || isCommitmentTask;
+      const bonusXp = isCommitment ? 2 : 0;
+      const totalXp = xpValue + bonusXp;
+
       DataStore.addXpRecord({
         taskName,
-        xp: parseInt(xpValue, 10) || 0,
-        description,
+        xp: totalXp,
+        baseXp: xpValue,
+        commitmentBonus: isCommitment,
+        description: isCommitment ? description + " [承诺兑现]" : description,
         status: "pending",
       }).then(async () => {
+        // 打卡即完成约定：如果该任务是本周约定，自动标记完成（兼容无 saveFamilyMeetings 的环境）
+        try {
+          const cfgNow = window.__lastCfg || await DataStore.loadData();
+          const meetings = cfgNow.familyMeetings || [];
+          const linkedTaskName = (selectedOpt && selectedOpt.dataset && selectedOpt.dataset.taskname) || taskName;
+          const meeting = meetings.find(m => m.commitments && m.commitments.some(c => {
+            if (c.completed) return false;
+            if (c.linked && c.taskName === linkedTaskName) return true;
+            if (isCommitmentTask && !c.linked && c.text === taskName) return true;
+            return false;
+          }));
+          if (meeting && window.DataStore.saveFamilyMeetings) {
+            let changed = false;
+            meeting.commitments.forEach(c => {
+              if (c.completed) return;
+              if (c.linked && c.taskName === linkedTaskName) { c.completed = true; changed = true; }
+              else if (isCommitmentTask && !c.linked && c.text === taskName) { c.completed = true; changed = true; }
+            });
+            if (changed) {
+              await window.DataStore.saveFamilyMeetings(meetings);
+              showToast("🎯 完成了一项约定！继续加油", true);
+            }
+          }
+        } catch (e) {
+          console.error("自动标记约定完成失败:", e);
+        }
         await DataStore.refreshData();
         const cfg = await DataStore.loadData();
         const pending = cfg.pendingCount || (cfg.recentRecords || []).filter(r => r.status === "pending").length;
@@ -10805,7 +10837,10 @@ if (typeof window !== "undefined") {
         document.getElementById("xpValuePage").value = "";
         document.getElementById("xpCategoryPage").value = "";
         document.getElementById("xpDescPage").value = "";
-        showToast(`✅ 已提交，待确认 ${pending} 条`, true);
+        const hintEl = document.getElementById("xpCommitmentHint");
+        if (hintEl) hintEl.style.display = "none";
+        const msg = isCommitment ? `✅ 已提交承诺任务，待确认 ${pending} 条（含承诺加成 +2 XP）` : `✅ 已提交，待确认 ${pending} 条`;
+        showToast(msg, true);
         return renderXp();
       }).then(() => {
         refreshIcons(50);
