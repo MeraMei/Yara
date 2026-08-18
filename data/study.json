@@ -1030,7 +1030,11 @@
           "description": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
           "details": [],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "duration": "30-60分钟",
+          "wrongCount": 0,
+          "unitIndex": -1,
+          "unitName": null
         }
       ]
     },
