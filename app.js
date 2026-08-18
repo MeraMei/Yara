@@ -2134,6 +2134,8 @@ if (typeof window !== "undefined") {
         // 重置承诺复选框
         document.getElementById("xpCommitmentCheck").checked = false;
         document.getElementById("xpCommitmentHint").style.display = "none";
+        // 填充默认选中任务的分值/分类（否则默认分值为空，提交时按 0+2 计算）
+        onXpTaskChangePage();
         refreshIcons(50);
       });
     }
