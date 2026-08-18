@@ -650,11 +650,12 @@
     {
       "id": "hw_mslv9a7m9uniba",
       "subject": "语文",
-      "title": "语文",
+      "title": "语文：抄写四年级上册古诗词、日积月累。",
       "description": "",
       "homeworkType": "特色作业",
-      "module": "",
+      "module": "汉字",
       "modules": [
+        "汉字",
         "阅读"
       ],
       "status": "pending",
@@ -662,7 +663,9 @@
       "dueDate": "2026-07-20",
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "date": "2026-07-15",
