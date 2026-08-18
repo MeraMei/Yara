@@ -1095,7 +1095,7 @@
         {
           "id": "recvrd7AIv7hau",
           "subject": "英语",
-          "title": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer ho",
+          "title": "【第六次】特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer holiday 来写一写暑假期间外出游玩的一篇小作文。以下句子可供参考： My Summer Holiday I have a great Summer Holiday.   I go to the ...  I play and eat .  I go to the ...  I ...   I have a lot of fun.  写好的作品拍照上传。",
           "cleanTitle": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer ho",
           "shortTitle": "特色作业：在英语本子上贴上一张暑假外出游玩的照片，然后用题目My summer ...",
           "homeworkType": "日常预习",
@@ -1117,7 +1117,9 @@
               "type": "hot"
             }
           ],
-          "progress": 0
+          "progress": 0,
+          "unitIndex": -1,
+          "unitName": null
         }
       ]
     },
