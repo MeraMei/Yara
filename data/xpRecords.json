@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_msy6nc7w7g9q9k",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "每天阅读30分钟",
+    "taskName": "每天阅读30分钟",
+    "taskCategory": "",
+    "date": "2026-08-18",
+    "datetime": "2026-08-18 04:48:52",
+    "xp": 2,
+    "baseXp": 0,
+    "commitmentBonus": true,
+    "xpCategory": "",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "阅读《逃离图书馆3》 [承诺兑现]",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_msvxev5ci9cj9d",
     "domain": "XP",
     "type": "XP获得",
