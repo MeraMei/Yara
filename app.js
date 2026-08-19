@@ -2275,7 +2275,10 @@ if (typeof window !== "undefined") {
       const taskName = selectEl.value;
       const selectedOpt = selectEl.options[selectEl.selectedIndex];
       const description = document.getElementById("xpDescPage").value.trim();
-      const xpValue = parseInt(document.getElementById("xpValuePage").value, 10) || 0;
+      // 基础分值：优先配置表（data-xp），手填框为空/0 时兜底取配置值，避免"0+承诺"误加分
+      const cfgXp = parseInt(selectedOpt?.dataset?.xp || "", 10);
+      const manualXp = parseInt(document.getElementById("xpValuePage").value, 10) || 0;
+      const xpValue = manualXp > 0 ? manualXp : (cfgXp > 0 ? cfgXp : 0);
       const isCommitmentCheck = document.getElementById("xpCommitmentCheck").checked;
       const isCommitmentTask = selectedOpt && selectedOpt.dataset?.commitment === "1";
       if (!taskName) { alert("请选择 XP 任务"); return; }
@@ -3248,6 +3251,7 @@ function getAllAssignments(cfg) {
 }
 
 // 本地更新作业数据（API 不可用时的回退方案）
+// 注意：此函数是写入链路的最后防线，必须同时更新缓存和写文件，否则刷新后数据丢失
 async function updateHomeworkLocally(homeworkId, fields) {
   _dataGen++;
   const data = await loadAppData();
@@ -3271,6 +3275,13 @@ async function updateHomeworkLocally(homeworkId, fields) {
     if (found) break;
   }
   if (found) {
+    // 写入文件（复用 writeGithubFile 的本地优先/远程双模式）
+    try {
+      await writeGithubFile('study.json', data.study, '本地更新作业: ' + homeworkId);
+    } catch (e) {
+      console.warn('updateHomeworkLocally 写文件失败:', e.message);
+      // 即使写文件失败，也要确保缓存持久化，刷新时至少 localStorage 还有数据
+    }
     _persistCache();
   }
 }
@@ -7793,10 +7804,7 @@ function closeEditModal() {
 }
 
 /* ════════ 添加作业 ════════ */
-// 作业类型 XP：日常预习/日常复习/暑假作业/特色作业（家庭作业合并到特色作业）
-const ADD_HW_TYPE_XP = {
-  "日常预习": 2, "日常复习": 2, "暑假作业": 2, "特色作业": 4
-};
+// 作业类型 XP 从 config.json xpRules 中读取，不再硬编码
 // 哪些作业类型需要独立截止日期
 const ADD_HW_DUE_TYPES = new Set(["暑假作业", "特色作业"]);
 
@@ -8245,8 +8253,18 @@ async function saveSubmitHomework() {
         console.warn("提交作业-置为完成失败(尝试直接写)", err.message);
         await updateHomeworkLocally(__shmCurrentItem.id, donePayload);
       }
-      // 2. 按作业类型发放 XP
-      const baseXp = ADD_HW_TYPE_XP[hwType] || 2;
+      // 2. 按作业类型发放 XP（从 config.json xpRules 中读取配置值）
+      const cfgXpData = await loadAppData();
+      const xpRulesMap = (cfgXpData.config && cfgXpData.config.xpRules) || {};
+      const hwRuleName = "作业·" + hwType;
+      let baseXp = 2;
+      for (const cat of Object.keys(xpRulesMap)) {
+        const found = (xpRulesMap[cat] || []).find(function(r) { return r.name === hwRuleName; });
+        if (found && found.xp) {
+          baseXp = Number(found.xp) || 2;
+          break;
+        }
+      }
       const taskName = __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业";
       await window.DataStore.addXpRecord({
         taskName,

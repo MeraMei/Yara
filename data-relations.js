@@ -74,10 +74,13 @@
     return isLocalMode().then(function (local) {
       if (local) {
         // 本地测试：写入本地 data/ 目录，无需 Token，不碰线上库
+        // 注意：本地服务器 /api/write 只接受纯文件名（如 study.json），
+        // 因此需要去掉可能带有的 data/ 前缀，服务器自己会拼到 DATA_DIR。
+        var cleanPath = String(path).replace(/^data\//, '');
         return global.fetch('/api/write', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: path, content: content, message: msg || ('更新数据: ' + path) }),
+          body: JSON.stringify({ path: cleanPath, content: content, message: msg || ('更新数据: ' + path) }),
         }).then(function (r) {
           if (!r.ok) throw new Error('本地写入失败: ' + r.status);
           return r.json();

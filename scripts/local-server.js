@@ -71,7 +71,7 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === '/api/write' && req.method === 'POST') {
     try {
       const body = JSON.parse(await readBody(req) || '{}');
-      const file = String(body.path || '').replace(/^\/+/, '');
+      const file = String(body.path || '').replace(/^\/+/, '').replace(/^data\//, '');
       // 安全校验：只允许写 data/ 下的 .json 文件，禁止路径穿越
       if (!/^[\w.-]+\.json$/.test(file)) {
         return send(res, 400, { ok: false, error: '非法文件名: ' + file });
