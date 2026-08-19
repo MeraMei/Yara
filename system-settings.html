@@ -41,6 +41,8 @@
   --neutral-800: var(--colourful-neutral-800); --neutral-900: var(--colourful-neutral-900);
   --colourful-surface-50: #ffffff;
   --colourful-warning-50: var(--colourful-warning-100); --colourful-warning-200: var(--colourful-warning-100);
+  --colourful-primary-50: var(--colourful-sky-blue-50); --colourful-primary-500: var(--colourful-sky-blue-500); --colourful-primary-600: var(--colourful-sky-blue-600);
+  --colourful-info-50: var(--colourful-sky-blue-50); --colourful-info-600: var(--colourful-sky-blue-600);
   --colourful-success-50: var(--colourful-success-100); --colourful-success-700: var(--colourful-success-600);
 
   /* 第二层：语义别名 */
@@ -1023,23 +1025,39 @@ body {
       </div>
     </div>
 
-    <!-- 记录管理：来自 5 张记录表真实条数，多色叠加 -->
+    <!-- 记录管理：来自 5 张记录表真实条数，多色叠加，Tab 切换 -->
     <div class="tabp" data-p="record">
       <div class="card">
-        <div class="card-title lav">🗂️ 记录管理 <span style="font-size:12px;color:var(--colourful-neutral-500);font-weight:700">· 共 138 条</span></div>
-        <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="btn primary mini">＋ 新建记录</button></div>
-        <div class="row"><div class="icon-box ic-coral">💰</div><div class="inf"><b>财富记录</b><span>记录-财务流水 · 16 条</span></div><button class="btn ghost mini">管理</button></div>
-        <div class="row"><div class="icon-box ic-mint">⚡</div><div class="inf"><b>能量记录</b><span>记录-XP获得 · 28 条</span></div><button class="btn ghost mini">管理</button></div>
-        <div class="row"><div class="icon-box ic-blue">📝</div><div class="inf"><b>作业记录</b><span>记录-作业 · 21 条</span></div><button class="btn ghost mini">管理</button></div>
-        <div class="row"><div class="icon-box ic-lav">🏆</div><div class="inf"><b>成绩记录</b><span>记录-成绩 · 67 条</span></div><button class="btn ghost mini">管理</button></div>
-        <div class="row"><div class="icon-box ic-yellow">🎖️</div><div class="inf"><b>期末评价</b><span>记录-期末评价 · 6 条</span></div><button class="btn ghost mini">管理</button></div>
-      </div>
-      <div class="bookmarks">
-        <div class="bk"><b>💰 财富记录 <span class="flag">16 条</span></b><span>记一笔 · 流水 / 余额</span></div>
-        <div class="bk"><b>⚡ 能量记录 <span class="flag">28 条</span></b><span>任务完成 · 分值发放</span></div>
-        <div class="bk"><b>📝 作业记录 <span class="flag">21 条</span></b><span>作业提交 · 完成状态</span></div>
-        <div class="bk"><b>🏆 成绩记录 <span class="flag">67 条</span></b><span>各科期末 · 等级</span></div>
-        <div class="bk"><b>🎖️ 期末评价 <span class="flag">6 条</span></b><span>学期 · 综合评价</span></div>
+        <div class="card-title lav">🗂️ 记录管理 <span id="drTotalCount" style="font-size:12px;color:var(--colourful-neutral-500);font-weight:700">· 加载中…</span></div>
+        <style>
+          #drTabs{display:flex;gap:4px;flex-wrap:wrap;margin:14px 0 4px;border-bottom:2px solid var(--neutral-100);}
+          #drTabs .dr-tab{display:inline-flex;align-items:center;gap:5px;padding:9px 13px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--neutral-500);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;line-height:1;}
+          #drTabs .dr-tab .cnt{font-size:11px;background:var(--neutral-100);color:var(--neutral-500);border-radius:10px;padding:1px 7px;font-weight:700;}
+          #drTabs .dr-tab:hover{color:var(--neutral-800);}
+          #drTabs .dr-tab.active{color:var(--colourful-primary-600);border-bottom-color:var(--colourful-primary-500);background:var(--colourful-primary-50);border-radius:10px 10px 0 0;}
+          #drTabs .dr-tab.active .cnt{background:var(--colourful-primary-500);color:#fff;}
+        </style>
+        <div id="drTabs">
+          <button type="button" class="dr-tab active" data-dr="finance" onclick="drTab('finance')">💰 财富<span class="cnt" id="drCount-finance"></span></button>
+          <button type="button" class="dr-tab" data-dr="xp" onclick="drTab('xp')">⚡ 能量<span class="cnt" id="drCount-xp"></span></button>
+          <button type="button" class="dr-tab" data-dr="homework" onclick="drTab('homework')">📝 作业<span class="cnt" id="drCount-homework"></span></button>
+          <button type="button" class="dr-tab" data-dr="exam" onclick="drTab('exam')">🏆 成绩<span class="cnt" id="drCount-exam"></span></button>
+          <button type="button" class="dr-tab" data-dr="evaluation" onclick="drTab('evaluation')">🎖️ 期末评价<span class="cnt" id="drCount-evaluation"></span></button>
+          <button type="button" class="dr-tab" data-dr="diary" onclick="drTab('diary')">📓 日记<span class="cnt" id="drCount-diary"></span></button>
+          <button type="button" class="dr-tab" data-dr="commitment" onclick="drTab('commitment')">🤝 承诺<span class="cnt" id="drCount-commitment"></span></button>
+          <button type="button" class="dr-tab" data-dr="aiweekly" onclick="drTab('aiweekly')">📊 周报<span class="cnt" id="drCount-aiweekly"></span></button>
+        </div>
+        <div style="font-size:11px;line-height:1.7;color:var(--neutral-400);background:var(--neutral-50);border-radius:8px;padding:6px 10px;margin-top:4px">
+          这里管理业务流水记录，已覆盖能量/财富/作业/成绩/期末评价/日记/承诺/AI周报。等级与权益在「等级」标签，任务与分值在「任务规则」、财务分类在「财务分类」、孩子资料与校历在「基本信息」里维护。
+        </div>
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:12px 0 6px;flex-wrap:wrap">
+          <div id="drTpHint" style="margin-right:auto;font-size:12px;color:var(--neutral-400)"></div>
+          <button class="btn secondary mini" onclick="drShowRelations()" style="display:none" id="drRelBtn">🔗 关联</button>
+          <button class="btn primary mini" onclick="drAdd()">＋ 新增记录</button>
+        </div>
+        <div id="drRelBox" style="display:none;margin-bottom:12px;padding:12px;background:var(--colourful-info-50);border-radius:10px;font-size:13px;line-height:1.8;color:var(--neutral-700)"></div>
+        <div id="drListWrap" style="max-height:480px;overflow-y:auto;border-radius:10px"></div>
+        <div id="drEmpty" style="padding:24px;text-align:center;color:var(--neutral-400);display:none">该类型暂无记录</div>
       </div>
     </div>
   </main>
@@ -1169,6 +1187,7 @@ body {
   </div>
 </div>
 
+<script src="data-relations.js"></script>
 <script>
 (function(){
   var tabbar = document.querySelector('.tabs');
@@ -1777,10 +1796,484 @@ function renderDefGrid() {
   });
 }
 
+/* ════════ 记录管理（统一数据关联层） ════════ */
+var DR = (typeof window.DataRelations === 'object') ? window.DataRelations : null;
+var _drType = 'xp';
+var _drRecords = [];
+var _drSel = null;
+
+var DR_ICON = { xp: '⚡', finance: '💰', homework: '📝', exam: '🏆', evaluation: '🎖️', diary: '📓', commitment: '🤝', aiweekly: '📊' };
+var DR_LABEL = { xp: '能量记录', finance: '财富记录', homework: '作业记录', exam: '成绩记录', evaluation: '期末评价', diary: '日记', commitment: '家庭会议承诺', aiweekly: 'AI周报' };
+
+function initDr() {
+  if (!DR) { showToast('数据关联层未加载', false); return; }
+  var first = document.querySelector('#drTabs .dr-tab.active');
+  var t = first ? first.getAttribute('data-dr') : 'finance';
+  drTab(t);
+}
+
+// 刷新各记录类型条数（写进各 tab 的计数角标）· 直接复用已加载数据，避免二次请求
+function refreshDrCounts() {
+  if (!DR) return;
+  try {
+    var c = DR.getCounts();
+    var total = 0;
+    Object.keys(c).forEach(function(k) {
+      total += c[k];
+      var el = document.getElementById('drCount-' + k);
+      if (el) el.textContent = c[k];
+    });
+    var tc = document.getElementById('drTotalCount');
+    if (tc) tc.textContent = '· ' + total + ' 条';
+  } catch (e) {}
+}
+
+// 切换 tab -> 加载该类型列表
+function drTab(type) {
+  if (!DR) { showToast('数据关联层未加载', false); return; }
+  _drType = type;
+  _drSel = null;
+  // 激活当前 tab
+  var tabs = document.querySelectorAll('#drTabs .dr-tab');
+  tabs.forEach(function(b) { if (b.getAttribute('data-dr') === type) b.classList.add('active'); else b.classList.remove('active'); });
+  document.getElementById('drRelBtn').style.display = 'none';
+  document.getElementById('drRelBox').style.display = 'none';
+  var hint = document.getElementById('drTpHint');
+  if (hint) hint.textContent = '当前：' + (DR_LABEL[type] || type) + ' · 编辑/删除会自动重算关联的等级/余额/承诺等';
+  DR.load().then(function() {
+    _drRecords = DR.getRecords(type);
+    renderDrList();
+    refreshDrCounts();
+  }).catch(function() { showToast('加载记录失败', false); });
+}
+
+// 打开某类型的记录列表（兼容旧引用）
+function drOpenType(type) {
+  drTab(type);
+}
+
+function esc(s) {
+  return String(s === undefined || s === null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtVal(v) {
+  if (v === undefined || v === null) return '';
+  if (typeof v === 'boolean') return v ? '是' : '否';
+  return String(v);
+}
+
+// 选项对象统一取值/取标签：支持 ['待确认'] 或 [{v,l}] 两种写法
+function optVal(o) { return (o && typeof o === 'object' && 'v' in o) ? o.v : o; }
+function optLabel(o) {
+  if (o && typeof o === 'object' && 'l' in o) return o.l;
+  return fmtVal(o);
+}
+
+// 列表展示：select 栏位把存储值(可能是英文)映射为界面中文标签
+function fieldDisp(f, val) {
+  if (f && f.type === 'select' && f.options && f.options.length) {
+    var need = String(val === undefined ? '' : val);
+    for (var i = 0; i < f.options.length; i++) {
+      var o = f.options[i];
+      if (String(optVal(o)) === need || (val === true && String(optVal(o)) === 'true')) return optLabel(o);
+    }
+    // 存储值与选项值不一致（如已是中文）时直接显示
+    return fmtVal(val);
+  }
+  return fmtVal(val);
+}
+
+// 表单下落值：可能来自多个字段名，取第一个非空
+function pickVal(rec, keys) {
+  for (var i = 0; i < keys.length; i++) {
+    var v = rec[keys[i]];
+    if (v !== undefined && v !== null && String(v) !== '') return v;
+  }
+  return '';
+}
+
+// 输入框自适应高度：文字越多框越高，匹配内容文字量
+function autoGrow(el) {
+  if (!el) return;
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight + 4) + 'px';
+}
+
+// 任务关联下拉变化 → 自动回填分值/类别/任务名等派生字段
+function drTaskRefChange(selIdx) {
+  var sel = document.getElementById('drf_' + selIdx);
+  if (!sel) return;
+  var name = sel.value;
+  var snap = (DR && DR.getSnapshot) ? DR.getSnapshot() : {};
+  var src = snap['xpSources.json'] || [];
+  var task = null;
+  src.forEach(function(cat) {
+    (cat.tasks || []).forEach(function(t) {
+      if (t.name === name) task = Object.assign({ category: cat.type }, t);
+    });
+  });
+  var rel = DR.RELATIONS[_drType];
+  var derive = null;
+  (rel.fields || []).forEach(function(f) { if (f.key === 'taskRef' && f.deriveTo) derive = f.deriveTo; });
+  if (!derive || !task) return;
+  Object.keys(derive).forEach(function(targetKey) {
+    var tval;
+    if (targetKey === 'title' || targetKey === 'taskName') tval = task.name;
+    else if (targetKey === 'xp') tval = task.xp;
+    else if (targetKey === 'taskCategory') tval = task.category;
+    else tval = task[targetKey];
+    var el = document.querySelector('#drListWrap [data-fk="' + targetKey + '"]');
+    if (el) el.value = (tval === undefined || tval === null ? '' : tval);
+  });
+}
+
+// 渲染列表
+function renderDrList() {
+  var wrap = document.getElementById('drListWrap');
+  var empty = document.getElementById('drEmpty');
+  if (!_drRecords || _drRecords.length === 0) {
+    wrap.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // AI周报：整块卡片展示全部内容，而非一行摘要
+  if (_drType === 'aiweekly') { wrap.innerHTML = renderDrAiweekly(); return; }
+
+  var rel = DR.RELATIONS[_drType];
+  // 只用精简列（listFields），控制列数不再挤成一坨；找不到则退回全部字段
+  var cols = [];
+  var all = rel.fields || [];
+  var lf = rel.listFields;
+  if (lf && lf.length) {
+    cols = lf.map(function(k) {
+      for (var j = 0; j < all.length; j++) if (all[j].key === k) return all[j];
+      return { key: k, name: k };
+    });
+  } else {
+    cols = all;
+  }
+  // 表格 100% 宽、随浏览器自适应拉伸，去掉硬性 max-width 缩短
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:auto">';
+  html += '<thead><tr>';
+  cols.forEach(function(f) { html += '<th style="text-align:left;padding:8px 10px;background:var(--neutral-100);color:var(--neutral-500);border-bottom:2px solid var(--neutral-200);white-space:nowrap">' + esc(f.name) + '</th>'; });
+  html += '<th style="padding:8px 10px;background:var(--neutral-100);width:96px"></th></tr></thead><tbody>';
+  (_drRecords || []).forEach(function(r, idx) {
+    html += '<tr style="border-bottom:1px solid var(--neutral-100)">';
+    cols.forEach(function(f) {
+      var val = pickVal(r, f.use || [f.key]);
+      var disp = fieldDisp(f, val);
+      if (disp.length > 60) disp = disp.slice(0, 60) + '…';
+      html += '<td style="padding:8px 10px;color:var(--neutral-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">' + esc(disp) + '</td>';
+    });
+    html += '<td style="padding:8px 10px;white-space:nowrap;text-align:right">';
+    html += '<button class="btn ghost mini" onclick="drEdit(' + idx + ')">编辑</button> ';
+    html += '<button class="btn ghost mini" style="color:var(--colourful-error-500)" onclick="drDel(' + idx + ')">删除</button>';
+    html += '</td></tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// AI周报完整展示：把一条周报的所有数据全部展开显示
+function renderDrAiweekly() {
+  var html = '<div style="display:flex;flex-direction:column;gap:12px">';
+  (_drRecords || []).forEach(function(r, idx) {
+    var stats = r.stats || {};
+    var academic = r.academic || {};
+    var behavior = r.behavior || {};
+    var emotion = r.emotion || {};
+    var sugg = r.suggestions || {};
+    var growth = r.growth || {};
+    var body = '';
+
+    // 数据概览
+    var statRows = '';
+    var statMap = [['energy','⚡ 能量'],['study','📚 学习'],['finance','💰 财富'],['diary','📓 日记']];
+    statMap.forEach(function(kv) {
+      var s = stats[kv[0]] || {};
+      var trendTxt = s.trend === 'up' ? '↑' : (s.trend === 'down' ? '↓' : '→');
+      if (s.hasData === false) return;
+      statRows += '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted var(--neutral-100)">'
+        + '<span>' + kv[1] + '</span><span style="font-weight:700">' + fmtVal(s.value) + ' ' + trendTxt + ' <span style="color:var(--neutral-400);font-weight:400">(较上周 ' + fmtVal(s.diff) + ')</span></span></div>';
+    });
+    if (statRows) body += '<div><b style="font-size:12px;color:var(--neutral-500)">📊 本周数据</b>' + statRows + '</div>';
+
+    // 学习表现
+    if (academic.hasData || (academic.homework && academic.homework.subjects && academic.homework.subjects.length)) {
+      var ac = '<div><b style="font-size:12px;color:var(--neutral-500)">📚 学习表现</b>';
+      var subs = (academic.homework && academic.homework.subjects) || [];
+      if (subs.length) ac += '<div style="padding:5px 0">作业科目：' + esc(subs.join('、')) + '</div>';
+      (academic.trends || []).forEach(function(t) { ac += '<div style="padding:3px 0">· ' + esc(t) + '</div>'; });
+      (academic.weakModules || []).forEach(function(w) { ac += '<div style="padding:3px 0;color:var(--colourful-warning-600)">⚠ 薄弱：' + esc(w) + '</div>'; });
+      ac += '</div>';
+      body += ac;
+    }
+    if (academic.hasData === false && academic.emptyHint) body += '<div style="color:var(--neutral-400);font-size:12px">' + esc(academic.emptyHint) + '</div>';
+
+    // 行为表现
+    var profile = behavior.profile || [];
+    if (profile.length) {
+      var bh = '<div><b style="font-size:12px;color:var(--neutral-500)">🌟 行为表现</b>';
+      profile.forEach(function(p) { bh += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted var(--neutral-100)"><span>' + esc(p.category) + '</span><span>' + fmtVal(p.count) + ' 次 · +' + fmtVal(p.xp) + 'XP</span></div>'; });
+      (behavior.effortStories || []).forEach(function(e) { bh += '<div style="padding:3px 0">💪 ' + esc(e) + '</div>'; });
+      if (behavior.badge && behavior.badge.earned) bh += '<div style="padding:3px 0;color:var(--colourful-warning-600)">🎖 ' + esc(behavior.badge.name || '达成徽章') + '</div>';
+      bh += '</div>';
+      body += bh;
+    }
+
+    // 情绪 / 日记
+    var md = emotion.moodDistribution || {};
+    var moodKeys = Object.keys(md);
+    var emHeader = '😊 情绪与日记';
+    if (moodKeys.length) {
+      var em = '<div><b style="font-size:12px;color:var(--neutral-500)">' + emHeader + '</b>';
+      em += '<div style="padding:4px 0">日记 ' + fmtVal(emotion.diaryCount) + ' 篇；心情：' + moodKeys.map(function(k) { return k + '×' + md[k]; }).join('、') + '</div>';
+      if (emotion.bestDiary) em += '<div style="padding:3px 0;background:var(--neutral-50);border-radius:6px;padding:6px 8px"><span style="font-weight:600">💬 最棒日记</span><span style="color:var(--neutral-400)">（' + fmtVal(emotion.bestDiary.date) + '）</span><div style="margin-top:2px">' + esc(emotion.bestDiary.snippet) + '</div></div>';
+      if (emotion.financeWorthIt !== undefined) em += '<div style="padding:3px 0">💰 花销值得度 ' + fmtVal(emotion.financeWorthIt) + '%</div>';
+      em += '</div>';
+      body += em;
+    }
+
+    // 建议
+    if (sugg.keep || sugg.improve || sugg.challenge) {
+      var sg = '<div><b style="font-size:12px;color:var(--neutral-500)">💡 成长建议</b>';
+      if (sugg.keep) sg += '<div style="padding:3px 0"><span style="color:var(--neutral-600);font-weight:600">继续保持：</span>' + esc(sugg.keep) + '</div>';
+      if (sugg.improve) sg += '<div style="padding:3px 0"><span style="color:var(--neutral-600);font-weight:600">可以改进：</span>' + esc(sugg.improve) + '</div>';
+      if (sugg.challenge) sg += '<div style="padding:3px 0"><span style="color:var(--neutral-600);font-weight:600">趣味挑战：</span>' + esc(sugg.challenge) + '</div>';
+      sg += '</div>';
+      body += sg;
+    }
+
+    // 成长画像更新
+    var hi = (growth.profileUpdate && growth.profileUpdate.highlights) || [];
+    if (hi.length) {
+      var gr = '<div><b style="font-size:12px;color:var(--neutral-500)">🌱 成长档案更新</b>';
+      hi.forEach(function(h) { gr += '<div style="padding:3px 0">· ' + esc(h) + '</div>'; });
+      gr += '</div>';
+      body += gr;
+    }
+
+    html += '<div style="background:var(--surface,#fff);border:1px solid var(--neutral-150,var(--neutral-200));border-radius:10px;padding:12px 14px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      + '<b>第 ' + fmtVal(r.weekNumber) + ' 周 · ' + fmtVal(r.date) + '</b>'
+      + '<span style="white-space:nowrap">'
+      + '<button class="btn ghost mini" onclick="drEdit(' + idx + ')">编辑</button> '
+      + '<button class="btn ghost mini" style="color:var(--colourful-error-500)" onclick="drDel(' + idx + ')">删除</button>'
+      + '</span></div>'
+      + '<div style="font-size:13px;color:var(--neutral-700);padding:6px 0">' + esc(r.summary || '') + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">' + (body || '<div style="color:var(--neutral-400);font-size:12px">暂无详细数据。</div>') + '</div>'
+      + '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// 关联说明
+function drShowRelations() {
+  if (!_drSel || !DR) return;
+  var rels = DR.getRelations(_drType, _drSel);
+  var box = document.getElementById('drRelBox');
+  if (!rels.length) {
+    box.innerHTML = '<b>🔗 ' + (DR_LABEL[_drType] || '该记录') + '</b><br>该记录暂未建立明确关联（仅独立数据）。';
+  } else {
+    var html = '<b>🔗 ' + (DR_LABEL[_drType] || '该记录') + ' · 关联数据</b>';
+    rels.forEach(function(r) {
+      html += '<div style="display:flex;gap:8px;margin-top:4px"><span style="flex-shrink:0;font-weight:600">' + esc(r.kind) + '</span><span style="flex:1;color:var(--neutral-500)">' + esc(r.desc) + '</span><span style="flex-shrink:0;font-size:11px;color:var(--colourful-info-600)">→ ' + esc(r.target) + '</span></div>';
+    });
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--neutral-400)">编辑/删除该记录时，右侧列出的关联数据会通过统一关联层自动同步更新。</div>';
+    box.innerHTML = html;
+  }
+  box.style.display = '';
+}
+
+function drOpenDetail(idx) {
+  _drSel = _drRecords[idx];
+  document.getElementById('drRelBtn').style.display = '';
+  drShowRelations();
+}
+
+function drEdit(idx) {
+  drOpenDetail(idx);
+  var r = _drRecords[idx];
+  buildDrForm(r);
+}
+
+function drAdd() {
+  _drSel = null;
+  document.getElementById('drRelBtn').style.display = 'none';
+  document.getElementById('drRelBox').style.display = 'none';
+  buildDrForm({});
+}
+
+// 构建编辑/新增表单
+function buildDrForm(rec) {
+  var rel = DR.RELATIONS[_drType];
+  var cols = rel && rel.fields || [];
+  var wrap = document.getElementById('drListWrap');
+  var html = '<div style="padding:12px">';
+  html += '<div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">';
+  cols.forEach(function(f, i) {
+    var val = pickVal(rec, f.use || [f.key]);
+    var id = 'drf_' + i;
+    var labelHtml = '<label style="font-size:11px;font-weight:700;color:var(--neutral-500);display:block;margin-bottom:4px">' + esc(f.name) + '</label>';
+
+    // 任务关联：直接选取模块里的任务，选中后自动带出分值/类别/任务名
+    if (f.type === 'taskRef') {
+      var snap = (DR && DR.getSnapshot) ? DR.getSnapshot() : {};
+      var src = snap['xpSources.json'] || [];
+      var opts2 = '<option value=""></option>';
+       var selTaskName = String(pickVal(rec, ['taskRef', 'title', 'taskName']) || '');
+      src.forEach(function(cat) {
+        var tasks = cat.tasks || [];
+        if (!tasks.length) return;
+        opts2 += '<optgroup label="' + esc(cat.type) + '">';
+        tasks.forEach(function(t) {
+          var sel2 = (String(t.name) === selTaskName) ? ' selected' : '';
+          opts2 += '<option value="' + esc(t.name) + '"' + sel2 + '>' + esc(t.name) + '（+' + fmtVal(t.xp) + 'XP）</option>';
+        });
+        opts2 += '</optgroup>';
+      });
+      html += '<div style="grid-column:1 / -1">' + labelHtml
+        + '<select id="' + id + '" data-fk="' + esc(f.key) + '" onchange="drTaskRefChange(' + i + ')" style="width:100%;padding:8px 10px;border:1px solid var(--neutral-200);border-radius:8px;font-size:13px;background:#fff;outline:none">' + opts2 + '</select>'
+        + '<div style="font-size:10px;color:var(--neutral-400);margin-top:3px">从任务清单选一条，分值、类别、任务名会自动带出，无需手动填写</div>'
+        + '</div>';
+      return;
+    }
+
+    html += '<div>';
+    html += labelHtml;
+    if (f.type === 'select') {
+      var opts = (f.options || []).map(function(o) {
+        var oVal = optVal(o);
+        var need = String(val);
+        var selected = String(oVal) === need || (val === true && String(oVal) === 'true') ? ' selected' : '';
+        return '<option value="' + (typeof oVal === 'boolean' ? oVal : esc(oVal)) + '"' + selected + '>' + esc(optLabel(o)) + '</option>';
+      }).join('');
+      html += '<select id="' + id + '" data-fk="' + esc(f.key) + '" style="width:100%;padding:8px 10px;border:1px solid var(--neutral-200);border-radius:8px;font-size:13px;background:#fff;outline:none">' + opts + '</select>';
+    } else if (f.type === 'textarea') {
+      html += '<textarea id="' + id + '" data-fk="' + esc(f.key) + '" oninput="autoGrow(this)" style="width:100%;padding:8px 10px;border:1px solid var(--neutral-200);border-radius:8px;font-size:13px;outline:none;min-height:44px;resize:none;overflow:hidden;line-height:1.6">' + esc(val) + '</textarea>';
+    } else if (f.type === 'date') {
+      html += '<input type="date" id="' + id + '" data-fk="' + esc(f.key) + '" value="' + esc(val) + '" style="width:100%;padding:8px 10px;border:1px solid var(--neutral-200);border-radius:8px;font-size:13px;outline:none;background:#fff">';
+    } else if (f.type === 'number') {
+      html += '<input type="number" id="' + id + '" data-fk="' + esc(f.key) + '" value="' + (val === '' ? '' : esc(val)) + '" style="width:100%;padding:8px 10px;border:1px solid var(--neutral-200);border-radius:8px;font-size:13px;outline:none;background:#fff">';
+    } else {
+      html += '<input type="text" id="' + id + '" data-fk="' + esc(f.key) + '" value="' + esc(val) + '" style="width:100%;padding:8px 10px;border:1px solid var(--neutral-200);border-radius:8px;font-size:13px;outline:none;background:#fff">';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">';
+  html += '<button class="btn ghost mini" onclick="drCancelForm()">取消</button>';
+  html += '<button class="btn primary mini" onclick="drSave()">保存</button>';
+  html += '</div></div>';
+  wrap.innerHTML = html;
+  // 渲染后统一把文本框高度调整到与内容一致
+  runAutoGrowAll();
+}
+
+function runAutoGrowAll() {
+  var tas = document.querySelectorAll('#drListWrap textarea');
+  for (var i = 0; i < tas.length; i++) autoGrow(tas[i]);
+}
+
+function drCancelForm() { renderDrList(); }
+
+// 收集表单 -> 记录对象
+function collectDrForm() {
+  var rel = DR.RELATIONS[_drType];
+  var cols = rel && rel.fields || [];
+  var rec = {};
+  cols.forEach(function(f, i) {
+    var el = document.getElementById('drf_' + i);
+    if (!el) return;
+    var key = f.key;
+    var v;
+    if (f.type === 'number') {
+      v = el.value === '' ? 0 : Number(el.value);
+    } else if (f.type === 'select') {
+      // 选项是布尔（完成/未完成）时以字符串 'true'/'false' 语义还原
+      var firstOpt = (f.options && f.options[0]) ? optVal(f.options[0]) : null;
+      if (typeof firstOpt === 'boolean') v = (el.value === 'true');
+      else v = el.value;
+      // 若是带 label 的对象选项，保存的是界面原本的存储值(v)，确保数据库口径不变
+      if (f.options) {
+        for (var oi = 0; oi < f.options.length; oi++) {
+          if (String(optVal(f.options[oi])) === String(v)) { v = optVal(f.options[oi]); break; }
+        }
+      }
+    } else {
+      v = el.value;
+    }
+    // use 映射：该表单字段可能对应记录的多个候选键名（不同记录写法不同）。
+    // 保存时应回写到"原记录实际存在的那个键"，并清掉其余候选键，避免字段错位/堆积。
+    var writeKeys;
+    if (f.use && f.use.length) writeKeys = f.use;
+    else writeKeys = [f.key];
+    // 若是编辑且原记录已有某个候选键，就优先回写到那个键；否则写主键
+    var targetKey = f.key;
+    if (_drSel) {
+      for (var ui = 0; ui < writeKeys.length; ui++) {
+        if (writeKeys[ui] in _drSel) { targetKey = writeKeys[ui]; break; }
+      }
+    }
+    // 移除候选键中的其余键，只保留一个，避免同时出现与原值冲突
+    writeKeys.forEach(function(wk) { if (wk !== targetKey) delete rec[wk]; });
+    rec[targetKey] = v;
+  });
+  // 保留原 id
+  if (_drSel && _drSel.id) rec.id = _drSel.id;
+  return rec;
+}
+
+// 保存（新增=create / 修改=update），通过关联层级联更新
+function drSave() {
+  var rec = collectDrForm();
+  if (!DR) { showToast('关联层未加载', false); return; }
+  var isNew = !_drSel || !_drSel.id;
+  var btn = null;
+  DR.apply(_drType, isNew ? 'create' : 'update', rec).then(function(res) {
+    if (res && res.ok) {
+      showToast(isNew ? '✅ 已新增记录，关联数据已同步' : '✅ 已修改记录，关联数据已同步');
+      _drSel = null;
+      // 保留当前类型列表并刷新
+      return DR.load().then(function() {
+        _drRecords = DR.getRecords(_drType);
+        renderDrList();
+        refreshDrCounts();
+      });
+    }
+    if (res && res.error) { showToast('保存失败: ' + res.error, false); return null; }
+    showToast('保存完成', false); return null;
+  }).catch(function(e) {
+    showToast('保存失败: ' + (e && e.message || '未知错误'), false);
+  });
+}
+
+// 删除记录，通过关联层级联更新
+function drDel(idx) {
+  var r = _drRecords[idx];
+  if (!r || !r.id) { showToast('无法删除（缺少ID）', false); return; }
+  var desc = r.taskName || r.title || r.text || r.description || r.date || '';
+  if (!confirm('确定删除这条 ' + (DR_LABEL[_drType] || '') + '：\n' + (fmtVal(desc).slice(0, 40) || '(无标题)') + '\n\n关联的等级/余额/承诺等数据会一并重算。')) return;
+  DR.apply(_drType, 'remove', r).then(function(res) {
+    showToast('✅ 已删除，关联数据已同步重算');
+    return DR.load().then(function() {
+      _drRecords = DR.getRecords(_drType);
+      renderDrList();
+      refreshDrCounts();
+    });
+  }).catch(function(e) {
+    showToast('删除失败: ' + (e && e.message || '未知错误'), false);
+  });
+}
+
 // 页面加载时渲染规则
 document.addEventListener('DOMContentLoaded', function() {
   renderRuleGrid();
   renderDefGrid();
+  initDr();
 });
 </script>
 <div class="toast" id="settingsToast"></div>
