@@ -1138,7 +1138,7 @@
           "title": "创造自己的分数小册子：从1 - 1/10（参照视频） ",
           "cleanTitle": "创造自己的分数小册子（参照视频）",
           "shortTitle": "创造自己的分数小册子（参照视频）",
-          "homeworkType": "日常预习",
+          "homeworkType": "暑假作业",
           "module": "概念",
           "modules": [
             "概念"
@@ -1157,7 +1157,11 @@
             }
           ],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "duration": "15-30分钟",
+          "wrongCount": 0,
+          "unitIndex": -1,
+          "unitName": null
         },
         {
           "id": "recvrd7AIvjQKm",
