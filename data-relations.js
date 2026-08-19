@@ -32,6 +32,19 @@
 
   function getToken() { return global.localStorage ? global.localStorage.getItem(TOKEN_KEY) : ''; }
 
+  // 本地模式探测（本地测试服务器 /api/ping，结果缓存）——与 app.js 保持一致
+  var _localModeChecked = false;
+  var _localMode = false;
+  function isLocalMode() {
+    if (_localModeChecked) return Promise.resolve(_localMode);
+    return new Promise(function (resolve, reject) {
+      global.fetch('/api/ping', { method: 'GET' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { _localMode = !!(d && d.ok); _localModeChecked = true; resolve(_localMode); })
+        .catch(function () { _localMode = false; _localModeChecked = true; resolve(false); });
+    });
+  }
+
   // 读数据文件：优先本地 data/xxx.json，GitHub Token 存在时读远端，保证最新
   function fetchRaw(file) {
     return global.fetch('data/' + file)
@@ -58,6 +71,23 @@
   }
 
   function writeFile(path, content, msg) {
+    return isLocalMode().then(function (local) {
+      if (local) {
+        // 本地测试：写入本地 data/ 目录，无需 Token，不碰线上库
+        return global.fetch('/api/write', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: path, content: content, message: msg || ('更新数据: ' + path) }),
+        }).then(function (r) {
+          if (!r.ok) throw new Error('本地写入失败: ' + r.status);
+          return r.json();
+        });
+      }
+      return writeFileRemote(path, content, msg);
+    });
+  }
+
+  function writeFileRemote(path, content, msg) {
     var token = getToken();
     if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
     return getFileSHA(path).then(function (sha) {
@@ -95,7 +125,7 @@
   }
   function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
-  /* ═══════════ 1. 派生数据重算函数（核心，与 data-store.js 计算口径一致） ═══════════ */
+  /* ═══════════ 1. 派生数据重算函数（核心，计算口径与主站保持一致） ═══════════ */
 
   // 1.1 从 xpRecords 重算 totalXP + pendingCount + returnedCount
   function recomputeXpStats(xpRecords) {
@@ -647,6 +677,14 @@
       }, Promise.resolve()).then(function () {
         return { ok: true, type: type, action: summary && summary.action, id: summary && summary.id, written: unique.map(function (w) { return w.file; }), reason: cascade.map(function (c) { return c.reason; }) };
       });
+    },
+
+    // 全系统唯一 GitHub 写入出口：复用内部 writeFile（getFileSHA+btoa+分支写入）
+    // 供记录管理页（原 writeGithubFile）与任务规则/分值同步等直接调用，消除重复实现。
+    writeDataFile: function (path, content, msg) {
+      if (!path) return Promise.reject(new Error('缺少文件路径'));
+      var p = String(path).indexOf('data/') === 0 ? path : ('data/' + path);
+      return writeFile(p, content, msg || ('更新数据: ' + path));
     },
 
     // 一键重算所有关联的派生数据并写回（用于统一校准）

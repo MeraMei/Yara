@@ -1287,34 +1287,6 @@ const GITHUB_OWNER_R = 'meramei';
 const GITHUB_REPO_R = 'Yara';
 const GITHUB_BRANCH_R = 'main';
 const GITHUB_RAW_BASE_R = 'https://raw.githubusercontent.com/' + GITHUB_OWNER_R + '/' + GITHUB_REPO_R + '/' + GITHUB_BRANCH_R + '/data';
-const GITHUB_API_BASE_R = 'https://api.github.com/repos/' + GITHUB_OWNER_R + '/' + GITHUB_REPO_R + '/contents/data';
-
-function getFileSHA(path) {
-  var token = getGithubToken();
-  if (!token) return Promise.resolve(null);
-  return fetch(GITHUB_API_BASE_R + '/' + path, {
-    headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json' }
-  }).then(function(r) {
-    if (!r.ok) { if (r.status === 404) return null; throw new Error('HTTP ' + r.status); }
-    return r.json();
-  }).then(function(d) { return d && d.sha ? d.sha : null; });
-}
-
-function writeGithubFile(path, content, msg) {
-  var token = getGithubToken();
-  if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
-  return getFileSHA(path).then(function(sha) {
-    var body = { message: msg || '更新数据: ' + path, content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))), branch: GITHUB_BRANCH_R };
-    if (sha) body.sha = sha;
-    return fetch(GITHUB_API_BASE_R + '/' + path, {
-      method: 'PUT', headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-  }).then(function(r) {
-    if (!r.ok) return r.json().then(function(e) { throw new Error(e.message || 'GitHub API 错误: ' + r.status); });
-    return r.json();
-  });
-}
 
 function fetchRawJSON(filename) {
   return fetch('data/' + filename).then(function(r) {
@@ -1507,7 +1479,7 @@ function recalcXp(mode) {
         var msgParts = [];
         if (mappedCount > 0) msgParts.push('任务名映射 ' + mappedCount + ' 条');
         if (updated > 0) msgParts.push('更新分值 ' + updated + ' 条');
-        return writeGithubFile('xpRecords.json', records, '分值同步：' + msgParts.join('，'))
+        return DR.writeDataFile('xpRecords.json', records, '分值同步：' + msgParts.join('，'))
           .then(function() {
             var resHtml = '';
             if (mappedCount > 0) resHtml += '🔗 已应用 <b>' + mappedCount + '</b> 条任务名映射<br>';
@@ -1696,7 +1668,7 @@ function saveRule() {
       });
     });
 
-    return writeGithubFile('config.json', config, isEdit ? '编辑任务: ' + name : '新增任务: ' + name);
+    return DR.writeDataFile('config.json', config, isEdit ? '编辑任务: ' + name : '新增任务: ' + name);
   }).then(function() {
     showToast(isEdit ? '✅ 任务已更新' : '✅ 任务已添加');
     closeRuleModal();
@@ -1726,7 +1698,7 @@ function deleteRule(cat, idx) {
         config.xpRuleList.push(item);
       });
     });
-    return writeGithubFile('config.json', config, '删除任务: ' + (name || ''));
+    return DR.writeDataFile('config.json', config, '删除任务: ' + (name || ''));
   }).then(function() {
     showToast('✅ 已删除');
     setTimeout(renderRuleGrid, 500);
@@ -1856,6 +1828,12 @@ function esc(s) {
   return String(s === undefined || s === null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function escTitle(s) {
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/\r?\n/g,' ');
+}
+
 function fmtVal(v) {
   if (v === undefined || v === null) return '';
   if (typeof v === 'boolean') return v ? '是' : '否';
@@ -1964,8 +1942,9 @@ function renderDrList() {
     cols.forEach(function(f) {
       var val = pickVal(r, f.use || [f.key]);
       var disp = fieldDisp(f, val);
-      if (disp.length > 60) disp = disp.slice(0, 60) + '…';
-      html += '<td style="padding:8px 10px;color:var(--neutral-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">' + esc(disp) + '</td>';
+      var dispTxt = String(disp === undefined || disp === null ? '' : disp);
+      // 保留完整内容，交给 CSS 省略，同时用 title 悬停显示全文（不再在 JS 端硬切 60 字符）
+      html += '<td style="padding:8px 10px;color:var(--neutral-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0" title="' + escTitle(dispTxt) + '">' + esc(dispTxt) + '</td>';
     });
     html += '<td style="padding:8px 10px;white-space:nowrap;text-align:right">';
     html += '<button class="btn ghost mini" onclick="drEdit(' + idx + ')">编辑</button> ';

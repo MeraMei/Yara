@@ -92,7 +92,7 @@ function fetchRawJSON(filename) {
     });
 }
 
-// 获取文件 SHA（用于更新）
+// 获取文件 SHA（用于更新）——为兼容保留，但写入统一走 DR
 function getFileSHA(path) {
   const token = getGithubToken();
   if (!token) return Promise.resolve(null);
@@ -112,7 +112,7 @@ function getFileSHA(path) {
     .then(data => data && data.sha ? data.sha : null);
 }
 
-// ── 本地模式探测（本地测试服务器 /api/ping，结果缓存） ──
+// ── 本地模式探测（本地测试服务器 /api/ping，结果缓存）──
 let _localModeChecked = false;
 let _localMode = false;
 function isLocalMode() {
@@ -123,11 +123,14 @@ function isLocalMode() {
     .catch(() => { _localMode = false; _localModeChecked = true; return false; });
 }
 
-// 写入 JSON 文件（本地优先，回退 GitHub）
+// 统一写入出口：委托 data-relations.js 的 DR.writeDataFile（本地优先，回退 GitHub），消除重复实现
 function writeGithubFile(path, content, message) {
+  if (typeof window.DataRelations === 'object' && window.DataRelations.writeDataFile) {
+    return window.DataRelations.writeDataFile(path, content, message);
+  }
+  // 兜底：DR 未加载时复用本地/远程写入
   return isLocalMode().then(local => {
     if (local) {
-      // 本地测试：写入本地 data/ 目录，无需 Token
       return fetch('/api/write', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

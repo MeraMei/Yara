@@ -8,3 +8,10 @@ __pycache__/
 .superpowers/
 diary-fusion.html
 diary-preview.html
+
+# 本地测试数据
+# 说明：data/ 是线上数据库源（12 个 json 已跟踪为线上基线，不可删除）。
+#     此规则仅拦截“本地测试新增的未跟踪文件”，防止误提交。
+#     对已跟踪文件请在 upload.sh 中通过 ':(exclude)data' 排除（已配置）。
+#     线上数据库更新走专用路径，见 scripts/upload.sh --with-data。
+data/
