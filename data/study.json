@@ -658,8 +658,8 @@
         "汉字",
         "阅读"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-07-20",
       "xp": 0,
       "errorModule": "",
@@ -667,7 +667,8 @@
       "unitIndex": -1,
       "unitName": null,
       "duration": "30-60分钟",
-      "wrongCount": 0
+      "wrongCount": 0,
+      "submittedAt": "2026-08-19T10:01:04.776Z"
     },
     {
       "date": "2026-07-15",
