@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mt039ukp3uhltc",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "创造自己的分数小册子：从1 - 1/10（参照视频） ",
+    "taskName": "创造自己的分数小册子：从1 - 1/10（参照视频） ",
+    "taskCategory": "学习成长",
+    "date": "2026-08-19",
+    "datetime": "2026-08-19 12:49:56",
+    "xp": 2,
+    "baseXp": 2,
+    "commitmentBonus": false,
+    "xpCategory": "学习成长",
+    "reviewStatus": "已通过",
+    "returnReason": "",
+    "description": "暑假作业完成",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mt037i0v7wlb1j",
     "domain": "XP",
     "type": "XP获得",
