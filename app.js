@@ -1972,10 +1972,17 @@ function renderSemesterBar() {
     const total = info.breakTotalDays || (info.daysUntilStart + 1);
     const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
     fillPercent = Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
-    // 左边：第X周第X天（假期周次，从假期开始算）
-    const breakWeek = Math.floor(elapsed / 7) + 1;
-    const breakDay = (elapsed % 7) + 1;
-    dateText = `第${breakWeek}周第${breakDay}天`;
+    // 底部左侧：距开学倒计时（未开学状态优先展示，替代假期周次）
+    // 距开学天数 = daysUntilStart；若为 0（已开学）则不展示倒计时
+    const startDays = Number(info.daysUntilStart) || 0;
+    if (startDays > 0) {
+      dateText = `距开学还有 <strong>${startDays}</strong> 天`;
+    } else {
+      // 兜底：距开学为 0 时退回假期周次显示
+      const breakWeek = Math.floor(elapsed / 7) + 1;
+      const breakDay = (elapsed % 7) + 1;
+      dateText = `第${breakWeek}周第${breakDay}天`;
+    }
   } else {
     // 开学后：按学期进度填充
     fillPercent = info.progressPercent;
@@ -1983,7 +1990,7 @@ function renderSemesterBar() {
     dateText = `第${info.weekNum}周第${info.dayInWeek || 1}天`;
   }
 
-  if (dateEl) dateEl.textContent = dateText;
+  if (dateEl) dateEl.innerHTML = dateText;
   if (fillEl) fillEl.style.width = fillPercent + "%";
 
   // 刷新沙漏图标
@@ -8224,6 +8231,38 @@ async function saveSubmitHomework() {
     if (!saved) {
       await updateHomeworkLocally(__shmCurrentItem.id, payload);
     }
+
+    // ── 提交作业 = 置为已完成 + 按类型加分 ──
+    // 用户点「提交作业」即视为完成：只有未完成时才置 done 并发放一次 XP，
+    // 避免重复提交导致重复加分。
+    const wasDone = __shmCurrentItem.status === "done" || !!__shmCurrentItem.submitted;
+    if (!wasDone) {
+      // 1. 将作业标记为已完成
+      const donePayload = Object.assign({ status: "done", submitted: true, submittedAt: new Date().toISOString() }, payload);
+      try {
+        await updateStudyRecord(__shmCurrentItem.id, donePayload);
+      } catch (err) {
+        console.warn("提交作业-置为完成失败(尝试直接写)", err.message);
+        await updateHomeworkLocally(__shmCurrentItem.id, donePayload);
+      }
+      // 2. 按作业类型发放 XP
+      const baseXp = ADD_HW_TYPE_XP[hwType] || 2;
+      const taskName = __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业";
+      await window.DataStore.addXpRecord({
+        taskName,
+        title: taskName,
+        xpCategory: "学习成长",
+        type: "作业完成",
+        xp: baseXp,
+        baseXp,
+        status: "verified",
+        description: (hwType || "作业") + "完成",
+      }).catch(err => console.warn("提交作业-加分失败:", err.message));
+      showToast(`✅ 作业已提交，+${baseXp} XP`, true);
+    } else {
+      showToast("✅ 补充信息已保存", true);
+    }
+
     // 随堂测验的能量发放已合并到【录入成绩】，此处移除
     closeSubmitHomeworkModal();
     if (window.DataStore && window.DataStore.refreshData) {
@@ -8231,7 +8270,6 @@ async function saveSubmitHomework() {
     }
     if (typeof renderStudy === "function") await renderStudy();
     refreshIcons(50);
-    showToast("✅ 补充信息已保存", true);
   } catch (e) {
     console.error("补充信息保存失败:", e);
     const errMsg = (e && e.message) || "";
