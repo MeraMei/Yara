@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mt037i0v7wlb1j",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
+    "taskName": "朗读三年级下册第1～8单元的单词表，可发朗读视频。",
+    "taskCategory": "学习成长",
+    "date": "2026-08-19",
+    "datetime": "2026-08-19 12:48:06",
+    "xp": 2,
+    "baseXp": 2,
+    "commitmentBonus": false,
+    "xpCategory": "学习成长",
+    "reviewStatus": "已通过",
+    "returnReason": "",
+    "description": "日常预习完成",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mszx8qyazas60t",
     "domain": "XP",
     "type": "XP获得",
