@@ -12,10 +12,11 @@
     "baseXp": 0,
     "commitmentBonus": true,
     "xpCategory": "学习成长",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "阅读《逃离图书馆3》 [承诺兑现]",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_msvxev5ci9cj9d",
