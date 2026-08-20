@@ -40,7 +40,7 @@ const GITHUB_BRANCH = 'main';
 const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_BRANCH}/data`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data`;
 
-const CACHE_KEY = "yara_growth_data_v11";
+const CACHE_KEY = "yara_growth_data_v12";
 const CHILD_CACHE_KEY = "yara_child_profile";
 const CALENDAR_CACHE_KEY = "yara_calendar_data";
 
@@ -559,6 +559,7 @@ function processFinance(finance) {
       worthIt: tx.worthIt || '',
       reason: tx.reason || '',
       suggestion: tx.suggestion || '',
+      paymentMethod: tx.paymentMethod || '',
     })),
   };
 }
@@ -5485,6 +5486,7 @@ function renderHwRow(a, hidden, index, earnedXp) {
   const subjClass = KNOWN[a.subject] || "other";
   const isDone = a.status === "done";
   const isSubmitted = a.submitted === true;
+  const showSubmitted = isDone || isSubmitted;
   const hiddenClass = hidden ? " hw-hidden" : "";
   let title = a.title || a.shortTitle || a.name || "";
   title = title.replace(/^\d{2}-\d{2}[^：]*[：:]\s*/, "").trim();
@@ -5536,7 +5538,6 @@ function renderHwRow(a, hidden, index, earnedXp) {
 
   // 右侧操作：提交 + 编辑（始终垂直居中）
   // 已完成状态自动显示"已提交"，保持UI一致
-  const showSubmitted = isDone || isSubmitted;
   const actions = `
     <div class="hw-actions">
       <button class="hw-submit-btn${showSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${showSubmitted ? "已提交" : "提交作业"}">
@@ -6838,11 +6839,15 @@ async function renderMoney() {
     } else {
       const totalSpend = freeExpenses.reduce((s, t) => s + Number(t.amount || 0), 0);
       const fmt1 = v => "¥" + Number(v).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-      // 按值得程度聚合：值得 / 一般 / 不值得
+      // 按值得程度聚合：值得 / 一般 / 不值得（金额 + 笔数）
       const worthMap = { "值得": 0, "一般": 0, "不值得": 0 };
+      const worthCountMap = { "值得": 0, "一般": 0, "不值得": 0 };
       freeExpenses.forEach(t => {
         const w = t.worthIt || t.worth || "一般";
-        if (worthMap[w] != null) worthMap[w] += Number(t.amount || 0);
+        if (worthMap[w] != null) {
+          worthMap[w] += Number(t.amount || 0);
+          worthCountMap[w] += 1;
+        }
       });
       const worthAgg = Object.entries(worthMap).filter(([, v]) => v > 0);
       const worthColors = { "值得": "var(--colourful-lime-pop-500)", "一般": "var(--colourful-butter-yellow-300)", "不值得": "var(--colourful-sunny-coral-500)" };
@@ -6855,12 +6860,13 @@ async function renderMoney() {
       if (spendLegendEl) {
         spendLegendEl.innerHTML = worthAgg.map(([name, value]) => {
           const pctVal = Math.round((value / totalSpend) * 100);
+          const count = worthCountMap[name] || 0;
           const icon = name === "值得" ? "✅" : name === "不值得" ? "❌" : "🤔";
           return `
             <div class="spend-legend-item">
               <span class="sl-dot" style="background:${worthColors[name] || "#ccc"}"></span>
               <span class="sl-name">${icon} ${name}</span>
-              <span class="sl-val">${fmt1(value)}</span>
+              <span class="sl-val">${fmt1(value)} <span class="sl-count">/ ${count}笔</span></span>
             </div>
           `;
         }).join("");
@@ -6947,22 +6953,24 @@ async function renderMoney() {
 
       return `
         <div class="tx-item ${isHidden ? 'hw-hidden' : ''}">
-          <div class="tx-date-col">
+          <div class="tx-col tx-col-date">
             <div class="tx-date-label ${dateInfo.isToday ? 'today' : ''}">${dateInfo.label}</div>
           </div>
-          <div class="tx-icon-col ${isIncome ? 'income' : 'expense'}">${sign}</div>
-          <div class="tx-body">
+          <div class="tx-col tx-col-icon ${isIncome ? 'income' : 'expense'}">${sign}</div>
+          <div class="tx-col tx-col-desc">
             <div class="tx-title">
               ${titleText}
               ${category && category !== titleText ? `<span class="tx-cat">${category}</span>` : ""}
             </div>
             ${note ? `<div class="tx-note">${note}</div>` : ""}
           </div>
-          <div class="tx-amount-col">
-            <div class="tx-amount ${isIncome ? 'income' : 'expense'}">${amountStr}</div>
-            ${worthIt && !isIncome ? `<div class="tx-worth">${worthIt}</div>` : ""}
-            <div class="tx-pay-method ${payMethod}">${payLabel}</div>
+          <div class="tx-col tx-col-worth">
+            ${worthIt && !isIncome ? `<span class="tx-worth-tag ${worthIt === '值得' ? 'good' : worthIt === '不值得' ? 'bad' : 'mid'}">${worthIt}</span>` : "—"}
           </div>
+          <div class="tx-col tx-col-pay">
+            <span class="tx-pay-method ${payMethod}">${payLabel}</span>
+          </div>
+          <div class="tx-col tx-col-amount ${isIncome ? 'income' : 'expense'}">${amountStr}</div>
         </div>`;
     };
 
@@ -9352,6 +9360,11 @@ async function checkAndAddWeeklyAllowance() {
 }
 
 // 启动：渲染首页（支持 ?view=xxx 从其他页面指定进入某个星球）
+// 禁用浏览器滚动恢复，确保每次进入都从顶部开始
+if (history && history.scrollRestoration) {
+  history.scrollRestoration = "manual";
+}
+window.scrollTo(0, 0);
 const __urlView = new URLSearchParams(location.search).get("view");
 boot(["home", "xp", "study", "money"].includes(__urlView) ? __urlView : "home");
   

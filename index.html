@@ -53,25 +53,26 @@
           </div>
         </div>
 
-        <!-- 右：学期进度 — 3个独立框（框1学期 · 框2第几周第几天 · 框3倒计时） -->
+        <!-- 右：学期进度 — 学期（大字在上）+ 进度条（中间）+ 左下周几 / 右下倒计时 -->
         <div class="id-side">
           <div class="id-sem">
-            <!-- 框1：学期：几年级·（暑假/寒假/秋季/春季） -->
-            <div class="sem-box">
-              <span class="sem-box-icon"><i data-lucide="calendar-days"></i></span>
-              <span class="sem-box-value" id="semBarTitle">--</span>
-            </div>
-            <!-- 框2：第几周第几天 -->
-            <div class="sem-box">
-              <span class="sem-box-icon"><i data-lucide="list"></i></span>
-              <span class="sem-box-value" id="semBarWeek">--</span>
+            <!-- 顶部：学期（大字） -->
+            <div class="sem-title-row">
+              <span class="sem-title-icon"><i data-lucide="calendar-days"></i></span>
+              <span class="sem-title-text" id="semBarTitle">--</span>
             </div>
             <!-- 进度条 -->
             <div class="sem-bar-track"><div class="sem-bar-fill" id="semBarFill" style="width:0%"></div></div>
-            <!-- 框3：距离（开学/期中/期末）还有X天 -->
-            <div class="sem-box">
-              <span class="sem-box-icon"><i data-lucide="hourglass"></i></span>
-              <span class="sem-box-value" id="semBarDate">--</span>
+            <!-- 底部：左=第几周第几天 / 右=倒计时 -->
+            <div class="sem-foot-row">
+              <div class="sem-foot-left">
+                <span class="sem-foot-icon"><i data-lucide="list"></i></span>
+                <span class="sem-foot-text" id="semBarWeek">--</span>
+              </div>
+              <div class="sem-foot-right">
+                <span class="sem-foot-icon"><i data-lucide="hourglass"></i></span>
+                <span class="sem-foot-text" id="semBarDate">--</span>
+              </div>
             </div>
           </div>
         </div>
@@ -515,9 +516,6 @@
               <span class="ffc-pay-value" id="freeFundCash">--</span>
             </div>
           </div>
-          <!-- 最近交易预览 -->
-          <div class="ffc-recent-head">最近交易</div>
-          <div class="ffc-recent-list" id="freeFundRecent"></div>
         </div>
 
         <!-- 花销分析（环形图） -->

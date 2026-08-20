@@ -2307,13 +2307,57 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       padding: 13px 16px 12px;
       box-shadow: 0 1px 6px rgba(249,96,36,.08);
     }
-    /* 3个信息框 + 进度条，竖向排列，间距紧凑 */
-    .id-sem .sem-box + .sem-box {
-      margin-top: 4px;
+    /* 学期进度：学期大字在上 + 进度条在中 + 底部左右分布 */
+    .sem-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .sem-title-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      flex: none;
+    }
+    .sem-title-icon i { width: 18px; height: 18px; color: var(--colourful-butter-yellow-600, #f5b301); }
+    .sem-title-text {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--neutral-900);
     }
     .id-sem .sem-bar-track {
-      margin: 7px 0 8px;
+      margin: 0 0 8px;
     }
+    .sem-foot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sem-foot-left, .sem-foot-right {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .sem-foot-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      flex: none;
+    }
+    .sem-foot-icon i { width: 13px; height: 13px; }
+    .sem-foot-left .sem-foot-icon i { color: #7a3fd6; }
+    .sem-foot-right .sem-foot-icon i { color: var(--colourful-butter-yellow-600, #f5b301); }
+    .sem-foot-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neutral-700);
+    }
+    .sem-foot-text strong { color: #7a3fd6; font-weight: 800; }
     .sem-box {
       display: flex;
       align-items: center;
@@ -7378,6 +7422,11 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       font-weight: 800;
       flex-shrink: 0;
     }
+    .spend-legend-item .sl-count {
+      color: var(--neutral-400);
+      font-weight: 600;
+      font-size: 11px;
+    }
     .worth-rate-row {
       display: flex;
       align-items: center;
@@ -7829,18 +7878,21 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
 
     /* 增强版流水列表 */
     .tx-list-enhanced .tx-item {
-      display: flex;
+      display: grid;
+      grid-template-columns: 52px 34px 1fr auto auto auto;
       align-items: center;
-      gap: 12px;
-      padding: 13px 4px;
+      gap: 10px;
+      padding: 12px 4px;
       border-bottom: 1px solid var(--neutral-50);
     }
     .tx-list-enhanced .tx-item:last-child { border-bottom: none; }
-    .tx-list-enhanced .tx-date-col {
-      width: 52px;
-      flex-shrink: 0;
-      text-align: left;
-    }
+    .tx-list-enhanced .tx-col { min-width: 0; }
+    .tx-list-enhanced .tx-col-date { order: 1; text-align: left; }
+    .tx-list-enhanced .tx-col-icon { order: 2; }
+    .tx-list-enhanced .tx-col-desc { order: 3; }
+    .tx-list-enhanced .tx-col-worth { order: 4; }
+    .tx-list-enhanced .tx-col-pay { order: 5; }
+    .tx-list-enhanced .tx-col-amount { order: 6; }
     .tx-list-enhanced .tx-date-label {
       font-size: 12px;
       font-weight: 700;
@@ -7850,22 +7902,21 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .tx-list-enhanced .tx-date-label.today {
       color: var(--mint-600);
     }
-    .tx-list-enhanced .tx-icon-col {
+    .tx-list-enhanced .tx-col-icon {
       width: 34px;
       height: 34px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      flex-shrink: 0;
       font-size: 15px;
       font-weight: 800;
       line-height: 1;
     }
-    .tx-list-enhanced .tx-icon-col.income { background: var(--mint-50); color: var(--mint-600); }
-    .tx-list-enhanced .tx-icon-col.expense { background: var(--pink-50); color: var(--pink-500); }
-    .tx-list-enhanced .tx-body {
-      flex: 1;
+    .tx-list-enhanced .tx-col-icon.income { background: var(--mint-50); color: var(--mint-600); }
+    .tx-list-enhanced .tx-col-icon.expense { background: var(--pink-50); color: var(--pink-500); }
+    .tx-list-enhanced .tx-col-desc {
       min-width: 0;
+      overflow: hidden;
     }
     .tx-list-enhanced .tx-title {
       font-size: 14px;
@@ -7896,44 +7947,60 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
     }
-    .tx-list-enhanced .tx-amount-col {
-      flex-shrink: 0;
-      text-align: right;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 3px;
+    .tx-list-enhanced .tx-col-worth {
+      text-align: center;
+      white-space: nowrap;
+      font-size: 11px;
+      color: var(--neutral-400);
+      font-weight: 700;
+      min-width: 48px;
     }
-    .tx-list-enhanced .tx-amount {
-      font: 800 16px var(--font-display);
-      letter-spacing: -.01em;
-      font-variant-numeric: tabular-nums;
-    }
-    .tx-list-enhanced .tx-amount.income { color: var(--mint-600); }
-    .tx-list-enhanced .tx-amount.expense { color: var(--neutral-800); }
-    .tx-list-enhanced .tx-worth {
+    .tx-list-enhanced .tx-worth-tag {
       font-size: 10px;
       font-weight: 700;
-      color: var(--neutral-400);
-      padding: 1px 6px;
-      background: var(--neutral-100);
+      padding: 2px 9px;
       border-radius: 999px;
+    }
+    .tx-list-enhanced .tx-worth-tag.good {
+      color: #52c41a;
+      background: rgba(82,196,26,.12);
+    }
+    .tx-list-enhanced .tx-worth-tag.mid {
+      color: #d4a800;
+      background: rgba(245,179,1,.18);
+    }
+    .tx-list-enhanced .tx-worth-tag.bad {
+      color: #ff4d4f;
+      background: rgba(255,77,79,.12);
+    }
+    .tx-list-enhanced .tx-col-pay {
+      text-align: center;
+      white-space: nowrap;
+      min-width: 54px;
     }
     .tx-list-enhanced .tx-pay-method {
       font-size: 10px;
       font-weight: 700;
-      padding: 1px 7px;
+      padding: 2px 9px;
       border-radius: 999px;
-      line-height: 1.3;
     }
     .tx-list-enhanced .tx-pay-method.alipay {
       color: #1677ff;
-      background: rgba(22,119,255,.1);
+      background: rgba(22,119,255,.12);
     }
     .tx-list-enhanced .tx-pay-method.cash {
       color: #52c41a;
-      background: rgba(82,196,26,.1);
+      background: rgba(82,196,26,.12);
     }
+    .tx-list-enhanced .tx-col-amount {
+      font: 800 15px var(--font-display);
+      letter-spacing: -.01em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      text-align: right;
+    }
+    .tx-list-enhanced .tx-col-amount.income { color: var(--mint-600); }
+    .tx-list-enhanced .tx-col-amount.expense { color: var(--neutral-800); }
 
     /* 成长基金流水（弱化） */
     .wealth-tx-section {
