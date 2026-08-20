@@ -1,5 +1,5 @@
 {
-  "totalAssets": 10920.77,
+  "totalAssets": 10914.77,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,27 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 851.7,
+      "balance": 845.7,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_mt1jb11myebfdh",
+      "date": "2026-08-20",
+      "type": "expense",
+      "amount": 6,
+      "rawAmount": -6,
+      "category": "本子和笔",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "本子和笔",
+      "worthIt": "值得",
+      "reason": "我觉得有用",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "fin_mss4yq872e5fy3",
       "date": "2026-08-14",
@@ -29,8 +44,7 @@
       "description": "每周零花钱",
       "worthIt": "值得",
       "reason": "系统每周五自动发放零花钱",
-      "suggestion": "",
-      "reviewStatus": "已通过"
+      "suggestion": ""
     },
     {
       "id": "fin_msooe1ml2bo30a",
