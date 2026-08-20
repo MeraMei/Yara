@@ -501,11 +501,23 @@
             <span class="ffc-tag" id="freeFundTag">可自由支配</span>
           </div>
           <div class="ffc-amount" id="freeFundAmount">--</div>
-          <div class="ffc-stats">
-            <div class="ffc-stat"><span>已复盘金额</span><b id="freeFundReviewed">--</b></div>
-            <div class="ffc-stat"><span>值得花销</span><b id="freeFundWorthAmt">--</b></div>
-            <div class="ffc-stat"><span>不值得花销</span><b id="freeFundNotWorthAmt">--</b></div>
+          <!-- 支付方式拆分 -->
+          <div class="ffc-payment-row">
+            <div class="ffc-pay-item">
+              <span class="ffc-pay-icon alipay"><i data-lucide="smartphone"></i></span>
+              <span class="ffc-pay-label">支付宝</span>
+              <span class="ffc-pay-value" id="freeFundAlipay">--</span>
+            </div>
+            <div class="ffc-pay-divider"></div>
+            <div class="ffc-pay-item">
+              <span class="ffc-pay-icon cash"><i data-lucide="wallet"></i></span>
+              <span class="ffc-pay-label">纸币现金</span>
+              <span class="ffc-pay-value" id="freeFundCash">--</span>
+            </div>
           </div>
+          <!-- 最近交易预览 -->
+          <div class="ffc-recent-head">最近交易</div>
+          <div class="ffc-recent-list" id="freeFundRecent"></div>
         </div>
 
         <!-- 花销分析（环形图） -->

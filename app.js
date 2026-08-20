@@ -6767,19 +6767,44 @@ async function renderMoney() {
   if (moneyLiveEl) moneyLiveEl.innerHTML =
     `距离下次零花钱发放还有 <strong>${daysToAllow}</strong> 天，本周也要好好规划储蓄计划哟`;
 
-  // ════════ 2. 自由基金主卡（余额 + 复盘统计） ════════
+  // ════════ 2. 自由基金主卡（余额 + 支付方式拆分 + 最近交易预览） ════════
   setText("freeFundAmount", formatMoney(freeAcc.balance));
   const _freeTx = txData.filter(t => !t.account || t.account === "free");
-  // 已复盘金额：已填写值得/不值得评价的支出流水
-  const _reviewed = _freeTx.filter(t => t.type === "expense" && t.worthIt);
-  const _worthArr = _freeTx.filter(t => t.worthIt === "值得");
-  const _notWorthArr = _freeTx.filter(t => t.worthIt === "不值得");
-  const _reviewedAmt = _reviewed.reduce((s, t) => s + Number(t.amount || 0), 0);
-  const _worthAmt = _worthArr.reduce((s, t) => s + Number(t.amount || 0), 0);
-  const _notWorthAmt = _notWorthArr.reduce((s, t) => s + Number(t.amount || 0), 0);
-  setText("freeFundReviewed", _reviewedAmt > 0 ? formatMoney(_reviewedAmt) : "¥0");
-  setText("freeFundWorthAmt", `${formatMoney(_worthAmt)}/${_worthArr.length}笔`);
-  setText("freeFundNotWorthAmt", `${formatMoney(_notWorthAmt)}/${_notWorthArr.length}笔`);
+
+  // 支付方式拆分：支付宝 vs 纸币
+  const _freeAlipay = _freeTx.filter(t => t.paymentMethod !== "cash");
+  const _freeCash = _freeTx.filter(t => t.paymentMethod === "cash");
+  // 支付宝余额 = 所有支付宝收入 - 支付宝支出
+  const _alipayIncome = _freeAlipay.filter(t => t.type === "in" || t.type === "income").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const _alipayExpense = _freeAlipay.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const _alipayBalance = _alipayIncome - _alipayExpense;
+  // 纸币余额 = 所有纸币收入 - 纸币支出
+  const _cashIncome = _freeCash.filter(t => t.type === "in" || t.type === "income").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const _cashExpense = _freeCash.filter(t => t.type === "expense").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const _cashBalance = _cashIncome - _cashExpense;
+  setText("freeFundAlipay", formatMoney(_alipayBalance));
+  setText("freeFundCash", formatMoney(_cashBalance));
+
+  // 最近交易预览（倒序取前3条）
+  const _recentFree = [..._freeTx].sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 3);
+  const recentEl = document.getElementById("freeFundRecent");
+  if (recentEl) {
+    recentEl.innerHTML = _recentFree.map(tx => {
+      const isIncome = tx.type === "in" || tx.type === "income";
+      const sign = isIncome ? "+" : "−";
+      const amt = "¥" + Number(tx.amount).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      const payIcon = tx.paymentMethod === "cash" ? "💰" : "📱";
+      const payLabel = tx.paymentMethod === "cash" ? "纸币" : "支付宝";
+      const title = tx.description || tx.category || "未命名";
+      const dateStr = (tx.date || "").slice(5); // MM-DD
+      return `<div class="ffc-recent-item">
+        <span class="ffc-recent-date">${dateStr}</span>
+        <span class="ffc-recent-title">${title}</span>
+        <span class="ffc-recent-pay">${payIcon}${payLabel}</span>
+        <span class="ffc-recent-amt ${isIncome ? 'income' : 'expense'}">${sign}${amt}</span>
+      </div>`;
+    }).join("");
+  }
 
   // 财富板块自身的任务（含"财务"或"花销"），本周/今日获得能量互不串扰其他版块
   // 筛选依据改为 datetime（记录创建时间），而非 date（记录的业务日期），
@@ -6916,6 +6941,9 @@ async function renderMoney() {
       // 备注仅在与标题/分类不同时展示，避免信息重复
       const note = tx.reason || (tx.description && tx.description !== titleText && tx.description !== category ? tx.description : "") || "";
       const worthIt = tx.worthIt || tx.worth || "";
+      // 支付方式标识
+      const payMethod = tx.paymentMethod === "cash" ? "cash" : "alipay";
+      const payLabel = tx.paymentMethod === "cash" ? "纸币" : "支付宝";
 
       return `
         <div class="tx-item ${isHidden ? 'hw-hidden' : ''}">
@@ -6933,6 +6961,7 @@ async function renderMoney() {
           <div class="tx-amount-col">
             <div class="tx-amount ${isIncome ? 'income' : 'expense'}">${amountStr}</div>
             ${worthIt && !isIncome ? `<div class="tx-worth">${worthIt}</div>` : ""}
+            <div class="tx-pay-method ${payMethod}">${payLabel}</div>
           </div>
         </div>`;
     };
