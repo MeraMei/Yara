@@ -2468,7 +2468,7 @@ if (typeof window !== "undefined") {
 /* ===== Script block 6 (original lines 3298-3780) ===== */
 
 
-  // ════════ 财务分析（复盘即财务分析：多笔拆分 + 自动算差额 + 每笔 +2 XP，当日封顶 10 XP） ════════
+  // ════════ 财务分析（复盘即财务分析：多笔拆分 + 自动算差额 + 每笔 +5 XP，每笔独立记录） ════════
 
   // 全局变量：当前自由基金余额
   let currentFreeBalance = 0;
@@ -2492,7 +2492,7 @@ if (typeof window !== "undefined") {
     document.getElementById("reconcileModalTitle").textContent = "财务分析";
     document.getElementById("submitBtn").textContent = "确认记录";
     document.getElementById("reconcileForm").reset();
-    setRecMode('balance');
+    setRecMode('item');
 
     // 默认日期为今天
     const today = new Date().toISOString().slice(0, 10);
@@ -2823,25 +2823,21 @@ if (typeof window !== "undefined") {
         });
       }
 
-      // 本次财务分析（复盘即财务分析）：每笔复盘记录 +2 XP，当日累计封顶 10 XP（两种模式均可多次叠加）
+      // 本次财务分析（复盘即财务分析）：每笔复盘记录 + 配置分值 XP，每笔独立生成记录
       // ⚠️ XP 记录的日期 = 录入时间（今天），不是交易日期
       const _todayStr = new Date().toISOString().slice(0, 10);
       const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
-      const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 2;
-      const _capXp = 10;
-      // 只统计已通过的复盘记录，按录入时间（todayStr）封顶
-      const _todayReviewed = (cachedData?.xpRecords || []).filter(function(r){
-        return r.taskName === "财务能力分析" && getDateStr(r) === _todayStr && r.reviewStatus === "已通过";
-      }).reduce(function(s,r){ return s + (Number(r.xp)||0); }, 0);
-      const _rawXp = entries.length * _perRecXp;
-      const _financeXp = Math.max(0, Math.min(_rawXp, _capXp - _todayReviewed));
-      if (_financeXp > 0) {
+      const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
+      // 每笔都要生成独立的 XP 记录，不封顶（用户要求每笔都要有积分）
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        if (!entry.amount || !entry.content) continue;
         await window.DataStore.addXpRecord({
           taskName: "财务能力分析",
-          description: `完成一次财务分析（${recMode === "item" ? "逐笔" : "余额"} · ${entries.length} 笔明细）`,
+          description: `财务分析：${entry.content}（${entry.worthIt}）`,
           date: _todayStr,
           status: "verified",
-          xp: _financeXp,
+          xp: _perRecXp,
           xpCategory: "能力成长",
         });
       }
@@ -2851,7 +2847,10 @@ if (typeof window !== "undefined") {
       // 直接重渲染即可，避免重新加载 CDN 数据导致缓存覆盖
       await renderMoney();
       if (window.lucide) refreshIcons(50);
-      alert(`已记录 ${entries.length} 笔财务流水，完成一次财务分析，+${_financeXp} XP（当日复盘累计封顶 ${_capXp} XP）🎉`);
+      if (entries.length > 0) {
+        const _totalXp = entries.length * _perRecXp;
+        alert(`已记录 ${entries.length} 笔财务流水，完成财务分析，共 +${_totalXp} XP（每笔 +${_perRecXp} XP）🎉`);
+      }
     } catch (e) {
       console.error("提交失败:", e);
       handleWriteError(e, "提交失败，请稍后重试");
@@ -3646,6 +3645,9 @@ function getPlanetXp(verifiedXpRecords) {
     } else if (name === "财务能力分析") {
       // 财务板块：只计"财务能力分析"（财务复盘），不包"财务进账"和"花销复盘"
       result.finance += xp;
+    } else if (name.indexOf("财务") >= 0 || name.indexOf("花销") >= 0) {
+      // 财务进账（2 XP）、花销复盘等不计入任何板块，避免串到能量板块
+      // skip
     } else {
       result.energy += xp;
     }
@@ -6716,7 +6718,7 @@ async function renderMoney() {
   const _mtoday = new Date().toISOString().slice(0, 10);
   const _mm = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.toISOString().slice(0, 10); })();
   const _getActionDate = (r) => (r.datetime || r.date || "").slice(0, 10);
-  const _isMoneyTask = (r) => { const n = String(r.taskName || r.title || ""); return n.indexOf("财务") >= 0 || n.indexOf("花销") >= 0; };
+  const _isMoneyTask = (r) => { const n = String(r.taskName || r.title || ""); return n === "财务能力分析"; };
   const _mweekXp = _mTx.filter(r => _getActionDate(r) >= _mm && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   const _mtodayXp = _mTx.filter(r => _getActionDate(r) === _mtoday && _isMoneyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   const moneyWeekEl = document.getElementById("moneyStatWeek");
