@@ -2308,7 +2308,7 @@ if (typeof window !== "undefined") {
         });
     }
 
-    function submitAddXpPage() {
+    async function submitAddXpPage() {
       const selectEl = document.getElementById("xpTaskSelectPage");
       const taskName = selectEl.value;
       const selectedOpt = selectEl.options[selectEl.selectedIndex];
