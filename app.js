@@ -60,10 +60,6 @@ const CALENDAR_CACHE_KEY = "yara_calendar_data";
 let cachedData = null;
 let loadPromise = null;
 
-// ── 环境检测：GitHub Pages 线上模式 vs 本地开发 ──
-// 线上模式直接走 GitHub Raw，跳过 data/ 404 探测（12个文件省12次无效请求）
-const _isGitHubPages = typeof location !== 'undefined' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
-
 // ── GitHub 工具函数 ──
 
 function getGithubToken() {
@@ -81,15 +77,8 @@ function setGithubToken(token) {
 
 // 从 GitHub raw 读取 JSON 文件
 function fetchRawJSON(filename) {
-  // 线上模式（GitHub Pages）：跳过 data/ 404 探测，直接走 GitHub Raw
-  // 本地模式：优先 data/ 目录，失败回退 GitHub Raw
-  if (_isGitHubPages) {
-    return fetch(`${GITHUB_RAW_BASE}/${filename}`).then(resp => {
-      if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${filename}`);
-      return resp.json();
-    });
-  }
-  // 优先读取本地 data/ 目录（本地预览），失败则回退到 GitHub 仓库（线上部署）
+  // 优先从 data/ 目录读取（GitHub Pages 上 data/ 也在仓库中，同域访问更快）
+  // 失败时回退到 raw.githubusercontent.com
   return fetch(`data/${filename}`)
     .then(resp => {
       if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for data/${filename}`);
