@@ -3638,11 +3638,13 @@ function getPlanetXp(verifiedXpRecords) {
   const result = { energy: 0, knowledge: 0, finance: 0 };
   (verifiedXpRecords || []).forEach(r => {
     const name = String(r.taskName || r.title || "");
+    const desc = String(r.description || "");
     const xp = Number(r.xp) || 0;
-    // 知识板块：包含"作业"或"成绩录入"关键词（作业→知识，正确统计）
-    if (name.indexOf("作业") >= 0 || name.indexOf("成绩录入") >= 0) {
+    // 知识板块：taskName 包含"作业"/"成绩录入"，或 description 包含"作业"（兼容手动录入的作业记录）
+    if (name.indexOf("作业") >= 0 || name.indexOf("成绩录入") >= 0 || desc.indexOf("作业") >= 0) {
       result.knowledge += xp;
-    } else if (name.indexOf("财务") >= 0 || name.indexOf("花销") >= 0) {
+    } else if (name === "财务能力分析") {
+      // 财务板块：只计"财务能力分析"（财务复盘），不包"财务进账"和"花销复盘"
       result.finance += xp;
     } else {
       result.energy += xp;
@@ -3729,7 +3731,7 @@ async function renderHome() {
   // ═══ 知识星球右侧 ═══
   setText("homeStudy", planetXp.knowledge);
   // 本周作业所得积分
-  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && String(r.taskName || r.title || "").indexOf("作业") >= 0 && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && (String(r.taskName || r.title || "").indexOf("作业") >= 0 || String(r.description || "").indexOf("作业") >= 0) && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   setText("homeWeekStudyXp", weekStudyXp);
   const studyProgressEl = document.getElementById("homeStudyProgress");
   if (studyProgressEl) studyProgressEl.style.width = sharePct(planetXp.knowledge) + "%";
@@ -5543,7 +5545,7 @@ async function renderStudy() {
 
   // 知识板块 本周/今日 获得能量（以"作业·"开头的已通过 XP 记录）
   const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
-  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") >= 0;
+  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") >= 0 || String(r.description || "").indexOf("作业") >= 0;
   const stoday = new Date();
   const sMonday = new Date(stoday);
   sMonday.setDate(stoday.getDate() - ((stoday.getDay() + 6) % 7));
@@ -8375,10 +8377,10 @@ async function saveSubmitHomework() {
           break;
         }
       }
-      const taskName = __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业";
+      const taskName = "作业·" + (hwType || "日常预习");
       await window.DataStore.addXpRecord({
         taskName,
-        title: taskName,
+        title: __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业",
         xpCategory: "学习成长",
         type: "作业完成",
         xp: baseXp,
