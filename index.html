@@ -81,7 +81,7 @@
       <!-- ════════ 2. 等级模块（成长之路 + 进度条 + 权益） ════════ -->
       <section class="level-module">
         <div class="lm-head">
-          <span class="lm-title">我的等级</span>
+          <span class="lm-title">我的等级 <span class="lm-count" id="levelJourneyCount">--</span></span>
           <span class="lm-link" onclick="switchView('level')">完整等级 →</span>
         </div>
 
@@ -137,13 +137,13 @@
         <div class="pcard energy" onclick="switchView('xp')" style="cursor:pointer">
           <div class="pc-head"><span class="pc-dot"></span><span class="pc-name">能量 · 主动打卡</span></div>
           <div class="pc-score"><span class="pc-num" id="homeXp">--</span><span class="pc-unit">分</span><span class="pc-trend" id="homeXpTrend">--</span></div>
-          <div class="pc-meta" id="homeXpNote">--</div>
+          <div class="pc-meta"><span id="homeWeekXp">--</span><span class="pc-meta-sep">·</span><span id="homeXpNote">--</span></div>
           <div class="pc-track"><div class="pc-fill" id="homeXpProgress" style="width:0%"></div></div>
         </div>
         <div class="pcard study" onclick="switchView('study')" style="cursor:pointer">
           <div class="pc-head"><span class="pc-dot"></span><span class="pc-name">知识 · 默认加分</span></div>
           <div class="pc-score"><span class="pc-num" id="homeStudy">--</span><span class="pc-unit">分</span></div>
-          <div class="pc-meta" id="homeStudyNote">--</div>
+          <div class="pc-meta"><span id="homeWeekStudyXp">--</span><span class="pc-meta-sep">·</span><span id="homeStudyNote">--</span></div>
           <div class="pc-track"><div class="pc-fill" id="homeStudyProgress" style="width:0%"></div></div>
         </div>
         <div class="pcard money" onclick="switchView('money')" style="cursor:pointer">
@@ -225,6 +225,10 @@
             <div class="planet-stat">
               <span class="planet-stat-label">今日获得</span>
               <span class="planet-stat-value" id="heroStatToday">--</span>
+            </div>
+            <div class="planet-stat">
+              <span class="planet-stat-label">待确认</span>
+              <span class="planet-stat-value" id="heroStatPending">--</span>
             </div>
           </div>
           <div class="planet-actions">

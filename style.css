@@ -2471,6 +2471,12 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--neutral-900, #2e2620);
       letter-spacing: -.01em;
     }
+    .lm-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neutral-400, #a89f94);
+      margin-left: 6px;
+    }
     .lm-link {
       font-size: 12px;
       font-weight: 800;
@@ -2884,6 +2890,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .pc-unit{ font-size:10px; font-weight:700; color:var(--neutral-500,#8a8178); }
     .pc-trend{ font-size:9px; font-weight:800; color:var(--mint-600,#4a9b7b); background:rgba(74,155,123,.16); padding:1px 6px; border-radius:999px; margin-left:2px; white-space:nowrap; }
     .pc-meta{ font-size:9px; font-weight:700; color:var(--neutral-500,#8a8178); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pc-meta-sep{ margin:0 3px; color:var(--neutral-300,#d8d2c9); }
     .pc-track{ height:6px; border-radius:999px; background:rgba(0,0,0,.06); overflow:hidden; }
     .pc-fill{ height:100%; border-radius:inherit; will-change:width; transition: width .6s ease; }
     .pcard.energy{ background:

@@ -3720,6 +3720,7 @@ async function renderHome() {
   // ═══ 成长之路时间轴：上一级 · 当前级 · 下一级 ═══
   const levels = cfg.levels || [];
   const currentLevelIdx = xp.currentLevel && levels.length ? levels.findIndex(l => l.name === (xp.currentLevel.name || "")) : -1;
+  setText("levelJourneyCount", `共 ${levels.length} 级`);
   const journeyEl = document.getElementById("lmJourney");
   if (journeyEl && levels.length > 0) {
     const startIdx = currentLevelIdx >= 0 ? Math.max(0, currentLevelIdx - 1) : 0;
@@ -3762,14 +3763,13 @@ async function renderHome() {
   const verifiedXpAll = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
   const weekXP = verifiedXpAll.filter(r => getDateStr(r) >= _monday && _isHomeEnergyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   const lastWeekXP = verifiedXpAll.filter(r => getDateStr(r) >= _lastMonday && getDateStr(r) < _monday && _isHomeEnergyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
-  setText("homeWeekXp", weekXP);
+  setText("homeWeekXp", "本周 +" + weekXP);
   const changePct = lastWeekXP > 0 ? Math.round((weekXP - lastWeekXP) / lastWeekXP * 100) : 0;
   const trendEl = document.getElementById("homeXpTrend");
   if (trendEl) {
     trendEl.textContent = (changePct >= 0 ? "▲" : "▼") + Math.abs(changePct) + "%";
     trendEl.style.color = changePct >= 0 ? "var(--mint-600,#4a9b7b)" : "var(--coral-600,#e04a15)";
   }
-  setText("homeWeekXpChange", Math.abs(changePct));
   const xpNoteEl = document.getElementById("homeXpNote");
   if (xpNoteEl) {
     xpNoteEl.textContent = `占总积分 ${sharePct(planetXp.energy)}%`;
@@ -3780,7 +3780,7 @@ async function renderHome() {
   setText("homeStudy", planetXp.knowledge);
   // 本周作业所得积分
   const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && (String(r.taskName || r.title || "").indexOf("作业") >= 0 || /完成$/.test(String(r.description || ""))) && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
-  setText("homeWeekStudyXp", weekStudyXp);
+  setText("homeWeekStudyXp", "本周 +" + weekStudyXp);
   const studyProgressEl = document.getElementById("homeStudyProgress");
   if (studyProgressEl) studyProgressEl.style.width = sharePct(planetXp.knowledge) + "%";
   const studyNoteEl = document.getElementById("homeStudyNote");
@@ -4058,7 +4058,6 @@ async function renderHome() {
   if (dataXpEl) { dataXpEl.textContent = xp.current; dataXpEl.classList.remove("is-empty"); }
   const dataLevelEl = document.getElementById("dataLevel");
   if (dataLevelEl) { dataLevelEl.textContent = xp.currentLevel?.levelNum || "Lv.1"; dataLevelEl.classList.remove("is-empty"); }
-  setText("dataLevelSub", xp.currentLevel?.name || "-");
 
   const dataNextEl = document.getElementById("dataNextLevel");
   if (dataNextEl) {
@@ -4075,7 +4074,6 @@ async function renderHome() {
   const homeworkTotal = homework.total || 0;
   const dataHwEl = document.getElementById("dataHomework");
   if (dataHwEl) { dataHwEl.textContent = homeworkDone; dataHwEl.classList.remove("is-empty"); }
-  setText("dataHomeworkSub", "共 " + homeworkTotal + " 项");
 
   const dataFinEl = document.getElementById("dataFinance");
   if (dataFinEl) { dataFinEl.textContent = formatMoney(cfg.finance?.totalAssets || 0); dataFinEl.classList.remove("is-empty"); }
@@ -5567,26 +5565,34 @@ function renderHwRow(a, hidden, index, earnedXp) {
 }
 
 // 增量更新学习统计数字（P5优化：避免全量重渲）
-function updateStudyStatsDisplay() {
-  const statsGrid = document.getElementById("hwStatsGrid");
-  if (!statsGrid) return;
-  const valEls = statsGrid.querySelectorAll(".stat-value");
+function updateStudyStatsDisplay(cfg) {
+  const statsRow = document.getElementById("hwStatsRow");
+  if (!statsRow) return;
+  const valEls = statsRow.querySelectorAll(".hsi-value");
   if (valEls.length < 4) return;
   const allRows = document.querySelectorAll(".hw-row");
   const total = allRows.length;
   const doneCount = document.querySelectorAll(".hw-row.hw-done").length;
   const pendingCount = total - doneCount;
   const donePct = pct(doneCount, total);
-  valEls[0].textContent = total;
-  valEls[1].textContent = pendingCount;
-  valEls[2].textContent = doneCount;
-  valEls[3].textContent = donePct + "%";
-  const subEls = statsGrid.querySelectorAll(".stat-sub");
+  // 逾期：待完成且 dueDate 已过
+  const todayStr = new Date().toISOString().slice(0, 10);
+  let overdue = 0;
+  if (cfg && cfg.study) {
+    const asm = getAllAssignments(cfg);
+    overdue = asm.filter(a => {
+      if (!a.dueDate) return false;
+      return a.dueDate < todayStr && a.status !== "done";
+    }).length;
+  }
+  valEls[0].textContent = pendingCount;   // 待完成
+  valEls[1].textContent = doneCount;      // 已完成
+  valEls[2].textContent = donePct + "%";  // 完成率
+  valEls[3].textContent = overdue;        // 逾期
+  const subEls = statsRow.querySelectorAll(".hsi-sub");
   if (subEls.length >= 2) {
     subEls[1].textContent = pendingCount > 0 ? "需尽快完成" : "全部完成";
   }
-  setText("pendingCount", `${pendingCount} 项`);
-  setText("doneCount", `${doneCount} 项`);
 }
 
 async function renderStudy() {
@@ -6750,9 +6756,9 @@ function toggleTxAnalysis(id, btn) {
 
 async function renderMoney() {
   const cfg = await loadAppData();
-  const finance = cfg.finance || { totalAssets: null, accounts: [], transactions: [] };
+  const finance = cfg.finance || { totalAssets: null, accounts: [], recentTransactions: [] };
   const accounts = finance.accounts || [];
-  const transactions = finance.transactions || finance.recentTransactions || [];
+  const transactions = finance.recentTransactions || [];
   const txData = transactions.map(t => ({ ...t, type: t.type || "in" }));
 
   function getAccount(key) {
@@ -7480,7 +7486,7 @@ function initDataEntry() {
   });
 
   // ── XP 录入 ──
-  document.getElementById("submitXp").addEventListener("click", async () => {
+  document.getElementById("submitXp")?.addEventListener("click", async () => {
     const title = document.getElementById("xpTitle").value.trim();
     const note = document.getElementById("xpNote").value.trim();
     if (!title) { deShowToast("xpToast", "请输入做了什么", false); return; }
@@ -7511,7 +7517,7 @@ function initDataEntry() {
   });
 
   // ── XP 任务选择 ──
-  document.getElementById("xpTaskSelect").addEventListener("change", (e) => {
+  document.getElementById("xpTaskSelect")?.addEventListener("change", (e) => {
     const opt = e.target.selectedOptions[0];
     if (!opt || !opt.value) return;
     document.getElementById("xpTitle").value = opt.value;
@@ -7520,7 +7526,7 @@ function initDataEntry() {
   });
 
   // ── 作业智能拆分 ──
-  document.getElementById("parseHomeworkBtn").addEventListener("click", () => {
+  document.getElementById("parseHomeworkBtn")?.addEventListener("click", () => {
     const raw = document.getElementById("homeworkRaw").value.trim();
     if (!raw) { deShowToast("studyToast", "请先粘贴作业原文", false); return; }
 
@@ -7563,7 +7569,7 @@ function initDataEntry() {
   });
 
   // ── 批量录入 ──
-  document.getElementById("batchSubmitStudy").addEventListener("click", async () => {
+  document.getElementById("batchSubmitStudy")?.addEventListener("click", async () => {
     const checks = document.querySelectorAll(".parse-check:checked");
     if (checks.length === 0) { deShowToast("studyToast", "请至少勾选一条作业", false); return; }
 
@@ -7618,7 +7624,7 @@ function initDataEntry() {
   });
 
   // ── 学习录入（作业） ──
-  document.getElementById("submitStudy").addEventListener("click", async () => {
+  document.getElementById("submitStudy")?.addEventListener("click", async () => {
     const title = document.getElementById("studyTitle").value.trim();
     if (!title) { deShowToast("studyToast", "请输入作业标题", false); return; }
     deSetLoading("submitStudy", true, "录入中…");
@@ -7653,7 +7659,7 @@ function initDataEntry() {
   });
 
   // ── 成绩录入 ──
-  document.getElementById("submitScore").addEventListener("click", async () => {
+  document.getElementById("submitScore")?.addEventListener("click", async () => {
     const grade = document.getElementById("scoreGrade").value;
     if (!grade) { deShowToast("scoreToast", "请选择等级", false); return; }
     const subject = getRadioValue("scoreSubjectGroup");
@@ -7685,7 +7691,7 @@ function initDataEntry() {
   });
 
   // ── 期末评语录入 ──
-  document.getElementById("submitEvaluation").addEventListener("click", async () => {
+  document.getElementById("submitEvaluation")?.addEventListener("click", async () => {
     const teacher = document.getElementById("evalTeacherComment").value.trim();
     const parent = document.getElementById("evalParentComment").value.trim();
     if (!teacher && !parent) { deShowToast("evalToast", "请至少填写老师或家长评语", false); return; }
@@ -7710,7 +7716,7 @@ function initDataEntry() {
   });
 
   // ── 财务录入 ──
-  document.getElementById("submitMoney").addEventListener("click", async () => {
+  document.getElementById("submitMoney")?.addEventListener("click", async () => {
     const amount = Number(document.getElementById("moneyAmount").value);
     if (!amount || amount <= 0) { deShowToast("moneyToast", "请输入有效金额", false); return; }
     const desc = document.getElementById("moneyDesc").value.trim();
@@ -8249,8 +8255,8 @@ async function getTeachingUnits(subject) {
     if (window.DataStore && window.DataStore._config && window.DataStore._config.teaching) {
       cfgJson = window.DataStore._config;
     } else {
-      const resp = await fetch("/data/config.json");
-      if (resp.ok) cfgJson = await resp.json();
+      // 与其他数据文件一致，统一走 fetchRawJSON（优先本地 data/，失败回退 GitHub）
+      cfgJson = await fetchRawJSON("config.json").catch(() => null);
     }
     if (!cfgJson || !cfgJson.teaching || !cfgJson.teaching.subjects) return [];
     const subjects = cfgJson.teaching.subjects;
@@ -9056,7 +9062,7 @@ function initEditModal() {
           if (icon) icon.setAttribute("data-lucide", newDone ? "check" : "send");
         }
       }
-      updateStudyStatsDisplay();
+      updateStudyStatsDisplay(cfg);
       // 重新渲染能力雷达图（作业状态变化后数据同步更新）
       if (typeof renderAbilityRadar === "function") {
         const allAsm = getAllAssignments(cfg);
