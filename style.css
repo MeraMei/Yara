@@ -2304,27 +2304,48 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       background: rgba(255,255,255,.55);
       border: 1px solid rgba(255,255,255,.7);
       border-radius: 18px;
-      padding: 14px 16px;
+      padding: 13px 16px 12px;
       box-shadow: 0 1px 6px rgba(249,96,36,.08);
     }
-    .id-sem-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
+    /* 3个信息框 + 进度条，竖向排列，间距紧凑 */
+    .id-sem .sem-box + .sem-box {
+      margin-top: 4px;
     }
-    .id-sem-title {
+    .id-sem .sem-bar-track {
+      margin: 7px 0 8px;
+    }
+    .sem-box {
       display: flex;
       align-items: center;
-      gap: 7px;
-      font: 700 14px var(--font-display);
+      gap: 6px;
+      font: 700 13px var(--font-display);
+      color: var(--neutral-800);
+    }
+    .sem-box-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      flex: none;
+    }
+    .sem-box-icon i { width: 15px; height: 15px; }
+    .sem-box-icon i[data-lucide="calendar-days"] { color: var(--colourful-butter-yellow-600, #f5b301); }
+    .sem-box-icon i[data-lucide="list"] { color: #7a3fd6; }
+    .sem-box-icon i[data-lucide="hourglass"] { color: var(--colourful-butter-yellow-600, #f5b301); }
+    .sem-box-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neutral-500, #8a8178);
+      flex: none;
+    }
+    .sem-box-value {
+      font-size: 13px;
+      font-weight: 800;
       color: var(--neutral-900);
+      margin-left: auto;
     }
-    .id-sem-title i { width: 16px; height: 16px; color: var(--colourful-butter-yellow-600); }
-    /* 学期卡内的小分隔点（避开全局 .dot 的 40px 图标样式） */
-    .sem-dot { display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: var(--neutral-300, #c9c4bc); flex: none; }
-    /* 沙漏图标：在底部文字行 */
-    .sem-hourglass { width: 13px; height: 13px; color: var(--colourful-butter-yellow-600, #f5b301); flex: none; }
+    .sem-box-value strong { color: #7a3fd6; }
     .id-sem-info {
       display: flex;
       align-items: center;
@@ -2339,17 +2360,6 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       border-radius: 50%;
       background: var(--neutral-300);
     }
-    .id-sem-foot {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--neutral-500, #8a8178);
-      margin-top: 9px;
-      align-items: center;
-    }
-
     /* 身份卡右侧栏：学期进度（开学进度 / 开学倒计时） */
     .id-side {
       position: relative;

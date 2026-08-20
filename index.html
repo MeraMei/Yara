@@ -53,15 +53,28 @@
           </div>
         </div>
 
-        <!-- 右：学期进度（开学中显示进度 / 未开学显示距开学天数） -->
+        <!-- 右：学期进度 — 3个独立框（框1学期 · 框2第几周第几天 · 框3倒计时） -->
         <div class="id-side">
           <div class="id-sem">
-            <div class="id-sem-head">
-              <span class="id-sem-title"><i data-lucide="calendar-days"></i> <b id="semBarTitle">--</b><span class="sem-dot"></span><span id="semBarWeek">--</span></span>
+            <!-- 框1：几年级·（暑假/寒假/秋季/春季） -->
+            <div class="sem-box">
+              <span class="sem-box-icon"><i data-lucide="calendar-days"></i></span>
+              <span class="sem-box-label">学期</span>
+              <span class="sem-box-value" id="semBarTitle">--</span>
             </div>
+            <!-- 框2：第几周第几天 -->
+            <div class="sem-box">
+              <span class="sem-box-icon"><i data-lucide="list"></i></span>
+              <span class="sem-box-label">进度</span>
+              <span class="sem-box-value" id="semBarWeek">--</span>
+            </div>
+            <!-- 进度条 -->
             <div class="sem-bar-track"><div class="sem-bar-fill" id="semBarFill" style="width:0%"></div></div>
-            <div class="id-sem-foot">
-              <span id="semBarDate">--</span><i data-lucide="hourglass" class="sem-hourglass"></i>
+            <!-- 框3：距离（开学/期中/期末）还有X天 -->
+            <div class="sem-box">
+              <span class="sem-box-icon"><i data-lucide="hourglass"></i></span>
+              <span class="sem-box-label">倒计时</span>
+              <span class="sem-box-value" id="semBarDate">--</span>
             </div>
           </div>
         </div>
