@@ -922,7 +922,11 @@
           "description": "背诵并默写四上古诗（内容见微信群）。",
           "details": [],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "duration": "30-60分钟",
+          "wrongCount": 0,
+          "unitIndex": -1,
+          "unitName": null
         },
         {
           "id": "recvrd7AIvO6n0",
