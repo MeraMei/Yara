@@ -5431,7 +5431,7 @@ function renderAbilityRadar(doneList, subjIcon, configModules, configSubjects) {
 }
 
 // ── 作业行渲染（新设计：可点击切换状态） ──
-function renderHwRow(a, hidden, index) {
+function renderHwRow(a, hidden, index, earnedXp) {
   // 科目样式：内置三科用专门配色类，新增科目回退通用类
   const KNOWN = { "语文": "cn", "数学": "math", "英语": "en" };
   const subjClass = KNOWN[a.subject] || "other";
@@ -5445,6 +5445,10 @@ function renderHwRow(a, hidden, index) {
     : (a.subject || "").slice(0, 1) || "科";
   const itemId = a.id || "";
   const safeTitle = typeof escapeHtmlReason === "function" ? escapeHtmlReason(title) : title;
+  // 已完成作业：显示获得的 XP（从配置中查找）
+  const xpBadge = isDone && earnedXp != null
+    ? `<span class="hw-xp-badge">+${earnedXp} XP</span>`
+    : "";
 
   const modList = Array.isArray(a.modules) && a.modules.length > 0
     ? a.modules
@@ -5501,7 +5505,7 @@ function renderHwRow(a, hidden, index) {
     </div>
     <div class="hw-subj ${subjClass}">${shortSubj}</div>
     <div class="hw-content">
-      <div class="hw-title">${safeTitle}</div>
+      <div class="hw-title">${safeTitle}${xpBadge}</div>
       <div class="hw-subline">
         <span class="hw-chips">${typeTag}${modTag ? `<span class="hw-mod-group">${modTag}</span>` : ""}${durTag}</span>
         ${metaBit}
@@ -5680,6 +5684,18 @@ async function renderStudy() {
     return [...pendingSorted, ...doneSorted];
   }
 
+  function getHwXp(item) {
+    if (!item) return null;
+    const hwType = item.homeworkType || "日常预习";
+    const ruleName = "作业·" + hwType;
+    const xpRules = (cfg.config && cfg.config.xpRules) || {};
+    for (const cat of Object.keys(xpRules)) {
+      const found = (xpRules[cat] || []).find(function(r) { return r.name === ruleName; });
+      if (found && found.xp) return Number(found.xp) || null;
+    }
+    return null;
+  }
+
   function renderAssignmentList(filter) {
     if (!listEl) return;
     const list = getFilteredList(filter);
@@ -5698,8 +5714,8 @@ async function renderStudy() {
     const visibleCount = 6;
     const visible = list.slice(0, visibleCount);
     const hidden = list.slice(visibleCount);
-    let html = visible.map((a, i) => renderHwRow(a, false, "a-" + i)).join("");
-    html += hidden.map((a, i) => renderHwRow(a, !hwExpanded, "a-" + (i + visibleCount))).join("");
+    let html = visible.map((a, i) => renderHwRow(a, false, "a-" + i, getHwXp(a))).join("");
+    html += hidden.map((a, i) => renderHwRow(a, !hwExpanded, "a-" + (i + visibleCount), getHwXp(a))).join("");
     listEl.innerHTML = html;
     if (hidden.length > 0) {
       if (showMoreBtn) {
@@ -5734,6 +5750,11 @@ async function renderStudy() {
       if (!a.dueDate) return false;
       return a.dueDate < todayStr && a.status !== "done";
     }).length;
+    // 计算已完成作业获得的总 XP
+    const doneXpTotal = doneList.reduce(function(sum, a) {
+      const xp = getHwXp(a);
+      return sum + (xp != null ? xp : 0);
+    }, 0);
 
     hwStatsEl.innerHTML = `
       <div class="hw-stat-item todo">
@@ -5744,7 +5765,7 @@ async function renderStudy() {
       <div class="hw-stat-item done">
         <div class="hsi-label">已完成</div>
         <div class="hsi-value">${done}</div>
-        <div class="hsi-sub">真棒，继续保持</div>
+        <div class="hsi-sub">${doneXpTotal > 0 ? '共获得 +' + doneXpTotal + ' XP' : '真棒，继续保持'}</div>
       </div>
       <div class="hw-stat-item rate">
         <div class="hsi-label">完成率</div>

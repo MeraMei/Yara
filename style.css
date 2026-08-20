@@ -3828,6 +3828,19 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       gap: 3px;
     }
     .hw-dur-tag i { width: 11px; height: 11px; }
+    /* 已完成作业的 XP 徽章：绿色调，醒目不刺眼 */
+    .hw-xp-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      color: #10b981;
+      background: #d1fae5;
+      padding: 1px 7px;
+      border-radius: 999px;
+      margin-left: 6px;
+      vertical-align: middle;
+      line-height: 1.6;
+    }
     /* 标题下方的信息行：标签组 + 截止状态连成一条流，按需换行，基线对齐 */
     .hw-subline {
       display: flex;
@@ -4964,6 +4977,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       .hw-title { font-size: 12px; line-height: 1.4; }
       .hw-mod-tag { font-size: 9px; padding: 1px 5px; }
       .hw-type-tag, .hw-dur-tag { font-size: 9px; padding: 1px 6px; }
+      .hw-xp-badge { font-size: 9px; padding: 1px 5px; }
       .hw-meta { font-size: 10px; padding: 1px 6px; }
       .hw-meta i { width: 11px; height: 11px; }
       .hw-submit-btn, .hw-edit-btn { height: 22px; padding: 0 10px; font-size: 10px; }
