@@ -1,5 +1,5 @@
 {
-  "totalAssets": 10914.77,
+  "totalAssets": 10864.97,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,42 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 845.7,
+      "balance": 795.9,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_mt1jk8hi",
+      "date": "2026-08-20",
+      "type": "expense",
+      "amount": 19.9,
+      "rawAmount": -19.9,
+      "category": "小风扇",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "小风扇",
+      "worthIt": "值得",
+      "reason": "也有点贵，但是方便携带",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
+    {
+      "id": "fin_mt1jk8hh",
+      "date": "2026-08-20",
+      "type": "expense",
+      "amount": 29.9,
+      "rawAmount": -29.9,
+      "category": "MINI相机",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "MINI相机",
+      "worthIt": "一般",
+      "reason": "有点贵",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "fin_mt1jb11myebfdh",
       "date": "2026-08-20",

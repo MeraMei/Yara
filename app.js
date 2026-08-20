@@ -245,6 +245,21 @@ async function loadData() {
 
 // 纯网络加载：绕过缓存，直接拉取所有数据文件
 async function _fetchAllData() {
+  // 优先尝试加载合并后的 all.json（1个请求代替12个）
+  try {
+    const resp = await fetch('data/all.json');
+    if (resp.ok) {
+      const all = await resp.json();
+      const dashboard = buildDashboard(
+        all.child || {}, all.calendar || [], all.levels || [],
+        all.xpRecords || [], all.finance || null, all.study || null,
+        all.config || null, all.xpSources || [], all.redeemRecords || [], all.diaryEntries || [],
+        all.aiWeeklyReports || [], all.familyMeetings || []
+      );
+      return dashboard;
+    }
+  } catch (e) { /* fallback to individual files */ }
+
   const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings] =
     await Promise.all([
       fetchRawJSON('child.json').catch(() => null),
@@ -2049,43 +2064,61 @@ function renderSemesterBar() {
   const fillEl = document.getElementById("semBarFill");
   const trackEl = document.querySelector(".sem-bar-track");
 
-  // 进度条轨道必须始终可见（防止被任何逻辑误隐藏）
+  // 进度条轨道必须始终可见
   if (trackEl) trackEl.style.display = "";
 
-  // 标题行：学年 + 学期（如 "2026-2027 上"）
+  // 框1：年级·季节（如 "四年级·暑假" / "四年级·秋季"）
+  let season = "";
+  if (info.isBreak) {
+    season = info.breakName || (info.breakType === "winter" ? "寒假" : "暑假");
+  } else {
+    season = info.semester === 1 ? "秋季" : "春季";
+  }
   if (titleEl) {
-    titleEl.innerHTML = `${info.academicYear} <b>${info.semesterShortName || info.semesterName}</b>`;
+    titleEl.innerHTML = `${info.grade}·${season}`;
   }
 
-  // 状态：假期显示"距开学 X 天"，学期中显示"第X周"
+  // 框2：第几周第几天
+  let weekText = "";
+  if (info.isBreak) {
+    const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
+    const breakWeek = Math.floor(elapsed / 7) + 1;
+    const breakDay = (elapsed % 7) + 1;
+    weekText = `假期第${breakWeek}周第${breakDay}天`;
+  } else {
+    weekText = `第${info.weekNum}周第${info.dayInWeek || 1}天`;
+  }
+  if (weekEl) weekEl.textContent = weekText;
+
+  // 框3：距离（开学/期中/期末）还有X天
   let dateText = "";
   let fillPercent = 0;
-  let weekText = "";
 
   if (info.isBreak) {
-    // 假期中：进度条显示假期剩余进度
+    // 假期中：进度条显示假期进度
     const total = info.breakTotalDays || (info.daysUntilStart + 1);
     const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
     fillPercent = Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
     const startDays = Number(info.daysUntilStart) || 0;
     if (startDays > 0) {
-      weekText = `距开学 ${startDays} 天`;
-      dateText = `还有 <strong>${startDays}</strong> 天开学`;
+      dateText = `距开学还有 <strong>${startDays}</strong> 天`;
     } else {
-      // 开学当天或已开学但 isBreak 仍为 true 的兜底
-      const breakWeek = Math.floor(elapsed / 7) + 1;
-      const breakDay = (elapsed % 7) + 1;
-      weekText = `假期第${breakWeek}周`;
-      dateText = `第${breakWeek}周第${breakDay}天`;
+      dateText = "开学中";
     }
   } else {
-    // 学期中：按学期教学进度填充
+    // 学期中：进度条按教学进度填充
     fillPercent = info.progressPercent;
-    weekText = `第${info.weekNum}周`;
-    dateText = `第${info.weekNum}周第${info.dayInWeek || 1}天`;
+    const mid = Number(info.daysUntilMidTerm) || 0;
+    const fin = Number(info.daysUntilFinal) || 0;
+    if (mid > 0) {
+      dateText = `距期中还有 <strong>${mid}</strong> 天`;
+    } else if (fin > 0) {
+      dateText = `距期末还有 <strong>${fin}</strong> 天`;
+    } else {
+      dateText = `期末周`;
+    }
   }
 
-  if (weekEl) weekEl.textContent = weekText;
   if (dateEl) dateEl.innerHTML = dateText;
   if (fillEl) fillEl.style.width = fillPercent + "%";
 
@@ -2716,9 +2749,9 @@ if (typeof window !== "undefined") {
     if (window.lucide) refreshIcons(20);
   }
 
-  // 添加一笔
+  // 添加一笔（插入到最前面，最新记录显示在最上方）
   function addRecEntry() {
-    recEntries.push(newEntry());
+    recEntries.unshift(newEntry());
     renderRecEntries();
   }
 
@@ -5475,34 +5508,36 @@ function renderHwRow(a, hidden, index, earnedXp) {
   let dueClass = "";
   let dueIcon = "calendar";
   let dueText = a.dueDate ? `截止 ${a.dueDate}` : "";
-  if (!isDone && a.dueDate) {
+  if (!showSubmitted && a.dueDate) {
     const today = new Date(); today.setHours(0,0,0,0);
     const due = new Date(a.dueDate); due.setHours(0,0,0,0);
     const daysLeft = Math.ceil((due - today) / (1000*60*60*24));
     if (daysLeft < 0) { dueClass = " hw-due-overdue"; dueIcon = "alert-circle"; dueText = `已逾期 ${Math.abs(daysLeft)} 天`; }
     else if (daysLeft === 0) { dueClass = " hw-due-today"; dueText = "今天截止"; }
     else if (daysLeft <= 2) { dueClass = " hw-due-soon"; dueText = `还剩 ${daysLeft} 天`; }
-  } else if (isDone && a.dueDate) {
+  } else if (showSubmitted && a.dueDate) {
     dueClass = " hw-due-done"; dueText = "";
   }
 
   const metaBit = dueText ? `<span class="hw-meta${dueClass}"><i data-lucide="${dueIcon}"></i>${dueText}</span>` : "";
 
   // 右侧操作：提交 + 编辑（始终垂直居中）
+  // 已完成状态自动显示"已提交"，保持UI一致
+  const showSubmitted = isDone || isSubmitted;
   const actions = `
     <div class="hw-actions">
-      <button class="hw-submit-btn${isSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${isSubmitted ? "已提交" : "提交作业"}">
-        <i data-lucide="${isSubmitted ? "check" : "send"}"></i>${isSubmitted ? "已提交" : "提交"}
+      <button class="hw-submit-btn${showSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${showSubmitted ? "已提交" : "提交作业"}">
+        <i data-lucide="${showSubmitted ? "check" : "send"}"></i>${showSubmitted ? "已提交" : "提交"}
       </button>
       <button class="hw-edit-btn" data-edit="${itemId}" title="编辑作业">
         <i data-lucide="pencil"></i>编辑
       </button>
     </div>`;
 
-  return `<div class="hw-row${subjClass === "cn" ? " cn" : ""}${subjClass === "math" ? " math" : ""}${subjClass === "en" ? " en" : ""}${hiddenClass}${isDone ? " hw-done" : ""}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
+  return `<div class="hw-row${subjClass === "cn" ? " cn" : ""}${subjClass === "math" ? " math" : ""}${subjClass === "en" ? " en" : ""}${hiddenClass}${showSubmitted ? " hw-done" : ""}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
     <div class="hw-check-col">
-      <button class="hw-check-btn${isDone ? " checked" : ""}" data-toggle-status="${itemId}" title="${isDone ? "标记为待完成" : "标记为已完成"}">
-        <i data-lucide="${isDone ? "check-circle-2" : "circle"}"></i>
+      <button class="hw-check-btn${showSubmitted ? " checked" : ""}" data-toggle-status="${itemId}" title="${showSubmitted ? "标记为待完成" : "标记为已完成"}">
+        <i data-lucide="${showSubmitted ? "check-circle-2" : "circle"}"></i>
       </button>
     </div>
     <div class="hw-subj ${subjClass}">${shortSubj}</div>
@@ -8901,6 +8936,8 @@ function initEditModal() {
 
       const newDone = item.status !== "done";
       const newStatus = newDone ? "done" : "pending";
+      // 同步更新 submitted 字段，确保勾选与提交状态一致
+      const newSubmitted = newDone;
       let toggled = false;
       try {
         // 设置超时，避免 API 响应缓慢/卡住时界面无响应
@@ -8909,7 +8946,7 @@ function initEditModal() {
         const resp = await fetch(`/api/homework/${item.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus }),
+          body: JSON.stringify({ status: newStatus, submitted: newSubmitted }),
           signal: ctrl.signal,
         });
         clearTimeout(timer);
@@ -8920,17 +8957,17 @@ function initEditModal() {
       }
       if (!toggled && window.DataStore && window.DataStore.updateStudyRecord) {
         try {
-          await window.DataStore.updateStudyRecord(item.id, { status: newStatus });
+          await window.DataStore.updateStudyRecord(item.id, { status: newStatus, submitted: newSubmitted });
           toggled = true;
         } catch (dsErr) {
           console.warn("切换状态 DataStore 失败:", dsErr.message);
         }
       }
       if (!toggled) {
-        await updateHomeworkLocally(item.id, { status: newStatus });
+        await updateHomeworkLocally(item.id, { status: newStatus, submitted: newSubmitted });
       } else {
         if (window.DataStore && window.DataStore.updateStudyRecord) {
-          await window.DataStore.updateStudyRecord(item.id, { status: newStatus }).catch(() => {});
+          await window.DataStore.updateStudyRecord(item.id, { status: newStatus, submitted: newSubmitted }).catch(() => {});
         }
       }
       // ═══ 作业完成能量累加 ═══
@@ -8942,14 +8979,31 @@ function initEditModal() {
       if (newDone && window.DataStore && window.DataStore.refreshData) {
         window.DataStore.refreshData(true).catch(() => {});
       }
-      // 增量 DOM 更新（P5）
+      // 增量 DOM 更新（P5）— 同步更新提交按钮
       const rowEl = document.querySelector(`.hw-row[data-id="${item.id}"]`);
       if (rowEl) {
         rowEl.classList.toggle("hw-done", newDone);
-        const btn = rowEl.querySelector("[data-toggle-status]");
-        if (btn) {
-          btn.classList.toggle("checked", newDone);
-          btn.title = newDone ? "标记为待完成" : "标记为已完成";
+        const checkBtn = rowEl.querySelector("[data-toggle-status]");
+        if (checkBtn) {
+          checkBtn.classList.toggle("checked", newDone);
+          checkBtn.title = newDone ? "标记为待完成" : "标记为已完成";
+        }
+        // ★ 同步更新提交按钮：文字、图标、类名
+        const submitBtn = rowEl.querySelector("[data-toggle-submit]");
+        if (submitBtn) {
+          submitBtn.classList.toggle("submitted", newDone);
+          submitBtn.title = newDone ? "已提交" : "提交作业";
+          // 更新文字节点（<i>图标</i>文字）
+          const childNodes = submitBtn.childNodes;
+          for (let i = childNodes.length - 1; i >= 0; i--) {
+            if (childNodes[i].nodeType === Node.TEXT_NODE) {
+              childNodes[i].textContent = newDone ? "已提交" : "提交";
+              break;
+            }
+          }
+          // 更新图标 data-lucide 属性（refreshIcons 会重新渲染 SVG）
+          const icon = submitBtn.querySelector("i");
+          if (icon) icon.setAttribute("data-lucide", newDone ? "check" : "send");
         }
       }
       updateStudyStatsDisplay();
