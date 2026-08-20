@@ -5029,7 +5029,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       .hw-check-btn { width: 22px; height: 22px; }
       .hw-check-btn svg { width: 16px; height: 16px; }
       .hw-subj { width: 30px; height: 30px; font-size: 11px; }
-      .hw-title { font-size: 12px; line-height: 1.4; }
+      .hw-title { font-size: 12px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .hw-mod-tag { font-size: 9px; padding: 1px 5px; }
       .hw-type-tag, .hw-dur-tag { font-size: 9px; padding: 1px 6px; }
       .hw-xp-badge { font-size: 9px; padding: 1px 5px; }
@@ -7933,6 +7933,8 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .tx-list-enhanced .tx-cat {
       font-size: 10px;
@@ -8008,6 +8010,23 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .tx-list-enhanced .tx-col-amount.income { color: var(--mint-600); }
     .tx-list-enhanced .tx-col-amount.expense { color: var(--neutral-800); }
+
+    /* 移动端：隐藏价值标签和支付方式，让标题列有足够宽度 */
+    @media (max-width: 640px) {
+      .tx-list-enhanced .tx-item {
+        grid-template-columns: 40px 28px 1fr auto;
+        gap: 6px;
+        padding: 10px 2px;
+      }
+      .tx-list-enhanced .tx-col-worth { display: none; }
+      .tx-list-enhanced .tx-col-pay { display: none; }
+      .tx-list-enhanced .tx-col-date { min-width: 0; }
+      .tx-list-enhanced .tx-date-label { font-size: 10px; }
+      .tx-list-enhanced .tx-col-icon { width: 28px; height: 28px; font-size: 13px; }
+      .tx-list-enhanced .tx-title { font-size: 13px; flex-wrap: nowrap; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .tx-list-enhanced .tx-note { display: none; }
+      .tx-list-enhanced .tx-col-amount { font-size: 14px; }
+    }
 
     /* 成长基金流水（弱化） */
     .wealth-tx-section {
