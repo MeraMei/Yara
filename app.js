@@ -3639,7 +3639,8 @@ function getPlanetXp(verifiedXpRecords) {
   (verifiedXpRecords || []).forEach(r => {
     const name = String(r.taskName || r.title || "");
     const xp = Number(r.xp) || 0;
-    if (name.indexOf("作业") === 0 || name.indexOf("成绩录入") >= 0) {
+    // 知识板块：包含"作业"或"成绩录入"关键词（作业→知识，正确统计）
+    if (name.indexOf("作业") >= 0 || name.indexOf("成绩录入") >= 0) {
       result.knowledge += xp;
     } else if (name.indexOf("财务") >= 0 || name.indexOf("花销") >= 0) {
       result.finance += xp;
@@ -3706,7 +3707,7 @@ async function renderHome() {
   // 能量板块本周/上周获得：仅统计能量页自身操作（日记 + 手动打分），排除知识"作业·/成绩录入"与财务"财务/花销"
   const _isHomeEnergyTask = (r) => {
     const n = String(r.taskName || r.title || "");
-    return n.indexOf("作业") !== 0 && n.indexOf("成绩录入") < 0 && n.indexOf("财务") < 0 && n.indexOf("花销") < 0;
+    return n.indexOf("作业") < 0 && n.indexOf("成绩录入") < 0 && n.indexOf("财务") < 0 && n.indexOf("花销") < 0;
   };
   const verifiedXpAll = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
   const weekXP = verifiedXpAll.filter(r => getDateStr(r) >= _monday && _isHomeEnergyTask(r)).reduce((s, r) => s + (Number(r.xp) || 0), 0);
@@ -3728,7 +3729,7 @@ async function renderHome() {
   // ═══ 知识星球右侧 ═══
   setText("homeStudy", planetXp.knowledge);
   // 本周作业所得积分
-  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && String(r.taskName || r.title || "").indexOf("作业") === 0 && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && String(r.taskName || r.title || "").indexOf("作业") >= 0 && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   setText("homeWeekStudyXp", weekStudyXp);
   const studyProgressEl = document.getElementById("homeStudyProgress");
   if (studyProgressEl) studyProgressEl.style.width = sharePct(planetXp.knowledge) + "%";
@@ -4628,7 +4629,7 @@ async function renderXp() {
   const _isEnergyTask = (r) => {
     const n = String(r.taskName || r.title || "");
     // 仅统计能量页自身操作（日记 + 手动打分任务），排除知识页"作业·/成绩录入"与财务页"财务/花销"
-    return n.indexOf("作业") !== 0 && n.indexOf("成绩录入") < 0 && n.indexOf("财务") < 0 && n.indexOf("花销") < 0;
+    return n.indexOf("作业") < 0 && n.indexOf("成绩录入") < 0 && n.indexOf("财务") < 0 && n.indexOf("花销") < 0;
   };
   const todayXpH = _xpAll.filter(r => getDateStr(r) === todayStr && _isEnergyTask(r))
     .reduce((sum, r) => sum + (Number(r.xp) || 0), 0);
@@ -5542,7 +5543,7 @@ async function renderStudy() {
 
   // 知识板块 本周/今日 获得能量（以"作业·"开头的已通过 XP 记录）
   const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
-  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") === 0;
+  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") >= 0;
   const stoday = new Date();
   const sMonday = new Date(stoday);
   sMonday.setDate(stoday.getDate() - ((stoday.getDay() + 6) % 7));
