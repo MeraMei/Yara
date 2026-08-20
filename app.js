@@ -1464,6 +1464,19 @@ async function addFinanceRecord(record) {
     _addToCache('finance.recentTransactions', newRecord);
   }
   _persistCache();
+  // ★ 如果是支出且填写了"值得/不值得/一般"，每笔自动生成独立的财务能力分析 XP 记录
+  if (record.type === 'expense' && record.worthIt) {
+    const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
+    const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
+    await addXpRecord({
+      taskName: "财务能力分析",
+      description: `财务分析：${record.description || ''}（${record.worthIt}）`,
+      date: record.date || todayStr(),
+      status: "verified",
+      xp: _perRecXp,
+      xpCategory: "能力成长",
+    });
+  }
   return recordId;
 }
 
