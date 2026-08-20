@@ -4887,14 +4887,16 @@ async function renderXp() {
 
   if (xpRulesEl) {
     // 按版块（分类）渲染卡片，展示：频次 · 单次默认XP · 已获得XP，每版块默认展示 5 条
-    // 过滤掉"自动打卡/自动发放"的项目（作业·自动完成、财务自动积分），保留手动认领/手动打分任务
+    // 过滤掉"自动打卡/自动发放"的项目（作业·自动完成、财务自动积分、认真投入、财务能力分析）
     const LIMIT = 5;
     const isAutoTask = (t) => {
       const d = String(t.description || "");
       const n = String(t.name || "");
       const m = String(t.method || "");
-      // 自动发放（作业完成自动加分、财务自动积分）不在此展示；认真投入为主动认领手动任务，保留
-      return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0;
+      // 自动发放（作业完成自动加分、财务自动积分）不在此展示；
+      // 认真投入绑定到作业完成确认，不单独展示；财务能力分析自动按支出记录生成，不展示
+      return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
+        || n.indexOf("认真投入") >= 0 || n === "财务能力分析";
     };
     const cards = allCats.map(cat => {
       const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
