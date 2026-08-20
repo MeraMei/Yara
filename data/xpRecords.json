@@ -1,5 +1,21 @@
 [
   {
+    "id": "recvrAifE9FgFk",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "财务能力分析",
+    "taskName": "财务能力分析",
+    "taskCategory": "能力成长",
+    "date": "2026-08-07",
+    "datetime": "2026-08-07 12:00:00",
+    "xp": 5,
+    "xpCategory": "能力成长",
+    "reviewStatus": "已通过",
+    "returnReason": "",
+    "description": "完成一次财务分析",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mt0xpgc7wiq27l",
     "domain": "XP",
     "type": "XP获得",
