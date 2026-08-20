@@ -60,6 +60,10 @@ const CALENDAR_CACHE_KEY = "yara_calendar_data";
 let cachedData = null;
 let loadPromise = null;
 
+// ── 环境检测：GitHub Pages 线上模式 vs 本地开发 ──
+// 线上模式直接走 GitHub Raw，跳过 data/ 404 探测（12个文件省12次无效请求）
+const _isGitHubPages = typeof location !== 'undefined' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+
 // ── GitHub 工具函数 ──
 
 function getGithubToken() {
@@ -77,6 +81,14 @@ function setGithubToken(token) {
 
 // 从 GitHub raw 读取 JSON 文件
 function fetchRawJSON(filename) {
+  // 线上模式（GitHub Pages）：跳过 data/ 404 探测，直接走 GitHub Raw
+  // 本地模式：优先 data/ 目录，失败回退 GitHub Raw
+  if (_isGitHubPages) {
+    return fetch(`${GITHUB_RAW_BASE}/${filename}`).then(resp => {
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} for ${filename}`);
+      return resp.json();
+    });
+  }
   // 优先读取本地 data/ 目录（本地预览），失败则回退到 GitHub 仓库（线上部署）
   return fetch(`data/${filename}`)
     .then(resp => {
@@ -187,38 +199,36 @@ let _dataGen = 0;
 async function loadData() {
   if (cachedData) return cachedData;
 
+  // 优先返回 localStorage 缓存，避免每次都要等网络请求
+  if (!loadPromise) {
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.child) {
+          cachedData = parsed;
+          // 后台刷新数据（不阻塞渲染）
+          setTimeout(() => {
+            _refreshDataInBackground().catch(() => {});
+          }, 0);
+          return cachedData;
+        }
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   if (loadPromise) return loadPromise;
 
   loadPromise = (async () => {
     try {
       // 并行加载所有数据文件（fetchRawJSON 优先本地 data/，失败回退 GitHub）
-      const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings] =
-        await Promise.all([
-          fetchRawJSON('child.json').catch(() => null),
-          fetchRawJSON('calendar.json').catch(() => []),
-          fetchRawJSON('levels.json').catch(() => []),
-          fetchRawJSON('xpRecords.json').catch(() => []),
-          fetchRawJSON('finance.json').catch(() => null),
-          fetchRawJSON('study.json').catch(() => null),
-          fetchRawJSON('config.json').catch(() => null),
-          fetchRawJSON('xpSources.json').catch(() => []),
-          fetchRawJSON('redeemRecords.json').catch(() => []),
-          fetchRawJSON('diaryEntries.json').catch(() => []),
-          fetchRawJSON('aiWeeklyReports.json').catch(() => []),
-          fetchRawJSON('familyMeetings.json').catch(() => []),
-        ]);
-
-      // 合并为 dashboard 结构（与飞书版 getDashboard() 返回结构一致）
-      const dashboard = buildDashboard(
-        child || {}, calendar || [], levels || [],
-        xpRecords || [], finance || null, study || null,
-        config || null, xpSources || [], redeemRecords || [], diaryEntries || [],
-        aiWeeklyReports || [], familyMeetings || []
-      );
-
-      cachedData = dashboard;
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
-      return cachedData;
+      const data = await _fetchAllData();
+      if (data) {
+        cachedData = data;
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(cachedData)); } catch (e) {}
+        return cachedData;
+      }
+      throw new Error('_fetchAllData 返回空');
     } catch (err) {
       console.warn('数据加载失败，尝试 localStorage 缓存:', err.message);
       // 回退到 localStorage 缓存
@@ -244,8 +254,34 @@ async function loadData() {
   return loadPromise;
 }
 
+// 纯网络加载：绕过缓存，直接拉取所有数据文件
+async function _fetchAllData() {
+  const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings] =
+    await Promise.all([
+      fetchRawJSON('child.json').catch(() => null),
+      fetchRawJSON('calendar.json').catch(() => []),
+      fetchRawJSON('levels.json').catch(() => []),
+      fetchRawJSON('xpRecords.json').catch(() => []),
+      fetchRawJSON('finance.json').catch(() => null),
+      fetchRawJSON('study.json').catch(() => null),
+      fetchRawJSON('config.json').catch(() => null),
+      fetchRawJSON('xpSources.json').catch(() => []),
+      fetchRawJSON('redeemRecords.json').catch(() => []),
+      fetchRawJSON('diaryEntries.json').catch(() => []),
+      fetchRawJSON('aiWeeklyReports.json').catch(() => []),
+      fetchRawJSON('familyMeetings.json').catch(() => []),
+    ]);
+
+  const dashboard = buildDashboard(
+    child || {}, calendar || [], levels || [],
+    xpRecords || [], finance || null, study || null,
+    config || null, xpSources || [], redeemRecords || [], diaryEntries || [],
+    aiWeeklyReports || [], familyMeetings || []
+  );
+  return dashboard;
+}
+
 // 后台静默刷新：从 GitHub 拉取最新数据，不阻塞 UI
-// 只在首次打开页面时由 boot() 调用一次
 async function _backgroundRefresh() {
   // 简化版：直接复用 loadData 的缓存
   if (window.__dataCache) {
@@ -254,8 +290,21 @@ async function _backgroundRefresh() {
     window.__dataCache = await loadData();
   }
   // 数据刷新完成后，通知 boot() 注册的监听器重渲染当前视图
-  // （不再调用不存在的 renderAll，避免遗留报错）
   window.dispatchEvent(new CustomEvent("yara-data-refreshed"));
+}
+
+// 后台静默刷新（缓存已返回后）：强制执行网络请求，更新缓存并触发重绘
+async function _refreshDataInBackground() {
+  try {
+    const data = await _fetchAllData();
+    if (data) {
+      cachedData = data;
+      _persistCache();
+      window.dispatchEvent(new CustomEvent("yara-data-refreshed"));
+    }
+  } catch (e) {
+    console.warn('后台刷新失败，保留缓存数据:', e.message);
+  }
 }
 
 // 数据版本号，用于视图缓存：每次数据刷新时递增，渲染函数凭此判断是否需要重绘
