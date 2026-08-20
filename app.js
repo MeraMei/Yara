@@ -747,6 +747,19 @@ async function addXpRecord(record) {
     returnReason: newRecord.returnReason,
   });
   _persistCache();
+  // ★ 如果是支出且填写了"值得/不值得/一般"，每笔自动生成独立的财务能力分析 XP 记录
+  if (record.type === 'expense' && record.worthIt) {
+    const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
+    const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
+    await addXpRecord({
+      taskName: "财务能力分析",
+      description: `财务分析：${record.description || ''}（${record.worthIt}）`,
+      date: record.date || todayStr(),
+      status: "verified",
+      xp: _perRecXp,
+      xpCategory: "能力成长",
+    });
+  }
   return recordId;
 }
 
@@ -2823,31 +2836,15 @@ if (typeof window !== "undefined") {
         });
       }
 
-      // 本次财务分析（复盘即财务分析）：每笔复盘记录 + 配置分值 XP，每笔独立生成记录
-      // ⚠️ XP 记录的日期 = 录入时间（今天），不是交易日期
-      const _todayStr = new Date().toISOString().slice(0, 10);
-      const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
-      const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
-      // 每笔都要生成独立的 XP 记录，不封顶（用户要求每笔都要有积分）
-      for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        if (!entry.amount || !entry.content) continue;
-        await window.DataStore.addXpRecord({
-          taskName: "财务能力分析",
-          description: `财务分析：${entry.content}（${entry.worthIt}）`,
-          date: _todayStr,
-          status: "verified",
-          xp: _perRecXp,
-          xpCategory: "能力成长",
-        });
-      }
-
+      // 本次财务分析（复盘即财务分析）：每笔复盘记录 → addFinanceRecord 已自动生成 XP，无需再重复生成
       closeReconcileModal();
       // 不调用 refreshData()：addFinanceRecord 和 addXpRecord 已更新 cachedData，
       // 直接重渲染即可，避免重新加载 CDN 数据导致缓存覆盖
       await renderMoney();
       if (window.lucide) refreshIcons(50);
       if (entries.length > 0) {
+        const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
+        const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
         const _totalXp = entries.length * _perRecXp;
         alert(`已记录 ${entries.length} 笔财务流水，完成财务分析，共 +${_totalXp} XP（每笔 +${_perRecXp} XP）🎉`);
       }
