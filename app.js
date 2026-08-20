@@ -2080,7 +2080,7 @@ function renderSemesterBar() {
   // 进度条轨道必须始终可见
   if (trackEl) trackEl.style.display = "";
 
-  // 框1：年级·季节（如 "四年级·暑假" / "四年级·秋季"）
+  // 框1：学期：几年级·（暑假/寒假/秋季/春季）
   let season = "";
   if (info.isBreak) {
     season = info.breakName || (info.breakType === "winter" ? "寒假" : "暑假");
@@ -2088,7 +2088,7 @@ function renderSemesterBar() {
     season = info.semester === 1 ? "秋季" : "春季";
   }
   if (titleEl) {
-    titleEl.innerHTML = `${info.grade}·${season}`;
+    titleEl.innerHTML = `学期：${info.grade}·${season}`;
   }
 
   // 框2：第几周第几天

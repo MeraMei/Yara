@@ -2333,17 +2333,11 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .sem-box-icon i[data-lucide="calendar-days"] { color: var(--colourful-butter-yellow-600, #f5b301); }
     .sem-box-icon i[data-lucide="list"] { color: #7a3fd6; }
     .sem-box-icon i[data-lucide="hourglass"] { color: var(--colourful-butter-yellow-600, #f5b301); }
-    .sem-box-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--neutral-500, #8a8178);
-      flex: none;
-    }
     .sem-box-value {
       font-size: 13px;
       font-weight: 800;
       color: var(--neutral-900);
-      margin-left: auto;
+      margin-left: 4px;
     }
     .sem-box-value strong { color: #7a3fd6; }
     .id-sem-info {
