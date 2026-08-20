@@ -285,14 +285,67 @@ async function _backgroundRefresh() {
 // 后台静默刷新（缓存已返回后）：强制执行网络请求，更新缓存并触发重绘
 async function _refreshDataInBackground() {
   try {
+    // 如果本地缓存是最近写入的（如刚提交作业），说明本地数据比 GitHub 更新，
+    // 跳过刷新，避免用 CDN 旧数据覆盖本地新数据。
+    // 后台刷新只用于"冷启动时拉取最新数据"，不应用来覆盖用户刚操作完的缓存。
+    if (cachedData && cachedData._cachedAt && Date.now() - cachedData._cachedAt < 60000) {
+      console.log('后台刷新跳过：本地缓存数据较新 (_cachedAt=' + new Date(cachedData._cachedAt).toISOString() + ')');
+      return;
+    }
     const data = await _fetchAllData();
     if (data) {
+      // 保留本地缓存的 _cachedAt（如果存在），用于后续判断
+      if (cachedData && cachedData._cachedAt) {
+        data._cachedAt = cachedData._cachedAt;
+      }
+      // 合并：对于同时存在于本地缓存和 GitHub 的数据，以本地缓存为准（因为本地缓存是用户操作后的最新状态）
+      if (cachedData && cachedData.study && cachedData.study.allHomework) {
+        _mergeHomeworkData(data, cachedData);
+      }
       cachedData = data;
       _persistCache();
       window.dispatchEvent(new CustomEvent("yara-data-refreshed"));
     }
   } catch (e) {
     console.warn('后台刷新失败，保留缓存数据:', e.message);
+  }
+}
+
+// 合并作业数据：以本地缓存为准，将 GitHub 上不存在的作业记录补充进来
+function _mergeHomeworkData(target, source) {
+  try {
+    const localHw = source.study?.allHomework || [];
+    const targetHw = target.study?.allHomework || [];
+    if (!target.study) target.study = {};
+    if (!target.study.allHomework) target.study.allHomework = [];
+
+    for (let gi = 0; gi < localHw.length; gi++) {
+      const localGroup = localHw[gi];
+      if (!localGroup || !Array.isArray(localGroup.items)) continue;
+      for (let ii = 0; ii < localGroup.items.length; ii++) {
+        const localItem = localGroup.items[ii];
+        if (!localItem || !localItem.id) continue;
+        // 在目标中查找同 id 的作业
+        let foundInTarget = false;
+        for (const targetGroup of targetHw) {
+          if (targetGroup && Array.isArray(targetGroup.items)) {
+            const targetIdx = targetGroup.items.findIndex(r => r && r.id === localItem.id);
+            if (targetIdx >= 0) {
+              // 以本地缓存为准（本地是用户操作后的最新状态）
+              Object.assign(targetGroup.items[targetIdx], localItem);
+              foundInTarget = true;
+              break;
+            }
+          }
+        }
+        // 如果目标中不存在，追加到第一个分组
+        if (!foundInTarget && targetHw.length > 0 && Array.isArray(targetHw[0].items)) {
+          targetHw[0].items.push(localItem);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('后台刷新-合并作业数据失败:', e.message);
   }
 }
 
