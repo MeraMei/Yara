@@ -2056,44 +2056,36 @@ function renderSemesterBar() {
   if (titleEl) {
     titleEl.innerHTML = `${info.academicYear} <b>${info.semesterShortName || info.semesterName}</b>`;
   }
-  // 状态：统一显示"第X周"（不写假期中/寒假/暑假等文字）
-  if (weekEl) {
-    if (info.isBreak) {
-      const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
-      const breakWeek = Math.floor(elapsed / 7) + 1;
-      weekEl.textContent = `第${breakWeek}周`;
-    } else {
-      weekEl.textContent = `第${info.weekNum}周`;
-    }
-  }
 
-  // 底部文字行：只保留 第X周第X天 + 沙漏图标（不写开学/期中/期末倒计时）
+  // 状态：假期显示"距开学 X 天"，学期中显示"第X周"
   let dateText = "";
   let fillPercent = 0;
+  let weekText = "";
 
   if (info.isBreak) {
-    // 假期进度 = 已过假期天数 / 假期总天数
+    // 假期中：进度条显示假期剩余进度
     const total = info.breakTotalDays || (info.daysUntilStart + 1);
     const elapsed = info.breakElapsedDays != null ? info.breakElapsedDays : 0;
     fillPercent = Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)));
-    // 底部左侧：距开学倒计时（未开学状态优先展示，替代假期周次）
-    // 距开学天数 = daysUntilStart；若为 0（已开学）则不展示倒计时
     const startDays = Number(info.daysUntilStart) || 0;
     if (startDays > 0) {
-      dateText = `距开学还有 <strong>${startDays}</strong> 天`;
+      weekText = `距开学 ${startDays} 天`;
+      dateText = `还有 <strong>${startDays}</strong> 天开学`;
     } else {
-      // 兜底：距开学为 0 时退回假期周次显示
+      // 开学当天或已开学但 isBreak 仍为 true 的兜底
       const breakWeek = Math.floor(elapsed / 7) + 1;
       const breakDay = (elapsed % 7) + 1;
+      weekText = `假期第${breakWeek}周`;
       dateText = `第${breakWeek}周第${breakDay}天`;
     }
   } else {
-    // 开学后：按学期进度填充
+    // 学期中：按学期教学进度填充
     fillPercent = info.progressPercent;
-    // 左边：第X周第X天（学期周次）
+    weekText = `第${info.weekNum}周`;
     dateText = `第${info.weekNum}周第${info.dayInWeek || 1}天`;
   }
 
+  if (weekEl) weekEl.textContent = weekText;
   if (dateEl) dateEl.innerHTML = dateText;
   if (fillEl) fillEl.style.width = fillPercent + "%";
 
@@ -3568,6 +3560,10 @@ function renderBarRows(items, options) {
 // MODULE: render-home.js
 // ═══════════════════════════════════════════════════════════
 
+// 首页渲染缓存：只在数据版本变化时重新计算
+let _lastHomeDataVersion = -1;
+let _lastHomeCfgHash = '';
+
 // ═══════════════════════════════════════════════════════════════
 // render-home.js — 首页渲染
 // ═══════════════════════════════════════════════════════════════
@@ -3653,7 +3649,13 @@ function getPlanetXp(verifiedXpRecords) {
 }
 
 async function renderHome() {
+  // 首页渲染缓存：如果数据版本未变且配置哈希未变，跳过重渲染
   const cfg = await loadAppData();
+  if (_lastHomeDataVersion === __dataVersion && _lastHomeCfgHash === (cfg.config?.xpRuleList?.length || '') + '-' + (cfg.xpRecords?.length || '') + '-' + (cfg.study?.allHomework?.length || '')) {
+    return; // 数据没变，跳过重渲染
+  }
+  _lastHomeDataVersion = __dataVersion;
+  _lastHomeCfgHash = (cfg.config?.xpRuleList?.length || '') + '-' + (cfg.xpRecords?.length || '') + '-' + (cfg.study?.allHomework?.length || '');
   window.__lastCfg = cfg;
   const xp = getLevelProgress(cfg);
   const homework = cfg.study?.homework || {};
