@@ -3640,8 +3640,8 @@ function getPlanetXp(verifiedXpRecords) {
     const name = String(r.taskName || r.title || "");
     const desc = String(r.description || "");
     const xp = Number(r.xp) || 0;
-    // 知识板块：taskName 包含"作业"/"成绩录入"，或 description 包含"作业"（兼容手动录入的作业记录）
-    if (name.indexOf("作业") >= 0 || name.indexOf("成绩录入") >= 0 || desc.indexOf("作业") >= 0) {
+    // 知识板块：taskName 包含"作业"/"成绩录入"，或 description 以"完成"结尾（兼容手动录入的作业完成记录）
+    if (name.indexOf("作业") >= 0 || name.indexOf("成绩录入") >= 0 || /完成$/.test(desc)) {
       result.knowledge += xp;
     } else if (name === "财务能力分析") {
       // 财务板块：只计"财务能力分析"（财务复盘），不包"财务进账"和"花销复盘"
@@ -3731,7 +3731,7 @@ async function renderHome() {
   // ═══ 知识星球右侧 ═══
   setText("homeStudy", planetXp.knowledge);
   // 本周作业所得积分
-  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && (String(r.taskName || r.title || "").indexOf("作业") >= 0 || String(r.description || "").indexOf("作业") >= 0) && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
+  const weekStudyXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过" && (String(r.taskName || r.title || "").indexOf("作业") >= 0 || /完成$/.test(String(r.description || ""))) && getDateStr(r) >= _monday).reduce((s, r) => s + (Number(r.xp) || 0), 0);
   setText("homeWeekStudyXp", weekStudyXp);
   const studyProgressEl = document.getElementById("homeStudyProgress");
   if (studyProgressEl) studyProgressEl.style.width = sharePct(planetXp.knowledge) + "%";
@@ -5545,7 +5545,7 @@ async function renderStudy() {
 
   // 知识板块 本周/今日 获得能量（以"作业·"开头的已通过 XP 记录）
   const verifiedXp = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
-  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") >= 0 || String(r.description || "").indexOf("作业") >= 0;
+  const isKnowledge = (r) => String(r.taskName || r.title || "").indexOf("作业") >= 0 || /完成$/.test(String(r.description || ""));
   const stoday = new Date();
   const sMonday = new Date(stoday);
   sMonday.setDate(stoday.getDate() - ((stoday.getDay() + 6) % 7));
