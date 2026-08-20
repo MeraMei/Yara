@@ -2275,10 +2275,28 @@ if (typeof window !== "undefined") {
       const taskName = selectEl.value;
       const selectedOpt = selectEl.options[selectEl.selectedIndex];
       const description = document.getElementById("xpDescPage").value.trim();
-      // 基础分值：优先配置表（data-xp），手填框为空/0 时兜底取配置值，避免"0+承诺"误加分
+      // 基础分值：优先手填 → data-xp → 从 config.xpRules / xpRuleList 按任务名查，三层兜底
+      const cfgData = await loadAppData();
       const cfgXp = parseInt(selectedOpt?.dataset?.xp || "", 10);
       const manualXp = parseInt(document.getElementById("xpValuePage").value, 10) || 0;
-      const xpValue = manualXp > 0 ? manualXp : (cfgXp > 0 ? cfgXp : 0);
+      let xpValue = 0;
+      if (manualXp > 0) {
+        xpValue = manualXp;
+      } else if (cfgXp > 0) {
+        xpValue = cfgXp;
+      } else {
+        // 最后兜底：从配置中按任务名查找 XP（兼容 xpRules 分类结构和 xpRuleList 扁平结构）
+        const xpRulesMap = (cfgData.config && cfgData.config.xpRules) || {};
+        const xpRuleList = (cfgData.config && cfgData.config.xpRuleList) || [];
+        for (const cat of Object.keys(xpRulesMap)) {
+          const found = (xpRulesMap[cat] || []).find(function(r) { return r.name === taskName; });
+          if (found && found.xp) { xpValue = Number(found.xp) || 0; break; }
+        }
+        if (xpValue <= 0) {
+          const found = xpRuleList.find(function(r) { return r.name === taskName; });
+          if (found && found.xp) xpValue = Number(found.xp) || 0;
+        }
+      }
       const isCommitmentCheck = document.getElementById("xpCommitmentCheck").checked;
       const isCommitmentTask = selectedOpt && selectedOpt.dataset?.commitment === "1";
       if (!taskName) { alert("请选择 XP 任务"); return; }
