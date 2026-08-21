@@ -779,8 +779,8 @@ body {
     <div class="profile">
       <div class="cat"><img src="assets/cat-avatar.jpg" alt="" class="cat-img"></div>
       <div>
-        <strong>Yara</strong>
-        <small>9 岁 · 四年级</small>
+        <strong id="sideChildName">Yara</strong>
+        <small id="sideChildInfo"><!-- 动态渲染，与首页侧边栏一致（以首页为准） --></small>
       </div>
     </div>
     <div class="nav-label">菜单</div>
@@ -1219,6 +1219,36 @@ document.addEventListener("click", function(e) {
   var navLink = e.target.closest(".sidebar .nav a, .sidebar .nav-foot a");
   if (navLink) closeSidebar();
 });
+
+/* ════════ 侧边栏个人信息：与首页完全一致（以首页为准） ════════ */
+(function syncSidebarProfile() {
+  function fmtAge(birthday) {
+    if (!birthday) return "";
+    var birth = new Date(String(birthday) + "T00:00:00");
+    if (isNaN(birth.getTime())) return "";
+    var today = new Date();
+    var years = today.getFullYear() - birth.getFullYear();
+    var months = today.getMonth() - birth.getMonth();
+    var days = today.getDate() - birth.getDate();
+    if (days < 0) { months -= 1; days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+    if (months < 0) { years -= 1; months += 12; }
+    return years + "岁" + months + "个月" + days + "天";
+  }
+  try {
+    var raw = localStorage.getItem("yara_child_profile");
+    if (raw) {
+      var c = JSON.parse(raw) || {};
+      var nmEl = document.getElementById("sideChildName");
+      var infoEl = document.getElementById("sideChildInfo");
+      if (nmEl && c.name) nmEl.textContent = c.name;
+      if (infoEl) {
+        var age = fmtAge(c.birthday);
+        // 与首页一致：显示“X岁Y个月Z天 ♀”
+        infoEl.innerHTML = age + ' <span style="color:var(--colourful-candy-pink-500)">♀</span>';
+      }
+    }
+  } catch (e) { /* 静默，保持默认占位 */ }
+})();
 
 /* ════════ GitHub Token 配置 ════════ */
 var GITHUB_TOKEN_KEY = "github_token";
