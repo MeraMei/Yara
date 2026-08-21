@@ -547,7 +547,7 @@
     }
   ],
   "homework": {
-    "total": 22,
+    "total": 18,
     "done": 8,
     "todayTotal": 2,
     "todayDone": 2
@@ -622,28 +622,6 @@
         }
       ],
       "progress": 100
-    },
-    {
-      "id": "recvrd7AIvTKa5",
-      "subject": "数学",
-      "title": "数学计算题练习30题，做完拍照上传（已修改）",
-      "cleanTitle": "数学计算题练习30题，做完拍照上传（已修改）",
-      "shortTitle": "数学计算题练习30题，做完拍照上传（已修改）",
-      "homeworkType": "日常预习",
-      "module": "计算",
-      "modules": [
-        "计算"
-      ],
-      "dueDate": "2026-07-17",
-      "deadline": "2026-07-17",
-      "status": "pending",
-      "submitted": false,
-      "reviewStatus": "",
-      "returnReason": "",
-      "description": "数学计算题练习30题，做完拍照上传",
-      "details": [],
-      "tags": [],
-      "progress": 0
     }
   ],
   "allHomework": [
@@ -729,33 +707,6 @@
       ]
     },
     {
-      "date": "2026-07-17",
-      "items": [
-        {
-          "id": "recvrd7AIvTKa5",
-          "subject": "数学",
-          "title": "数学计算题练习30题，做完拍照上传",
-          "cleanTitle": "数学计算题练习30题，做完拍照上传（已修改）",
-          "shortTitle": "数学计算题练习30题，做完拍照上传（已修改）",
-          "homeworkType": "日常预习",
-          "module": "计算",
-          "modules": [
-            "计算"
-          ],
-          "dueDate": "2026-07-17",
-          "deadline": "2026-07-17",
-          "status": "pending",
-          "submitted": false,
-          "reviewStatus": "",
-          "returnReason": "",
-          "description": "数学计算题练习30题，做完拍照上传",
-          "details": [],
-          "tags": [],
-          "progress": 0
-        }
-      ]
-    },
-    {
       "date": "2026-07-22",
       "items": [
         {
@@ -819,28 +770,6 @@
             }
           ],
           "progress": 100
-        },
-        {
-          "id": "recvrd7AIvSuAa",
-          "subject": "数学",
-          "title": "数学计算题练习30题，做完拍照上传",
-          "cleanTitle": "数学计算题练习30题，做完拍照上传",
-          "shortTitle": "数学计算题练习30题，做完拍照上传",
-          "homeworkType": "日常预习",
-          "module": "计算",
-          "modules": [
-            "计算"
-          ],
-          "dueDate": "2026-07-24",
-          "deadline": "2026-07-24",
-          "status": "pending",
-          "submitted": false,
-          "reviewStatus": "",
-          "returnReason": "",
-          "description": "数学计算题练习30题，做完拍照上传",
-          "details": [],
-          "tags": [],
-          "progress": 0
         }
       ]
     },
@@ -955,28 +884,6 @@
             }
           ],
           "progress": 100
-        },
-        {
-          "id": "recvrd7AIvCmYM",
-          "subject": "数学",
-          "title": "数学计算题练习30题，做完拍照上传",
-          "cleanTitle": "数学计算题练习30题，做完拍照上传",
-          "shortTitle": "数学计算题练习30题，做完拍照上传",
-          "homeworkType": "日常预习",
-          "module": "计算",
-          "modules": [
-            "计算"
-          ],
-          "dueDate": "2026-07-31",
-          "deadline": "2026-07-31",
-          "status": "pending",
-          "submitted": false,
-          "reviewStatus": "",
-          "returnReason": "",
-          "description": "数学计算题练习30题，做完拍照上传",
-          "details": [],
-          "tags": [],
-          "progress": 0
         }
       ]
     },
@@ -1076,28 +983,6 @@
             }
           ],
           "progress": 100
-        },
-        {
-          "id": "recvrd7AIvkIbo",
-          "subject": "数学",
-          "title": "数学计算题练习30题，做完拍照上传",
-          "cleanTitle": "数学计算题练习30题，做完拍照上传",
-          "shortTitle": "数学计算题练习30题，做完拍照上传",
-          "homeworkType": "日常预习",
-          "module": "计算",
-          "modules": [
-            "计算"
-          ],
-          "dueDate": "2026-08-07",
-          "deadline": "2026-08-07",
-          "status": "pending",
-          "submitted": false,
-          "reviewStatus": "",
-          "returnReason": "",
-          "description": "数学计算题练习30题，做完拍照上传",
-          "details": [],
-          "tags": [],
-          "progress": 0
         }
       ]
     },
