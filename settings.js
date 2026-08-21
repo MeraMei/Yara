@@ -411,7 +411,7 @@ function renderRuleGrid() {
         var n = String(t.name || "");
         var m = String(t.method || "");
         return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
-          || n.indexOf("认真投入") >= 0 || n.indexOf("财务能力分析") >= 0;
+          || n.indexOf("认真投入") >= 0 || n.indexOf("财务能力分析") >= 0 || n.indexOf("写日记") >= 0;
       };
       var visibleRules = rules.map(function(t, i) { return { t: t, i: i }; }).filter(function(x) { return !isAutoTask(x.t); });
       var meta = _ruleMeta[cat] || { dot: '#888', ic: 'ic-learn', icon: '📖' };

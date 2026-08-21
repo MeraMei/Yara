@@ -4989,7 +4989,7 @@ async function renderXp() {
       // 自动发放（作业完成自动加分、财务自动积分）不在此展示；
       // 认真投入绑定到作业完成确认，不单独展示；财务能力分析自动按支出记录生成，不展示
       return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
-        || n.indexOf("认真投入") >= 0 || n === "财务能力分析";
+        || n.indexOf("认真投入") >= 0 || n === "财务能力分析" || n.indexOf("写日记") >= 0;
     };
     const cards = allCats.map(cat => {
       const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
