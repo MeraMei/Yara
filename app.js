@@ -6948,11 +6948,10 @@ async function renderMoney() {
       const sign = isIncome ? "+" : "−";
       const amountStr = sign + "¥" + Number(tx.amount).toLocaleString("zh-CN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       const dateInfo = formatDateLabel(tx.date);
-      const category = tx.category || tx.sub || (isIncome ? "收入" : "支出");
       const titleText = tx.name || tx.description || "未命名";
-      // 备注仅在与标题/分类不同时展示，避免信息重复
-      const note = tx.reason || (tx.description && tx.description !== titleText && tx.description !== category ? tx.description : "") || "";
-      const worthIt = tx.worthIt || tx.worth || "";
+      // 备注仅在与标题不同时展示，避免信息重复
+      const note = tx.reason || (tx.description && tx.description !== titleText ? tx.description : "") || "";
+      const worthIt = !isIncome ? (tx.worthIt || tx.worth || "") : "";
       // 支付方式标识
       const payMethod = tx.paymentMethod === "cash" ? "cash" : "alipay";
       const payLabel = tx.paymentMethod === "cash" ? "纸币" : "支付宝";
@@ -6966,13 +6965,11 @@ async function renderMoney() {
           <div class="tx-col tx-col-desc">
             <div class="tx-title">
               ${titleText}
-              ${category && category !== titleText ? `<span class="tx-cat">${category}</span>` : ""}
+              ${worthIt ? `<span class="tx-cat worth-${worthIt === '值得' ? 'good' : worthIt === '不值得' ? 'bad' : 'mid'}">${worthIt}</span>` : ""}
             </div>
             ${note ? `<div class="tx-note">${note}</div>` : ""}
           </div>
-          <div class="tx-col tx-col-worth">
-            ${worthIt && !isIncome ? `<span class="tx-worth-tag ${worthIt === '值得' ? 'good' : worthIt === '不值得' ? 'bad' : 'mid'}">${worthIt}</span>` : "—"}
-          </div>
+          <div class="tx-col tx-col-worth" style="display:none">
           <div class="tx-col tx-col-pay">
             <span class="tx-pay-method ${payMethod}">${payLabel}</span>
           </div>
