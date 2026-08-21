@@ -9160,7 +9160,7 @@ input[type="date"]:focus::-webkit-datetime-edit {
 
     /* ════════ 周报 3 幕重构 ════════ */
 
-    /* ── 高亮标记（纯彩色加粗，无底色） ── */
+    /* ── 高亮标记（渐变的彩色加粗，无底色） ── */
     .hl {
       font-weight: 800; background: none; padding: 0; border: none; border-radius: 0;
       background: linear-gradient(135deg, #ea4d85, #ac87ff);
@@ -9168,11 +9168,7 @@ input[type="date"]:focus::-webkit-datetime-edit {
       background-clip: text;
       box-decoration-break: clone; -webkit-box-decoration-break: clone;
     }
-    .hl-data {
-      font-weight: 800; color: #ea4d85; background: none;
-    }
     .wr-hero-summary .hl { font-size: inherit; }
-    .wr-hero-summary .hl-data { font-size: inherit; }
 
     /* ── 第 1 幕：闪光时刻 Hero ── */
     .wr-hero { margin-bottom: 18px; }

@@ -3291,21 +3291,24 @@ function renderHighlighted(text) {
   const div = document.createElement("div");
   div.textContent = text;
   var safe = div.innerHTML;
-  // 2. 将 **双星号标记** 转为高亮 span（标记由 AI 在生成时嵌入）
+  // 2. 用占位符保护 AI 已有的 **标记**，防止兜底时重复包裹
+  var hlPlaceholders = [];
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, function(m, inner) {
+    var idx = hlPlaceholders.length;
+    hlPlaceholders.push(inner);
+    return '\x00HL' + idx + '\x00';
+  });
+  // 3. 兜底：在剩余纯文本中把表扬关键词也包上 **标记**（不会破坏已有占位符）
+  var praiseWords = ["说到做到", "小达人", "小书虫", "遵守约定", "遵守了约定", "好习惯", "真了不起", "为你骄傲", "闪闪发光", "自律", "真棒", "了不起", "超棒", "负责任", "有责任感", "兑现了承诺", "好孩子"];
+  for (var pi = 0, pw; pi < praiseWords.length; pi++) {
+    pw = praiseWords[pi];
+    safe = safe.replace(new RegExp(pw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '**' + pw + '**');
+  }
+  // 4. 恢复占位符 → <span class="hl">，同时把兜底新增的 **标记** 也转成 <span class="hl">
+  safe = safe.replace(/\x00HL(\d+)\x00/g, function(m, idx) {
+    return '<span class="hl">' + hlPlaceholders[parseInt(idx)] + '</span>';
+  });
   safe = safe.replace(/\*\*([^*]+)\*\*/g, '<span class="hl">$1</span>');
-  // 3. 自动高亮数字/XP/百分比（关键数据模式）
-  safe = safe.replace(/(\+?\d+)\s*(XP|点能量|分|项|篇|天|次|元|%|分钟)/g, function(m, num, unit) {
-    return '<span class="hl-data">' + num + '</span>' + unit;
-  });
-  // 4. 兜底：自动高亮常见表扬关键词（仅处理文本节点，不破坏已有 HTML 标签）
-  var praiseWords = ["说到做到", "小达人", "小书虫", "遵守约定", "遵守了约定", "好习惯", "真了不起", "为你骄傲", "闪闪发光", "自律"];
-  safe = safe.replace(/>([^<]+)</g, function(match, content) {
-    for (var pi = 0, pw; pi < praiseWords.length; pi++) {
-      pw = praiseWords[pi];
-      content = content.replace(new RegExp(pw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '<span class="hl">$&</span>');
-    }
-    return '>' + content + '<';
-  });
   return safe;
 }
 
