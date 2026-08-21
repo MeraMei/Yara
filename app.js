@@ -4356,8 +4356,14 @@ function renderAiWeeklyReport(cfg) {
     if (!catMap[cat]) catMap[cat] = { category: cat, count: 0, xp: 0 };
     catMap[cat].count += 1;
     catMap[cat].xp += Number(r.xp) || 0;
-    if (r.description && r.description.trim() && r.description.trim().length >= 2) {
-      effortStories.push({ subject: r.taskName || "", date: getDateStr(r), story: r.description });
+    // 「最棒的时刻」只收集四维成长行为，剔除消费/财务流水与自动任务
+    var rName = String(r.taskName || r.title || "");
+    var rDesc = String(r.description || "").trim();
+    var rCat = String(cat || "");
+    var isSpending = /财务能力分析|值得/.test(rName + rCat) && /买|花|元|值得|支出/.test(rName + rDesc);
+    if (rDesc.length >= 2 && !isSpending
+        && /认真投入|主动|独立|坚持|自觉|完成|作业|阅读|家务|沟通|帮忙|助人|勇敢|约定/.test(rName)) {
+      effortStories.push({ subject: rName, date: getDateStr(r), story: rDesc });
     }
   });
   var realtimeProfile = [];
@@ -4365,9 +4371,11 @@ function renderAiWeeklyReport(cfg) {
   for (var catKey in catMap) { if (catOrder.indexOf(catKey) < 0) realtimeProfile.push(catMap[catKey]); }
 
   var enhancedReport = Object.assign({}, currentReport);
+  var aiStories = (currentReport.behavior && currentReport.behavior.effortStories) || [];
   enhancedReport.behavior = Object.assign({}, currentReport.behavior || {}, {
     profile: realtimeProfile.length > 0 ? realtimeProfile : (currentReport.behavior && currentReport.behavior.profile) || [],
-    effortStories: effortStories.length > 0 ? effortStories : (currentReport.behavior && currentReport.behavior.effortStories) || [],
+    // AI 生成的成长高光优先；仅当 AI 为空且有实时成长行为时才替补兜底
+    effortStories: aiStories.length > 0 ? aiStories : (effortStories.length > 0 ? effortStories : []),
   });
   var realtimeStats = Object.assign({}, currentReport.stats || {});
   var weekTotalXp = weekXpRecs.reduce(function(sum, r) { return sum + (Number(r.xp) || 0); }, 0);

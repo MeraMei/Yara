@@ -120,13 +120,21 @@ function growthAnalysis(ctx) {
     catStat[cat].xp += (Number(r.xp) || 0);
   });
 
-  // 3.2 亮点故事（认真投入/自我驱动类任务）
+  // 3.2 亮点故事（四维成长行为：意志力/情绪/关系/认知，剔除消费流水）
+  // 原则：只有真正属于成长维度的行为才配进「最棒的时刻」，消费记录不进。
   const effortStories = [];
   (xpRecords || []).forEach(r => {
     if (!inWin(r.date || r.datetime || '', week.start, week.end)) return;
     const name = String(r.title || r.taskName || '');
-    if (/认真投入|主动|独立|坚持/.test(name) && r.description) {
-      effortStories.push({ name, date: r.date || '', desc: r.description });
+    const desc = String(r.description || '').trim();
+    const cat = String(r.taskCategory || r.xpCategory || '');
+    // 消费/财务流水、自动任务一律排除
+    const isExpense = /财务能力分析|财务|值得|花|买|支出/.test(name + cat) &&
+      /买|花|元|值得|支出/.test(name + desc);
+    if (isExpense) return;
+    // 只保留成长行为信号（坚持/主动/认真/作业完成/沟通/家务/阅读/助人等）
+    if (/认真投入|主动|独立|坚持|自觉|完成|作业|阅读|家务|沟通|帮忙|助人|勇敢/.test(name) && desc.length >= 2) {
+      effortStories.push({ name, date: r.date || '', desc });
     }
   });
 
@@ -161,6 +169,14 @@ function growthAnalysis(ctx) {
         text: c.text || '', done: !!c.completed
       }))
     : [];
+  // 补充：遵守家庭约定也是成长高光（关系维度）
+  if (currentCommitment) {
+    currentCommitment.commitments.forEach(c => {
+      if (c.completed && c.text) {
+        effortStories.push({ name: '家庭约定', date: week.end, desc: '遵守了约定：' + c.text });
+      }
+    });
+  }
 
   // 3.6 GrowthAlgorithm 四维评估（认知/情绪/意志力/关系）——给孩子的"底层代码"归因
   const dimension = {};
@@ -271,7 +287,7 @@ const GROWTH_SYSTEM = `
   },
   "behavior": {
     "profile": [ { "category": "<成长分类>", "count": <次数>, "xp": <XP> } ],
-    "effortStories": [ { "subject": "<任务>", "date": "<日期>", "story": "<孩子怎么做的具体描述>" } ],
+    "effortStories": [ { "subject": "<成长行为>", "date": "<日期>", "story": "<孩子具体怎么做的>（只放真正出自认知/情绪/意志力/关系四维的成长高光，如坚持、主动、完成作业、遵守约定、助人；严禁放消费流水/买了什么值不值）> } ],
     "badge": { "earned": false, "type": "", "days": 0, "name": "" }
   },
   "emotion": {
