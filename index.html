@@ -106,30 +106,21 @@
         </div>
       </section>
 
-      <!-- ════════ 3. 今日要做的事（行动重点 · 紧贴等级，形成"目标→行动"闭环） ════════ -->
+      <!-- ════════ 3. 今日要做的事（主动行为优先 · 引导孩子自觉行动） ════════ -->
       <section class="today-tasks">
         <div class="tt-head">
           <div class="tt-title">☀️ 今日要做的事</div>
           <div class="tt-date" id="todayStatusDate">--</div>
         </div>
+        <!-- 进度卡 -->
         <div class="tt-goal">
           <div class="tt-goal-t" id="ttGoalText">今天完成 -- 件事，点亮 -- 能量 ✨</div>
           <div class="tt-goal-bar" id="ttGoalBar"><i id="ttGoalFill" style="width:0%"></i></div>
           <div class="tt-goal-foot"><span id="ttGoalDone">已完成 -- / --</span><span id="ttGoalHint">先把重要的事做完</span></div>
         </div>
-        <div class="tt-list" id="ttList"><div class="tt-empty">正在整理今天的任务…</div></div>
-        <div class="tt-challenge" id="ttChallenge" style="display:none">
-          <div class="tt-challenge-head">
-            <span class="tt-challenge-title">🎯 我的挑战</span>
-            <button class="tt-challenge-edit" onclick="openChallengeModal()">换一换</button>
-          </div>
-          <div class="tt-challenge-list" id="ttChallengeList"></div>
-        </div>
-        <div class="tt-quick-actions">
-          <button class="tt-quick-btn xp" onclick="openXpModal()"><i data-lucide="zap"></i>能量打卡</button>
-          <button class="tt-quick-btn diary" onclick="openDiaryModal()"><i data-lucide="book-open"></i>能量日记</button>
-        </div>
-        <div class="tt-add" onclick="switchView('study')">＋ 添加今日任务</div>
+
+        <!-- 行为卡片式（图3：挑战 / 记录 / 日记 / 约定）+ 作业统计卡 -->
+        <div class="tt-cards" id="ttCards"></div>
       </section>
 
       <!-- ════════ 4. 三大板块 · 积分累计（并排紧凑卡片 · 图3风格） ════════ -->
@@ -186,10 +177,10 @@
         </div>
         <div class="wr-date-range" id="wrDateRange"></div>
         <div class="wr-history" id="wrHistoryList"></div>
-        <div class="wr-summary" id="wrSummary">加载中...</div>
       </div>
-      <div class="wr-stats" id="wrStats"></div>
-      <div class="wr-chapters" id="wrChapters"></div>
+      <div class="wr-hero" id="wrHero"></div>
+      <div class="wr-data" id="wrData"></div>
+      <div class="wr-quest" id="wrQuest"></div>
       <div class="wr-empty" id="wrEmpty" style="display:none">
         <div class="empty-state"><i data-lucide="file-text"></i><div>本周报告将在周日晚上生成 ✨</div></div>
       </div>
@@ -666,6 +657,8 @@
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="editTypeGroup">
+          <label class="choice-pill"><input type="radio" name="editType" value="日常预习">日常预习</label>
+          <label class="choice-pill"><input type="radio" name="editType" value="日常复习">日常复习</label>
           <label class="choice-pill"><input type="radio" name="editType" value="假期作业">假期作业</label>
           <label class="choice-pill"><input type="radio" name="editType" value="特色作业">特色作业</label>
         </div>
@@ -704,6 +697,8 @@
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="addTypeGroup">
+          <label class="choice-pill"><input type="radio" name="addType" value="日常预习">日常预习</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="日常复习">日常复习</label>
           <label class="choice-pill"><input type="radio" name="addType" value="假期作业" checked>假期作业</label>
           <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色作业</label>
         </div>
@@ -743,6 +738,8 @@
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="shmTypeGroup">
+          <label class="choice-pill"><input type="radio" name="shmType" value="日常预习">日常预习</label>
+          <label class="choice-pill"><input type="radio" name="shmType" value="日常复习">日常复习</label>
           <label class="choice-pill"><input type="radio" name="shmType" value="假期作业" checked>假期作业</label>
           <label class="choice-pill"><input type="radio" name="shmType" value="特色作业">特色作业</label>
         </div>
@@ -1139,7 +1136,7 @@
           <label class="form-label">✏️ 今天做了什么</label>
           <textarea class="form-textarea" id="diaryContent" rows="6" placeholder="把今天开心、难忘的事自由写下来吧…"></textarea>
         </div>
-        <div class="diary-tip" id="diaryTip">写完提交后，我会看看你有没有把时间、地点、人物、事件和感受都写出来，写全了 +10 XP ✨</div>
+        <div class="diary-tip" id="diaryTip">写完提交后，我会看看你有没有把时间、地点、人物、事件和感受都写出来，写全了 +XP ✨</div>
       </div>
       <div class="modal-foot">
         <button class="btn-cancel" onclick="closeDiaryModal()">取消</button>

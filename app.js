@@ -596,6 +596,18 @@ function mergeChildData(base, override) {
   return merged;
 }
 
+// 判断一个 XP 任务是否为"自动/系统"类型，不应出现在主动打卡入口
+function isAutoTask(t) {
+  const d = String(t.description || "");
+  const n = String(t.name || "");
+  const m = String(t.method || "");
+  // 自动发放（作业完成自动加分、财务自动积分）不在此展示
+  // 认真投入绑定到作业完成确认，不单独展示；财务能力分析自动按支出记录生成，不展示
+  // 写日记有独立的日记弹窗入口，不在打卡列表展示
+  return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
+    || n.indexOf("认真投入") >= 0 || n === "财务能力分析" || n === "财务能力分析（复盘）" || n.indexOf("写日记") >= 0;
+}
+
 function todayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -908,6 +920,21 @@ function analyzeDiaryElements(content) {
 // ── 日记本 UI 渲染与交互 ──
 
 let _diaryMood = "";
+let _xpModalPreSelectTask = null;
+let _xpModalIsCommit = false; // 标记当前打卡是否由"家庭约定"卡片进入
+
+// 从家庭约定卡点击进入打卡弹窗，预选关联任务
+function openXpModalWithTask(taskName) {
+  _xpModalPreSelectTask = taskName;
+  _xpModalIsCommit = true;
+  if (typeof openXpModal === "function") {
+    openXpModal();
+  } else {
+    // openXpModal 可能是嵌套函数，通过事件触发
+    var btn = document.querySelector('[onclick*="openXpModal"]');
+    if (btn) btn.click();
+  }
+}
 
 function openDiaryModal() {
   _diaryMood = "";
@@ -918,6 +945,12 @@ function openDiaryModal() {
   if (otherWrap) otherWrap.classList.remove("show");
   const otherInput = document.getElementById("diaryMoodOther");
   if (otherInput) otherInput.value = "";
+  // 动态读取日记任务XP值，更新提示文案
+  const cfg = window.__lastCfg || {};
+  const diaryTask = ((cfg.config && cfg.config.xpRules && cfg.config.xpRules["能力成长"]) || []).find(t => t.name === "写日记：写作四要素+感受");
+  const diaryXp = diaryTask ? (Number(diaryTask.xp) || 8) : 8;
+  const tipEl = document.getElementById("diaryTip");
+  if (tipEl) tipEl.textContent = "写完提交后，我会看看你有没有把时间、地点、人物、事件和感受都写出来，写全了 +" + diaryXp + " XP ✨";
   const m = document.getElementById("diaryModalPage");
   if (m) m.classList.add("active");
 }
@@ -2218,7 +2251,7 @@ if (typeof window !== "undefined") {
         const linkedNames = new Set(linked.map(c => c.taskName || c.text));
         // 任务池任务：排除自动发放、排除手动新增（单独分组）、排除已被约定关联的任务（避免重复）
         const tasks = (xpRules[cat] || []).filter(t =>
-          !t.name.startsWith("作业·") && t.method !== "自动发放" && !t._manual && !linkedNames.has(t.name)
+          !isAutoTask(t) && !t._manual && !linkedNames.has(t.name)
         );
         // 关联约定任务排最前
         const linkedHtml = linked.map(c => {
@@ -2288,8 +2321,30 @@ if (typeof window !== "undefined") {
         // 重置承诺复选框
         document.getElementById("xpCommitmentCheck").checked = false;
         document.getElementById("xpCommitmentHint").style.display = "none";
+        // 如果有预选任务（从家庭约定卡点击进入），自动选中该任务
+        if (_xpModalPreSelectTask) {
+          var sel = document.getElementById("xpTaskSelectPage");
+          if (sel) {
+            for (var i = 0; i < sel.options.length; i++) {
+              if (sel.options[i].value === _xpModalPreSelectTask) {
+                sel.selectedIndex = i;
+                break;
+              }
+            }
+          }
+          _xpModalPreSelectTask = null; // 用完清空
+        }
         // 填充默认选中任务的分值/分类（否则默认分值为空，提交时按 0+2 计算）
         onXpTaskChangePage();
+        // 从"家庭约定"卡片进入时，提示这是要去兑现的承诺，而非随手记录
+        if (_xpModalIsCommit) {
+          var commitHintEl = document.getElementById("xpCommitmentHint");
+          if (commitHintEl) {
+            commitHintEl.innerHTML = "🤝 这是你在家庭会议上和爸爸妈妈说好的<b>约定</b>，达成它就能攒到对应的能量～";
+            commitHintEl.style.display = "";
+          }
+          _xpModalIsCommit = false;
+        }
         refreshIcons(50);
       });
     }
@@ -2311,7 +2366,7 @@ if (typeof window !== "undefined") {
       if (!listEl) return;
       let html = "";
       categories.forEach(cat => {
-        const tasks = (xpRules[cat] || []).filter(t => !t.name.startsWith("作业·") && t.method !== "自动发放");
+        const tasks = (xpRules[cat] || []).filter(t => !isAutoTask(t));
         if (tasks.length === 0) return;
         html += `<div style="font-size:11px;font-weight:800;color:var(--neutral-500,#8a8178);margin:10px 2px 6px">${cat}</div>`;
         tasks.forEach(t => {
@@ -3951,135 +4006,170 @@ async function renderHome() {
     }
   }
 
-  // ── 今日要做的事（行动清单 · 顶部目标进度） ──
+  // ── 今日要做的事（图3式布局：进度卡 + 行为卡片列表） ──
   setText("todayStatusDate", dateStr + " · " + weekdayText(today));
-  const ttListEl = document.getElementById("ttList");
+  const ttCardsEl = document.getElementById("ttCards");
   const ttGoalTextEl = document.getElementById("ttGoalText");
   const ttGoalFillEl = document.getElementById("ttGoalFill");
   const ttGoalDoneEl = document.getElementById("ttGoalDone");
   const ttGoalHintEl = document.getElementById("ttGoalHint");
   const ttGoalBarEl = document.getElementById("ttGoalBar");
 
-  // 收集今日任务：优先来自今日作业，其次最近未完成作业，再补充成长待确认
-  const todayTasks = [];
-  const seen = new Set();
-  const addTask = (t) => { const key = t.id ? ("id:" + t.id) : ("t:" + t.title); if (!seen.has(key)) { seen.add(key); todayTasks.push(t); } };
+  const allHw = collectAssignments(cfg.study?.allHomework);
+  const todayDue = allHw.filter(a => (a.dueDate || "") === todayStr);
+  const overdueHw = allHw.filter(a => (a.dueDate || "") !== "" && a.dueDate < todayStr && !(a.status === "done") && !a.submitted);
+  const hwDone = todayDue.filter(a => (a.status === "done") || !!a.submitted).length;
+  const hwTotal = todayDue.length;
+  const overdueTotal = overdueHw.length;
 
-  // 今日作业
-  const todayAssignments = collectAssignments(cfg.study?.allHomework);
-  const todayDue = todayAssignments.filter(a => (a.dueDate || "") === todayStr);
-  todayDue.forEach(a => {
-    addTask({
-      title: (a.subject ? a.subject + " · " : "") + (a.title || "作业"),
-      sub: [a.subject, a.dueDate === todayStr ? "今天交" : ""].filter(Boolean).join(" · ") || "今日作业",
-      done: a.status === "done" || !!a.submitted,
-      xp: Number(a.xp) || 0,
-      pri: (a.status !== "done" && !a.submitted) || (a.dueDate === todayStr && a.status !== "done"),
-      source: "hw",
-      id: a.id
+  // ═══ ① 行为卡片列表（图3：挑战 / 记录 / 日记 / 约定 / 作业统计） ═══
+  const cards = [];
+
+  // 1. 本周挑战（引导去家庭例会，直到在例会上填好「明确约定」）
+  // 挑战不再由孩子单独"自己选"，而是来自家庭庆祝会与爸爸妈妈一起定下的「明确约定」。
+  // 还没填约定 → 引导去开家庭例会；填了 → 显示约定完成状态。
+  var fmList = cfg.familyMeetings || [];
+  var lastFm = null;
+  for (var fi = 0; fi < fmList.length; fi++) { if (fmList[fi].commitments && fmList[fi].commitments.length > 0) { lastFm = fmList[fi]; break; } }
+  if (lastFm) {
+    var commDone = lastFm.commitments.filter(function(c) { return c.completed; });
+    var commUndone = lastFm.commitments.filter(function(c) { return !c.completed; });
+    if (commUndone.length > 0) {
+      var c0 = commUndone[0];
+      var hasTn = c0.taskName && c0.taskName.length > 0;
+      cards.push({
+        type: "challenge",
+        icon: "🎯",
+        name: "本周约定：" + (c0.text || c0.taskName || ""),
+        sub: "和爸爸妈妈在例会上说好的 · 还差 " + commUndone.length + " 件 · 完成 +" + (c0.xp || 0) + " 能量",
+        tag: hasTn ? "去兑现" : "去打卡",
+        onclick: hasTn
+          ? "openXpModalWithTask('" + c0.taskName.replace(/'/g, "\\'") + "')"
+          : "openFamilyMeeting()"
+      });
+    } else {
+      cards.push({
+        type: "challenge",
+        icon: "🏆",
+        name: "本周约定全部做到！",
+        sub: "你和爸爸妈妈说好的 " + lastFm.commitments.length + " 件事都做到了",
+        tag: "太棒了",
+        onclick: "openFamilyMeeting()"
+      });
+    }
+  } else {
+    cards.push({
+      type: "challenge",
+      icon: "🎯",
+      name: "和爸爸妈妈定个本周约定",
+      sub: "开一次家庭庆祝会，一起说清楚这周要做的事",
+      tag: "去例会",
+      onclick: "openFamilyMeeting()"
     });
+  }
+
+  // 2. 能量打卡
+  var todayXpCount = (cfg.xpRecords || []).filter(r => getDateStr(r) === todayStr).length;
+  if (todayXpCount === 0) {
+    cards.push({
+      type: "xp",
+      icon: "⚡",
+      name: "能量打卡",
+      sub: "记录一件今天做的事",
+      tag: "去打卡",
+      onclick: "openXpModal()"
+    });
+  } else {
+    cards.push({
+      type: "xp",
+      icon: "⚡",
+      name: "能量打卡",
+      sub: "今天已点亮 " + todayXpCount + " 次",
+      tag: "继续打卡",
+      onclick: "openXpModal()"
+    });
+  }
+
+  // 3. 写一篇能量日记
+  var todayDiary = (cfg.diaries || []).filter(d => (d.date || "").indexOf(todayStr) === 0);
+  if (todayDiary.length === 0) {
+    cards.push({
+      type: "diary",
+      icon: "✏️",
+      name: "能量日记",
+      sub: "今天心情怎么样？写几句吧",
+      tag: "去记录",
+      onclick: "openDiaryModal()"
+    });
+  } else {
+    cards.push({
+      type: "diary",
+      icon: "✏️",
+      name: "今天的日记已写",
+      sub: "写得很棒，继续保持",
+      tag: "已完成",
+      onclick: "openDiaryModal()"
+    });
+  }
+
+  // 4. 作业进度卡（未完成 / 逾期 / 今日）
+  const hwNotDone = allHw.filter(a => !(a.status === "done") && !a.submitted).length;
+  cards.push({
+    type: "hw",
+    icon: "📚",
+    name: "管理我的作业",
+    sub: "作业进度：未完成作业 " + hwNotDone + " 个，逾期作业 " + overdueTotal + " 个 / 今日作业 " + hwTotal + " 个",
+    tag: "去管理",
+    onclick: "switchView('study')"
   });
 
-  // 最近未完成作业（补充到 2 条）
-  if (todayTasks.filter(t => !t.done).length < 2) {
-    const pendingAssign = todayAssignments.filter(a => a.status !== "done" && !a.submitted && (a.dueDate || "") !== todayStr);
-    pendingAssign.slice(0, 2).forEach(a => {
-      addTask({
-        title: (a.subject ? a.subject + " · " : "") + (a.title || "作业"),
-        sub: a.subject ? a.subject + " · 待完成" : "待完成",
-        done: false,
-        xp: Number(a.xp) || 0,
-        pri: false,
-        source: "hw",
-        id: a.id
-      });
-    });
+  // 渲染卡片：挑战单卡 + [打卡|日记] 双列 + 作业卡
+  if (ttCardsEl) {
+    var challengeCard = cards[0]; // 挑战
+    var xpCard = cards[1];        // 记录打卡
+    var diaryCard = cards[2];     // 日记
+    var hwCard = cards.length > 3 ? cards[3] : null; // 作业（约定已删）
+
+    var cardHtml = function(c) {
+      return '<div class="tt-action-card ' + c.type + '" onclick="' + c.onclick + '">' +
+        '<div class="tt-action-icon">' + c.icon + '</div>' +
+        '<div class="tt-action-main"><div class="tt-action-name">' + c.name + '</div>' +
+        (c.sub ? '<div class="tt-action-sub">' + c.sub + '</div>' : '') + '</div>' +
+        '<span class="tt-action-tag">' + c.tag + '</span>' +
+        '</div>';
+    };
+
+    var html = '';
+    if (challengeCard) html += cardHtml(challengeCard);
+    html += '<div class="tt-row2">';
+    if (xpCard) html += cardHtml(xpCard);
+    if (diaryCard) html += cardHtml(diaryCard);
+    html += '</div>';
+    if (hwCard) html += cardHtml(hwCard);
+    ttCardsEl.innerHTML = html;
+    refreshIcons(0);
   }
 
-  // 成长待确认（补充成一条行动项）
-  if (pendingCount > 0 && todayTasks.length < 3) {
-    addTask({
-      title: "确认成长记录",
-      sub: pendingCount + " 条能量分等你确认",
-      done: false,
-      xp: pendingXp ? Number(pendingXp.xp) || 0 : 0,
-      pri: false,
-      source: "confirm"
-    });
-  }
-
-  // 没有任何任务时给一条引导
-  if (todayTasks.length === 0) {
-    addTask({ title: "今天还没有安排", sub: "去添加一条今日任务吧", done: false, xp: 0, pri: false, source: "empty" });
-  }
-
-  const totalCount = todayTasks.length;
-  const doneCount = todayTasks.filter(t => t.done).length;
+  // ═══ ② 进度卡：统计当前可办的事 ═══
+  const allTodo = allHw.filter(a => !(a.status === "done") && !a.submitted);
+  const totalCount = todayDue.length + overdueTotal + (pendingCount > 0 ? 1 : 0);
+  const doneCount = hwDone;
   const todoCount = totalCount - doneCount;
-  const totalXpT = todayTasks.filter(t => !t.done).reduce((s, t) => s + t.xp, 0);
+  const totalXpT = allTodo.reduce((s, a) => s + (Number(a.xp) || 0), 0);
   const pctV = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
-
-  if (ttGoalTextEl) ttGoalTextEl.innerHTML = `今天完成 <b>${totalCount}</b> 件事，点亮 <b>${totalXpT}</b> 能量 ✨`;
+  if (ttGoalTextEl) ttGoalTextEl.innerHTML = totalCount > 0
+    ? `今天完成 <b>${doneCount}</b> / <b>${totalCount}</b> 件事，点亮 <b>${totalXpT}</b> 能量 ✨`
+    : "今天没有待做的事，点下面的卡片记点能量吧 ✨";
   if (ttGoalFillEl) ttGoalFillEl.style.width = pctV + "%";
-  if (ttGoalBarEl) ttGoalBarEl.classList.toggle("empty", pctV === 0);
+  if (ttGoalBarEl) ttGoalBarEl.classList.toggle("empty", totalCount === 0);
   if (ttGoalDoneEl) ttGoalDoneEl.textContent = `已完成 ${doneCount} / ${totalCount}`;
   if (ttGoalHintEl) {
-    const firstTodo = todayTasks.find(t => !t.done);
-    ttGoalHintEl.textContent = todoCount === 0 ? "全部完成，太棒了 🎉" : (firstTodo && firstTodo.pri ? "还差 " + todoCount + " 件 · 先做优先的那件" : "还差 " + todoCount + " 件 · 一件一件来");
-  }
-
-  if (ttListEl) {
-    if (todayTasks.length === 0) {
-      ttListEl.innerHTML = `<div class="tt-empty">今天没有任务，好好休息吧 🌿</div>`;
-    } else {
-      ttListEl.innerHTML = todayTasks.map(t => {
-        const priCls = t.pri && !t.done ? " pri" : "";
-        const doneCls = t.done ? " done" : "";
-        const check = t.done ? "✓" : "";
-        const tag = t.done
-          ? `<span class="tt-tag done">已完成</span>`
-          : (t.pri ? `<span class="tt-tag pri">优先</span>` : (t.xp > 0 ? `<span class="tt-tag win">+${t.xp} 能量</span>` : `<span class="tt-tag win">待完成</span>`));
-        return `<div class="tt-item${doneCls}${priCls}">
-          <div class="tt-check">${check}</div>
-          <div class="tt-main"><div class="tt-name">${t.title}</div><div class="tt-sub">${t.sub}</div></div>
-          ${tag}
-        </div>`;
-      }).join("");
-    }
-  }
-
-  // ── 我的挑战（孩子自己选的每周目标 · 优先展示） ──
-  const ttChallengeEl = document.getElementById("ttChallenge");
-  const ttChallengeListEl = document.getElementById("ttChallengeList");
-  if (ttChallengeEl && ttChallengeListEl) {
-    const weeklyGoals = (cfg.child && cfg.child.weeklyGoals) || [];
-    if (weeklyGoals.length > 0) {
-      // 判断本周目标是否已完成：本周内是否有对应任务名的打卡记录
-      const weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - 6);
-      const weekStartStr = formatDate(weekStart);
-      const xpRecs = (cfg.xpRecords || []).filter(r => {
-        const d = getDateStr(r);
-        return d >= weekStartStr && d <= todayStr;
-      });
-      const doneNames = new Set(xpRecs.map(r => r.taskName));
-      ttChallengeListEl.innerHTML = weeklyGoals.map(g => {
-        const done = doneNames.has(g.name);
-        return `<div class="tt-challenge-item${done ? " done" : ""}">
-          <span class="tt-c-dot"></span>
-          <span class="tt-c-name">${g.name}</span>
-          <span class="tt-c-xp">${done ? "✓ 完成" : "+" + (g.xp || 0) + " XP"}</span>
-        </div>`;
-      }).join("");
-      ttChallengeEl.style.display = "";
-    } else {
-      // 还没选目标：显示引导入口，点击可打开挑战弹窗
-      ttChallengeListEl.innerHTML = `<div class="tt-challenge-item" style="cursor:pointer" onclick="openChallengeModal()">
-        <span class="tt-c-dot" style="background:var(--warning,#efaa17)"></span>
-        <span class="tt-c-name" style="color:var(--neutral-600,#6b6259)">还没选这周的挑战？点我挑 2-3 个想做的事 ✨</span>
-        <span class="tt-c-xp" style="color:var(--lav-600,#7a3fd6)">去选择</span>
-      </div>`;
-      ttChallengeEl.style.display = "";
-    }
+    let hint = "先把重要的事做完";
+    if (totalCount === 0) hint = "今天没有待做的事";
+    else if (todoCount === 0) hint = "全部完成，太棒了 🎉";
+    else if (overdueTotal > 0) hint = "有 " + overdueTotal + " 件作业逾期了，先补上";
+    else hint = "还差 " + todoCount + " 件 · 一件一件来";
+    ttGoalHintEl.textContent = hint;
   }
 
   // ═══ 3. 我的信息卡 ═══
@@ -4235,9 +4325,9 @@ function renderAiWeeklyReport(cfg) {
     document.getElementById("wrEmpty").style.display = "";
     document.getElementById("wrTitle").textContent = "第 -- 周成长周报";
     document.getElementById("wrDateRange").textContent = "";
-    document.getElementById("wrSummary").textContent = "";
-    document.getElementById("wrStats").innerHTML = "";
-    document.getElementById("wrChapters").innerHTML = "";
+    document.getElementById("wrHero").innerHTML = "";
+    document.getElementById("wrData").innerHTML = "";
+    document.getElementById("wrQuest").innerHTML = "";
     document.getElementById("wrFooter").style.display = "none";
     populateWeekSelect(reports);
     return;
@@ -4248,10 +4338,8 @@ function renderAiWeeklyReport(cfg) {
   document.getElementById("wrFooter").style.display = "";
   document.getElementById("wrTitle").textContent = "第 " + currentReport.weekNumber + " 周成长周报";
   setDateRange(currentReport);
-  document.getElementById("wrSummary").textContent = currentReport.summary || "";
 
   // ── 实时计算本周行为数据（打卡后立即更新到周记） ──
-  // 用本周的真实 XP 记录覆盖预生成的 behavior 数据，确保打卡后周记同步更新
   var today = new Date();
   var weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - 6);
   var weekStartStr = formatDate(weekStart);
@@ -4260,7 +4348,6 @@ function renderAiWeeklyReport(cfg) {
     var d = getDateStr(r);
     return d >= weekStartStr && d <= todayStrVal;
   });
-  // 按分类汇总 XP
   var catMap = {};
   var catOrder = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
   var effortStories = [];
@@ -4269,48 +4356,254 @@ function renderAiWeeklyReport(cfg) {
     if (!catMap[cat]) catMap[cat] = { category: cat, count: 0, xp: 0 };
     catMap[cat].count += 1;
     catMap[cat].xp += Number(r.xp) || 0;
-    // 有备注说明的记录作为"认真投入亮点"
     if (r.description && r.description.trim() && r.description.trim().length >= 2) {
-      effortStories.push({
-        subject: r.taskName || "",
-        date: getDateStr(r),
-        story: r.description,
-      });
+      effortStories.push({ subject: r.taskName || "", date: getDateStr(r), story: r.description });
     }
   });
-  // 按预设顺序排列分类，保证显示稳定
   var realtimeProfile = [];
-  catOrder.forEach(function(cat) {
-    if (catMap[cat]) realtimeProfile.push(catMap[cat]);
-  });
-  // 加上预设分类之外的其他分类
-  for (var catKey in catMap) {
-    if (catOrder.indexOf(catKey) < 0) realtimeProfile.push(catMap[catKey]);
-  }
-  // 用实时数据覆盖预生成的 behavior（仅覆盖 profile 和 effortStories，保留 badge 等其他字段）
+  catOrder.forEach(function(cat) { if (catMap[cat]) realtimeProfile.push(catMap[cat]); });
+  for (var catKey in catMap) { if (catOrder.indexOf(catKey) < 0) realtimeProfile.push(catMap[catKey]); }
+
   var enhancedReport = Object.assign({}, currentReport);
   enhancedReport.behavior = Object.assign({}, currentReport.behavior || {}, {
     profile: realtimeProfile.length > 0 ? realtimeProfile : (currentReport.behavior && currentReport.behavior.profile) || [],
     effortStories: effortStories.length > 0 ? effortStories : (currentReport.behavior && currentReport.behavior.effortStories) || [],
   });
-  // 更新统计卡片里的能量值（用本周实时 XP 总数）
   var realtimeStats = Object.assign({}, currentReport.stats || {});
   var weekTotalXp = weekXpRecs.reduce(function(sum, r) { return sum + (Number(r.xp) || 0); }, 0);
   if (realtimeStats.energy && weekTotalXp > 0) {
     realtimeStats.energy = Object.assign({}, realtimeStats.energy, { value: weekTotalXp });
   }
+  enhancedReport.stats = realtimeStats;
 
-  // 渲染四个统计卡片（报告式 KPI：顶部彩条 + 趋势胶囊）
-  document.getElementById("wrStats").innerHTML = buildWrStatsHtml(realtimeStats);
-  // 渲染可折叠章节（孩子友好：闪光点在前，正向积极）
-  renderChapter("chapterGrowth", "⭐ 本周闪光点", renderGrowthContent(enhancedReport));
-  renderChapter("chapterBehavior", "🎯 行为与习惯", renderBehaviorContent(enhancedReport));
-  renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(enhancedReport));
-  renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(enhancedReport));
-  // 渲染建议
-  renderChapter("chapterSuggestions", "🎯 下周小目标", renderSuggestionContent(enhancedReport, cfg.familyMeetings));
+  var childName = (cfg.child && cfg.child.name) || "Yara";
+  document.getElementById("wrHero").innerHTML = renderWrHero(enhancedReport, childName);
+  document.getElementById("wrData").innerHTML = renderWrData(enhancedReport);
+  document.getElementById("wrQuest").innerHTML = renderWrQuest(enhancedReport, cfg.familyMeetings);
   populateWeekSelect(reports);
   if (window.lucide) refreshIcons(20);
+}
+
+// ── 第 1 幕：闪光时刻 Hero ──
+function renderWrHero(report, childName) {
+  var html = "";
+  // 摘要：第三人称→第二人称
+  var summary = (report.summary || "").replace(new RegExp(childName, "g"), "你");
+  if (summary) {
+    html += '<div class="wr-hero-summary">' + escapeHtmlReason(summary) + '</div>';
+  }
+  // 闪光点 → 成就徽章卡片
+  var pu = (report.growth || {}).profileUpdate || {};
+  var highlights = pu.highlights || [];
+  if (highlights.length > 0) {
+    html += '<div class="wr-hero-badges">';
+    highlights.forEach(function(h) {
+      var icon = wrHighlightIcon(h);
+      html += '<div class="wr-badge-card"><div class="wr-badge-icon">' + icon + '</div><div class="wr-badge-text">' + escapeHtmlReason(h) + '</div></div>';
+    });
+    html += '</div>';
+  }
+  // 最佳日记 → 情感中心
+  var best = (report.emotion || {}).bestDiary || {};
+  if (best.snippet) {
+    html += '<div class="wr-hero-diary">';
+    html += '<div class="wr-diary-mark">&ldquo;</div>';
+    html += '<div class="wr-diary-text">' + escapeHtmlReason(best.snippet) + '</div>';
+    html += '<div class="wr-diary-meta">· ' + (best.date || '') + ' · 写作四要素 ' + (best.elements || 0) + '/4</div>';
+    html += '</div>';
+  }
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px;padding:20px 0;text-align:center">本周还没有记录，快去打卡吧</div>';
+  return html;
+}
+
+function wrHighlightIcon(text) {
+  if (!text) return "⭐";
+  if (text.indexOf("说到") >= 0 || text.indexOf("约定") >= 0 || text.indexOf("遵守") >= 0) return "🤝";
+  if (text.indexOf("财务") >= 0 || text.indexOf("花") >= 0 || text.indexOf("钱") >= 0) return "💰";
+  if (text.indexOf("日记") >= 0 || text.indexOf("写") >= 0) return "✏️";
+  if (text.indexOf("习惯") >= 0) return "🎯";
+  if (text.indexOf("能力") >= 0) return "💪";
+  if (text.indexOf("学习") >= 0) return "📚";
+  return "⭐";
+}
+
+// ── 第 2 幕：成长数据 ──
+function renderWrData(report) {
+  var html = "";
+  var beh = report.behavior || {};
+  var profile = beh.profile || [];
+
+  // 能量条
+  if (profile.length > 0) {
+    var maxXp = 1;
+    profile.forEach(function(p) { if (p.xp > maxXp) maxXp = p.xp; });
+    var palette = ["#7bb8f7", "#f28daf", "#b88af5", "#7cd4b0", "#fba07a", "#fee680"];
+    var icons = ["🌟", "💪", "🎨", "🏃", "🔥", "⭐"];
+    html += '<div class="wr-data-section">';
+    html += '<div class="wr-data-label">⚡ 本周能量条</div>';
+    profile.forEach(function(p, i) {
+      var w = Math.max(15, Math.round((p.xp / maxXp) * 100));
+      var c = palette[i % palette.length];
+      html += '<div class="wr-energy-row"><span class="wr-energy-name">' + icons[i % icons.length] + p.category + '</span><span class="wr-energy-track"><span class="wr-energy-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="wr-energy-meta">+' + p.xp + 'XP</span></div>';
+    });
+    html += '</div>';
+  }
+
+  // 统计数据（孩子友好胶囊）
+  var stats = report.stats || {};
+  var statMeta = [
+    { key: "energy", label: "能量", unit: "XP", icon: "⚡" },
+    { key: "diary", label: "日记", unit: "篇", icon: "✏️" },
+    { key: "finance", label: "花销", unit: "元", icon: "💰" },
+    { key: "study", label: "学习", unit: "项", icon: "📚" }
+  ];
+  var pillsHtml = "";
+  statMeta.forEach(function(item) {
+    var s = stats[item.key] || {};
+    var val = s.value || 0;
+    if (s.hasData === false) return; // 跳过无数据的，不显示"—"
+    var trendArrow = s.trend === "up" ? "↑" : s.trend === "down" ? "↓" : "→";
+    var trendColor = s.trend === "up" ? "var(--colourful-mint-green-500)" : s.trend === "down" ? "var(--colourful-sunny-coral-400)" : "var(--neutral-400)";
+    var trendTxt = s.trend === "stable" ? "持平" : (trendArrow + (s.diff > 0 ? "+" : "") + (s.diff || 0));
+    pillsHtml += '<div class="wr-stat-pill"><span class="sp-icon">' + item.icon + '</span><span>' + item.label + '</span><span class="sp-val">' + val + item.unit + '</span><span class="sp-trend" style="color:' + trendColor + '">' + trendTxt + '</span></div>';
+  });
+  if (pillsHtml) {
+    html += '<div class="wr-data-section"><div class="wr-data-label">📊 本周数据</div><div class="wr-data-stats">' + pillsHtml + '</div></div>';
+  }
+
+  // 学业状态
+  var aca = report.academic || {};
+  var hw = aca.homework || {};
+  var subjects = hw.subjects || [];
+  var subjColor = { "数学": "#7bb8f7", "语文": "#f28daf", "英语": "#b88af5" };
+  var acaHtml = "";
+  if (subjects.length > 0) {
+    acaHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#7bb8f7"></span>作业完成率</div>';
+    subjects.forEach(function(s) {
+      var pct = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
+      var color = subjColor[s.name] || (s.alert === "low" ? "var(--colourful-sunny-coral-500)" : "var(--colourful-mint-green-500)");
+      acaHtml += '<div class="wr-progress-row"><div class="wr-progress-head"><span class="wr-p-name">' + s.name + '</span><span class="wr-p-val" style="color:' + color + '">' + s.completed + '/' + s.total + ' · ' + pct + '%</span></div><div class="wr-progress-track"><div class="wr-progress-fill" style="width:' + pct + '%;background:linear-gradient(90deg,' + color + ',' + color + 'cc)"></div></div></div>';
+    });
+  }
+  var trends = aca.trends || [];
+  if (trends.length > 0) {
+    acaHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#7cd4b0"></span>成绩趋势</div><div class="wr-trends">';
+    var trendText = { up: "📈 上升", down: "📉 下降", stable: "➡️ 稳定", wave: "🔀 波动" };
+    var trendColor = { up: "var(--colourful-mint-green-500)", down: "var(--colourful-sunny-coral-400)", stable: "var(--neutral-400)", wave: "var(--colourful-butter-yellow-500)" };
+    trends.forEach(function(t) {
+      acaHtml += '<span class="wr-trend-chip"><span class="wr-t-arrow" style="color:' + (trendColor[t.trend] || "var(--neutral-500)") + '">' + (trendText[t.trend] || t.trend) + '</span><span style="color:var(--neutral-400);font-weight:600">' + t.subject + ' · ' + t.lastGrade + '</span></span>';
+    });
+    acaHtml += '</div>';
+  }
+  if (!acaHtml) {
+    var hint = aca.emptyHint || '这周还没记录学习呢～下周记得完成作业，每完成一项就+5XP哦💪';
+    acaHtml = '<div class="wr-academic-empty"><div class="ae-icon">📚</div><div class="ae-text">' + escapeHtmlReason(hint) + '</div></div>';
+  }
+  html += '<div class="wr-data-section"><div class="wr-data-label">📚 学业状态</div>' + acaHtml + '</div>';
+
+  // 心情 + 财商
+  var emo = report.emotion || {};
+  var emoHtml = "";
+  var moods = emo.moodDistribution || {};
+  var moodKeys = Object.keys(moods);
+  if (moodKeys.length > 0) {
+    emoHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#f28daf"></span>心情晴雨表</div><div class="wr-mood-row">';
+    moodKeys.forEach(function(k) {
+      var emoji = k === "开心" ? "😊" : k === "难过" ? "😢" : k === "生气" ? "😡" : k === "兴奋" ? "😄" : k === "平静" ? "😌" : k === "惊喜" ? "🤩" : (k.length <= 2 ? k : "😐");
+      emoHtml += '<span class="wr-mood-chip-v2"><span class="mc-emoji">' + emoji + '</span>' + k + '<span class="mc-count">' + moods[k] + '次</span></span>';
+    });
+    emoHtml += '</div>';
+  }
+  if (emo.financeStatus) {
+    var finMap = { good: "🟢 理性消费", watch: "🟡 需要关注", alert: "🔴 冲动消费" };
+    var finColor = { good: "var(--colourful-mint-green-500)", watch: "#c4a030", alert: "var(--colourful-sunny-coral-500)" };
+    var finBg = { good: "rgba(54,185,139,.08)", watch: "rgba(253,216,50,.08)", alert: "rgba(249,96,36,.08)" };
+    var fc = finColor[emo.financeStatus] || "var(--colourful-mint-green-500)";
+    var fb = finBg[emo.financeStatus] || "rgba(54,185,139,.08)";
+    emoHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#7cd4b0"></span>财商习惯</div>';
+    emoHtml += '<div class="wr-fin-row"><span class="wr-fin-chip-v2" style="background:' + fb + ';color:' + fc + '">' + (finMap[emo.financeStatus] || "🟢 理性消费") + ' · 值得率 ' + (emo.financeWorthIt || 0) + '%</span></div>';
+  }
+  if (emoHtml) {
+    html += '<div class="wr-data-section"><div class="wr-data-label">😊 情绪与表达</div>' + emoHtml + '</div>';
+  }
+
+  // 认真投入亮点
+  var stories = beh.effortStories || [];
+  if (stories.length > 0) {
+    html += '<div class="wr-data-section"><div class="wr-data-label">✨ 认真投入亮点</div>';
+    stories.slice(0, 3).forEach(function(s) {
+      html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.subject || "") + ' · ' + (s.date || "") + '</div><div>' + escapeHtmlReason(s.story || "") + '</div>' + (s.reviewerComment ? '<div class="parent-msg">💬 ' + escapeHtmlReason(s.reviewerComment) + "</div>" : "") + "</div>";
+    });
+    if (stories.length > 3) html += '<div style="font-size:12px;color:var(--muted-foreground);margin-top:6px">还有 ' + (stories.length - 3) + " 条精彩瞬间</div>";
+    html += '</div>';
+  }
+
+  var badge = beh.badge || {};
+  if (badge.earned) {
+    var badgeText = badge.type === "small_perseverance" ? "🏅 小坚持" : "🏆 大毅力";
+    html += '<div style="margin-top:4px"><span class="wr-badge">' + badgeText + ' · 连续 ' + badge.days + ' 天</span></div>';
+  }
+
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px;padding:20px 0;text-align:center">还没有行为记录，快去打卡吧</div>';
+  return html;
+}
+
+// ── 第 3 幕：冒险任务 ──
+function renderWrQuest(report, familyMeetings) {
+  var sug = report.suggestions || {};
+  var html = "";
+
+  // 主挑战卡
+  if (sug.challenge) {
+    html += '<div class="wr-quest-main">';
+    html += '<div class="wr-quest-header"><span class="wr-quest-icon">🎯</span><span class="wr-quest-label">下周冒险任务</span></div>';
+    html += '<div class="wr-quest-body">' + escapeHtmlReason(sug.challenge.replace(/^趣味挑战[：:]/, "")) + '</div>';
+    // 提取 +XP 奖励
+    var xpMatch = (sug.challenge || "").match(/\+(\d+)\s*XP/);
+    if (xpMatch) {
+      html += '<div class="wr-quest-reward">⭐ +' + xpMatch[1] + ' XP</div>';
+    }
+    html += '</div>';
+  }
+
+  // 一句话鼓励（合并 keep + improve）
+  var encTxt = "";
+  if (sug.keep) encTxt += sug.keep.replace(/^成就达成[：:]/, "");
+  if (sug.improve) {
+    if (encTxt) encTxt += "  ";
+    encTxt += sug.improve.replace(/^试试看[：:]/, "");
+  }
+  if (encTxt) {
+    html += '<div class="wr-quest-encourage"><span class="qe-icon">🌟</span><span class="qe-text">' + escapeHtmlReason(encTxt) + '</span></div>';
+  }
+
+  // 每周约定
+  var meetings = (familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
+  if (meetings.length > 0) {
+    var currentWeek = report.weekNumber;
+    var matched = meetings.filter(function(m) { return m.weekNumber === currentWeek; });
+    var meeting = matched.length > 0 ? matched[0] : meetings[0];
+    if (meeting && meeting.commitments && meeting.commitments.length > 0) {
+      var done = meeting.commitments.filter(function(c) { return c.completed; }).length;
+      var total = meeting.commitments.length;
+      var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      html += '<div class="wr-quest-commit">';
+      html += '<div class="qc-title">🤝 每周约定 · ' + done + '/' + total + ' 已完成</div>';
+      // 进度条
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="wr-quest-bar-track"><span class="wr-quest-bar-fill" style="width:' + pct + '%"></span></span><span style="font-size:11px;font-weight:600;color:var(--neutral-400)">' + pct + '%</span></div>';
+      meeting.commitments.forEach(function(c) {
+        var statusIcon = c.completed ? '✅' : '⏳';
+        var statusStyle = c.completed ? 'color:var(--colourful-mint-green-600)' : 'color:var(--neutral-500)';
+        var xpTag = c.completed ? ((c.xp > 0) ? '<span class="qc-xp">已兑现 +' + c.xp + 'XP</span>' : '<span class="qc-xp">已兑现</span>') : '';
+        html += '<div class="qc-item" style="' + statusStyle + '"><span class="qc-status">' + statusIcon + '</span><span class="qc-text">' + escapeHtmlReason(c.text) + '</span>' + xpTag + '</div>';
+      });
+      html += '<div class="qc-hint">约定奖励由家庭会议商定 · 下次回顾</div>';
+      html += '</div>';
+    }
+  }
+
+  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px;padding:20px 0;text-align:center">暂无建议</div>';
+  return html;
 }
 
 function renderChapter(id, title, content) {
@@ -4551,14 +4844,11 @@ function displayWeeklyReport(report, allReports, index) {
   document.getElementById("wrFooter").style.display = "";
   document.getElementById("wrTitle").textContent = "第 " + report.weekNumber + " 周成长周报";
   setDateRange(report);
-  document.getElementById("wrSummary").textContent = report.summary || "";
-  document.getElementById("wrStats").innerHTML = buildWrStatsHtml(report.stats || {});
-  document.getElementById("wrChapters").innerHTML = "";
-  renderChapter("chapterGrowth", "⭐ 本周闪光点", renderGrowthContent(report));
-  renderChapter("chapterAcademic", "📚 学业状态", renderAcademicContent(report));
-  renderChapter("chapterBehavior", "🎯 行为与习惯", renderBehaviorContent(report));
-  renderChapter("chapterEmotion", "😊 情绪与表达", renderEmotionContent(report));
-  renderChapter("chapterSuggestions", "🎯 下周小目标", renderSuggestionContent(report, (window.__lastCfg || {}).familyMeetings));
+  var cfg = window.__lastCfg || {};
+  var childName = (cfg.child && cfg.child.name) || "Yara";
+  document.getElementById("wrHero").innerHTML = renderWrHero(report, childName);
+  document.getElementById("wrData").innerHTML = renderWrData(report);
+  document.getElementById("wrQuest").innerHTML = renderWrQuest(report, cfg.familyMeetings);
   populateWeekSelect(allReports || []);
   if (window.lucide) refreshIcons(20);
 }
@@ -4581,7 +4871,7 @@ function addCommitmentRow(value, linked) {
     var categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
     var opts = ['<option value="">-- 从任务池选一条 --</option>'];
     categories.forEach(function(cat) {
-      var tasks = (xpRules[cat] || []).filter(function(t) { return !t.name.startsWith("作业·") && t.method !== "自动发放"; });
+      var tasks = (xpRules[cat] || []).filter(function(t) { return !isAutoTask(t); });
       if (tasks.length === 0) return;
       opts.push('<optgroup label="' + cat + '">');
       tasks.forEach(function(t) {
@@ -4980,17 +5270,8 @@ async function renderXp() {
 
   if (xpRulesEl) {
     // 按版块（分类）渲染卡片，展示：频次 · 单次默认XP · 已获得XP，每版块默认展示 5 条
-    // 过滤掉"自动打卡/自动发放"的项目（作业·自动完成、财务自动积分、认真投入、财务能力分析）
+    // 过滤掉自动/系统类型任务（统一使用全局 isAutoTask 函数）
     const LIMIT = 5;
-    const isAutoTask = (t) => {
-      const d = String(t.description || "");
-      const n = String(t.name || "");
-      const m = String(t.method || "");
-      // 自动发放（作业完成自动加分、财务自动积分）不在此展示；
-      // 认真投入绑定到作业完成确认，不单独展示；财务能力分析自动按支出记录生成，不展示
-      return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
-        || n.indexOf("认真投入") >= 0 || n === "财务能力分析" || n.indexOf("写日记") >= 0;
-    };
     const cards = allCats.map(cat => {
       const tasks = (xpRulesCfg[cat] || []).filter(t => !isAutoTask(t));
       const earned = catAgg[cat] ? catAgg[cat].xp : 0;
@@ -7336,13 +7617,17 @@ async function refreshMoneyRecent() {
 
 // ── 作业智能拆分 ──
 
-// 根据作业内容判定作业类型：假期作业 / 特色作业
+// 根据作业内容判定作业类型：日常预习 / 日常复习 / 假期作业 / 特色作业
 function inferHomeworkType(text) {
   if (!text) return "假期作业";
   const t = String(text);
   // 特色作业：动手/实践/展示类
   if (/手抄报|手工作品|手工|画画|绘画|观察|实践|实验|日记|阅读打卡|打卡|书法|书法练习|演讲|朗诵|口才|小报|手绘|制作|剪贴|贴画|泥塑|折纸|种植|养|社会实践|研学/.test(t)) return "特色作业";
-  // 其余（预习、复习、假期作业、日常等）统一为假期作业
+  // 预习
+  if (/预习/.test(t)) return "日常预习";
+  // 复习
+  if (/复习|背诵|默写|整理笔记|错题|复盘/.test(t)) return "日常复习";
+  // 其余统一为假期作业
   return "假期作业";
 }
 
@@ -8270,7 +8555,7 @@ function initAddHomeworkModal() {
           <div style="display:flex;align-items:center;gap:6px;">
             <label style="font-size:11px;color:var(--neutral-500);flex-shrink:0;">类型</label>
             <select class="add-parse-type" data-idx="${i}" style="flex:1;font-size:12px;padding:3px 6px;border:1px solid var(--neutral-300);border-radius:8px;background:#fff;color:var(--neutral-800);">
-              ${["假期作业","特色作业"].map(t => `<option value="${t}" ${it.type === t ? "selected" : ""}>${t}</option>`).join("")}
+              ${["日常预习","日常复习","假期作业","特色作业"].map(t => `<option value="${t}" ${it.type === t ? "selected" : ""}>${t}</option>`).join("")}
             </select>
           </div>
           <span style="font-size:12px;color:var(--neutral-700);line-height:1.4;">${it.text}</span>

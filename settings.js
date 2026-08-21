@@ -824,82 +824,123 @@ function renderDrAiweekly() {
     var growth = r.growth || {};
     var body = '';
 
-    // 数据概览
-    var statRows = '';
-    var statMap = [['energy','⚡ 能量'],['study','📚 学习'],['finance','💰 财富'],['diary','📓 日记']];
+    // 数据概览 → 药丸标签
+    var statMap = [['energy','⚡ 能量','XP'],['study','📚 学习','项'],['finance','💰 花销','元'],['diary','📓 日记','篇']];
+    var pillsHtml = '';
     statMap.forEach(function(kv) {
       var s = stats[kv[0]] || {};
-      var trendTxt = s.trend === 'up' ? '↑' : (s.trend === 'down' ? '↓' : '→');
       if (s.hasData === false) return;
-      statRows += '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dotted var(--neutral-100)">'
-        + '<span>' + kv[1] + '</span><span style="font-weight:700">' + fmtVal(s.value) + ' ' + trendTxt + ' <span style="color:var(--neutral-400);font-weight:400">(较上周 ' + fmtVal(s.diff) + ')</span></span></div>';
+      var trendArrow = s.trend === 'up' ? '↑' : (s.trend === 'down' ? '↓' : '→');
+      var trendColor = s.trend === 'up' ? 'var(--colourful-mint-green-500)' : (s.trend === 'down' ? 'var(--colourful-sunny-coral-500)' : 'var(--neutral-400)');
+      pillsHtml += '<span class="dr-wr-pill"><span class="pp-icon">' + kv[1] + '</span><span class="pp-val">' + fmtVal(s.value) + kv[2] + '</span><span class="pp-trend" style="color:' + trendColor + '">' + trendArrow + (s.diff > 0 ? '+' : '') + fmtVal(s.diff) + '</span></span>';
     });
-    if (statRows) body += '<div><b style="font-size:12px;color:var(--neutral-500)">📊 本周数据</b>' + statRows + '</div>';
+    if (pillsHtml) body += '<div class="dr-wr-section"><div class="dr-wr-label">📊 本周数据</div><div class="dr-wr-pills">' + pillsHtml + '</div></div>';
 
-    // 学习表现
+    // 学习表现 → 科目标签 + 趋势芯片 + 薄弱提示
     if (academic.hasData || (academic.homework && academic.homework.subjects && academic.homework.subjects.length)) {
-      var ac = '<div><b style="font-size:12px;color:var(--neutral-500)">📚 学习表现</b>';
+      var acHtml = '<div class="dr-wr-section"><div class="dr-wr-label">📚 学习表现</div>';
       var subs = (academic.homework && academic.homework.subjects) || [];
-      if (subs.length) ac += '<div style="padding:5px 0">作业科目：' + esc(subs.join('、')) + '</div>';
-      (academic.trends || []).forEach(function(t) { ac += '<div style="padding:3px 0">· ' + esc(t) + '</div>'; });
-      (academic.weakModules || []).forEach(function(w) { ac += '<div style="padding:3px 0;color:var(--colourful-warning-600)">⚠ 薄弱：' + esc(w) + '</div>'; });
-      ac += '</div>';
-      body += ac;
+      if (subs.length) {
+        acHtml += '<div class="dr-wr-subj-tags">' + subs.map(function(s) { return '<span class="dr-wr-subj-tag">' + esc(s) + '</span>'; }).join('') + '</div>';
+      }
+      var trendText = { up: '📈 上升', down: '📉 下降', stable: '➡️ 稳定', wave: '🔀 波动' };
+      var trendColor = { up: 'var(--colourful-mint-green-500)', down: 'var(--colourful-sunny-coral-500)', stable: 'var(--neutral-400)', wave: '#c4a030' };
+      (academic.trends || []).forEach(function(t) {
+        var tt = typeof t === 'string' ? t : (t.subject + ' · ' + (trendText[t.trend] || t.trend) + ' · ' + (t.lastGrade || ''));
+        acHtml += '<span class="dr-wr-trend-chip">' + esc(tt) + '</span>';
+      });
+      (academic.weakModules || []).forEach(function(w) {
+        acHtml += '<div class="dr-wr-weak">⚠ 薄弱：' + esc(w) + '</div>';
+      });
+      acHtml += '</div>';
+      body += acHtml;
     }
-    if (academic.hasData === false && academic.emptyHint) body += '<div style="color:var(--neutral-400);font-size:12px">' + esc(academic.emptyHint) + '</div>';
+    if (academic.hasData === false && academic.emptyHint) body += '<div class="dr-wr-empty">' + esc(academic.emptyHint) + '</div>';
 
-    // 行为表现
+    // 行为表现 → 迷你能量条
     var profile = behavior.profile || [];
     if (profile.length) {
-      var bh = '<div><b style="font-size:12px;color:var(--neutral-500)">🌟 行为表现</b>';
-      profile.forEach(function(p) { bh += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted var(--neutral-100)"><span>' + esc(p.category) + '</span><span>' + fmtVal(p.count) + ' 次 · +' + fmtVal(p.xp) + 'XP</span></div>'; });
-      (behavior.effortStories || []).forEach(function(e) { bh += '<div style="padding:3px 0">💪 ' + esc(e) + '</div>'; });
-      if (behavior.badge && behavior.badge.earned) bh += '<div style="padding:3px 0;color:var(--colourful-warning-600)">🎖 ' + esc(behavior.badge.name || '达成徽章') + '</div>';
-      bh += '</div>';
-      body += bh;
+      var maxXp = 1;
+      profile.forEach(function(p) { if (p.xp > maxXp) maxXp = p.xp; });
+      var palette = ['#7bb8f7','#f28daf','#b88af5','#7cd4b0','#fba07a','#fee680'];
+      var bhHtml = '<div class="dr-wr-section"><div class="dr-wr-label">🌟 行为表现</div><div class="dr-wr-bars">';
+      profile.forEach(function(p, i) {
+        var w = Math.max(12, Math.round((p.xp / maxXp) * 100));
+        var c = palette[i % palette.length];
+        bhHtml += '<div class="dr-wr-bar-row"><span class="dr-wr-bar-name">' + esc(p.category) + '</span><span class="dr-wr-bar-track"><span class="dr-wr-bar-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="dr-wr-bar-meta">' + fmtVal(p.count) + '次 +' + fmtVal(p.xp) + 'XP</span></div>';
+      });
+      bhHtml += '</div>';
+      (behavior.effortStories || []).forEach(function(e) {
+        var storyText = typeof e === 'string' ? e : (e.story || e.description || '');
+        var storyDate = typeof e === 'object' ? (e.date || '') : '';
+        if (storyText) bhHtml += '<div class="dr-wr-diary-quote"><div class="dr-wr-diary-text">' + esc(storyText) + '</div>' + (storyDate ? '<div class="dr-wr-diary-date">' + esc(storyDate) + '</div>' : '') + '</div>';
+      });
+      if (behavior.badge && behavior.badge.earned) bhHtml += '<div style="margin-top:4px"><span class="dr-wr-badge">🎖 ' + esc(behavior.badge.name || '达成徽章') + ' · 连续' + fmtVal(behavior.badge.days) + '天</span></div>';
+      bhHtml += '</div>';
+      body += bhHtml;
     }
 
-    // 情绪 / 日记
+    // 情绪 / 日记 → 心情芯片 + 日记引用块
     var md = emotion.moodDistribution || {};
     var moodKeys = Object.keys(md);
-    var emHeader = '😊 情绪与日记';
     if (moodKeys.length) {
-      var em = '<div><b style="font-size:12px;color:var(--neutral-500)">' + emHeader + '</b>';
-      em += '<div style="padding:4px 0">日记 ' + fmtVal(emotion.diaryCount) + ' 篇；心情：' + moodKeys.map(function(k) { return k + '×' + md[k]; }).join('、') + '</div>';
-      if (emotion.bestDiary) em += '<div style="padding:3px 0;background:var(--neutral-50);border-radius:6px;padding:6px 8px"><span style="font-weight:600">💬 最棒日记</span><span style="color:var(--neutral-400)">（' + fmtVal(emotion.bestDiary.date) + '）</span><div style="margin-top:2px">' + esc(emotion.bestDiary.snippet) + '</div></div>';
-      if (emotion.financeWorthIt !== undefined) em += '<div style="padding:3px 0">💰 花销值得度 ' + fmtVal(emotion.financeWorthIt) + '%</div>';
-      em += '</div>';
-      body += em;
+      var emHtml = '<div class="dr-wr-section"><div class="dr-wr-label">😊 情绪与日记</div>';
+      var moodEmojis = { '开心':'😊','难过':'😢','生气':'😡','兴奋':'😄','平静':'😌','惊喜':'🤩' };
+      emHtml += '<div class="dr-wr-mood-chips">';
+      moodKeys.forEach(function(k) {
+        var emoji = moodEmojis[k] || '😐';
+        emHtml += '<span class="dr-wr-mood-chip">' + emoji + ' ' + esc(k) + ' ×' + md[k] + '</span>';
+      });
+      emHtml += '</div>';
+      if (emotion.diaryCount !== undefined) emHtml += '<div class="dr-wr-empty">本周日记 ' + fmtVal(emotion.diaryCount) + ' 篇</div>';
+      if (emotion.bestDiary) {
+        emHtml += '<div class="dr-wr-diary-quote"><div class="dr-wr-diary-text">' + esc(emotion.bestDiary.snippet || '') + '</div>';
+        if (emotion.bestDiary.date) emHtml += '<div class="dr-wr-diary-date">· ' + esc(emotion.bestDiary.date) + ' · 写作要素 ' + fmtVal(emotion.bestDiary.elements) + '/4</div>';
+        emHtml += '</div>';
+      }
+      if (emotion.financeStatus) {
+        var finMap = { good: '🟢 理性消费', watch: '🟡 需要关注', alert: '🔴 冲动消费' };
+        var finColor = { good: 'var(--colourful-mint-green-500)', watch: '#c4a030', alert: 'var(--colourful-sunny-coral-500)' };
+        var finBg = { good: 'rgba(54,185,139,.06)', watch: 'rgba(253,216,50,.06)', alert: 'rgba(249,96,36,.06)' };
+        emHtml += '<div style="margin-top:4px"><span class="dr-wr-fin-chip" style="background:' + (finBg[emotion.financeStatus]||finBg.good) + ';color:' + (finColor[emotion.financeStatus]||finColor.good) + '">' + (finMap[emotion.financeStatus]||'🟢 理性消费') + ' · 值得率 ' + fmtVal(emotion.financeWorthIt) + '%</span></div>';
+      }
+      emHtml += '</div>';
+      body += emHtml;
     }
 
-    // 建议
+    // 建议 → 彩色标签卡
     if (sugg.keep || sugg.improve || sugg.challenge) {
-      var sg = '<div><b style="font-size:12px;color:var(--neutral-500)">💡 成长建议</b>';
-      if (sugg.keep) sg += '<div style="padding:3px 0"><span style="color:var(--neutral-600);font-weight:600">继续保持：</span>' + esc(sugg.keep) + '</div>';
-      if (sugg.improve) sg += '<div style="padding:3px 0"><span style="color:var(--neutral-600);font-weight:600">可以改进：</span>' + esc(sugg.improve) + '</div>';
-      if (sugg.challenge) sg += '<div style="padding:3px 0"><span style="color:var(--neutral-600);font-weight:600">趣味挑战：</span>' + esc(sugg.challenge) + '</div>';
-      sg += '</div>';
-      body += sg;
+      var sgHtml = '<div class="dr-wr-section"><div class="dr-wr-label">💡 成长建议</div><div class="dr-wr-sugg">';
+      if (sugg.keep) sgHtml += '<div class="dr-wr-sugg-item keep"><span class="si-label">继续保持：</span>' + esc(sugg.keep) + '</div>';
+      if (sugg.improve) sgHtml += '<div class="dr-wr-sugg-item improve"><span class="si-label">可以改进：</span>' + esc(sugg.improve) + '</div>';
+      if (sugg.challenge) sgHtml += '<div class="dr-wr-sugg-item challenge"><span class="si-label">趣味挑战：</span>' + esc(sugg.challenge) + '</div>';
+      sgHtml += '</div></div>';
+      body += sgHtml;
     }
 
-    // 成长画像更新
+    // 成长画像 → 小徽章
     var hi = (growth.profileUpdate && growth.profileUpdate.highlights) || [];
     if (hi.length) {
-      var gr = '<div><b style="font-size:12px;color:var(--neutral-500)">🌱 成长档案更新</b>';
-      hi.forEach(function(h) { gr += '<div style="padding:3px 0">· ' + esc(h) + '</div>'; });
-      gr += '</div>';
-      body += gr;
+      var hiIcons = { '说到':'🤝','日记':'✏️','财务':'💰','习惯':'🎯','能力':'💪','学习':'📚' };
+      var hiHtml = '<div class="dr-wr-section"><div class="dr-wr-label">🌱 成长档案更新</div><div class="dr-wr-highlights">';
+      hi.forEach(function(h) {
+        var icon = '⭐';
+        for (var key in hiIcons) { if (h.indexOf(key) >= 0) { icon = hiIcons[key]; break; } }
+        hiHtml += '<span class="dr-wr-highlight">' + icon + ' ' + esc(h) + '</span>';
+      });
+      hiHtml += '</div></div>';
+      body += hiHtml;
     }
 
-    html += '<div style="background:var(--surface,#fff);border:1px solid var(--neutral-150,var(--neutral-200));border-radius:10px;padding:12px 14px">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-      + '<b>第 ' + fmtVal(r.weekNumber) + ' 周 · ' + fmtVal(r.date) + '</b>'
-      + '<span style="white-space:nowrap">'
+    html += '<div class="dr-wr-card">'
+      + '<div class="dr-wr-head">'
+      + '<span class="dr-wr-title">第 ' + fmtVal(r.weekNumber) + ' 周 · ' + fmtVal(r.date) + '</span>'
+      + '<span class="dr-wr-actions">'
       + '<button class="btn ghost mini" onclick="drEdit(' + idx + ')">编辑</button> '
       + '<button class="btn ghost mini" style="color:var(--colourful-error-500)" onclick="drDel(' + idx + ')">删除</button>'
       + '</span></div>'
-      + '<div style="font-size:13px;color:var(--neutral-700);padding:6px 0">' + esc(r.summary || '') + '</div>'
-      + '<div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">' + (body || '<div style="color:var(--neutral-400);font-size:12px">暂无详细数据。</div>') + '</div>'
+      + (r.summary ? '<div class="dr-wr-summary">' + esc(r.summary) + '</div>' : '')
+      + (body || '<div class="dr-wr-empty">暂无详细数据。</div>')
       + '</div>';
   });
   html += '</div>';
