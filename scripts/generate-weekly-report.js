@@ -409,11 +409,17 @@ async function main() {
 
   if (!report) return 1;
 
-  // 写回 aiWeeklyReports.json
+  // 写回 aiWeeklyReports.json（按 weekNumber+year 覆盖，避免重复追加）
   const prev = readJSON('aiWeeklyReports.json') || [];
-  prev.push(report);
+  const dupIdx = prev.findIndex(r => r.weekNumber === report.weekNumber && r.year === report.year);
+  if (dupIdx >= 0) {
+    prev[dupIdx] = report;
+    console.log('\n↻ 已覆盖第 ' + week.weekNumber + ' 周原有周报（原 ' + report.generatedAt + ' → 新 ' + report.generatedAt + '）');
+  } else {
+    prev.push(report);
+    console.log('\n✅ 已新增第 ' + week.weekNumber + ' 周周报');
+  }
   fs.writeFileSync(path.join(DATA, 'aiWeeklyReports.json'), JSON.stringify(prev, null, 2), 'utf-8');
-  console.log('\n✅ 已生成第 ' + week.weekNumber + ' 周周报并写入 aiWeeklyReports.json');
   console.log('   摘要: ' + (report.summary || '').slice(0, 80));
   return 0;
 }
