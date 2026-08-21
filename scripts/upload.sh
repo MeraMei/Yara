@@ -186,21 +186,8 @@ echo " 步骤 3.5/4：提交并推送"
 echo "════════════════════════════════════════"
 if [ "$WITH_DATA" = "1" ]; then
   echo "  ✓ 本次将同时上传代码和 data/（--with-data）"
-  # 重新生成 all.json（合并数据文件，加速首页加载）
-  echo "  → 重新生成 data/all.json ..."
-  node -e "
-    const fs = require('fs');
-    const path = require('path');
-    const dataDir = 'data';
-    const files = ['child.json', 'calendar.json', 'levels.json', 'xpRecords.json', 'finance.json', 'study.json', 'config.json', 'xpSources.json', 'redeemRecords.json', 'diaryEntries.json', 'aiWeeklyReports.json', 'familyMeetings.json'];
-    const combined = {};
-    for (const f of files) {
-      try { combined[f.replace('.json', '')] = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf-8')); } catch (e) {}
-    }
-    const result = { child: combined.child || {}, calendar: combined.calendar || [], levels: combined.levels || [], xpRecords: combined.xpRecords || [], finance: combined.finance || null, study: combined.study || null, config: combined.config || null, xpSources: combined.xpSources || [], redeemRecords: combined.redeemRecords || [], diaryEntries: combined.diaryEntries || [], aiWeeklyReports: combined.aiWeeklyReports || [], familyMeetings: combined.familyMeetings || [] };
-    fs.writeFileSync(path.join(dataDir, 'all.json'), JSON.stringify(result));
-    console.log('     all.json 已生成 (' + (Buffer.byteLength(JSON.stringify(result)) / 1024).toFixed(1) + ' KB)');
-  "
+  # 注意：前端不再使用 all.json（12个独立文件并行加载更快），
+  # 所以此处不再生成 all.json，直接 add 所有 data 文件
   git add -A
 else
   echo "  ✓ 默认模式：仅上传代码/样式/脚本，跳过 data/（不影响线上数据库）"

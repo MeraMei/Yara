@@ -243,23 +243,8 @@ async function loadData() {
   return loadPromise;
 }
 
-// 纯网络加载：绕过缓存，直接拉取所有数据文件
+// 纯网络加载：绕过缓存，并行拉取所有小文件（比单一大文件 all.json 更快）
 async function _fetchAllData() {
-  // 优先尝试加载合并后的 all.json（1个请求代替12个）
-  try {
-    const resp = await fetch('data/all.json');
-    if (resp.ok) {
-      const all = await resp.json();
-      const dashboard = buildDashboard(
-        all.child || {}, all.calendar || [], all.levels || [],
-        all.xpRecords || [], all.finance || null, all.study || null,
-        all.config || null, all.xpSources || [], all.redeemRecords || [], all.diaryEntries || [],
-        all.aiWeeklyReports || [], all.familyMeetings || []
-      );
-      return dashboard;
-    }
-  } catch (e) { /* fallback to individual files */ }
-
   const [child, calendar, levels, xpRecords, finance, study, config, xpSources, redeemRecords, diaryEntries, aiWeeklyReports, familyMeetings] =
     await Promise.all([
       fetchRawJSON('child.json').catch(() => null),
