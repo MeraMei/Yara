@@ -172,9 +172,12 @@ function growthAnalysis(ctx) {
   }
   const commitmentSummary = currentCommitment
     ? currentCommitment.commitments.map(c => ({
-        text: c.text || '', done: !!c.completed
+        text: c.text || '', done: !!c.completed,
+        // 真实单次 XP（家庭约定里配置的，挑战/建议里的 XP 必须以此为准）
+        xp: Number(c.xp) || 0,
+        category: c.category || ''
       }))
-    : [];
+    : []
   // 补充：遵守家庭约定也是成长高光（关系维度）
   if (currentCommitment) {
     currentCommitment.commitments.forEach(c => {
@@ -272,7 +275,8 @@ const GROWTH_SYSTEM = `
 - 先肯定后引导；表扬要落到具体行为（"你遵守了和爸爸妈妈的约定"）而非空话（"你真棒"）。
 - 建议是邀约"你可以试试…"，不是命令。
 - 支撑四维均衡：若孩子本周在意志力/关系上有表现，导语和"综合建议"应纳入；若某维缺失，用一句"下周可以试着…"轻轻补位，而不是回避。
-- 挑战(suggestions.challenge)应呼应本周未达成的约定/弱维度：例如本周"主动做家务"未完成，挑战就建议主动做一件具体家务并给 +XP。
+- 挑战(suggestions.challenge)应呼应本周未达成的约定/弱维度：例如本周"主动做家务"未完成，挑战就建议主动做一件具体家务。
+- **challenge 的 +XP 必须可验证**：只能使用上面数据里"家庭约定(commitments)"中该任务配置的真实单次 XP（如"主动做家务"=+5XP、"每天阅读30分钟"=+5XP）。若挑战设定连续 N 天，则总额 = 单次XP × 天数（例如每天做家务+5XP，坚持3天=+15XP），并在末尾明确写出"每天+5XP，坚持N天共+N*5XP"。严禁凭空编造+50XP这类与规则无关的数字。
 - 用 1 个 emoji 点缀即可，不要堆砌。
 
 ## 输出格式（严格 JSON，不要 markdown 代码块，不要任何解释文字）
