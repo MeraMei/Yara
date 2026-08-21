@@ -3280,6 +3280,35 @@ function escapeHtmlReason(text) {
   return div.innerHTML;
 }
 
+/**
+ * renderHighlighted — 安全HTML转义后，将 **关键词** 转为高亮 span，
+ * 并将数字/百分比/XP值等关键数据自动标记为金色高亮。
+ * 两步处理：先转义避免XSS，再替换标记和数字。
+ */
+function renderHighlighted(text) {
+  if (!text) return "";
+  // 1. 安全转义
+  const div = document.createElement("div");
+  div.textContent = text;
+  var safe = div.innerHTML;
+  // 2. 将 **双星号标记** 转为高亮 span（标记由 AI 在生成时嵌入）
+  safe = safe.replace(/\*\*([^*]+)\*\*/g, '<span class="hl">$1</span>');
+  // 3. 自动高亮数字/XP/百分比（关键数据模式）
+  safe = safe.replace(/(\+?\d+)\s*(XP|点能量|分|项|篇|天|次|元|%|分钟)/g, function(m, num, unit) {
+    return '<span class="hl-data">' + num + '</span>' + unit;
+  });
+  // 4. 兜底：自动高亮常见表扬关键词（仅处理文本节点，不破坏已有 HTML 标签）
+  var praiseWords = ["说到做到", "小达人", "小书虫", "遵守约定", "遵守了约定", "好习惯", "真了不起", "为你骄傲", "闪闪发光", "自律"];
+  safe = safe.replace(/>([^<]+)</g, function(match, content) {
+    for (var pi = 0, pw; pi < praiseWords.length; pi++) {
+      pw = praiseWords[pi];
+      content = content.replace(new RegExp(pw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '<span class="hl">$&</span>');
+    }
+    return '>' + content + '<';
+  });
+  return safe;
+}
+
 // ── DOM 选择工具 ──
 
 function getModuleOptions(subject) {
@@ -4398,7 +4427,7 @@ function renderWrHero(report, childName) {
   // 摘要：第三人称→第二人称
   var summary = (report.summary || "").replace(new RegExp(childName, "g"), "你");
   if (summary) {
-    html += '<div class="wr-hero-summary">' + escapeHtmlReason(summary) + '</div>';
+    html += '<div class="wr-hero-summary">' + renderHighlighted(summary) + '</div>';
   }
   // 闪光点 → 成就徽章卡片
   var pu = (report.growth || {}).profileUpdate || {};
@@ -4416,7 +4445,7 @@ function renderWrHero(report, childName) {
   if (best.snippet) {
     html += '<div class="wr-hero-diary">';
     html += '<div class="wr-diary-mark">&ldquo;</div>';
-    html += '<div class="wr-diary-text">' + escapeHtmlReason(best.snippet) + '</div>';
+    html += '<div class="wr-diary-text">' + renderHighlighted(best.snippet) + '</div>';
     html += '<div class="wr-diary-meta">· ' + (best.date || '') + ' · 写作四要素 ' + (best.elements || 0) + '/5</div>';
     html += '</div>';
   }
@@ -4502,7 +4531,7 @@ function renderWrData(report) {
       html += '<div class="wr-act-row"><span class="wr-act-icon">📚</span><span class="wr-act-text">完成了 <b>' + studyStat.value + '</b> 项作业' + subjText + '</span></div>';
     } else {
       var hint = aca.emptyHint || "这周还没记录学习，下周完成作业每项+5XP哦";
-      html += '<div class="wr-act-row wr-act-hint-row"><span class="wr-act-icon">📚</span><span class="wr-act-text">' + escapeHtmlReason(hint) + '</span></div>';
+      html += '<div class="wr-act-row wr-act-hint-row"><span class="wr-act-icon">📚</span><span class="wr-act-text">' + renderHighlighted(hint) + '</span></div>';
     }
 
     // 日记 + 心情行
@@ -4539,7 +4568,7 @@ function renderWrData(report) {
     html += '<div class="wr-data-section wr-section-stories">';
     html += '<div class="wr-data-label-v2">⭐ 你最棒的时刻</div>';
     stories.slice(0, 3).forEach(function(s) {
-      html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.date || "") + '</div><div class="wr-story-body">' + escapeHtmlReason(s.story || "") + '</div></div>';
+      html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.date || "") + '</div><div class="wr-story-body">' + renderHighlighted(s.story || "") + '</div></div>';
     });
     if (stories.length > 3) html += '<div class="wr-story-more">还有 ' + (stories.length - 3) + " 个精彩瞬间</div>";
     html += '</div>';
@@ -4565,7 +4594,7 @@ function renderWrQuest(report, familyMeetings) {
   if (sug.challenge) {
     html += '<div class="wr-quest-main">';
     html += '<div class="wr-quest-header"><span class="wr-quest-icon">🎯</span><span class="wr-quest-label">下周冒险任务</span></div>';
-    html += '<div class="wr-quest-body">' + escapeHtmlReason(sug.challenge.replace(/^趣味挑战[：:]/, "")) + '</div>';
+    html += '<div class="wr-quest-body">' + renderHighlighted(sug.challenge.replace(/^趣味挑战[：:]/, "")) + '</div>';
     // 提取 +XP 奖励
     var xpMatch = (sug.challenge || "").match(/\+(\d+)\s*XP/);
     if (xpMatch) {
@@ -4582,7 +4611,7 @@ function renderWrQuest(report, familyMeetings) {
     encTxt += sug.improve.replace(/^试试看[：:]/, "");
   }
   if (encTxt) {
-    html += '<div class="wr-quest-encourage"><span class="qe-icon">🌟</span><span class="qe-text">' + escapeHtmlReason(encTxt) + '</span></div>';
+    html += '<div class="wr-quest-encourage"><span class="qe-icon">🌟</span><span class="qe-text">' + renderHighlighted(encTxt) + '</span></div>';
   }
 
   // 每周约定

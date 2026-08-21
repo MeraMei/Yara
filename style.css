@@ -9160,6 +9160,18 @@ input[type="date"]:focus::-webkit-datetime-edit {
 
     /* ════════ 周报 3 幕重构 ════════ */
 
+    /* ── 高亮标记（由 AI 在文本中嵌入 **关键词** 触发） ── */
+    .hl {
+      background: linear-gradient(120deg, rgba(255,215,0,.25), rgba(255,180,50,.18));
+      color: var(--neutral-800); font-weight: 700; padding: 1px 4px; border-radius: 6px;
+      box-decoration-break: clone; -webkit-box-decoration-break: clone;
+    }
+    .hl-data {
+      color: #e67e22; font-weight: 700;
+    }
+    .wr-hero-summary .hl { font-size: inherit; }
+    .wr-hero-summary .hl-data { font-size: inherit; }
+
     /* ── 第 1 幕：闪光时刻 Hero ── */
     .wr-hero { margin-bottom: 18px; }
     .wr-hero-summary {
