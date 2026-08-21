@@ -4669,7 +4669,6 @@ async function renderXp() {
     : -1;
 
   // ════════ 顶部统计 ════════
-  setText("heroStatPending", `${pending}`);
   // 能量板块自身的任务（不含"作业·"知识任务、不含"财务"财富任务），保证各模块数值互不串扰
   const _xpAll = (cfg.xpRecords || []).filter(r => r.reviewStatus === "已通过");
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -4740,22 +4739,6 @@ async function renderXp() {
         }).join("")}
       </div>`;
     refreshIcons(0);
-  }
-
-  // ════════ 最近做过的事 ════════
-  const pcEl = document.getElementById("pendingCount");
-  if (pcEl) {
-    pcEl.textContent = pending > 0 ? `待确认 ${pending} 条，去审批 →` : "无待确认";
-    pcEl.classList.toggle("has-pending", pending > 0);
-    pcEl.style.cursor = pending > 0 ? "pointer" : "default";
-    pcEl.onclick = pending > 0 ? () => {
-      const strip = document.getElementById("xpRecordsStrip");
-      if (strip) {
-        strip.scrollIntoView({ behavior: "smooth", block: "start" });
-        const firstPending = strip.querySelector(".recent-card.pending-card");
-        if (firstPending) firstPending.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    } : null;
   }
 
   const statusMap = {
