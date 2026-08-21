@@ -102,8 +102,8 @@ echo "════════════════════════�
 echo " 步骤 2/4：运行提交前体检"
 echo "════════════════════════════════════════"
 if [ -f scripts/pre-commit-check.py ]; then
-  python3 scripts/pre-commit-check.py
-  RC=$?
+  RC=0
+  python3 scripts/pre-commit-check.py || RC=$?
   if [ "$RC" -eq 1 ]; then
     echo ""
     echo "❌ 提交前体检存在【必须修复】问题，阻断上传。请修复后重试。"
@@ -122,8 +122,8 @@ echo "════════════════════════�
 echo " 步骤 2.5/4：运行场景化检查"
 echo "════════════════════════════════════════"
 if [ -f scripts/scenario-check.py ]; then
-  python3 scripts/scenario-check.py
-  RC=$?
+  RC=0
+  python3 scripts/scenario-check.py || RC=$?
   if [ "$RC" -eq 1 ]; then
     echo ""
     echo "❌ 场景化检查存在【必须修复】问题，阻断上传。请修复后重试。"
@@ -186,8 +186,8 @@ echo " 步骤 3.5/4：提交并推送"
 echo "════════════════════════════════════════"
 if [ "$WITH_DATA" = "1" ]; then
   echo "  ✓ 本次将同时上传代码和 data/（--with-data）"
-  # 重新生成 all.json（合并数据文件，1个请求代替12个，避免浏览器连接限制）
-  echo "  → 重新生成 data/all.json ..."
+  # 重新生成 all.json（精简版：去掉首页不需要的重型字段，如 examRecords 等）
+  echo "  → 重新生成 data/all.json（精简版）..."
   node -e "
     const fs = require('fs');
     const path = require('path');
@@ -197,11 +197,22 @@ if [ "$WITH_DATA" = "1" ]; then
     for (const f of files) {
       try { combined[f.replace('.json', '')] = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf-8')); } catch (e) {}
     }
-    const result = { child: combined.child || {}, calendar: combined.calendar || [], levels: combined.levels || [], xpRecords: combined.xpRecords || [], finance: combined.finance || null, study: combined.study || null, config: combined.config || null, xpSources: combined.xpSources || [], redeemRecords: combined.redeemRecords || [], diaryEntries: combined.diaryEntries || [], aiWeeklyReports: combined.aiWeeklyReports || [], familyMeetings: combined.familyMeetings || [] };
+    // 精简 study：首页不需要 examRecords/semesterAnalysis/strengthsAnalysis
+    var study = combined.study || null;
+    if (study) {
+      study = Object.assign({}, study);
+      delete study.examRecords;
+      delete study.semesterAnalysis;
+      delete study.strengthsAnalysis;
+    }
+    const result = { child: combined.child || {}, calendar: combined.calendar || [], levels: combined.levels || [], xpRecords: combined.xpRecords || [], finance: combined.finance || null, study: study, config: combined.config || null, xpSources: combined.xpSources || [], redeemRecords: combined.redeemRecords || [], diaryEntries: combined.diaryEntries || [], aiWeeklyReports: combined.aiWeeklyReports || [], familyMeetings: combined.familyMeetings || [] };
     fs.writeFileSync(path.join(dataDir, 'all.json'), JSON.stringify(result));
-    const kb = (Buffer.byteLength(JSON.stringify(result)) / 1024).toFixed(1);
-    console.log('     all.json 已生成 (' + kb + ' KB, 经 CDN gzip 后约 ' + (kb * 0.3).toFixed(1) + ' KB)');
-  "
+    const raw = Buffer.byteLength(JSON.stringify(result));
+    const was = Buffer.byteLength(JSON.stringify(combined));
+    const kb = (raw / 1024).toFixed(1);
+    const pct = Math.round((1 - raw/was) * 100);
+    console.log('     all.json 已生成 (' + kb + ' KB, 精简 ' + pct + '%, CDN gzip 后约 ' + (raw * 0.3 / 1024).toFixed(1) + ' KB)');
+  " 2>&1
   git add -A --force data/all.json 2>/dev/null || true
   git add -A
 else

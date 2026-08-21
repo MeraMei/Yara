@@ -230,6 +230,170 @@ def main():
     # main(). 检查主站是否被 system-settings 的 setGithubToken 联动（同 key 即可，无需额外检查）
 
     # ─────────────────────────────────────────────
+    # G. 代码冗余检查
+    # ─────────────────────────────────────────────
+    # G1. 注释掉的代码块（超过 3 行的连续注释代码，疑似调试遗留）
+    def check_commented_code(path, label):
+        content = read(path)
+        # 匹配连续注释行（// 或 # 开头，连续 >= 3 行）
+        lines = content.split("\n")
+        commented_blocks = 0
+        current_block = 0
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("//") or stripped.startswith("#"):
+                current_block += 1
+            else:
+                if current_block >= 3:
+                    commented_blocks += 1
+                current_block = 0
+        if current_block >= 3:
+            commented_blocks += 1
+        report("W", f"G1 {label} 注释代码块", commented_blocks == 0,
+               f"发现 {commented_blocks} 处连续 >=3 行的注释代码，建议清理" if commented_blocks else "无")
+    for p, lbl in [(APP_JS, "app.js"), (STYLE_CSS, "style.css")]:
+        if os.path.exists(p) and (not only_files or any(f in p for f in only_files or [])):
+            check_commented_code(p, lbl)
+
+    # G2. 冗余 console.log / debugger 语句（生产环境不应有）
+    def check_debug_statements(path, label):
+        content = read(path)
+        # 排除 console.log("✅") 等有意保留的日志，只检测无意义的调试输出
+        log_lines = len(re.findall(r'console\.(?:log|debug|trace)\s*\(', content))
+        debugger_lines = len(re.findall(r'\bdebugger\s*;', content))
+        total = log_lines + debugger_lines
+        if verbose:
+            report("W", f"G2 {label} 调试语句", total <= 5,
+                   f"console.log/debug: {log_lines} 处, debugger: {debugger_lines} 处" if total > 5 else f"共 {total} 处（可接受）")
+        else:
+            # 非 verbose 模式只报超过阈值
+            if total > 20:
+                report("W", f"G2 {label} 调试语句", False,
+                       f"console.log/debugger 共 {total} 处，建议削减至 20 以下")
+    for p, lbl in [(APP_JS, "app.js")]:
+        if os.path.exists(p) and (not only_files or any(f in p for f in only_files or [])):
+            check_debug_statements(p, lbl)
+
+    # G3. 检测未使用的全局函数定义（在 HTML 中没有 onclick 引用的 window 函数）
+    def check_unused_functions(path, label):
+        html = read(path)
+        # 提取所有 window.xxx = function 和 function xxx 的定义
+        defined = set()
+        defined |= set(re.findall(r'window\.([A-Za-z_]\w*)\s*=', html))
+        defined |= set(re.findall(r'^\s*function\s+([A-Za-z_]\w*)\s*\(', html, re.M))
+        # 提取所有 onclick 引用
+        called = set()
+        for m in re.finditer(r'on(?:click|change|input|submit)="\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(', html):
+            called.add(m.group(1))
+        # 纯定义但未被 onclick 引用的（排除已知的构建/工具函数）
+        reserved_global = {"loadAppData", "renderHome", "renderStudy", "renderFinance", "renderConfig",
+                           "renderDiary", "renderFamily", "renderCheckin", "renderLevel", "renderAchievements",
+                           "renderXpHistory", "renderRedeem", "openSettingsDrawer", "closeSettingsDrawer",
+                           "initApp", "main", "loadChildData", "saveChildData", "addXpRecord", "addDiaryEntry",
+                           "addStudyRecord", "addScoreRecord", "addFinanceRecord", "addEvaluationRecord",
+                           "redeemPrivilege", "updateStudyRecord", "updateXpRecord", "updateFinanceRecord",
+                           "updateScoreRecord", "updateXpRule", "updateEvaluationRecord",
+                           "getGithubToken", "hasGithubToken", "setGithubToken", "fetchRawJSON",
+                           "getFileSHA", "isLocalMode", "writeGithubFile", "writeGithubFileRemote",
+                           "loadData", "refreshData", "buildDashboard",
+                           "processLevels", "processStudy", "processFinance", "processConfig",
+                           "mergeChildData", "isAutoTask", "todayStr", "formatDate", "generateId",
+                           "getEmptyData", "updateChildData", "loadDiaryEntries", "saveDiaryEntries",
+                           "loadFamilyMeetings", "saveFamilyMeetings", "analyzeDiaryElements",
+                           "openXpModalWithTask", "openDiaryModal", "renderDiary", "renderDiaryCard",
+                           "openDiaryWallModal", "closeDiaryWallModal", "openDiaryDetailModal",
+                           "closeDiaryDetailModal", "renderDiaryStrip", "calcDiaryStreak", "calcDiaryBestStreak",
+                           "formatDiaryDate", "addXpRule", "closeDiaryModal", "pickDiaryMood", "submitDiary",
+                           "_getCachedRaw", "_persistCache", "_addToCache", "_updateCacheRecord",
+                           "_daysBetween", "getCalendarData", "saveCalendarData", "getCurrentSemesterInfo",
+                           "getSemesterKey", "getAllAcademicYears", "renderSemesterBar", "_fmtMD",
+                           "_mergeHomeworkData", "_fetchAllData", "_backgroundRefresh", "_refreshDataInBackground",
+                           "getDefaultCalendarData", "getWeekStars", "setText", "pickQuote",
+                           "renderPage", "navigateTo", "showToast", "loadAppConfig",
+                           "collectAssignments", "deRenderSubjectGroups", "renderHomeworkList",
+                           "_lastHomeDataVersion", "__dataVersion", "_lastHomeCfgHash",
+                           "groupBy", "getDateStr", "__teachingUnitsCache"}
+        unused = sorted(d for d in defined if d not in called | reserved_global)
+        report("W", f"G3 {label} 未使用的全局函数", not unused,
+               f"可能未使用: {', '.join(unused[:10])}" + (f" 等 {len(unused)} 个" if len(unused) > 10 else "") if unused else "无")
+    if not only_files or "index.html" in only_files:
+        check_unused_functions(INDEX, "index.html")
+
+    # ─────────────────────────────────────────────
+    # H. 文件大小预算检查
+    # ─────────────────────────────────────────────
+    FILE_BUDGETS = {
+        APP_JS: ("app.js", 500),       # KB
+        STYLE_CSS: ("style.css", 400),
+        INDEX: ("index.html", 100),
+        SETTINGS: ("system-settings.html", 100),
+    }
+    for fpath, (lbl, budget_kb) in FILE_BUDGETS.items():
+        if os.path.exists(fpath) and (not only_files or any(f in fpath for f in only_files or [])):
+            size_kb = os.path.getsize(fpath) / 1024
+            ok = size_kb <= budget_kb
+            report("E" if not ok else "W", f"H1 {lbl} 大小预算", ok,
+                   f"{size_kb:.1f} KB / {budget_kb} KB 预算" + (" ✅" if ok else f" ❌ 超出 {size_kb - budget_kb:.1f} KB，请精简"))
+
+    # H2. all.json 大小预算（影响首页加载速度的关键指标）
+    all_json = os.path.join(DATA_DIR, "all.json")
+    if os.path.exists(all_json):
+        size_kb = os.path.getsize(all_json) / 1024
+        # 预算：80 KB（gzip 后约 24 KB）
+        budget_kb = 80
+        ok = size_kb <= budget_kb
+        report("E" if not ok else "W", f"H2 data/all.json 大小预算", ok,
+               f"{size_kb:.1f} KB / {budget_kb} KB 预算" + (" ✅" if ok else f" ❌ 超出 {size_kb - budget_kb:.1f} KB，首页加载会变慢，请精简"))
+
+    # H3. data/ 目录总大小预算
+    total_data_kb = 0
+    for f in sorted(f for f in os.listdir(DATA_DIR) if f.endswith(".json")):
+        total_data_kb += os.path.getsize(os.path.join(DATA_DIR, f)) / 1024
+    data_budget = 300  # KB
+    report("W", "H3 data/*.json 合计大小", total_data_kb <= data_budget,
+           f"{total_data_kb:.1f} KB / {data_budget} KB 预算" + (" ✅" if total_data_kb <= data_budget else f" ❌ 超出 {total_data_kb - data_budget:.1f} KB"))
+
+    # ─────────────────────────────────────────────
+    # I. 性能检查
+    # ─────────────────────────────────────────────
+    # I1. 检测首页加载时不必要的全量嵌套数据遍历
+    app_js = read(APP_JS)
+    # 检测 for 循环嵌套（性能风险）
+    nested_loops = len(re.findall(r'for\s*\([^)]+\)\s*\{[^}]*for\s*\(', app_js))
+    if nested_loops > 3:
+        report("W", "I1 嵌套循环", False,
+               f"发现 {nested_loops} 处嵌套 for 循环，大数据量时可能卡顿，建议改用 Map/索引")
+    else:
+        report("W", "I1 嵌套循环", True, f"{nested_loops} 处（可接受）")
+
+    # I2. 检测 large JSON 的同步加载（首页可能因全量数据加载变慢）
+    # 检测 loadAppData 或 _fetchAllData 中是否一次性加载所有数据
+    large_fetches = len(re.findall(r'fetchRawJSON\s*\(\s*["\'](?:study|xpRecords|allHomework)\.json', app_js))
+    if large_fetches > 5:
+        report("W", "I2 大文件全量加载", False,
+               f"发现 {large_fetches} 处大文件 fetch，建议对首页非必须的数据做懒加载")
+    else:
+        report("W", "I2 大文件全量加载", True, f"{large_fetches} 处（可接受）")
+
+    # I3. 检测 all.json 中是否包含首页不需要的重型字段
+    if os.path.exists(all_json):
+        try:
+            aj = json.load(open(all_json, encoding="utf-8"))
+            study_obj = aj.get("study", {})
+            heavy_unused = []
+            for field in ["examRecords", "semesterAnalysis", "strengthsAnalysis"]:
+                if field in study_obj:
+                    field_size = len(json.dumps(study_obj[field]))
+                    heavy_unused.append(f"{field} ({field_size // 1024}KB)")
+            if heavy_unused:
+                report("E", "I3 all.json 含首页不需要的重型字段", False,
+                       f"study 中包含: {', '.join(heavy_unused)}，这些字段首页用不到但每次加载都下载，请移除")
+            else:
+                report("W", "I3 all.json 无冗余重型字段", True, "✅ 已精简")
+        except Exception as e:
+            report("W", "I3 all.json 检查", False, f"无法解析: {e}")
+
+    # ─────────────────────────────────────────────
     # 输出
     # ─────────────────────────────────────────────
     print("=" * 60)
