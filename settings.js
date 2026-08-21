@@ -579,6 +579,12 @@ function renderDefGrid() {
       }
       return null;
     };
+    // 根据规则的真实分类动态取色，不再硬编码
+    var clsForCat = function(cat) {
+      var m = { '学习成长': 'ic-learn', '能力成长': 'ic-ability', '身体成长': 'ic-body', '兴趣爱好': 'ic-hobby' };
+      return m[cat] || 'ic-learn';
+    };
+    var clsForRule = function(r) { return r && r.category ? clsForCat(r.category) : 'ic-learn'; };
     // 作业类（学习成长）
     var hwTypes = [
       { name: '作业·日常预习', icon: '📝', desc: '完成作业自动发放' },
@@ -588,16 +594,16 @@ function renderDefGrid() {
     ];
     hwTypes.forEach(function(h) {
       var r = findRule(h.name);
-      defs.push({ name: h.name, icon: h.icon, desc: h.desc, xp: r ? (Number(r.xp) || 0) : 0, cls: 'ic-learn' });
+      defs.push({ name: h.name, icon: h.icon, desc: h.desc, xp: r ? (Number(r.xp) || 0) : 0, cls: clsForRule(r) });
     });
     // 成绩录入（固定默认值，config 无对应任务）
     defs.push({ name: '成绩录入', icon: '🎯', desc: '录入成绩自动发放', xp: null, xpText: '+2~3', cls: 'ic-learn' });
     // 写日记（能力成长）
     var diary = findRule('写日记：写作四要素+感受');
-    defs.push({ name: '写日记 · 能量记录', icon: '📓', desc: '写日记自动发放', xp: diary ? (Number(diary.xp) || 0) : 0, cls: 'ic-ability' });
+    defs.push({ name: '写日记 · 能量记录', icon: '📓', desc: '写日记自动发放', xp: diary ? (Number(diary.xp) || 0) : 0, cls: clsForRule(diary) });
     // 财务能力分析（复盘）——以复盘为准，自动发放
     var fin = findRule('财务能力分析（复盘）') || findRule('财务能力分析');
-    defs.push({ name: '财务能力分析（复盘）', icon: '🔄', desc: '每笔支出分析自动复盘 · 当日封顶 +10', xp: fin ? (Number(fin.xp) || 0) : 0, xpUnit: 'XP/笔', cls: 'ic-coral' });
+    defs.push({ name: '财务能力分析（复盘）', icon: '🔄', desc: '每笔支出分析自动复盘 · 当日封顶 +10', xp: fin ? (Number(fin.xp) || 0) : 0, xpUnit: 'XP/笔', cls: clsForRule(fin) });
 
     var html = '';
     defs.forEach(function(d) {
