@@ -262,25 +262,11 @@
         "description": ""
       },
       {
-        "name": "财务能力分析",
+        "name": "财务能力分析（复盘）",
         "category": "能力成长",
         "xp": 5,
-        "method": "按次",
-        "description": "完成一次财务对账与反思，培养财商思维"
-      },
-      {
-        "name": "花销复盘",
-        "category": "能力成长",
-        "xp": 2,
         "method": "自动发放",
-        "description": "每笔复盘记录 +2XP，当日累计封顶 10XP"
-      },
-      {
-        "name": "财务进账",
-        "category": "能力成长",
-        "xp": 2,
-        "method": "自动发放",
-        "description": "记录一笔收入到财富/自由基金，动作记录低分值"
+        "description": "每笔支出分析自动复盘，当日累计封顶 +10"
       },
       {
         "name": "写日记：写作四要素+感受",
@@ -454,25 +440,11 @@
       "description": ""
     },
     {
-      "name": "财务能力分析",
+      "name": "财务能力分析（复盘）",
       "category": "能力成长",
       "xp": 5,
-      "method": "按次",
-      "description": "完成一次财务对账与反思，培养财商思维"
-    },
-    {
-      "name": "花销复盘",
-      "category": "能力成长",
-      "xp": 2,
       "method": "自动发放",
-      "description": "每笔复盘记录 +2XP，当日累计封顶 10XP"
-    },
-    {
-      "name": "财务进账",
-      "category": "能力成长",
-      "xp": 2,
-      "method": "自动发放",
-      "description": "记录一笔收入到财富/自由基金，动作记录低分值"
+      "description": "每笔支出分析自动复盘，当日累计封顶 +10"
     },
     {
       "name": "写日记：写作四要素+感受",

@@ -81,7 +81,7 @@ def main():
         if not html.rstrip().endswith("</html>"):
             report("E", "A2 index.html 文件结尾", False, "未以 </html> 结束")
 
-    if not only_files or "system-settings.html" in only_files:
+    if os.path.exists(SETTINGS) and (not only_files or "system-settings.html" in only_files):
         html = read(SETTINGS)
         for tag in ["html", "body"]:
             open_n = len(re.findall(rf"<{tag}[\s>]", html))
@@ -121,7 +121,7 @@ def main():
 
     if not only_files or "index.html" in only_files:
         check_functions(INDEX, "index.html", extra_defs_sources=[APP_JS])
-    if not only_files or "system-settings.html" in only_files:
+    if os.path.exists(SETTINGS) and (not only_files or "system-settings.html" in only_files):
         check_functions(SETTINGS, "system-settings.html")
 
     # ─────────────────────────────────────────────
@@ -193,13 +193,13 @@ def main():
 
     if not only_files or "index.html" in only_files:
         check_css_vars(INDEX, "index.html", extra_defs_sources=[STYLE_CSS])
-    if not only_files or "system-settings.html" in only_files:
+    if os.path.exists(SETTINGS) and (not only_files or "system-settings.html" in only_files):
         check_css_vars(SETTINGS, "system-settings.html")
 
     # ─────────────────────────────────────────────
     # E. Token 闭环：设置页与主站共用同一 key
     # ─────────────────────────────────────────────
-    if not only_files or "system-settings.html" in only_files:
+    if os.path.exists(SETTINGS) and (not only_files or "system-settings.html" in only_files):
         settings = read(SETTINGS)
         token_key_s = set(re.findall(r'GITHUB_TOKEN_KEY\s*=\s*"([^"]+)"', settings)) or \
                       set(re.findall(r'localStorage\.(?:getItem|setItem|removeItem)\("([^"]+)"', settings))

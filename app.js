@@ -765,7 +765,7 @@ async function addXpRecord(record) {
   _persistCache();
   // ★ 如果是支出且填写了"值得/不值得/一般"，每笔自动生成独立的财务能力分析 XP 记录
   if (record.type === 'expense' && record.worthIt) {
-    const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
+    const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return (r.name||"").indexOf("财务能力分析")>=0});
     const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
     await addXpRecord({
       taskName: "财务能力分析",
@@ -1335,7 +1335,7 @@ async function addStudyRecord(record) {
     cleanTitle: record.title || record.description || '',
     shortTitle: record.title || record.description || '',
     description: record.description || record.title || '',
-    homeworkType: record.homeworkType || '日常预习',
+    homeworkType: record.homeworkType || '假期作业',
     module: record.module || '',
     modules: (Array.isArray(record.modules) ? record.modules : (record.modules ? [record.modules] : [])).slice(),
     status: record.status || 'pending',
@@ -1467,7 +1467,7 @@ async function addFinanceRecord(record) {
   _persistCache();
   // ★ 如果是支出且填写了"值得/不值得/一般"，每笔自动生成独立的财务能力分析 XP 记录
   if (record.type === 'expense' && record.worthIt) {
-    const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
+    const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return (r.name||"").indexOf("财务能力分析")>=0});
     const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
     await addXpRecord({
       taskName: "财务能力分析",
@@ -2150,9 +2150,10 @@ function _fmtMD(s) {
 
 // ── 设置面板相关 ──
 
-// 设置入口统一跳转到系统配置页（原弹出抽屉已由独立配置页替代）
+// 设置入口统一跳到系统设置视图（SPA 内切换，避免整页跳变）
 function openSettingsDrawer() {
-  window.location.href = "system-settings.html";
+  if (typeof switchView === "function") switchView("settings");
+  else window.location.href = "index.html?view=settings";
 }
 
 function closeSettingsDrawer() { /* 兼容占位：抽屉已移除，配置页无需关闭 */ }
@@ -2882,7 +2883,7 @@ if (typeof window !== "undefined") {
       await renderMoney();
       if (window.lucide) refreshIcons(50);
       if (entries.length > 0) {
-        const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return r.name==="财务能力分析"});
+        const _financeRule = (cachedData?.config?.xpRuleList || []).find(function(r){return (r.name||"").indexOf("财务能力分析")>=0});
         const _perRecXp = (_financeRule && Number(_financeRule.xp)) ? Number(_financeRule.xp) : 5;
         const _totalXp = entries.length * _perRecXp;
         alert(`已记录 ${entries.length} 笔财务流水，完成财务分析，共 +${_totalXp} XP（每笔 +${_perRecXp} XP）🎉`);
@@ -5788,7 +5789,7 @@ async function renderStudy() {
 
   function getHwXp(item) {
     if (!item) return null;
-    const hwType = item.homeworkType || "日常预习";
+    const hwType = item.homeworkType || "假期作业";
     const ruleName = "作业·" + hwType;
     const xpRules = (cfg.config && cfg.config.xpRules) || {};
     for (const cat of Object.keys(xpRules)) {
@@ -7335,19 +7336,28 @@ async function refreshMoneyRecent() {
 
 // ── 作业智能拆分 ──
 
-// 根据作业内容判定作业类型：日常预习/日常复习/暑假作业/特色作业
+// 根据作业内容判定作业类型：假期作业 / 特色作业
 function inferHomeworkType(text) {
-  if (!text) return "日常预习";
+  if (!text) return "假期作业";
   const t = String(text);
-  // 暑假作业优先（特征最明显）
-  if (/暑假|假期作业|假期|下学期.*预习|暑假大本|暑假作业/.test(t)) return "暑假作业";
   // 特色作业：动手/实践/展示类
   if (/手抄报|手工作品|手工|画画|绘画|观察|实践|实验|日记|阅读打卡|打卡|书法|书法练习|演讲|朗诵|口才|小报|手绘|制作|剪贴|贴画|泥塑|折纸|种植|养|社会实践|研学/.test(t)) return "特色作业";
-  // 预习：提前看/读/圈
-  if (/预习|提前|明天(要|要讲|上课)|下节|读通|初读|圈生字|标生字|查生字|查字典|标自然段|读熟课文|明天.*讲/.test(t)) return "日常预习";
-  // 复习/巩固：回看、错题、订正
-  if (/复习|回顾|错题|看错题|订正|巩固|熟读|背诵|默写|背|熟记|练习册.*订正|重新|重做|消化|巩固练习/.test(t)) return "日常复习";
-  return "日常预习";
+  // 其余（预习、复习、暑假作业、日常等）统一为假期作业
+  return "假期作业";
+}
+
+// 兼容查询作业分值规则：作业类型现为「假期作业/特色作业」，而系统配置仍是
+// 「作业·日常预习/日常复习/暑假作业/特色作业」四类（用户要求不改配置）。
+// 优先精确名「作业·类型」，找不到时回退到任一「作业·」规则，保证发分不失效。
+function resolveHomeworkRule(xpRules, hwType) {
+  const exactName = "作业·" + (hwType || "");
+  const all = [];
+  for (const cat of Object.keys(xpRules || {})) {
+    (xpRules[cat] || []).forEach(r => all.push(r));
+  }
+  const exact = all.find(r => r.name === exactName);
+  if (exact) return exact;
+  return all.find(r => r && typeof r.name === "string" && r.name.indexOf("作业·") === 0) || null;
 }
 
 function parseHomeworkText(text) {
@@ -8024,7 +8034,7 @@ function layoutShell(active) {
       `).join("")}
     </nav>
     <nav class="nav-foot">
-      <a href="system-settings.html" data-page="settings" role="link" tabindex="0"><i>⚙️</i>系统设置</a>
+      <a href="javascript:void(0)" data-page="settings" onclick="switchView('settings')" style="cursor:pointer" role="link" tabindex="0"><i>⚙️</i>系统设置</a>
     </nav>
   `;
 }
@@ -8040,7 +8050,7 @@ async function openEditModal(item) {
 
   // 详情字段：作业类型/能力模块/关联单元
   const subject = item.subject || "语文";
-  setRadioValue("editTypeGroup", item.homeworkType || "日常预习");
+  setRadioValue("editTypeGroup", item.homeworkType || "假期作业");
   populateChoiceGroup("editModuleGroup", getModuleOptions(subject), item.modules || []);
 
   const units = await getTeachingUnits(subject);
@@ -8075,7 +8085,7 @@ function closeEditModal() {
 /* ════════ 添加作业 ════════ */
 // 作业类型 XP 从 config.json xpRules 中读取，不再硬编码
 // 哪些作业类型需要独立截止日期
-const ADD_HW_DUE_TYPES = new Set(["暑假作业", "特色作业"]);
+const ADD_HW_DUE_TYPES = new Set(["假期作业", "特色作业"]);
 
 function getTodayVal() {
   const d = new Date();
@@ -8104,7 +8114,7 @@ function openAddHomeworkModal() {
   document.getElementById("addHomeworkTitle").value = "";
   document.getElementById("addHomeworkDueDate").value = getTodayVal();
   setRadioValue("addSubjectGroup", "语文");
-  setRadioValue("addTypeGroup", "日常预习");
+  setRadioValue("addTypeGroup", "假期作业");
   syncAddHomeworkDue();
   // 重置拆分状态
   const parsedWrap = document.getElementById("addParsedWrap");
@@ -8158,7 +8168,7 @@ async function saveAddHomework() {
             subject: it.subject || subject,
             title: it.text || it.title,
             description: it.text || it.title,
-            homeworkType: it.type || getRadioValue("addTypeGroup") || "日常预习",
+            homeworkType: it.type || getRadioValue("addTypeGroup") || "假期作业",
             modules: it.module ? [it.module] : [],
             module: it.module || "",
             status: "pending",
@@ -8190,7 +8200,7 @@ async function saveAddHomework() {
     // ── 场景二：单条录入 ──
     if (!title) { showToast("先写一下作业内容吧 ✏️", false); return; }
     // 添加作业：存基础信息 + 作业类型；模块/单元/测验在提交时填写
-    const hwTypeNow = getRadioValue("addTypeGroup") || "日常预习";
+    const hwTypeNow = getRadioValue("addTypeGroup") || "假期作业";
     await DataStore.addStudyRecord({
       subject,
       title,
@@ -8260,7 +8270,7 @@ function initAddHomeworkModal() {
           <div style="display:flex;align-items:center;gap:6px;">
             <label style="font-size:11px;color:var(--neutral-500);flex-shrink:0;">类型</label>
             <select class="add-parse-type" data-idx="${i}" style="flex:1;font-size:12px;padding:3px 6px;border:1px solid var(--neutral-300);border-radius:8px;background:#fff;color:var(--neutral-800);">
-              ${["日常预习","日常复习","暑假作业","特色作业"].map(t => `<option value="${t}" ${it.type === t ? "selected" : ""}>${t}</option>`).join("")}
+              ${["假期作业","特色作业"].map(t => `<option value="${t}" ${it.type === t ? "selected" : ""}>${t}</option>`).join("")}
             </select>
           </div>
           <span style="font-size:12px;color:var(--neutral-700);line-height:1.4;">${it.text}</span>
@@ -8419,7 +8429,7 @@ async function openSubmitHomeworkModal(item) {
   }
 
   // 作业类型（预填已有值）
-  setRadioValue("shmTypeGroup", item.homeworkType || "日常预习");
+  setRadioValue("shmTypeGroup", item.homeworkType || "假期作业");
 
   // 完成用时（预填已有值）
   setRadioValue("shmDurationGroup", item.duration || "");
@@ -8462,7 +8472,7 @@ function closeSubmitHomeworkModal() {
 // 保存补充信息
 async function saveSubmitHomework() {
   if (!__shmCurrentItem || !__shmCurrentItem.id) { showToast("未找到作业，请重试", false); return; }
-  const hwType = getRadioValue("shmTypeGroup") || "日常预习";
+  const hwType = getRadioValue("shmTypeGroup") || "假期作业";
   const duration = getRadioValue("shmDurationGroup") || "";
   const wrongCount = getRadioValue("shmWrongGroup") || "";
   const modules = getCheckedOfGroup("shmModuleGroup");
@@ -8522,19 +8532,13 @@ async function saveSubmitHomework() {
         console.warn("提交作业-置为完成失败(尝试直接写)", err.message);
         await updateHomeworkLocally(__shmCurrentItem.id, donePayload);
       }
-      // 2. 按作业类型发放 XP（从 config.json xpRules 中读取配置值）
+      // 2. 按作业类型发放 XP（作业类型现为 假期作业/特色作业；系统配置仍是
+      //    「作业·日常预习」等四类，精确名找不到时回退到任一「作业·」规则，避免发分失效）
       const cfgXpData = await loadAppData();
       const xpRulesMap = (cfgXpData.config && cfgXpData.config.xpRules) || {};
-      const hwRuleName = "作业·" + hwType;
-      let baseXp = 2;
-      for (const cat of Object.keys(xpRulesMap)) {
-        const found = (xpRulesMap[cat] || []).find(function(r) { return r.name === hwRuleName; });
-        if (found && found.xp) {
-          baseXp = Number(found.xp) || 2;
-          break;
-        }
-      }
-      const taskName = "作业·" + (hwType || "日常预习");
+      const hwRule = resolveHomeworkRule(xpRulesMap, hwType);
+      const baseXp = (hwRule && hwRule.xp) ? Number(hwRule.xp) || 2 : 2;
+      const taskName = "作业·" + (hwType || "假期作业");
       await window.DataStore.addXpRecord({
         taskName,
         title: __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业",
@@ -8906,7 +8910,7 @@ async function saveEdit() {
   const newDueDate = document.getElementById("editDueDate").value;
 
   // 详情字段：作业类型/能力模块/关联单元
-  const hwType = getRadioValue("editTypeGroup") || "日常预习";
+  const hwType = getRadioValue("editTypeGroup") || "假期作业";
   const modules = getCheckedOfGroup("editModuleGroup");
   const module = modules[0] || "";
   const unitVal = getRadioValue("editUnitGroup") || "other";
@@ -8998,12 +9002,13 @@ function initEditModal() {
 
   // 作业完成能量累加（客户端兜底，防止 API 瞬时不可用导致能量丢失）
   async function grantHomeworkCompletionXp(item, cfg) {
-    const hwType = item.homeworkType || "日常预习";
-    const ruleList = (cfg && cfg.config && cfg.config.xpRuleList) || [];
-    const rule = ruleList.find(r => r.name === "作业·" + hwType);
-    // 优先从规则表查找，其次从默认映射表查找，最后回退到合理值
-    // 作业类型统一为4种：日常预习2 / 日常复习2 / 暑假作业2 / 特色作业4（家庭作业合并到特色作业）
-    const _defaultMap = {'日常预习':2,'日常复习':2,'暑假作业':2,'特色作业':4};
+    const hwType = item.homeworkType || "假期作业";
+    const ruleList = (cfg && cfg.config && cfg.config.xpRules
+      ? cfg.config.xpRules
+      : ((cfg && cfg.config && cfg.config.xpRuleList) || {}));
+    // 优先从规则表精确名查找，其次回退到任一「作业·」规则（兼容假期作业新命名，不改系统配置四类）
+    const rule = resolveHomeworkRule(typeof ruleList === "object" && !Array.isArray(ruleList) ? ruleList : {}, hwType);
+    const _defaultMap = {'假期作业':2,'特色作业':4};
     const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (_defaultMap[hwType] || 2);
     const subject = item.subject || "其他";
     try {
@@ -9222,6 +9227,7 @@ async function boot(page) {
     if (page === "xp") await renderXp();
     if (page === "study") await renderStudy();
     if (page === "money") await renderMoney();
+    if (page === "settings") { if (typeof renderSettingsView === "function") renderSettingsView(); }
     __viewRendered[page] = __dataVersion;
   } catch (e) {
     console.error("渲染失败:", e);
@@ -9355,8 +9361,8 @@ async function switchView(page) {
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     const target = document.getElementById("view-" + page);
     if (target) target.classList.add("active");
-    // 2. 更新侧边栏菜单 active 高亮
-    document.querySelectorAll("[data-sidebar] .nav a").forEach(a => a.classList.toggle("active", a.getAttribute("data-page") === page));
+    // 2. 更新侧边栏菜单 active 高亮（含 nav-foot 的系统设置）
+    document.querySelectorAll("[data-sidebar] .nav a, [data-sidebar] .nav-foot a").forEach(a => a.classList.toggle("active", a.getAttribute("data-page") === page));
     // 3. 更新底部 tab 栏 active 高亮
     document.querySelectorAll(".bottom-tab-item").forEach(t => t.classList.toggle("active", t.getAttribute("data-page") === page));
     document.body.setAttribute("data-view", page);
@@ -9367,6 +9373,7 @@ async function switchView(page) {
       else if (page === "study") await renderStudy();
       else if (page === "money") await renderMoney();
       else if (page === "level") { renderLevelLadder(); }
+      else if (page === "settings") { if (typeof renderSettingsView === "function") renderSettingsView(); }
       __viewRendered[page] = __dataVersion;
     }
     // 5. 移动端关闭侧边栏
@@ -9414,5 +9421,5 @@ if (history && history.scrollRestoration) {
 }
 window.scrollTo(0, 0);
 const __urlView = new URLSearchParams(location.search).get("view");
-boot(["home", "xp", "study", "money"].includes(__urlView) ? __urlView : "home");
+boot(["home", "xp", "study", "money", "settings"].includes(__urlView) ? __urlView : "home");
   

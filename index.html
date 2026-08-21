@@ -636,6 +636,9 @@
     </main>
   </section>
 
+  <!-- ════════ 系统设置视图（SPA 单页视图，内容由 settings.js 按需注入） ════════ -->
+  <section class="view" id="view-settings"></section>
+
   <!-- ════════ 编辑作业弹窗 ════════ -->
   <div class="edit-modal-overlay" id="editModal">
     <div class="edit-modal">
@@ -663,9 +666,7 @@
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="editTypeGroup">
-          <label class="choice-pill"><input type="radio" name="editType" value="日常预习">日常预习</label>
-          <label class="choice-pill"><input type="radio" name="editType" value="日常复习">日常复习</label>
-          <label class="choice-pill"><input type="radio" name="editType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="editType" value="假期作业">假期作业</label>
           <label class="choice-pill"><input type="radio" name="editType" value="特色作业">特色作业</label>
         </div>
       </div>
@@ -703,9 +704,7 @@
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="addTypeGroup">
-          <label class="choice-pill"><input type="radio" name="addType" value="日常预习" checked>日常预习</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="日常复习">日常复习</label>
-          <label class="choice-pill"><input type="radio" name="addType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="addType" value="假期作业" checked>假期作业</label>
           <label class="choice-pill"><input type="radio" name="addType" value="特色作业">特色作业</label>
         </div>
       </div>
@@ -744,9 +743,7 @@
       <div class="edit-field">
         <label>作业类型</label>
         <div class="choice-group" id="shmTypeGroup">
-          <label class="choice-pill"><input type="radio" name="shmType" value="日常预习" checked>日常预习</label>
-          <label class="choice-pill"><input type="radio" name="shmType" value="日常复习">日常复习</label>
-          <label class="choice-pill"><input type="radio" name="shmType" value="暑假作业">暑假作业</label>
+          <label class="choice-pill"><input type="radio" name="shmType" value="假期作业" checked>假期作业</label>
           <label class="choice-pill"><input type="radio" name="shmType" value="特色作业">特色作业</label>
         </div>
       </div>
@@ -1328,7 +1325,7 @@
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="xp" onclick="switchView('xp')"><i>⚡</i><span>能量</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="study" onclick="switchView('study')"><i>🌍</i><span>知识</span></a>
     <a class="bottom-tab-item" href="javascript:void(0)" data-page="money" onclick="switchView('money')"><i>💰</i><span>财富</span></a>
-    <a class="bottom-tab-item" href="system-settings.html" data-page="settings"><i>⚙️</i><span>设置</span></a>
+    <a class="bottom-tab-item" href="javascript:void(0)" data-page="settings" onclick="switchView('settings')"><i>⚙️</i><span>设置</span></a>
   </nav>
   
   
@@ -1338,6 +1335,7 @@
 
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="data-relations.js?v=20260820-v2"></script>
-  <script src="app.js?v=20260820-v2"></script>
+  <script src="settings.js?v=20260820-v1"></script>
+  <script src="app.js?v=20260820-v3"></script>
 </body>
 </html>
