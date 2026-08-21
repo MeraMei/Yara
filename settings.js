@@ -589,7 +589,7 @@ function renderDefGrid() {
     var hwTypes = [
       { name: '作业·日常预习', icon: '📝', desc: '完成作业自动发放' },
       { name: '作业·日常复习', icon: '📚', desc: '完成作业自动发放' },
-      { name: '作业·暑假作业', icon: '🏖️', desc: '完成作业自动发放' },
+      { name: '作业·假期作业', icon: '🏖️', desc: '完成作业自动发放' },
       { name: '作业·特色作业', icon: '🎨', desc: '完成作业自动发放（含家庭作业）' },
     ];
     hwTypes.forEach(function(h) {

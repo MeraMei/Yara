@@ -516,7 +516,7 @@
       "domain": "XP",
       "type": "XP获得",
       "title": "创造自己的分数小册子：从1 - 1/10（参照视频） ",
-      "taskName": "作业·暑假作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-19",
       "datetime": "2026-08-19 12:49:56",
@@ -526,7 +526,7 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "暑假作业完成",
+      "description": "假期作业完成",
       "_hasValidName": true
     },
     {
@@ -772,8 +772,8 @@
       "id": "recvrqmxVvIdsm",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:20:47",
@@ -781,15 +781,15 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成数学作业（暑假作业）",
+      "description": "完成数学作业（假期作业）",
       "_hasValidName": true
     },
     {
       "id": "recvrqmue41z12",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:20:33",
@@ -797,15 +797,15 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成数学作业（暑假作业）",
+      "description": "完成数学作业（假期作业）",
       "_hasValidName": true
     },
     {
       "id": "recvrqmrEm4F3y",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:20:23",
@@ -813,15 +813,15 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成英语作业（暑假作业）",
+      "description": "完成英语作业（假期作业）",
       "_hasValidName": true
     },
     {
       "id": "recvrqmqkDgFCK",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:20:17",
@@ -829,15 +829,15 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成数学作业（暑假作业）",
+      "description": "完成数学作业（假期作业）",
       "_hasValidName": true
     },
     {
       "id": "recvrqmnGStz39",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:20:07",
@@ -845,15 +845,15 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成英语作业（暑假作业）",
+      "description": "完成英语作业（假期作业）",
       "_hasValidName": true
     },
     {
       "id": "recvrqmmldUdJh",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:20:02",
@@ -861,15 +861,15 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成英语作业（暑假作业）",
+      "description": "完成英语作业（假期作业）",
       "_hasValidName": true
     },
     {
       "id": "recvrqml1q3IBt",
       "domain": "XP",
       "type": "XP获得",
-      "title": "作业·暑假作业",
-      "taskName": "作业·暑假作业",
+      "title": "作业·假期作业",
+      "taskName": "作业·假期作业",
       "taskCategory": "学习成长",
       "date": "2026-08-05",
       "datetime": "2026-08-05 12:19:57",
@@ -877,7 +877,7 @@
       "xpCategory": "学习成长",
       "reviewStatus": "已通过",
       "returnReason": "",
-      "description": "完成数学作业（暑假作业）",
+      "description": "完成数学作业（假期作业）",
       "_hasValidName": true
     },
     {
@@ -2030,9 +2030,9 @@
       {
         "id": "recvrd7AIvjkbE",
         "subject": "数学",
-        "title": "暑假作业 P29-P30",
-        "cleanTitle": "暑假作业 P29-P30",
-        "shortTitle": "暑假作业 P29-P30",
+        "title": "假期作业 P29-P30",
+        "cleanTitle": "假期作业 P29-P30",
+        "shortTitle": "假期作业 P29-P30",
         "homeworkType": "假期作业",
         "module": "概念",
         "modules": [
@@ -2045,7 +2045,7 @@
         "submitted": true,
         "reviewStatus": "已通过",
         "returnReason": "",
-        "description": "暑假作业 P29-P30",
+        "description": "假期作业 P29-P30",
         "details": [],
         "tags": [
           {
@@ -2058,9 +2058,9 @@
       {
         "id": "recvrd7AIv0ER4",
         "subject": "英语",
-        "title": "暑假作业 P48-P49",
-        "cleanTitle": "暑假作业 P48-P49",
-        "shortTitle": "暑假作业 P48-P49",
+        "title": "假期作业 P48-P49",
+        "cleanTitle": "假期作业 P48-P49",
+        "shortTitle": "假期作业 P48-P49",
         "homeworkType": "假期作业",
         "module": "",
         "modules": [],
@@ -2070,7 +2070,7 @@
         "submitted": true,
         "reviewStatus": "已通过",
         "returnReason": "",
-        "description": "暑假作业 P48-P49",
+        "description": "假期作业 P48-P49",
         "details": [],
         "tags": [
           {
@@ -2111,9 +2111,9 @@
           {
             "id": "recvrd7AIvjkbE",
             "subject": "数学",
-            "title": "暑假作业 P29-P30",
-            "cleanTitle": "暑假作业 P29-P30",
-            "shortTitle": "暑假作业 P29-P30",
+            "title": "假期作业 P29-P30",
+            "cleanTitle": "假期作业 P29-P30",
+            "shortTitle": "假期作业 P29-P30",
             "homeworkType": "假期作业",
             "module": "概念",
             "modules": [
@@ -2126,7 +2126,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P29-P30",
+            "description": "假期作业 P29-P30",
             "details": [],
             "tags": [
               {
@@ -2139,9 +2139,9 @@
           {
             "id": "recvrd7AIv0ER4",
             "subject": "英语",
-            "title": "暑假作业 P48-P49",
-            "cleanTitle": "暑假作业 P48-P49",
-            "shortTitle": "暑假作业 P48-P49",
+            "title": "假期作业 P48-P49",
+            "cleanTitle": "假期作业 P48-P49",
+            "shortTitle": "假期作业 P48-P49",
             "homeworkType": "假期作业",
             "module": "",
             "modules": [],
@@ -2151,7 +2151,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P48-P49",
+            "description": "假期作业 P48-P49",
             "details": [],
             "tags": [
               {
@@ -2169,9 +2169,9 @@
           {
             "id": "recvrd7AIvVAhf",
             "subject": "英语",
-            "title": "暑假作业 P52-P53",
-            "cleanTitle": "暑假作业 P52-P53",
-            "shortTitle": "暑假作业 P52-P53",
+            "title": "假期作业 P52-P53",
+            "cleanTitle": "假期作业 P52-P53",
+            "shortTitle": "假期作业 P52-P53",
             "homeworkType": "假期作业",
             "module": "单词",
             "modules": [
@@ -2184,7 +2184,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P52-P53",
+            "description": "假期作业 P52-P53",
             "details": [],
             "tags": [
               {
@@ -2202,9 +2202,9 @@
           {
             "id": "recvrd7AIv7Iqf",
             "subject": "数学",
-            "title": "暑假作业 P31-P32",
-            "cleanTitle": "暑假作业 P31-P32",
-            "shortTitle": "暑假作业 P31-P32",
+            "title": "假期作业 P31-P32",
+            "cleanTitle": "假期作业 P31-P32",
+            "shortTitle": "假期作业 P31-P32",
             "homeworkType": "假期作业",
             "module": "概念",
             "modules": [
@@ -2218,7 +2218,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P31-P32",
+            "description": "假期作业 P31-P32",
             "details": [],
             "tags": [
               {
@@ -2236,9 +2236,9 @@
           {
             "id": "recvrd7AIvIggL",
             "subject": "英语",
-            "title": "暑假作业 P55-P56",
-            "cleanTitle": "暑假作业 P55-P56",
-            "shortTitle": "暑假作业 P55-P56",
+            "title": "假期作业 P55-P56",
+            "cleanTitle": "假期作业 P55-P56",
+            "shortTitle": "假期作业 P55-P56",
             "homeworkType": "假期作业",
             "module": "单词",
             "modules": [
@@ -2251,7 +2251,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P55-P56",
+            "description": "假期作业 P55-P56",
             "details": [],
             "tags": [
               {
@@ -2317,9 +2317,9 @@
           {
             "id": "recvrd7AIvO6n0",
             "subject": "数学",
-            "title": "暑假作业 P33-P35",
-            "cleanTitle": "暑假作业 P33-P35",
-            "shortTitle": "暑假作业 P33-P35",
+            "title": "假期作业 P33-P35",
+            "cleanTitle": "假期作业 P33-P35",
+            "shortTitle": "假期作业 P33-P35",
             "homeworkType": "假期作业",
             "module": "概念",
             "modules": [
@@ -2332,7 +2332,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P33-P35",
+            "description": "假期作业 P33-P35",
             "details": [],
             "tags": [
               {
@@ -2350,9 +2350,9 @@
           {
             "id": "recvrd7AIvnnrb",
             "subject": "英语",
-            "title": "暑假作业 P61-P62",
-            "cleanTitle": "暑假作业 P61-P62",
-            "shortTitle": "暑假作业 P61-P62",
+            "title": "假期作业 P61-P62",
+            "cleanTitle": "假期作业 P61-P62",
+            "shortTitle": "假期作业 P61-P62",
             "homeworkType": "假期作业",
             "module": "单词",
             "modules": [
@@ -2365,7 +2365,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P61-P62",
+            "description": "假期作业 P61-P62",
             "details": [],
             "tags": [
               {
@@ -2416,9 +2416,9 @@
           {
             "id": "recvrd7AIvpTgx",
             "subject": "数学",
-            "title": "暑假作业 P36-P38",
-            "cleanTitle": "暑假作业 P36-P38",
-            "shortTitle": "暑假作业 P36-P38",
+            "title": "假期作业 P36-P38",
+            "cleanTitle": "假期作业 P36-P38",
+            "shortTitle": "假期作业 P36-P38",
             "homeworkType": "假期作业",
             "module": "概念",
             "modules": [
@@ -2431,7 +2431,7 @@
             "submitted": true,
             "reviewStatus": "已通过",
             "returnReason": "",
-            "description": "暑假作业 P36-P38",
+            "description": "假期作业 P36-P38",
             "details": [],
             "tags": [
               {
@@ -4309,7 +4309,7 @@
           "description": "完成作业自动发放"
         },
         {
-          "name": "作业·暑假作业",
+          "name": "作业·假期作业",
           "category": "学习成长",
           "xp": 2,
           "method": "按次",
@@ -4507,7 +4507,7 @@
         "description": "完成作业自动发放"
       },
       {
-        "name": "作业·暑假作业",
+        "name": "作业·假期作业",
         "category": "学习成长",
         "xp": 2,
         "method": "按次",
@@ -4983,7 +4983,7 @@
           "description": "完成作业自动发放"
         },
         {
-          "name": "作业·暑假作业",
+          "name": "作业·假期作业",
           "category": "学习成长",
           "xp": 2,
           "method": "按次",

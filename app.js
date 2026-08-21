@@ -7342,12 +7342,12 @@ function inferHomeworkType(text) {
   const t = String(text);
   // 特色作业：动手/实践/展示类
   if (/手抄报|手工作品|手工|画画|绘画|观察|实践|实验|日记|阅读打卡|打卡|书法|书法练习|演讲|朗诵|口才|小报|手绘|制作|剪贴|贴画|泥塑|折纸|种植|养|社会实践|研学/.test(t)) return "特色作业";
-  // 其余（预习、复习、暑假作业、日常等）统一为假期作业
+  // 其余（预习、复习、假期作业、日常等）统一为假期作业
   return "假期作业";
 }
 
-// 兼容查询作业分值规则：作业类型现为「假期作业/特色作业」，而系统配置仍是
-// 「作业·日常预习/日常复习/暑假作业/特色作业」四类（用户要求不改配置）。
+// 兼容查询作业分值规则：作业类型为「假期作业/特色作业」，
+// 系统配置为「作业·日常预习/日常复习/假期作业/特色作业」四类。
 // 优先精确名「作业·类型」，找不到时回退到任一「作业·」规则，保证发分不失效。
 function resolveHomeworkRule(xpRules, hwType) {
   const exactName = "作业·" + (hwType || "");
@@ -8094,7 +8094,7 @@ function getTodayVal() {
 
 function syncAddHomeworkDue() {
   // 添加作业时截止日期总是默认今天，类型在提交时选
-  // 但仍保留可填功能，供暑假作业等长周期作业使用
+  // 但仍保留可填功能，供假期作业等长周期作业使用
   const wrap = document.getElementById("addDueFieldWrap");
   const input = document.getElementById("addHomeworkDueDate");
   const hint = document.getElementById("addDueHint");
