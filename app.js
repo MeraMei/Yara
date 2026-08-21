@@ -4417,7 +4417,7 @@ function renderWrHero(report, childName) {
     html += '<div class="wr-hero-diary">';
     html += '<div class="wr-diary-mark">&ldquo;</div>';
     html += '<div class="wr-diary-text">' + escapeHtmlReason(best.snippet) + '</div>';
-    html += '<div class="wr-diary-meta">· ' + (best.date || '') + ' · 写作四要素 ' + (best.elements || 0) + '/4</div>';
+    html += '<div class="wr-diary-meta">· ' + (best.date || '') + ' · 写作四要素 ' + (best.elements || 0) + '/5</div>';
     html += '</div>';
   }
   if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px;padding:20px 0;text-align:center">本周还没有记录，快去打卡吧</div>';
@@ -4727,7 +4727,7 @@ function renderEmotionContent(report) {
   var best = emo.bestDiary || {};
   if (best.snippet) {
     html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#b88af5"></span>本周最佳日记</div>';
-    html += '<div class="wr-quote">"' + best.snippet + '"<div class="wr-quote-meta">· ' + (best.date || "") + ' · 四要素 ' + (best.elements || 0) + '/4</div></div>';
+    html += '<div class="wr-quote">"' + best.snippet + '"<div class="wr-quote-meta">· ' + (best.date || "") + ' · 四要素 ' + (best.elements || 0) + '/5</div></div>';
   }
   if (emo.financeStatus) {
     var finMap = { good: "🟢 理性消费", watch: "🟡 需要关注", alert: "🔴 冲动消费" };

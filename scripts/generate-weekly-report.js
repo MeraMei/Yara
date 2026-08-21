@@ -151,12 +151,18 @@ function growthAnalysis(ctx) {
     }
   });
 
-  // 3.4 作业进度
-  const weekHw = (homework || []).filter(h => {
+  // 3.4 作业进度（only 真实作业：过滤空壳/无日期的脏数据）
+  const isRealHw = (h) => h && typeof h === 'object' && (h.submittedAt || h.dueDate || h.title || h.subject);
+  const weekHw = (homework || []).filter(isRealHw).filter(h => {
     const st = String(h.submittedAt || h.dueDate || '');
     return st.slice(0, 10) >= week.start && st.slice(0, 10) <= week.end;
   });
   const hwDone = weekHw.filter(h => h.status === 'done' || h.submitted);
+  // 抽出本周已交作业的真实科目（供前端显示，避免"未知"）
+  const hwSubjects = hwDone
+    .map(h => String(h.subject || '').trim())
+    .filter(s => s.length > 0)
+    .filter((v, i, a) => a.indexOf(v) === i); // 去重
 
   // 3.5 家庭约定（来自最近一次家庭会议）
   const fmList = ctx.familyMeetings || [];
@@ -205,6 +211,7 @@ function growthAnalysis(ctx) {
     moodDistribution: moodDist,
     bestDiary,
     hwDoneCount: hwDone.length,
+    hwSubjects,
     hwTotalCount: weekHw.length,
     commitmentSummary,
     dimension
@@ -252,16 +259,20 @@ const GROWTH_SYSTEM = `
 3. 区分事实：只基于提供的数据事实说话，不空泛表扬、不做负面标签。
 
 ## 四维成长视角（GrowthAlgorithm）
-用以下四个维度观察孩子，挑选本周最突出、最值得表扬的一项体现在周报里：
+用以下四个维度观察本周孩子的成长，四维要尽量均衡呈现，不要只突出认知和情绪：
 - 认知（学到了什么、完成了什么作业）
 - 情绪（心情如何、是否愿意记录和分享）
-- 意志力（是否坚持、自觉、主动）
-- 关系（与家人协作、沟通、承担家务）
+- 意志力（是否坚持、自觉、主动）——本周有"坚持每天阅读30分钟约定"，这是意志力高光，请单独作为一条"最棒的时刻"徽章，不要和认知混在一起
+- 关系（与家人协作、沟通、承担家务）——本周"主动做家务"是唯一缺口，正是下周可开启的成长目标
+
+"最棒的时刻"(behavior.effortStories) 必须只放真正出自四维的成长高光（坚持、主动、完成作业、遵守约定、助人），严禁放消费流水/买了什么值不值。
 
 ## 语气与表达要求
 - 全程第二人称「你」，口语化，像大朋友。
 - 先肯定后引导；表扬要落到具体行为（"你遵守了和爸爸妈妈的约定"）而非空话（"你真棒"）。
 - 建议是邀约"你可以试试…"，不是命令。
+- 支撑四维均衡：若孩子本周在意志力/关系上有表现，导语和"综合建议"应纳入；若某维缺失，用一句"下周可以试着…"轻轻补位，而不是回避。
+- 挑战(suggestions.challenge)应呼应本周未达成的约定/弱维度：例如本周"主动做家务"未完成，挑战就建议主动做一件具体家务并给 +XP。
 - 用 1 个 emoji 点缀即可，不要堆砌。
 
 ## 输出格式（严格 JSON，不要 markdown 代码块，不要任何解释文字）
@@ -279,7 +290,7 @@ const GROWTH_SYSTEM = `
     "diary": { "value": <本周日记篇数>, "trend": "up|down|stable", "diff": <差值> }
   },
   "academic": {
-    "homework": { "subjects": ["<有作业的科目>"] },
+    "homework": { "subjects": ["<有作业的科目，必须用 analysis.hwSubjects 里的真实科目，如语文/数学/英语；若为空则给[]>"] },
     "trends": [],
     "weakModules": [],
     "hasData": <bool>,
@@ -414,6 +425,15 @@ async function main() {
       parsed.generatedAt = new Date().toISOString();
       // 覆写财务值得率（以真实数据为准，防模型算错）
       if (parsed.emotion) parsed.emotion.financeWorthIt = financeTx.worthRate;
+      // 覆写作业科目（以真实数据为准，防"未知"）
+      if (!parsed.academic) parsed.academic = {};
+      if (!parsed.academic.homework) parsed.academic.homework = {};
+      parsed.academic.homework.subjects = (analysis.hwSubjects || []).slice();
+      // 严格校验：作业数务必与真实值一致
+      if (parsed.stats && parsed.stats.study) {
+        parsed.stats.study.value = analysis.hwDoneCount;
+        parsed.stats.study.hasData = analysis.hwDoneCount > 0;
+      }
       report = parsed;
       ok = true;
     } catch (e) {
