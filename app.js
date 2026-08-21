@@ -3615,23 +3615,85 @@ let _lastHomeCfgHash = '';
 // render-home.js — 首页渲染
 // ═══════════════════════════════════════════════════════════════
 
-// ════════ 页面简介（每次进入随机切换一条） ════════
+// ════════ 页面名言（每次进入随机切换一条，贴合各板块主题） ════════
+// 能量 → 自律 / 自我提升 / 正能量
 const XP_INTROS = [
-  "这里记录着你变强的每一步。今天比昨天多坚持了一分钟？又学会了一个新本领？写下来，你就是自己的英雄。",
-  "每一颗好习惯都是一粒种子，每一次勇敢都是一缕阳光。看看你的花园里，今天又长出了什么？",
-  "长大不是等来的，是练出来的。早睡早起、整理房间、说出自己的感受……这些小事，都是你正在解锁的超能力。"
+  "“征服自己的一切弱点，正是一个人伟大的起始。” —— 沈从文",
+  "“志之难也，不在胜人，在自胜。” —— 《韩非子》",
+  "“习惯是一种顽强而巨大的力量，它可以主宰人生。” —— 培根",
+  "“种下一种行为，收获一种习惯；种下一种习惯，收获一种性格；种下一种性格，收获一种命运。” —— 威廉·詹姆斯",
+  "“胜人者有力，自胜者强。” —— 老子",
+  "“天行健，君子以自强不息。” —— 《周易》",
+  "“不积跬步，无以至千里；不积小流，无以成江海。” —— 荀子",
+  "“锲而不舍，金石可镂。” —— 荀子",
+  "“三军可夺帅也，匹夫不可夺志也。” —— 孔子",
+  "“宝剑锋从磨砺出，梅花香自苦寒来。” —— 《警世贤文》",
+  "“少壮不努力，老大徒伤悲。” —— 《长歌行》",
+  "“吾日三省吾身。” —— 曾子",
+  "“有志者，事竟成。” —— 《后汉书》",
+  "“业精于勤，荒于嬉；行成于思，毁于随。” —— 韩愈",
+  "“我未曾见过一个早起、勤奋、谨慎、诚实的人抱怨命运不好。” —— 本杰明·富兰克林"
 ];
+// 知识 → 学习 / 求知 / 沉淀
 const STUDY_INTROS = [
-  "知识不是关在课本里的，是藏在大千世界里的宝藏。今天的你，准备点亮哪颗星星？",
-  "学习不是为了考试，是为了给自己造一副'万能工具箱'。数学是尺子，语文是地图，英语是钥匙……装得越多，你能去的地方越远。",
-  "每解决一道题，你的大脑就升级一次。错题不是敌人，是帮你变强的经验包。今天，你想升到第几级？"
+  "“学而不思则罔，思而不学则殆。” —— 孔子",
+  "“知识就是力量。” —— 培根",
+  "“书籍是人类进步的阶梯。” —— 高尔基",
+  "“博观而约取，厚积而薄发。” —— 苏轼",
+  "“书山有路勤为径，学海无涯苦作舟。” —— 韩愈",
+  "“温故而知新，可以为师矣。” —— 孔子",
+  "“知之者不如好之者，好之者不如乐之者。” —— 孔子",
+  "“敏而好学，不耻下问。” —— 孔子",
+  "“三人行，必有我师焉。” —— 孔子",
+  "“吾生也有涯，而知也无涯。” —— 庄子",
+  "“读万卷书，行万里路。” —— 董其昌",
+  "“为中华之崛起而读书。” —— 周恩来",
+  "“玉不琢，不成器；人不学，不知义。” —— 《三字经》",
+  "“凡有所学，皆成性格。” —— 培根",
+  "“不读书的人，思想就会停止。” —— 狄德罗"
 ];
+// 财富 → 金钱财富观念
 const MONEY_INTROS = [
-  "钱本身不是魔法，但会管钱的人就像有了魔法。同样的硬币，有人变成糖果，有人变成自行车——选择权在你手里。",
-  "钱是一种工具，就像锤子、画笔、遥控器。用得好，它能帮你实现愿望；乱用，它会偷偷溜走。今天，你来当管家。",
-  "这里住着三个口袋：一个给未来的自己，一个给现在的快乐，一个给想帮助的人。怎么分配？你说了算。"
+  "“君子爱财，取之有道。” —— 《增广贤文》",
+  "“如果你懂得使用，金钱是一个好奴仆；如果你不懂得使用，它就变成你的主人。” —— 马克·吐温",
+  "“开始存钱并及早投资，这是最值得养成的好习惯。” —— 巴菲特",
+  "“不要把所有的鸡蛋放在同一个篮子里。” —— 西方投资格言",
+  "“由俭入奢易，由奢入俭难。” —— 司马光",
+  "“历览前贤国与家，成由勤俭破由奢。” —— 李商隐",
+  "“滴水成河，粒米成箩。” —— 民间谚语",
+  "“财富不是朋友，朋友却是财富。” —— 谚语",
+  "“钱能买到的东西，往往不需要多少钱。” —— 培根",
+  "“我不以穷为耻，但我更不以此为荣。” —— 富兰克林",
+  "“节约就是最大的财富。” —— 谚语",
+  "“财富就像海水，喝得越多越口渴。” —— 叔本华",
+  "“省下一分钱，就是赚到一分钱。” —— 富兰克林",
+  "“储钱是未雨绸缪，花钱是量入为出。” —— 理财格言",
+  "“知足者富，强行者有志。” —— 老子"
 ];
-function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// 名言选择：每个板块维护"最近 2 周使用记录"，优先挑 2 周内没用过的句子；
+// 若全部都在 2 周内用过，则重置一轮（选距今最久没用的，并清空历史）。
+function pickQuote(key, arr) {
+  const STORE = "quoteHistory_" + key;
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(STORE)) || []; } catch (e) { hist = []; }
+  const cutoff = Date.now() - 14 * 24 * 3600 * 1000; // 2 周
+  const recent = new Set(hist.filter(h => h.ts > cutoff).map(h => h.i));
+  let idx;
+  const freshPool = arr.map((_, i) => i).filter(i => !recent.has(i));
+  if (freshPool.length === 0) {
+    // 全部在 2 周内用过：取距今最久的一条，并重置历史，开始新的一轮
+    const oldest = hist.slice().sort((a, b) => a.ts - b.ts)[0];
+    idx = oldest ? oldest.i : Math.floor(Math.random() * arr.length);
+    hist = [];
+  } else {
+    idx = freshPool[Math.floor(Math.random() * freshPool.length)];
+  }
+  hist.push({ i: idx, ts: Date.now() });
+  hist = hist.filter(h => h.ts > cutoff);
+  try { localStorage.setItem(STORE, JSON.stringify(hist)); } catch (e) { /* ignore */ }
+  return arr[idx];
+}
 
 // 连续活跃天数：从今天(或昨天)起往前数，有任意已通过 XP 记录即算一天，遇断档即停
 function getCheckInStreak(cfg) {
@@ -4655,7 +4717,7 @@ async function renderXp() {
   const pending = cfg.pendingCount || (cfg.recentRecords || []).filter(item => item.status === "pending").length;
 
   // ════════ 顶部简介（随机切换）+ 实时数据行 ════════
-  setText("xpIntro", pickRandom(XP_INTROS));
+  setText("xpIntro", pickQuote("xp", XP_INTROS));
   const streak = getCheckInStreak(cfg);
   const xpLiveEl = document.getElementById("xpLiveText");
   if (xpLiveEl) xpLiveEl.innerHTML = `你已经连续浇水 <strong>${streak}</strong> 天，小树苗长高了！`;
@@ -5583,7 +5645,7 @@ async function renderStudy() {
   const study = cfg.study || {};
 
   // ════════ 顶部简介（随机切换）+ 实时数据行 ════════
-  setText("studyIntro", pickRandom(STUDY_INTROS));
+  setText("studyIntro", pickQuote("study", STUDY_INTROS));
   const stars = getWeekStars(cfg);
   const studyLiveEl = document.getElementById("studyLiveText");
   if (studyLiveEl) studyLiveEl.innerHTML = `本周你已点亮 <strong>${stars}</strong> 颗知识星星 🌟`;
@@ -6751,7 +6813,7 @@ async function renderMoney() {
   const wealthAcc = getAccount("wealth");
 
   // ════════ 顶部简介（随机切换）+ 实时数据行 ════════
-  setText("moneyIntro", pickRandom(MONEY_INTROS));
+  setText("moneyIntro", pickQuote("money", MONEY_INTROS));
   const daysToAllow = getDaysToAllowance();
   const moneyLiveEl = document.getElementById("moneyLiveText");
   if (moneyLiveEl) moneyLiveEl.innerHTML =
