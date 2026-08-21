@@ -1234,20 +1234,29 @@ document.addEventListener("click", function(e) {
     if (months < 0) { years -= 1; months += 12; }
     return years + "岁" + months + "个月" + days + "天";
   }
+  function render(name, birthday) {
+    var nmEl = document.getElementById("sideChildName");
+    var infoEl = document.getElementById("sideChildInfo");
+    if (nmEl && name) nmEl.textContent = name;
+    if (infoEl) {
+      var age = fmtAge(birthday);
+      // 与首页一致：显示“X岁Y个月Z天 ♀”
+      infoEl.innerHTML = age + ' <span style="color:var(--colourful-candy-pink-500)">♀</span>';
+    }
+  }
   try {
     var raw = localStorage.getItem("yara_child_profile");
-    if (raw) {
-      var c = JSON.parse(raw) || {};
-      var nmEl = document.getElementById("sideChildName");
-      var infoEl = document.getElementById("sideChildInfo");
-      if (nmEl && c.name) nmEl.textContent = c.name;
-      if (infoEl) {
-        var age = fmtAge(c.birthday);
-        // 与首页一致：显示“X岁Y个月Z天 ♀”
-        infoEl.innerHTML = age + ' <span style="color:var(--colourful-candy-pink-500)">♀</span>';
-      }
-    }
-  } catch (e) { /* 静默，保持默认占位 */ }
+    var c = raw ? (JSON.parse(raw) || {}) : {};
+    if (c.name && c.birthday) { render(c.name, c.birthday); return; }
+    // 本地缓存不全时，回退读取 data/child.json（与首页同一数据源），保证与首页侧边栏一致
+    fetch("data/child.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data) return;
+        render(data.name || "", data.birthday || "");
+      })
+      .catch(function () { /* 静默 */ });
+  } catch (e) { /* 静默 */ }
 })();
 
 /* ════════ GitHub Token 配置 ════════ */

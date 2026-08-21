@@ -7014,7 +7014,7 @@ async function renderMoney() {
             </div>
             ${note ? `<div class="tx-note">${note}</div>` : ""}
           </div>
-          <div class="tx-col tx-col-worth" style="display:none">
+          <div class="tx-col tx-col-worth" style="display:none"></div>
           <div class="tx-col tx-col-pay">
             <span class="tx-pay-method ${payMethod}">${payLabel}</span>
           </div>
