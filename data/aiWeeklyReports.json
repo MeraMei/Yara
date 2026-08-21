@@ -86,5 +86,97 @@
         "date": "2026-08-14"
       }
     }
+  },
+  {
+    "id": "wr_a1b2c3d4",
+    "weekNumber": 34,
+    "year": 2026,
+    "date": "2026-08-21",
+    "generatedAt": "2026-08-21T09:04:50.143Z",
+    "summary": "本周你收获了40点能量，比上周多了16点，特别棒！你完成了作业，还坚持写了日记，记录了和好朋友一起抓娃娃、吃寿司、玩VR的快乐时光，能感受到你满满的好心情。",
+    "stats": {
+      "energy": {
+        "value": 40,
+        "trend": "up",
+        "diff": 16
+      },
+      "study": {
+        "value": 1,
+        "trend": "up",
+        "diff": 1,
+        "hasData": true
+      },
+      "finance": {
+        "value": 37.8,
+        "trend": "down",
+        "diff": 227.2,
+        "hasData": true
+      },
+      "diary": {
+        "value": 1,
+        "trend": "stable",
+        "diff": 0
+      }
+    },
+    "academic": {
+      "homework": {
+        "subjects": []
+      },
+      "trends": [],
+      "weakModules": [],
+      "hasData": true,
+      "emptyHint": "本周完成了1项作业，很棒！下周可以试着挑战每天阅读30分钟，积累更多知识能量 📚"
+    },
+    "behavior": {
+      "profile": [
+        {
+          "category": "能力成长",
+          "count": 4,
+          "xp": 23
+        },
+        {
+          "category": "学习成长",
+          "count": 5,
+          "xp": 17
+        }
+      ],
+      "effortStories": [],
+      "badge": {
+        "earned": false,
+        "type": "",
+        "days": 0,
+        "name": ""
+      }
+    },
+    "emotion": {
+      "diaryTrend": "normal",
+      "diaryCount": 1,
+      "moodDistribution": {
+        "😊": 1
+      },
+      "bestDiary": {
+        "snippet": "今天我们从沙滩回来的时候逛了商场，我跟我的小伙伴和他的弟弟以及他的爸爸妈妈还有我的爸爸妈妈，我们首先玩了抓娃娃，我的爸爸抓了5个，我抓了11个，我的小伙伴跟他弟弟抓了五个，抓完后，我们把娃娃换成积分存起来了，我的小伙伴送给了我三个积分，他拿走了两个娃娃我感到很开心，，我们还去吃了寿司还玩了VR，今天可真是美好的一天呢，做了那么多事情，而且我的小伙伴跟我一起第一次抓娃娃，第一次吃寿司，第一次玩VR，真快乐！",
+        "date": "2026-08-16",
+        "elements": 5
+      },
+      "financeStatus": "watch",
+      "financeWorthIt": 67
+    },
+    "suggestions": {
+      "keep": "成就达成：你遵守了每天阅读30分钟的约定，还完成了作业，特别自律！而且你把快乐的一天写成了日记，把美好回忆留了下来，真棒！",
+      "improve": "试试看：这周你还没有主动做家务，下次可以试试帮妈妈摆碗筷或者浇花，你会发现自己动手做事情也很有趣哦。",
+      "challenge": "趣味挑战：这周邀请你当一次「家庭小管家」，帮家里做一件小事（比如整理书架或擦桌子），完成后可以给自己加 +10XP"
+    },
+    "growth": {
+      "profileUpdate": {
+        "highlights": [
+          "坚持完成作业并记录学习",
+          "用日记记录快乐时光，表达清晰",
+          "遵守阅读约定，自控力强",
+          "在玩耍中体验新鲜事物，保持好奇心"
+        ],
+        "date": "2026-08-21"
+      }
+    }
   }
 ]

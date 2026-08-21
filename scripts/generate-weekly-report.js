@@ -1,0 +1,421 @@
+#!/usr/bin/env node
+/**
+ * generate-weekly-report.js — 每周成长周报自动生成器（GrowthAlgorithm × DeepSeek）
+ *
+ * 【双重结合】
+ *  1. GrowthAlgorithm 视角：脚本内置成长算法作为"分析前置层"——先用规则对每周
+ *     真实数据进行四维评估（认知/情绪/意志力/关系）与亮点归类，产出结构化洞察，
+ *     再把"成长算法原则"作为系统约束注入到生成提示中。
+ *  2. AI 分析数据：把整理后的每周真实数据（XP/日记/作业/财富/家庭约定/上周周报）
+ *     交给 DeepSeek，由模型以"第二人称陪伴式"口吻把它写成孩子看得懂、想看的内容。
+ *
+ * 环境要求：
+ *  - 需环境变量 DEEPSEEK_API_KEY（仓库外读取，不入库）。
+ *  - 也可传 --key-file PATH 指定密钥文件。
+ *
+ * 用法：
+ *   node scripts/generate-weekly-report.js --dry-run          # 只分析数据，不调用模型（无需key）
+ *   node scripts/generate-weekly-report.js --week 2026-08-21  # 指定周内某天
+ *   node scripts/generate-weekly-report.js                     # 本周默认，调用 DeepSeek 生成
+ *
+ * 输出：把新周报追加写入 data/aiWeeklyReports.json
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const ROOT = path.resolve(__dirname, '..');
+const DATA = path.join(ROOT, 'data');
+
+const MODEL = 'deepseek-chat';
+const API_URL = 'https://api.deepseek.com/chat/completions';
+const MAX_RETRY = 1;
+
+/* ══════════════════ 1. 小工具 ══════════════════ */
+function readJSON(file) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(DATA, file), 'utf-8'));
+  } catch (e) {
+    return null;
+  }
+}
+
+function todayISO() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function dateStr(offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// 从环境或文件读取 key（绝不硬编码入库）
+function getApiKey(cliKeyFile) {
+  if (process.env.DEEPSEEK_API_KEY) return process.env.DEEPSEEK_API_KEY.trim();
+  const candidates = [cliKeyFile, path.join(os.homedir(), '.deepseek-key')]
+    .filter(Boolean);
+  for (const f of candidates) {
+    try {
+      const k = fs.readFileSync(f, 'utf-8').trim();
+      if (k) return k;
+    } catch (e) { /* 忽略 */ }
+  }
+  return '';
+}
+
+/* ══════════════════ 2. 数据窗口 ══════════════════ */
+// 本周：以指定(或今天)为结束日，窗口为 [end-6, end]；上周为再往前7天
+function weekWindow(endDateISO) {
+  const end = new Date(endDateISO + 'T00:00:00');
+  const start = new Date(end); start.setDate(start.getDate() - 6);
+  const prevEnd = new Date(start); prevEnd.setDate(prevEnd.getDate() - 1);
+  const prevStart = new Date(prevEnd); prevStart.setDate(prevStart.getDate() - 6);
+  const fmt = d => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  // 计算 ISO 周号
+  const wk = d => {
+    const t = new Date(d.getTime());
+    t.setHours(0, 0, 0, 0);
+    t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
+    const week1 = new Date(t.getFullYear(), 0, 4);
+    return 1 + Math.round(((t - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  };
+  return {
+    start: fmt(start), end: fmt(end),
+    prevStart: fmt(prevStart), prevEnd: fmt(prevEnd),
+    weekNumber: wk(end), year: end.getFullYear()
+  };
+}
+
+/* ══════════════════ 3. GrowthAlgorithm 分析前置层 ══════════════════ */
+// 返回结构化"成长洞察"，供AI生成时作为权威依据，避免 AI 天马行空或空泛表扬
+function growthAnalysis(ctx) {
+  const { xpRecords, diaries, homework, week } = ctx;
+  const inWin = (d, from, to) => d >= from && d <= to;
+
+  // 3.1 能量/Xp 归类（习惯养成 / 能力成长 / 学习成长 / 兴趣爱好 / 身体成长）
+  const catStat = {};
+  const autoKeywords = ['财务能力分析', '作业·', '认真投入', '写日记', '自动'];
+  let weekXp = 0;
+  (xpRecords || []).forEach(r => {
+    if (!inWin(r.date || r.datetime || '', week.start, week.end)) return;
+    if (String(r.type || '') === 'XP获得') weekXp += (Number(r.xp) || 0);
+    const cat = r.taskCategory || r.xpCategory || '其他';
+    catStat[cat] = catStat[cat] || { count: 0, xp: 0 };
+    catStat[cat].count += 1;
+    catStat[cat].xp += (Number(r.xp) || 0);
+  });
+
+  // 3.2 亮点故事（认真投入/自我驱动类任务）
+  const effortStories = [];
+  (xpRecords || []).forEach(r => {
+    if (!inWin(r.date || r.datetime || '', week.start, week.end)) return;
+    const name = String(r.title || r.taskName || '');
+    if (/认真投入|主动|独立|坚持/.test(name) && r.description) {
+      effortStories.push({ name, date: r.date || '', desc: r.description });
+    }
+  });
+
+  // 3.3 日记分析（四要素完整性 + 情绪）
+  const weekDiaries = (diaries || []).filter(d => inWin(d.date || '', week.start, week.end));
+  let moodDist = {};
+  let bestDiary = null;
+  weekDiaries.forEach(d => {
+    const mood = d.mood || '🙂';
+    moodDist[mood] = (moodDist[mood] || 0) + 1;
+    const hits = (d.hits || []).length;
+    if (!bestDiary || hits >= bestDiary.elements) {
+      bestDiary = { date: d.date, content: d.content, mood: d.mood, elements: hits };
+    }
+  });
+
+  // 3.4 作业进度
+  const weekHw = (homework || []).filter(h => {
+    const st = String(h.submittedAt || h.dueDate || '');
+    return st.slice(0, 10) >= week.start && st.slice(0, 10) <= week.end;
+  });
+  const hwDone = weekHw.filter(h => h.status === 'done' || h.submitted);
+
+  // 3.5 家庭约定（来自最近一次家庭会议）
+  const fmList = ctx.familyMeetings || [];
+  let currentCommitment = null;
+  for (const fm of fmList) {
+    if (fm.commitments && fm.commitments.length) { currentCommitment = fm; break; }
+  }
+  const commitmentSummary = currentCommitment
+    ? currentCommitment.commitments.map(c => ({
+        text: c.text || '', done: !!c.completed
+      }))
+    : [];
+
+  // 3.6 GrowthAlgorithm 四维评估（认知/情绪/意志力/关系）——给孩子的"底层代码"归因
+  const dimension = {};
+  dimension.cognition = weekHw.length ? '本周有作业投入记录' : '本周尚未记录学习投入';
+  dimension.emotion = (() => {
+    if (!weekDiaries.length) return '本周日记较少，情绪表达需要更多窗口';
+    const hasHappy = Object.keys(moodDist).some(m => /笑|😊|开心|棒/.test(String(m)));
+    return hasHappy ? '情绪整体积极，愿意记录开心瞬间' : '情绪表达存在，可多引导分享';
+  })();
+  dimension.willpower = (() => {
+    const autoTasks = (xpRecords || []).filter(r => inWin(r.date || '', week.start, week.end) &&
+      /认真投入|坚持|自觉/.test(String(r.title || r.taskName || '')));
+    return autoTasks.length ? '展现了自主坚持（' + autoTasks.length + ' 次）' : '自驱行为待观察';
+  })();
+  dimension.relation = (() => {
+    const rel = (xpRecords || []).filter(r => inWin(r.date || '', week.start, week.end) &&
+      /父母|沟通|家务|配合/.test(String(r.title || r.taskName || r.description || '')));
+    return rel.length ? '在家庭协作/沟通上有积极表现' : '家庭协作是本周可开启的小目标';
+  })();
+
+  return {
+    weekXp,
+    categoryStat: Object.entries(catStat).map(([k, v]) => ({ category: k, ...v })),
+    effortStories,
+    weekDiaryCount: weekDiaries.length,
+    moodDistribution: moodDist,
+    bestDiary,
+    hwDoneCount: hwDone.length,
+    hwTotalCount: weekHw.length,
+    commitmentSummary,
+    dimension
+  };
+}
+
+/* ══════════════════ 4. 组装数据上下文 ══════════════════ */
+function buildContext(week) {
+  const child = readJSON('child.json') || {};
+  const xpRecords = readJSON('xpRecords.json') || [];
+  const diaries = readJSON('diaryEntries.json') || [];
+  const finance = readJSON('finance.json') || {};
+  const study = readJSON('study.json') || {};
+  const familyMeetings = readJSON('familyMeetings.json') || [];
+  const prevReports = readJSON('aiWeeklyReports.json') || [];
+
+  const ctx = { xpRecords, diaries, finance, study, familyMeetings };
+  const analysis = growthAnalysis({ ...ctx, homework: study.allHomework || [], week });
+
+  // 上周周报（用于趋势，取最后一个）
+  const lastReport = prevReports.length ? prevReports[prevReports.length - 1] : null;
+
+  // 财富（本周交易）
+  const weekTx = (finance.recentTransactions || []).filter(t => {
+    const d = String(t.date || ''); return d >= week.start && d <= week.end;
+  });
+  const income = weekTx.filter(t => t.type === 'income').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const expense = weekTx.filter(t => t.type === 'expense').reduce((s, t) => s + (Math.abs(Number(t.amount)) || 0), 0);
+  const worthIt = weekTx.filter(t => t.type === 'expense' && t.worthIt === '值得').length;
+  const expenseCount = weekTx.filter(t => t.type === 'expense').length;
+  const worthRate = expenseCount ? Math.round(worthIt / expenseCount * 100) : 100;
+
+  return { child, analysis, financeTx: { weekTx, income, expense, worthRate, expenseCount }, lastReport };
+}
+
+/* ══════════════════ 5. GrowthAlgorithm 系统提示 ══════════════════ */
+// 这部分是"成长算法视角"的权威约束，让AI生成既忠于数据，又符合儿童心理。
+const GROWTH_SYSTEM = `
+你是一名资深的家庭教育成长专家，正在为一个 9 岁四年级女孩（名字见数据）生成每周成长周报。
+你的读者是孩子本人（不是家长），所有语言用第二人称「你」，像朋友聊天一样亲切自然。
+
+## 三条底层原则（必须贯穿全文）
+1. 关系优先：先让孩子感到被看见、被肯定，再谈可以做得更好的地方。
+2. 循序渐进：肯定已经做到的，措辞是"你可以试试"，不是"你应该"。
+3. 区分事实：只基于提供的数据事实说话，不空泛表扬、不做负面标签。
+
+## 四维成长视角（GrowthAlgorithm）
+用以下四个维度观察孩子，挑选本周最突出、最值得表扬的一项体现在周报里：
+- 认知（学到了什么、完成了什么作业）
+- 情绪（心情如何、是否愿意记录和分享）
+- 意志力（是否坚持、自觉、主动）
+- 关系（与家人协作、沟通、承担家务）
+
+## 语气与表达要求
+- 全程第二人称「你」，口语化，像大朋友。
+- 先肯定后引导；表扬要落到具体行为（"你遵守了和爸爸妈妈的约定"）而非空话（"你真棒"）。
+- 建议是邀约"你可以试试…"，不是命令。
+- 用 1 个 emoji 点缀即可，不要堆砌。
+
+## 输出格式（严格 JSON，不要 markdown 代码块，不要任何解释文字）
+{
+  "id": "wr_<8位随机小写字母数字>",
+  "weekNumber": <数值>,
+  "year": <数值>,
+  "date": "<本周结束日期 YYYY-MM-DD>",
+  "generatedAt": "<ISO时间戳>",
+  "summary": "<2-3句第二人称摘要，先肯定亮点再串数据>",
+  "stats": {
+    "energy": { "value": <本周XP总数>, "trend": "up|down|stable", "diff": <与上周差值的绝对值> },
+    "study": { "value": <本周完成作业数>, "trend": "up|down|stable", "diff": <差值>, "hasData": <bool> },
+    "finance": { "value": <本周累计存入-支出金额绝对值>, "trend": "up|down|stable", "diff": <差值>, "hasData": <bool> },
+    "diary": { "value": <本周日记篇数>, "trend": "up|down|stable", "diff": <差值> }
+  },
+  "academic": {
+    "homework": { "subjects": ["<有作业的科目>"] },
+    "trends": [],
+    "weakModules": [],
+    "hasData": <bool>,
+    "emptyHint": "<无学习数据时，用鼓励口吻提示本周可开启的小目标，带1个emoji>"
+  },
+  "behavior": {
+    "profile": [ { "category": "<成长分类>", "count": <次数>, "xp": <XP> } ],
+    "effortStories": [ { "subject": "<任务>", "date": "<日期>", "story": "<孩子怎么做的具体描述>" } ],
+    "badge": { "earned": false, "type": "", "days": 0, "name": "" }
+  },
+  "emotion": {
+    "diaryTrend": "low|normal|high",
+    "diaryCount": <本周日记篇数>,
+    "moodDistribution": { "<表情>": <次数> },
+    "bestDiary": { "snippet": "<本周最佳日记完整句子，不截断>", "date": "<日期>", "elements": <四要素命中数0-5> },
+    "financeStatus": "good|watch|alert",
+    "financeWorthIt": <值得率百分比>
+  },
+  "suggestions": {
+    "keep": "成就达成：<具体肯定本周最棒的一件事，第二人称>",
+    "improve": "试试看：<1条邀请式的小建议，呼应本周较弱的一个维度>",
+    "challenge": "趣味挑战：<一个有趣的本周挑战，末尾必须带 +XP>"
+  },
+  "growth": {
+    "profileUpdate": { "highlights": ["<3-5个具体闪光点，用行为而非标签>"], "date": "<本周结束日期>" }
+  }
+}
+`;
+const RULES = `
+本周数据与前置分析如下。请严格据此撰写，不要编造数据；趋势(diff/trend)要依据上周对比得出。
+`;
+
+/* ══════════════════ 6. 调用 DeepSeek ══════════════════ */
+function callDeepSeek(apiKey, messages) {
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages,
+      temperature: 0.7,
+      response_format: { type: 'json_object' },
+      stream: false
+    })
+  });
+}
+
+/* ══════════════════ 7. 主流程 ══════════════════ */
+async function main() {
+  const args = process.argv.slice(2);
+  const dryRun = args.includes('--dry-run');
+  let keyFile = '';
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--key-file') keyFile = args[i + 1] || '';
+  }
+  const weekArgIdx = args.findIndex(a => a === '--week');
+  const weekArg = weekArgIdx >= 0 ? args[weekArgIdx + 1] : todayISO();
+  const week = weekWindow(weekArg);
+
+  const ctx = buildContext(week);
+  const { child, analysis, financeTx, lastReport } = ctx;
+
+  console.log('════ 周报生成器 · GrowthAlgorithm × DeepSeek ════');
+  console.log(`周窗口: ${week.start} ~ ${week.end}  第${week.weekNumber}周(${week.year})  dry-run=${dryRun}`);
+
+  // 前置分析的直观摘要
+  console.log('\n[GrowthAlgorithm 前置分析]');
+  console.log(`  能量: ${analysis.weekXp} XP`);
+  console.log(`  分布: ${analysis.categoryStat.map(c => c.category + '×' + c.count).join(', ') || '(无)'}`);
+  console.log(`  日记: ${analysis.weekDiaryCount} 篇  情绪${JSON.stringify(analysis.moodDistribution)}`);
+  console.log(`  作业: ${analysis.hwDoneCount}/${analysis.hwTotalCount}`);
+  console.log(`  四维: ${JSON.stringify(analysis.dimension)}`);
+  console.log(`  约定: ${analysis.commitmentSummary.map(c => (c.done ? '✓' : '○') + c.text).join('  ') || '(无)'}`);
+
+  // 组装消息
+  const dataContext = {
+    child: { name: child.name, grade: child.grade, motto: child.motto },
+    week: { weekNumber: week.weekNumber, year: week.year, start: week.start, end: week.end },
+    analysis,
+    finance: {
+      income: financeTx.income, expense: financeTx.expense,
+      expenseCount: financeTx.expenseCount, worthRate: financeTx.worthRate
+    },
+    lastReport: lastReport ? { summary: lastReport.summary, stats: lastReport.stats } : null
+  };
+
+  let report;
+  if (dryRun) {
+    console.log('\n[dry-run] 未调用模型，以上为将交给 DeepSeek 的数据与分析。');
+    console.log('数据上下文预览:');
+    console.log(JSON.stringify(dataContext, null, 2));
+    return 0;
+  }
+
+  const apiKey = getApiKey(keyFile);
+  if (!apiKey) {
+    console.error('\n✗ 未配置 DEEPSEEK_API_KEY 环境变量或 ~/.deepseek-key 文件。');
+    console.error('  请设置后重试：export DEEPSEEK_API_KEY="sk-..."');
+    return 1;
+  }
+
+  const messages = [
+    { role: 'system', content: GROWTH_SYSTEM },
+    { role: 'user', content: RULES + '\n' + JSON.stringify(dataContext, null, 2) }
+  ];
+
+  let ok = false;
+  let attempt = 0;
+  while (!ok && attempt <= MAX_RETRY) {
+    attempt++;
+    console.log(`\n[DeepSeek] 生成中（第 ${attempt} 次）...`);
+    try {
+      const resp = await callDeepSeek(apiKey, messages);
+      if (!resp.ok) {
+        const body = await resp.text();
+        console.error(`✗ API 错误 ${resp.status}: ${body.slice(0, 400)}`);
+        if (attempt <= MAX_RETRY) { console.log('  重试一次...'); continue; }
+        return 1;
+      }
+      const data = await resp.json();
+      const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (!content) { console.error('✗ 模型返回为空'); return 1; }
+      const cleaned = content.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      if (!parsed.id) parsed.id = 'wr_' + Math.random().toString(36).slice(2, 10);
+      parsed.weekNumber = week.weekNumber;
+      parsed.year = week.year;
+      parsed.date = week.end;
+      parsed.generatedAt = new Date().toISOString();
+      // 覆写财务值得率（以真实数据为准，防模型算错）
+      if (parsed.emotion) parsed.emotion.financeWorthIt = financeTx.worthRate;
+      report = parsed;
+      ok = true;
+    } catch (e) {
+      console.error('✗ 调用失败: ' + e.message);
+      if (attempt <= MAX_RETRY) { continue; }
+      return 1;
+    }
+  }
+
+  if (!report) return 1;
+
+  // 写回 aiWeeklyReports.json
+  const prev = readJSON('aiWeeklyReports.json') || [];
+  prev.push(report);
+  fs.writeFileSync(path.join(DATA, 'aiWeeklyReports.json'), JSON.stringify(prev, null, 2), 'utf-8');
+  console.log('\n✅ 已生成第 ' + week.weekNumber + ' 周周报并写入 aiWeeklyReports.json');
+  console.log('   摘要: ' + (report.summary || '').slice(0, 80));
+  return 0;
+}
+
+main().then(rc => process.exit(rc)).catch(e => { console.error(e); process.exit(1); });
