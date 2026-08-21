@@ -4432,119 +4432,119 @@ function renderWrData(report) {
   var html = "";
   var beh = report.behavior || {};
   var profile = beh.profile || [];
+  var stats = report.stats || {};
 
-  // 能量条
-  if (profile.length > 0) {
-    var maxXp = 1;
-    profile.forEach(function(p) { if (p.xp > maxXp) maxXp = p.xp; });
-    var palette = ["#7bb8f7", "#f28daf", "#b88af5", "#7cd4b0", "#fba07a", "#fee680"];
-    var icons = ["🌟", "💪", "🎨", "🏃", "🔥", "⭐"];
-    html += '<div class="wr-data-section">';
-    html += '<div class="wr-data-label">⚡ 本周能量条</div>';
-    profile.forEach(function(p, i) {
-      var w = Math.max(15, Math.round((p.xp / maxXp) * 100));
-      var c = palette[i % palette.length];
-      html += '<div class="wr-energy-row"><span class="wr-energy-name">' + icons[i % icons.length] + p.category + '</span><span class="wr-energy-track"><span class="wr-energy-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="wr-energy-meta">+' + p.xp + 'XP</span></div>';
-    });
+  // ═══ 板块 A：你这周攒了多少能量 ═══
+  var totalXp = 0;
+  profile.forEach(function(p) { totalXp += (p.xp || 0); });
+  if (!totalXp) { var es = stats.energy || {}; totalXp = (es.value || 0); }
+
+  if (totalXp > 0 || profile.length > 0) {
+    html += '<div class="wr-data-section wr-section-energy">';
+    html += '<div class="wr-data-label-v2">⚡ 你这周攒了多少能量</div>';
+
+    // 能量总数 + 趋势
+    var eStat = stats.energy || {};
+    var eTrend = eStat.trend || "stable";
+    var eDiff = eStat.diff || 0;
+    var trendIcon = eTrend === "up" ? "📈" : eTrend === "down" ? "📉" : "→";
+    var trendTxt = eTrend === "stable" ? "和上周差不多" : (eTrend === "up" ? "比上周多 " + eDiff : "比上周少 " + eDiff);
+    html += '<div class="wr-energy-headline"><span class="wr-eh-num">' + totalXp + '</span><span class="wr-eh-unit">点能量</span><span class="wr-eh-trend">' + trendIcon + " " + trendTxt + '</span></div>';
+
+    // 能量条
+    if (profile.length > 0) {
+      var maxXp = 1;
+      profile.forEach(function(p) { if (p.xp > maxXp) maxXp = p.xp; });
+      var palette = ["#7bb8f7", "#f28daf", "#b88af5", "#7cd4b0", "#fba07a", "#fee680"];
+      var icons = ["🌟", "💪", "🎨", "🏃", "🔥", "⭐"];
+      html += '<div class="wr-energy-bars">';
+      profile.forEach(function(p, i) {
+        var w = Math.max(15, Math.round((p.xp / maxXp) * 100));
+        var c = palette[i % palette.length];
+        html += '<div class="wr-energy-row"><span class="wr-energy-name">' + icons[i % icons.length] + p.category + '</span><span class="wr-energy-track"><span class="wr-energy-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="wr-energy-meta">+' + p.xp + '</span></div>';
+      });
+      html += '</div>';
+    }
     html += '</div>';
   }
 
-  // 统计数据（孩子友好胶囊）
-  var stats = report.stats || {};
-  var statMeta = [
-    { key: "energy", label: "能量", unit: "XP", icon: "⚡" },
-    { key: "diary", label: "日记", unit: "篇", icon: "✏️" },
-    { key: "finance", label: "花销", unit: "元", icon: "💰" },
-    { key: "study", label: "学习", unit: "项", icon: "📚" }
-  ];
-  var pillsHtml = "";
-  statMeta.forEach(function(item) {
-    var s = stats[item.key] || {};
-    var val = s.value || 0;
-    if (s.hasData === false) return; // 跳过无数据的，不显示"—"
-    var trendArrow = s.trend === "up" ? "↑" : s.trend === "down" ? "↓" : "→";
-    var trendColor = s.trend === "up" ? "var(--colourful-mint-green-500)" : s.trend === "down" ? "var(--colourful-sunny-coral-400)" : "var(--neutral-400)";
-    var trendTxt = s.trend === "stable" ? "持平" : (trendArrow + (s.diff > 0 ? "+" : "") + (s.diff || 0));
-    pillsHtml += '<div class="wr-stat-pill"><span class="sp-icon">' + item.icon + '</span><span>' + item.label + '</span><span class="sp-val">' + val + item.unit + '</span><span class="sp-trend" style="color:' + trendColor + '">' + trendTxt + '</span></div>';
-  });
-  if (pillsHtml) {
-    html += '<div class="wr-data-section"><div class="wr-data-label">📊 本周数据</div><div class="wr-data-stats">' + pillsHtml + '</div></div>';
-  }
-
-  // 学业状态
+  // ═══ 板块 B：这周你做了什么 ═══
   var aca = report.academic || {};
   var hw = aca.homework || {};
   var subjects = hw.subjects || [];
-  var subjColor = { "数学": "#7bb8f7", "语文": "#f28daf", "英语": "#b88af5" };
-  var acaHtml = "";
-  if (subjects.length > 0) {
-    acaHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#7bb8f7"></span>作业完成率</div>';
-    subjects.forEach(function(s) {
-      var pct = s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0;
-      var color = subjColor[s.name] || (s.alert === "low" ? "var(--colourful-sunny-coral-500)" : "var(--colourful-mint-green-500)");
-      acaHtml += '<div class="wr-progress-row"><div class="wr-progress-head"><span class="wr-p-name">' + s.name + '</span><span class="wr-p-val" style="color:' + color + '">' + s.completed + '/' + s.total + ' · ' + pct + '%</span></div><div class="wr-progress-track"><div class="wr-progress-fill" style="width:' + pct + '%;background:linear-gradient(90deg,' + color + ',' + color + 'cc)"></div></div></div>';
-    });
-  }
-  var trends = aca.trends || [];
-  if (trends.length > 0) {
-    acaHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#7cd4b0"></span>成绩趋势</div><div class="wr-trends">';
-    var trendText = { up: "📈 上升", down: "📉 下降", stable: "➡️ 稳定", wave: "🔀 波动" };
-    var trendColor = { up: "var(--colourful-mint-green-500)", down: "var(--colourful-sunny-coral-400)", stable: "var(--neutral-400)", wave: "var(--colourful-butter-yellow-500)" };
-    trends.forEach(function(t) {
-      acaHtml += '<span class="wr-trend-chip"><span class="wr-t-arrow" style="color:' + (trendColor[t.trend] || "var(--neutral-500)") + '">' + (trendText[t.trend] || t.trend) + '</span><span style="color:var(--neutral-400);font-weight:600">' + t.subject + ' · ' + t.lastGrade + '</span></span>';
-    });
-    acaHtml += '</div>';
-  }
-  if (!acaHtml) {
-    var hint = aca.emptyHint || '这周还没记录学习呢～下周记得完成作业，每完成一项就+5XP哦💪';
-    acaHtml = '<div class="wr-academic-empty"><div class="ae-icon">📚</div><div class="ae-text">' + escapeHtmlReason(hint) + '</div></div>';
-  }
-  html += '<div class="wr-data-section"><div class="wr-data-label">📚 学业状态</div>' + acaHtml + '</div>';
-
-  // 心情 + 财商
   var emo = report.emotion || {};
-  var emoHtml = "";
-  var moods = emo.moodDistribution || {};
-  var moodKeys = Object.keys(moods);
-  if (moodKeys.length > 0) {
-    emoHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#f28daf"></span>心情晴雨表</div><div class="wr-mood-row">';
-    moodKeys.forEach(function(k) {
-      var emoji = k === "开心" ? "😊" : k === "难过" ? "😢" : k === "生气" ? "😡" : k === "兴奋" ? "😄" : k === "平静" ? "😌" : k === "惊喜" ? "🤩" : (k.length <= 2 ? k : "😐");
-      emoHtml += '<span class="wr-mood-chip-v2"><span class="mc-emoji">' + emoji + '</span>' + k + '<span class="mc-count">' + moods[k] + '次</span></span>';
-    });
-    emoHtml += '</div>';
-  }
-  if (emo.financeStatus) {
-    var finMap = { good: "🟢 理性消费", watch: "🟡 需要关注", alert: "🔴 冲动消费" };
-    var finColor = { good: "var(--colourful-mint-green-500)", watch: "#c4a030", alert: "var(--colourful-sunny-coral-500)" };
-    var finBg = { good: "rgba(54,185,139,.08)", watch: "rgba(253,216,50,.08)", alert: "rgba(249,96,36,.08)" };
-    var fc = finColor[emo.financeStatus] || "var(--colourful-mint-green-500)";
-    var fb = finBg[emo.financeStatus] || "rgba(54,185,139,.08)";
-    emoHtml += '<div class="wr-sub-v2"><span class="wr-sub-dot" style="background:#7cd4b0"></span>财商习惯</div>';
-    emoHtml += '<div class="wr-fin-row"><span class="wr-fin-chip-v2" style="background:' + fb + ';color:' + fc + '">' + (finMap[emo.financeStatus] || "🟢 理性消费") + ' · 值得率 ' + (emo.financeWorthIt || 0) + '%</span></div>';
-  }
-  if (emoHtml) {
-    html += '<div class="wr-data-section"><div class="wr-data-label">😊 情绪与表达</div>' + emoHtml + '</div>';
-  }
+  var moodDist = emo.moodDistribution || {};
+  var moodKeys = Object.keys(moodDist);
+  var finStat = stats.finance || {};
+  var diaryStat = stats.diary || {};
+  var studyStat = stats.study || {};
+  var trends = aca.trends || [];
 
-  // 认真投入亮点
-  var stories = beh.effortStories || [];
-  if (stories.length > 0) {
-    html += '<div class="wr-data-section"><div class="wr-data-label">✨ 认真投入亮点</div>';
-    stories.slice(0, 3).forEach(function(s) {
-      html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.subject || "") + ' · ' + (s.date || "") + '</div><div>' + escapeHtmlReason(s.story || "") + '</div>' + (s.reviewerComment ? '<div class="parent-msg">💬 ' + escapeHtmlReason(s.reviewerComment) + "</div>" : "") + "</div>";
-    });
-    if (stories.length > 3) html += '<div style="font-size:12px;color:var(--muted-foreground);margin-top:6px">还有 ' + (stories.length - 3) + " 条精彩瞬间</div>";
+  var hasActivity = (studyStat.hasData !== false && studyStat.value > 0) || diaryStat.value > 0 || (finStat.hasData !== false && finStat.value !== undefined) || trends.length > 0;
+
+  if (hasActivity) {
+    html += '<div class="wr-data-section wr-section-activity">';
+    html += '<div class="wr-data-label-v2">📋 这周你做了什么</div>';
+    html += '<div class="wr-act-list">';
+
+    // 学习行
+    if (studyStat.hasData !== false && studyStat.value > 0) {
+      var subjNames = subjects.map(function(s) { return typeof s === "string" ? s : (s.name || s.subject || ""); }).filter(Boolean);
+      var subjText = subjNames.length > 0 ? "（" + subjNames.join("、") + "）" : "";
+      html += '<div class="wr-act-row"><span class="wr-act-icon">📚</span><span class="wr-act-text">完成了 <b>' + studyStat.value + '</b> 项作业' + subjText + '</span></div>';
+    } else {
+      var hint = aca.emptyHint || "这周还没记录学习，下周完成作业每项+5XP哦";
+      html += '<div class="wr-act-row wr-act-hint-row"><span class="wr-act-icon">📚</span><span class="wr-act-text">' + escapeHtmlReason(hint) + '</span></div>';
+    }
+
+    // 日记 + 心情行
+    var diaryVal = diaryStat.value || 0;
+    var moodText = moodKeys.length > 0 ? moodKeys.map(function(k) { return k + moodDist[k] + "次"; }).join("、") : "";
+    if (diaryVal > 0) {
+      html += '<div class="wr-act-row"><span class="wr-act-icon">✏️</span><span class="wr-act-text">写了 <b>' + diaryVal + '</b> 篇日记' + (moodText ? ' · 心情：' + moodText : "") + '</span></div>';
+    } else {
+      html += '<div class="wr-act-row wr-act-hint-row"><span class="wr-act-icon">✏️</span><span class="wr-act-text">这周还没写日记，写一篇+8XP哦</span></div>';
+    }
+
+    // 花钱行
+    if (finStat.hasData !== false && finStat.value !== undefined) {
+      var worthRate = emo.financeWorthIt || 0;
+      var finText = "花了 <b>" + finStat.value + "</b> 元";
+      if (worthRate > 0) finText += " · " + worthRate + "% 觉得值得";
+      html += '<div class="wr-act-row"><span class="wr-act-icon">💰</span><span class="wr-act-text">' + finText + '</span></div>';
+    }
+
+    // 成绩趋势行（如有）
+    if (trends.length > 0) {
+      var tArrow = { up: "↑", down: "↓", stable: "→", wave: "🔀" };
+      var tSummary = trends.map(function(t) { return t.subject + (tArrow[t.trend] || "") + (t.lastGrade || ""); }).join("、");
+      html += '<div class="wr-act-row"><span class="wr-act-icon">📊</span><span class="wr-act-text">成绩：' + escapeHtmlReason(tSummary) + '</span></div>';
+    }
+
+    html += '</div>';
     html += '</div>';
   }
 
+  // ═══ 板块 C：你最棒的时刻 ═══
+  var stories = beh.effortStories || [];
+  if (stories.length > 0) {
+    html += '<div class="wr-data-section wr-section-stories">';
+    html += '<div class="wr-data-label-v2">⭐ 你最棒的时刻</div>';
+    stories.slice(0, 3).forEach(function(s) {
+      html += '<div class="wr-story"><div class="wr-story-head">📅 ' + (s.date || "") + '</div><div class="wr-story-body">' + escapeHtmlReason(s.story || "") + '</div></div>';
+    });
+    if (stories.length > 3) html += '<div class="wr-story-more">还有 ' + (stories.length - 3) + " 个精彩瞬间</div>";
+    html += '</div>';
+  }
+
+  // 徽章
   var badge = beh.badge || {};
   if (badge.earned) {
     var badgeText = badge.type === "small_perseverance" ? "🏅 小坚持" : "🏆 大毅力";
-    html += '<div style="margin-top:4px"><span class="wr-badge">' + badgeText + ' · 连续 ' + badge.days + ' 天</span></div>';
+    html += '<div class="wr-badge-row"><span class="wr-badge">' + badgeText + ' · 连续 ' + badge.days + ' 天</span></div>';
   }
 
-  if (!html) html = '<div style="color:var(--muted-foreground);font-size:13px;padding:20px 0;text-align:center">还没有行为记录，快去打卡吧</div>';
+  if (!html) html = '<div class="wr-empty-hint">还没有记录，快去打卡吧</div>';
   return html;
 }
 
