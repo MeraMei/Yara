@@ -50,6 +50,19 @@ function todayISO() {
   return `${y}-${m}-${day}`;
 }
 
+// 以【周五】为周期节点：返回“<= iso 的最近一个周五”。
+// 让周期始终固定为 周六~周五，无论哪天运行都不跳周号（防止补跑时周期错乱）。
+function anchorToFriday(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  const day = d.getDay();          // 0=周日 5=周五
+  const back = (day - 5 + 7) % 7;  // 距上个周五回退的天数
+  d.setDate(d.getDate() - back);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
 function dateStr(offsetDays) {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
@@ -366,7 +379,7 @@ async function main() {
     if (args[i] === '--key-file') keyFile = args[i + 1] || '';
   }
   const weekArgIdx = args.findIndex(a => a === '--week');
-  const weekArg = weekArgIdx >= 0 ? args[weekArgIdx + 1] : todayISO();
+  const weekArg = weekArgIdx >= 0 ? args[weekArgIdx + 1] : anchorToFriday(todayISO());
   const week = weekWindow(weekArg);
 
   const ctx = buildContext(week);
@@ -408,6 +421,8 @@ async function main() {
   if (!apiKey) {
     console.error('\n✗ 未配置 DEEPSEEK_API_KEY 环境变量或 ~/.deepseek-key 文件。');
     console.error('  请设置后重试：export DEEPSEEK_API_KEY="sk-..."');
+    console.error(`  【保护生效】本次对应周期: 第${week.weekNumber}周 (${week.start} ~ ${week.end})，未生成任何周报，未改动数据文件。`);
+    console.error('  说明：为避免“静默跳周导致周期错乱”，Key 缺失时会明确失败并终止，绝不写入空/错位周报。');
     return 1;
   }
 
