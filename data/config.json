@@ -274,6 +274,13 @@
         "xp": 8,
         "method": "按次",
         "description": ""
+      },
+      {
+        "name": "21点开始洗漱，20点关灯睡觉",
+        "category": "能力成长",
+        "xp": 5,
+        "method": "按次",
+        "description": ""
       }
     ]
   },
@@ -363,48 +370,6 @@
       "description": "主动认领，家长确认后发放"
     },
     {
-      "name": "将自己的精美作品发布至线上",
-      "category": "兴趣爱好",
-      "xp": 10,
-      "method": "按次",
-      "description": ""
-    },
-    {
-      "name": "画画、手工作品",
-      "category": "兴趣爱好",
-      "xp": 5,
-      "method": "按次",
-      "description": ""
-    },
-    {
-      "name": "照顾好自己（营养均衡、午休）",
-      "category": "身体成长",
-      "xp": 5,
-      "method": "按次",
-      "description": ""
-    },
-    {
-      "name": "每天跳绳 200个或3分钟",
-      "category": "身体成长",
-      "xp": 5,
-      "method": "按次",
-      "description": ""
-    },
-    {
-      "name": "每天10点前关灯睡觉",
-      "category": "身体成长",
-      "xp": 5,
-      "method": "按次",
-      "description": ""
-    },
-    {
-      "name": "做锻炼身体/户外 30分钟",
-      "category": "身体成长",
-      "xp": 5,
-      "method": "按次",
-      "description": ""
-    },
-    {
       "name": "主动做家务（力所能及）",
       "category": "能力成长",
       "xp": 5,
@@ -454,10 +419,53 @@
       "description": ""
     },
     {
-      "name": "成绩录入",
-      "xp": 2,
-      "category": "学习成长",
-      "method": "自动发放"
+      "name": "21点开始洗漱，20点关灯睡觉",
+      "category": "能力成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "照顾好自己（营养均衡、午休）",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "每天跳绳 200个或3分钟",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "每天10点前关灯睡觉",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "做锻炼身体/户外 30分钟",
+      "category": "身体成长",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "将自己的精美作品发布至线上",
+      "category": "兴趣爱好",
+      "xp": 10,
+      "method": "按次",
+      "description": ""
+    },
+    {
+      "name": "画画、手工作品",
+      "category": "兴趣爱好",
+      "xp": 5,
+      "method": "按次",
+      "description": ""
     }
   ],
   "abilityModules": {
