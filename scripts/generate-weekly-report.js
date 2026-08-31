@@ -525,6 +525,61 @@ async function main() {
         parsed.stats.study.value = analysis.hwDoneCount;
         parsed.stats.study.hasData = analysis.hwDoneCount > 0;
       }
+      // ═══ 数据真实性校验：防止 AI 编造不存在的数据 ═══
+      const hasAnyXp = analysis.weekXp > 0;
+      const hasEffortFromData = analysis.effortStories.length > 0;
+      const hasCommitments = analysis.commitmentSummary.length > 0;
+      const hasCompletedCommitments = analysis.commitmentSummary.some(c => c.done);
+      const hasDiaries = analysis.weekDiaryCount > 0;
+
+      // 1. effortStories 校验：无真实数据支撑的故事必须清除
+      if (parsed.behavior && parsed.behavior.effortStories) {
+        parsed.behavior.effortStories = parsed.behavior.effortStories.filter(story => {
+          const text = (story.story || '') + (story.subject || '');
+          // 提到"约定/承诺/遵守"但没有真实约定数据 → 编造
+          if (/约定|承诺|遵守|兑现/.test(text) && !hasCompletedCommitments) return false;
+          // 提到具体成长行为但本周 XP=0 且无真实 effortStories → 编造
+          if (!hasAnyXp && !hasEffortFromData) return false;
+          return true;
+        });
+      }
+
+      // 2. summary 校验：XP=0 时不能出现"坚持了""完成了"等虚假成就
+      if (!hasAnyXp && parsed.summary) {
+        if (/坚持了|完成了|遵守了|兑现了|积累了.*\*\*\d+.*点/.test(parsed.summary)) {
+          // 用诚实的默认值替换
+          parsed.summary = '这周还没有打卡记录，不过没关系，新的一周随时可以开始！';
+        }
+      }
+
+      // 3. growth.highlights 校验：不能出现数据中不存在的成就
+      if (parsed.growth && parsed.growth.profileUpdate && parsed.growth.profileUpdate.highlights) {
+        parsed.growth.profileUpdate.highlights = parsed.growth.profileUpdate.highlights.filter(h => {
+          if (/约定|承诺|遵守|阅读.*分钟/.test(h) && !hasCompletedCommitments) return false;
+          if (/坚持|自律|打卡/.test(h) && !hasAnyXp) return false;
+          return true;
+        });
+        // 如果过滤后为空，给诚实的默认
+        if (parsed.growth.profileUpdate.highlights.length === 0) {
+          parsed.growth.profileUpdate.highlights = ['等待新的一周开启成长之旅'];
+        }
+      }
+
+      // 4. suggestions.keep 校验：XP=0 时不能表扬不存在的成就
+      if (!hasAnyXp && parsed.suggestions && parsed.suggestions.keep) {
+        if (/坚持|自律|遵守|约定|说到做到/.test(parsed.suggestions.keep)) {
+          parsed.suggestions.keep = '成就达成：新的一周即将开始，你已经准备好了！';
+        }
+      }
+
+      // 5. behavior.profile 校验：XP=0 时清空
+      if (!hasAnyXp && parsed.behavior) {
+        parsed.behavior.profile = [];
+      }
+
+      console.log('\n[数据校验] XP=' + analysis.weekXp + ', 真实effortStories=' + analysis.effortStories.length + ', 约定=' + analysis.commitmentSummary.length);
+      console.log('  AI 生成 effortStories 保留: ' + (parsed.behavior.effortStories || []).length + ' 条');
+
       report = parsed;
       ok = true;
     } catch (e) {
