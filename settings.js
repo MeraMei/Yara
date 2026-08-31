@@ -564,32 +564,62 @@ function saveRule() {
   });
 }
 
+// 轻量确认弹窗（替换原生 confirm）
+function showConfirm(title, message, onConfirm) {
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay active';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:10000;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:12px;padding:24px;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.15);">' +
+    '<div style="font-size:16px;font-weight:600;margin-bottom:8px;color:#1a1a1a;">' + title + '</div>' +
+    '<div style="font-size:14px;color:#666;margin-bottom:20px;line-height:1.5;">' + message + '</div>' +
+    '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+    '<button id="confirmCancel" style="padding:8px 16px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:14px;color:#666;">取消</button>' +
+    '<button id="confirmOk" style="padding:8px 16px;border:none;border-radius:6px;background:#ff4d4f;color:#fff;cursor:pointer;font-size:14px;font-weight:500;">确认删除</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+  document.getElementById('confirmCancel').onclick = function() { document.body.removeChild(overlay); };
+  document.getElementById('confirmOk').onclick = function() { document.body.removeChild(overlay); onConfirm(); };
+  overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
+}
+
 // 删除规则
 function deleteRule(cat, idx) {
-  if (!confirm('确定要删除此任务规则吗？')) return;
-  fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
-    if (!config || !config.xpRules || !config.xpRules[cat]) { showToast('数据异常', false); return; }
-    var name = config.xpRules[cat][idx] && config.xpRules[cat][idx].name;
-    config.xpRules[cat].splice(idx, 1);
-    // 同步猫会清理空分类
-    if (config.xpRules[cat].length === 0) delete config.xpRules[cat];
-    // 重新生成 xpRuleList
-    config.xpRuleList = [];
-    ['学习成长', '能力成长', '身体成长', '兴趣爱好'].forEach(function(c) {
-      (config.xpRules[c] || []).forEach(function(item) {
-        config.xpRuleList.push(item);
-      });
-    });
-    return DR.writeDataFile('config.json', config, '删除任务: ' + (name || ''));
-  }).then(function() {
-    showToast('✅ 已删除');
-    setTimeout(renderRuleGrid, 500);
-    // 同步刷新首页/app 侧的数据缓存
-    if (window.DataStore && window.DataStore.refreshData) {
-      window.DataStore.refreshData().catch(function() {});
+  var config = _ruleData;
+  var item = config && config[cat] && config[cat][idx];
+  if (!item) { showToast('数据异常', false); return; }
+  var name = item.name;
+  showConfirm('确认删除', '确定要删除任务「' + name + '」吗？删除后不可恢复。', function() {
+    // 乐观更新：先从 DOM 移除，不等网络
+    var el = document.querySelector('.rule-item[data-cat="' + cat + '"][data-idx="' + idx + '"]');
+    if (el) {
+      el.style.transition = 'opacity 0.2s, transform 0.2s';
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(20px)';
+      setTimeout(function() { el.remove(); }, 200);
     }
-  }).catch(function(err) {
-    showToast('删除失败: ' + (err.message || '未知错误'), false);
+    // 后台写入
+    fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
+      if (!config || !config.xpRules || !config.xpRules[cat]) { showToast('数据异常', false); return; }
+      config.xpRules[cat].splice(idx, 1);
+      if (config.xpRules[cat].length === 0) delete config.xpRules[cat];
+      config.xpRuleList = [];
+      ['学习成长', '能力成长', '身体成长', '兴趣爱好'].forEach(function(c) {
+        (config.xpRules[c] || []).forEach(function(item) {
+          config.xpRuleList.push(item);
+        });
+      });
+      return DR.writeDataFile('config.json', config, '删除任务: ' + name);
+    }).then(function() {
+      showToast('✅ 已删除');
+      // 同步刷新首页/app 侧的数据缓存
+      if (window.DataStore && window.DataStore.refreshData) {
+        window.DataStore.refreshData().catch(function() {});
+      }
+    }).catch(function(err) {
+      showToast('删除失败: ' + (err.message || '未知错误'), false);
+      // 失败时重新渲染恢复
+      setTimeout(renderRuleGrid, 300);
+    });
   });
 }
 
