@@ -425,10 +425,8 @@ function renderRuleGrid() {
       visibleRules.forEach(function(x) {
         var item = x.t;
         var idx = x.i;
-        var icon = guessIcon(item.name);
         var desc = item.description || '';
         html += '<div class="rule-item" data-cat="' + cat + '" data-idx="' + idx + '">';
-        html += '<span class="ri-ic ' + meta.ic + '">' + icon + '</span>';
         html += '<div class="ri-t"><b>' + item.name + '</b>' + (desc ? '<span>' + desc + '</span>' : '') + '</div>';
         html += '<span class="ri-xp">+' + item.xp + '<small>XP</small></span>';
         html += '<span class="ri-ops"><button class="btn ghost mini" onclick="openEditRuleModal(\'' + cat + '\',' + idx + ')">编辑</button><button class="btn ghost mini" onclick="deleteRule(\'' + cat + '\',' + idx + ')">删除</button></span>';
