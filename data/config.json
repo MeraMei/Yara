@@ -253,12 +253,12 @@
         "id": "xpr_mtgwxiztev1d"
       },
       {
-        "name": "收拾自己的卧室（床和书桌）",
+        "id": "xpr_mtgwxizthkol",
+        "name": "收拾自己的房间（床和书桌）",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": "",
-        "id": "xpr_mtgwxizthkol"
+        "description": ""
       },
       {
         "name": "洗自己的小内裤或袜子",
@@ -408,12 +408,12 @@
       "id": "xpr_mtgwxiztev1d"
     },
     {
-      "name": "收拾自己的卧室（床和书桌）",
+      "id": "xpr_mtgwxizthkol",
+      "name": "收拾自己的房间（床和书桌）",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": "",
-      "id": "xpr_mtgwxizthkol"
+      "description": ""
     },
     {
       "name": "洗自己的小内裤或袜子",
