@@ -282,6 +282,112 @@ function computeGameTime(xpRecords, week, lastGameTime) {
   return { checkedDays, earnedMin, capWeek, balance, balanceCap, carryMin };
 }
 
+/* ══════════════════ 3.8 历史成长画像（GrowthAlgorithm 全面分析） ══════════════════ */
+// 基于所有历史 XP 记录，生成孩子的全面成长画像
+// 用于周报中提供"你一直以来的成长轨迹"视角，而不仅仅是本周
+function historicalPortrait(xpRecords, diaries, familyMeetings) {
+  if (!xpRecords || xpRecords.length === 0) {
+    return { hasData: false, totalXp: 0, activeDays: 0, categoryRank: [], topTasks: [], consistency: {}, familyMeetingEverHeld: false };
+  }
+
+  // 总 XP 和活跃天数
+  const daySet = new Set();
+  const catStat = {};
+  const taskStat = {};
+  let totalXp = 0;
+
+  xpRecords.forEach(r => {
+    const d = String(r.date || r.datetime || '').slice(0, 10);
+    if (d) daySet.add(d);
+    const xp = Number(r.xp) || 0;
+    totalXp += xp;
+    // 分类统计
+    const cat = r.taskCategory || r.xpCategory || '其他';
+    if (!catStat[cat]) catStat[cat] = { count: 0, xp: 0 };
+    catStat[cat].count++;
+    catStat[cat].xp += xp;
+    // 任务统计
+    const task = r.taskName || r.title || '';
+    if (task && !/财务能力分析|财务进账/.test(task)) {
+      if (!taskStat[task]) taskStat[task] = { count: 0, xp: 0 };
+      taskStat[task].count++;
+      taskStat[task].xp += xp;
+    }
+  });
+
+  // 分类排名（按 XP 降序）
+  const categoryRank = Object.entries(catStat)
+    .map(([k, v]) => ({ category: k, ...v }))
+    .sort((a, b) => b.xp - a.xp);
+
+  // 任务 TOP5
+  const topTasks = Object.entries(taskStat)
+    .map(([k, v]) => ({ task: k, ...v }))
+    .sort((a, b) => b.xp - a.xp)
+    .slice(0, 5);
+
+  // 连续性分析：最长连续打卡天数
+  const sortedDays = Array.from(daySet).sort();
+  let maxStreak = 1, curStreak = 1;
+  for (let i = 1; i < sortedDays.length; i++) {
+    const prev = new Date(sortedDays[i - 1] + 'T00:00:00');
+    const curr = new Date(sortedDays[i] + 'T00:00:00');
+    const diff = (curr - prev) / 86400000;
+    if (diff === 1) { curStreak++; maxStreak = Math.max(maxStreak, curStreak); }
+    else { curStreak = 1; }
+  }
+
+  // 四维评估（基于历史全量数据）
+  const fourDimensions = {
+    cognition: { label: '认知', xp: (catStat['学习成长'] || {}).xp || 0, desc: '' },
+    emotion: { label: '情绪', xp: (catStat['能力成长'] || {}).xp || 0, desc: '' },
+    willpower: { label: '意志力', xp: 0, desc: '' },
+    relation: { label: '关系', xp: 0, desc: '' }
+  };
+  // 意志力：阅读坚持、自主打卡
+  const readingCount = xpRecords.filter(r => /阅读/.test(r.taskName || r.title || '')).length;
+  fourDimensions.willpower.xp = readingCount * 5;
+  // 关系：沟通、家务
+  const relationTasks = xpRecords.filter(r => /沟通|家务|收拾|帮忙/.test(r.taskName || r.title || ''));
+  fourDimensions.relation.xp = relationTasks.reduce((s, r) => s + (r.xp || 0), 0);
+
+  // 填充描述
+  fourDimensions.cognition.desc = fourDimensions.cognition.xp > 30 ? '学习投入较多，作业完成有记录' :
+    fourDimensions.cognition.xp > 0 ? '有学习投入，但可以更持续' : '尚未记录学习投入';
+  fourDimensions.emotion.desc = diaries && diaries.length > 0 ? `写过${diaries.length}篇日记，愿意表达和记录` : '还没有写过日记，情绪表达需要更多窗口';
+  fourDimensions.willpower.desc = readingCount > 3 ? `阅读打卡${readingCount}次，展现了坚持的苗头` :
+    readingCount > 0 ? '有阅读记录，但频率还不稳定' : '还没有自主坚持的记录';
+  fourDimensions.relation.desc = relationTasks.length > 0 ? `有${relationTasks.length}次沟通/家务/整理记录` : '还没有主动承担家务或沟通的记录';
+
+  // 家庭会议是否开过
+  const familyMeetingEverHeld = familyMeetings && familyMeetings.length > 0;
+
+  // 最强能力标签（基于分类数据）
+  const strengthLabels = [];
+  if (categoryRank.length > 0) {
+    const top = categoryRank[0];
+    const topMap = { '能力成长': '独立小能手', '学习成长': '学习小达人', '身体成长': '运动小健将', '兴趣爱好': '创意小艺术家' };
+    if (topMap[top.category]) strengthLabels.push(topMap[top.category]);
+  }
+  if (readingCount >= 3) strengthLabels.push('阅读坚持者');
+  if (relationTasks.length >= 2) strengthLabels.push('家庭好帮手');
+  if (diaries && diaries.length >= 2) strengthLabels.push('日记记录者');
+
+  return {
+    hasData: true,
+    totalXp,
+    activeDays: daySet.size,
+    dateRange: sortedDays.length ? { first: sortedDays[0], last: sortedDays[sortedDays.length - 1] } : null,
+    categoryRank,
+    topTasks,
+    maxStreak,
+    fourDimensions,
+    familyMeetingEverHeld,
+    strengthLabels,
+    diaryCount: diaries ? diaries.length : 0
+  };
+}
+
 /* ══════════════════ 4. 组装数据上下文 ══════════════════ */
 function buildContext(week) {
   const child = readJSON('child.json') || {};
@@ -298,6 +404,9 @@ function buildContext(week) {
   // 游戏时间攒点（延迟满足 · 自由时间奖励；结转自上期周报，防无限累积）
   const lastGameTime = (prevReports.length ? prevReports[prevReports.length - 1].gameTime : null);
   analysis.gameTime = computeGameTime(xpRecords, week, lastGameTime);
+
+  // 历史成长画像（GrowthAlgorithm 全面分析）
+  analysis.portrait = historicalPortrait(xpRecords, diaries, familyMeetings);
 
   // 上周周报（用于趋势，取最后一个）
   const lastReport = prevReports.length ? prevReports[prevReports.length - 1] : null;
@@ -324,43 +433,69 @@ const GROWTH_SYSTEM = `
 ## 三条底层原则（必须贯穿全文）
 1. 关系优先：先让孩子感到被看见、被肯定，再谈可以做得更好的地方。
 2. 循序渐进：肯定已经做到的，措辞是"你可以试试"，不是"你应该"。
-3. 区分事实：只基于提供的数据事实说话，不空泛表扬、不做负面标签。
+3. 区分事实：只基于提供的数据事实说话，不空泛表扬、不做负面标签。**严禁编造数据中不存在的成就、约定或行为。**
 
 ## 四维成长视角（GrowthAlgorithm）
 用以下四个维度观察本周孩子的成长，四维要尽量均衡呈现，不要只突出认知和情绪：
 - 认知（学到了什么、完成了什么作业）
 - 情绪（心情如何、是否愿意记录和分享）
-- 意志力（是否坚持、自觉、主动）——本周有"坚持每天阅读30分钟约定"，这是意志力高光，请单独作为一条"最棒的时刻"徽章，不要和认知混在一起
-- 关系（与家人协作、沟通、承担家务）——本周"主动做家务"是唯一缺口，正是下周可开启的成长目标
+- 意志力（是否坚持、自觉、主动）
+- 关系（与家人协作、沟通、承担家务）
 
-"最棒的时刻"(behavior.effortStories) 必须只放真正出自四维的成长高光（坚持、主动、完成作业、遵守约定、助人），严禁放消费流水/买了什么值不值。
+"最棒的时刻"(behavior.effortStories) 必须只放真正出自四维的成长高光（坚持、主动、完成作业、遵守约定、助人），严禁放消费流水/买了什么值不值。**若本周 XP=0 且无真实 effortStories 数据，该字段必须为空数组 []，严禁编造。**
+
+## 空数据周的特殊引导（当 analysis.weekXp=0 时触发）
+当本周没有任何打卡记录时，这是最重要的引导时刻——不能批评、不能编造、不能假装什么都没发生：
+1. **诚实承认**：summary 直接说"这周还没有打卡记录"，不粉饰
+2. **回溯历史力量**：引用 analysis.portrait 中的历史数据，提醒孩子"你之前做到过"（如"你之前连续5天完成作业，说明你有这个能力"）
+3. **低门槛重启**：improve 和 challenge 给一个极低门槛的重新开始建议（如"明天试着做一件小事就好"）
+4. **不表扬不存在的成就**：suggestions.keep 不能写"你的坚持和自律"，应改为鼓励重新出发
+5. **growth.highlights**：不能出现"遵守约定""坚持自律"等虚假亮点，应写"等待新的一周开启成长之旅"
+
+## 家庭会议引导（当 analysis.portrait.familyMeetingEverHeld=false 时触发）
+如果数据中显示从未开过家庭会议，这是需要温柔但明确引导的重要信号：
+- 在 improve 或 challenge 中自然带一句："你和爸爸妈妈还没有一起坐下来聊过成长目标呢，下周可以试试开一个小小的家庭会议，一起定一个你觉得有趣的小目标"
+- 不要把家庭会议说成"任务"，要让孩子觉得是"和爸爸妈妈一起商量一件好玩的事"
+- 家庭会议的意义：帮你找到真正想做的事，而不是别人要你做的事
+
+## 历史成长画像（analysis.portrait 的使用）
+数据中提供了孩子的全面成长画像，包括：
+- portrait.totalXp：历史总 XP
+- portrait.activeDays：历史活跃天数
+- portrait.categoryRank：各分类 XP 排名（能力成长/学习成长/身体成长/兴趣爱好）
+- portrait.topTasks：历史 TOP5 任务
+- portrait.maxStreak：最长连续打卡天数
+- portrait.fourDimensions：四维历史评估（认知/情绪/意志力/关系）
+- portrait.strengthLabels：能力标签（如"独立小能手""阅读坚持者"）
+- portrait.familyMeetingEverHeld：是否开过家庭会议
+
+**使用方式**：
+- 本周有数据时：画像作为背景，在 keep 或 summary 中轻轻提及（如"你一直是**独立小能手**，这周又自己完成了XX"）
+- 本周无数据时：画像是核心引导素材，用"你之前做到过XX"来唤醒孩子的自信心
+- 不要每次都堆砌画像数据，挑最相关的 1-2 个点自然融入
 
 ## 游戏时间攒点（若 analysis.gameTime 提供，必须自然带一句）
 - 数据字段：gameTime.checkedDays(本周打卡天数)、earnedMin(本周攒下分钟)、balance(当前累计可用分钟)、capWeek(每周封顶=60)、balanceCap(结转封顶=120)。
-- 只在 earnedMin>0 时提它；把它定位成"你用工作日踏实打卡，攒来的周末自由时间"，体现"延迟满足"的意志力高光，可以在 summary 或 improve 里轻轻带一句（例如"你靠**坚持打卡**攒下了**X分钟**周末游戏时间"）。**严禁**做成"做了某事=换游戏时间"的交易感，也不要把游戏当成唯一奖励。
+- 只在 earnedMin>0 时提它；把它定位成"你用工作日踏实打卡，攒来的周末自由时间"，体现"延迟满足"的意志力高光，可以在 summary 或 improve 里轻轻带一句。**严禁**做成"做了某事=换游戏时间"的交易感。
 - 同步提醒一句："游戏时间是用来放松的，玩完按时放下就好"，语气温和不训诫。
 
 ## 语气与表达要求
 - 全程第二人称「你」，口语化，像大朋友。
-- 先肯定后引导；表扬要落到具体行为（"你遵守了和爸爸妈妈的约定"）而非空话（"你真棒"）。
+- 先肯定后引导；表扬要落到具体行为而非空话。
 - 建议是邀约"你可以试试…"，不是命令。
-- 支撑四维均衡：若孩子本周在意志力/关系上有表现，导语和"综合建议"应纳入；若某维缺失，用一句"下周可以试着…"轻轻补位，而不是回避。
-- 若家庭约定里有未达成的，challenge 应呼应本周未达成的约定/弱维度；例如"主动做家务"未完成，挑战就建议主动做一件具体家务。
-- 关系维度若"主动做家务"未完成，不要用鼓励性 hack；诚实呈现"这周还没主动承担家务"，作为下周小目标。
-- **challenge 的 +XP 必须可验证**：只能使用上面数据里"家庭约定(commitments)"中该任务配置的真实单次 XP（如"主动做家务"=+5XP、"每天阅读30分钟"=+5XP）。若挑战设定连续 N 天，则总额 = 单次XP × 天数（例如每天做家务+5XP，坚持3天=+15XP），并在末尾明确写出"每天+5XP，坚持N天共+N*5XP"。严禁凭空编造+50XP这类与规则无关的数字。
+- 支撑四维均衡：若某维缺失，用一句"下周可以试着…"轻轻补位。
+- **challenge 的 +XP 必须可验证**：只能使用数据中"家庭约定(commitments)"里配置的真实 XP。若没有家庭约定数据，challenge 的 XP 统一用 +5XP/次，并写明"完成一次+5XP"。严禁凭空编造+50XP这类数字。
 - 用 1 个 emoji 点缀即可，不要堆砌。
 
 ## 高亮标记（硬要求：每个文字字段必须包含至少一处 ** 标记）
-对文本中的关键数据（XP、天数、百分比）、表扬关键词（"说到做到""小达人""坚持""自律""责任感"）、关键行为，**必须用双星号 **包裹**。每条字段（summary/keep/improve/challenge/effortStories.story）至少包含 1-2 处 ** 高亮。这在 JSON 中就是普通的文本，只是用 ** 做为标记，前端会自动渲染。
+对关键数据、表扬关键词、关键行为，**必须用双星号 **包裹**。每条字段至少包含 1-2 处 ** 高亮。
 
 ## 严格禁止重复内容（每个板块写不同的事）
-- **summary**：一句话总览最高光，只说一个亮点，不列清单
-- **effortStories**：每篇故事是不同的独立场景，只说具体的事
+- **summary**：一句话总览最高光，只说一个亮点
+- **effortStories**：每篇故事是不同的独立场景
 - **keep**：抽象品质总结，不用具体行为
 - **improve**：改进方向，不重复 summary 提过的事
 - **challenge**：具体挑战任务，和 improve 方向一致
-
-检查方法：写完所有字段后，如果发现高亮标记导致内容重复，保留高亮、换句话表达，**不要删高亮**。
 
 ## 输出格式（严格 JSON，不要 markdown 代码块，不要任何解释文字）
 {
@@ -369,7 +504,7 @@ const GROWTH_SYSTEM = `
   "year": <数值>,
   "date": "<本周结束日期 YYYY-MM-DD>",
   "generatedAt": "<ISO时间戳>",
-  "summary": "<1-2句第二人称摘要，只说最高光亮点，不列清单！必须包含 ** 高亮。如'这周你**坚持做了阅读约定**，能量积累了**40点**！'>",
+  "summary": "<1-2句第二人称摘要。本周XP>0时说最高光亮点；XP=0时诚实说'这周还没有打卡记录'并引用历史力量鼓励。必须包含 ** 高亮。">,
   "stats": {
     "energy": { "value": <本周XP总数>, "trend": "up|down|stable", "diff": <与上周差值的绝对值> },
     "study": { "value": <本周完成作业数>, "trend": "up|down|stable", "diff": <差值>, "hasData": <bool> },
@@ -377,32 +512,32 @@ const GROWTH_SYSTEM = `
     "diary": { "value": <本周日记篇数>, "trend": "up|down|stable", "diff": <差值> }
   },
   "academic": {
-    "homework": { "subjects": ["<有作业的科目，必须用 analysis.hwSubjects 里的真实科目，如语文/数学/英语；若为空则给[]>"] },
+    "homework": { "subjects": ["<真实科目，无则[]>"] },
     "trends": [],
     "weakModules": [],
     "hasData": <bool>,
-    "emptyHint": "<无学习数据时，用鼓励口吻提示本周可开启的小目标，带1个emoji>"
+    "emptyHint": "<无学习数据时的鼓励，带1个emoji>"
   },
   "behavior": {
-    "profile": [ { "category": "<成长分类>", "count": <次数>, "xp": <XP> } ],
-    "effortStories": [ { "subject": "<成长行为>", "date": "<日期>", "story": "<孩子具体怎么做的，必须包含 ** 高亮。每个故事必须是独立场景，互不相同，严禁放消费流水>" } ],
+    "profile": [ { "category": "<分类>", "count": <次数>, "xp": <XP> } ],
+    "effortStories": [ { "subject": "<成长行为>", "date": "<日期>", "story": "<具体行为，含**高亮。XP=0时必须为空数组>" } ],
     "badge": { "earned": false, "type": "", "days": 0, "name": "" }
   },
   "emotion": {
     "diaryTrend": "low|normal|high",
     "diaryCount": <本周日记篇数>,
     "moodDistribution": { "<表情>": <次数> },
-    "bestDiary": { "snippet": "<本周最佳日记完整句子，不截断>", "date": "<日期>", "elements": <四要素命中数0-5> },
+    "bestDiary": { "snippet": "<最佳日记句子>", "date": "<日期>", "elements": <命中数0-5> },
     "financeStatus": "good|watch|alert",
     "financeWorthIt": <值得率百分比>
   },
   "suggestions": {
-    "keep": "成就达成：<抽象品质总结，不写具体行为，必须包含 ** 高亮。如'你的**自律**让成长闪闪发光'>",
-    "improve": "试试看：<1条邀请式的小建议，呼应本周较弱的一个维度，不要重复summary已经说过的事，必须包含 ** 高亮>",
-    "challenge": "趣味挑战：<一个有趣的本周挑战，和improve方向一致，必须包含 ** 高亮，末尾必须带 +XP>"
+    "keep": "成就达成：<抽象品质总结，XP=0时写鼓励重新出发，含**高亮>",
+    "improve": "试试看：<1条小建议，XP=0时引用历史力量+低门槛重启；从未开家庭会议时温柔引导，含**高亮>",
+    "challenge": "趣味挑战：<具体挑战，含**高亮，末尾带+XP>"
   },
   "growth": {
-    "profileUpdate": { "highlights": ["<3-5个具体闪光点，用行为而非标签>"], "date": "<本周结束日期>" }
+    "profileUpdate": { "highlights": ["<3-5个闪光点，XP=0时写等待重新出发>"], "date": "<本周结束日期>" }
   }
 }
 `;
@@ -454,6 +589,15 @@ async function main() {
   console.log(`  作业: ${analysis.hwDoneCount}/${analysis.hwTotalCount}`);
   console.log(`  四维: ${JSON.stringify(analysis.dimension)}`);
   console.log(`  约定: ${analysis.commitmentSummary.map(c => (c.done ? '✓' : '○') + c.text).join('  ') || '(无)'}`);
+  // 历史成长画像摘要
+  if (analysis.portrait && analysis.portrait.hasData) {
+    console.log(`\n[历史成长画像]`);
+    console.log(`  总XP: ${analysis.portrait.totalXp}  活跃天数: ${analysis.portrait.activeDays}  最长连续: ${analysis.portrait.maxStreak}天`);
+    console.log(`  分类TOP: ${analysis.portrait.categoryRank.slice(0, 3).map(c => c.category + '(' + c.xp + 'XP)').join(', ')}`);
+    console.log(`  能力标签: ${analysis.portrait.strengthLabels.join('、') || '(无)'}`);
+    console.log(`  家庭会议: ${analysis.portrait.familyMeetingEverHeld ? '已开过' : '从未开过 ← 需要引导'}`);
+    console.log(`  四维: ${Object.values(analysis.portrait.fourDimensions).map(d => d.label + '=' + d.desc.slice(0, 15)).join(' | ')}`);
+  }
 
   // 组装消息
   const dataContext = {
