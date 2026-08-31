@@ -227,12 +227,12 @@
         "id": "xpr_mtgwxiztt581"
       },
       {
-        "name": "每天10点前关灯睡觉",
+        "id": "xpr_mtgwxiztt8at",
+        "name": "21点洗漱、22点关灯睡觉",
         "category": "身体成长",
         "xp": 5,
         "method": "按次",
-        "description": "",
-        "id": "xpr_mtgwxiztt8at"
+        "description": ""
       },
       {
         "name": "做锻炼身体/户外 30分钟",
@@ -472,12 +472,12 @@
       "id": "xpr_mtgwxiztt581"
     },
     {
-      "name": "每天10点前关灯睡觉",
+      "id": "xpr_mtgwxiztt8at",
+      "name": "21点洗漱、22点关灯睡觉",
       "category": "身体成长",
       "xp": 5,
       "method": "按次",
-      "description": "",
-      "id": "xpr_mtgwxiztt8at"
+      "description": ""
     },
     {
       "name": "做锻炼身体/户外 30分钟",
