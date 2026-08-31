@@ -749,9 +749,10 @@ async function main() {
         }
       }
 
-      // 4. suggestions.keep 校验：XP=0 时不能表扬不存在的成就
+      // 4. suggestions.keep 校验：XP=0 时不能表扬"本周"不存在的成就，
+      //    但保留"一直/曾经"等回溯历史的真实表扬（符合空数据周引导）
       if (!hasAnyXp && parsed.suggestions && parsed.suggestions.keep) {
-        if (/坚持|自律|遵守|约定|说到做到/.test(parsed.suggestions.keep)) {
+        if (/这周|本周|坚持了|完成了|兑现了|遵守了/.test(parsed.suggestions.keep)) {
           parsed.suggestions.keep = '成就达成：新的一周即将开始，你已经准备好了！';
         }
       }
