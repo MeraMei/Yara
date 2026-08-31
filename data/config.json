@@ -299,14 +299,6 @@
         "method": "按次",
         "description": "",
         "id": "xpr_mtgwxiztfjh8"
-      },
-      {
-        "id": "xpr_mtgwxiztp8ic",
-        "name": "21点开始洗漱，22点关灯睡觉",
-        "category": "能力成长",
-        "xp": 5,
-        "method": "按次",
-        "description": ""
       }
     ]
   },
@@ -462,14 +454,6 @@
       "method": "按次",
       "description": "",
       "id": "xpr_mtgwxiztfjh8"
-    },
-    {
-      "id": "xpr_mtgwxiztp8ic",
-      "name": "21点开始洗漱，22点关灯睡觉",
-      "category": "能力成长",
-      "xp": 5,
-      "method": "按次",
-      "description": ""
     },
     {
       "name": "照顾好自己（营养均衡、午休）",
