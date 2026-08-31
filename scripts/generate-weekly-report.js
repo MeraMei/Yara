@@ -384,8 +384,34 @@ function historicalPortrait(xpRecords, diaries, familyMeetings) {
     fourDimensions,
     familyMeetingEverHeld,
     strengthLabels,
-    diaryCount: diaries ? diaries.length : 0
+    diaryCount: diaries ? diaries.length : 0,
+    avgWeeklyXp: calcAvgWeeklyXp(xpRecords)
   };
+}
+
+// 计算历史平均每周 XP（用于判断"低数据周"）
+function calcAvgWeeklyXp(xpRecords) {
+  if (!xpRecords || xpRecords.length === 0) return 0;
+  const weekMap = {};
+  xpRecords.forEach(r => {
+    const d = String(r.date || r.datetime || '').slice(0, 10);
+    if (!d) return;
+    const dt = new Date(d + 'T00:00:00');
+    const wk = getISOWeekKey(dt);
+    weekMap[wk] = (weekMap[wk] || 0) + (Number(r.xp) || 0);
+  });
+  const weeks = Object.values(weekMap);
+  if (weeks.length === 0) return 0;
+  return Math.round(weeks.reduce((s, v) => s + v, 0) / weeks.length);
+}
+
+function getISOWeekKey(d) {
+  const date = new Date(d.getTime());
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+  const week1 = new Date(date.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  return date.getFullYear() + '-W' + String(weekNum).padStart(2, '0');
 }
 
 /* ══════════════════ 4. 组装数据上下文 ══════════════════ */
@@ -451,6 +477,14 @@ const GROWTH_SYSTEM = `
 3. **低门槛重启**：improve 和 challenge 给一个极低门槛的重新开始建议（如"明天试着做一件小事就好"）
 4. **不表扬不存在的成就**：suggestions.keep 不能写"你的坚持和自律"，应改为鼓励重新出发
 5. **growth.highlights**：不能出现"遵守约定""坚持自律"等虚假亮点，应写"等待新的一周开启成长之旅"
+
+## 低数据周的加强引导（当 analysis.weekXp > 0 但明显低于 analysis.portrait.avgWeeklyXp 时触发）
+当本周有打卡但明显低于历史平均水平（weekXp < avgWeeklyXp * 0.5）时，同样需要加强引导：
+1. **先肯定已做到的**：哪怕只有 1 次打卡，也要具体表扬那一次（如"你虽然这周只打了1次卡，但你完成了XX，说明你心里一直记着"）
+2. **温和指出落差**：用对比方式让孩子自己意识到差距（如"你平时一周能攒30多XP，这周只有10XP，是不是有什么事耽误了？"）
+3. **回溯历史高光**：引用 portrait 中的强项数据，提醒孩子"你之前做到过XX，那才是真正的你"
+4. **improve 要更有针对性**：不是泛泛的"多努力"，而是具体指出哪个维度下降了（如"你之前能力成长最强，这周完全没动，下周可以试试主动做一件家务"）
+5. **challenge 要有恢复感**：不是从零开始，而是"回到你之前的节奏"（如"试试恢复到之前连续3天打卡的状态"）
 
 ## 家庭会议引导（当 analysis.portrait.familyMeetingEverHeld=false 时触发）
 如果数据中显示从未开过家庭会议，这是需要温柔但明确引导的重要信号：
@@ -596,6 +630,12 @@ async function main() {
     console.log(`  分类TOP: ${analysis.portrait.categoryRank.slice(0, 3).map(c => c.category + '(' + c.xp + 'XP)').join(', ')}`);
     console.log(`  能力标签: ${analysis.portrait.strengthLabels.join('、') || '(无)'}`);
     console.log(`  家庭会议: ${analysis.portrait.familyMeetingEverHeld ? '已开过' : '从未开过 ← 需要引导'}`);
+    console.log(`  平均周XP: ${analysis.portrait.avgWeeklyXp}  本周XP: ${analysis.weekXp}`);
+    // 数据水平判断
+    const level = analysis.weekXp === 0 ? '空数据' :
+      analysis.weekXp < analysis.portrait.avgWeeklyXp * 0.5 ? '低数据' :
+      analysis.weekXp < analysis.portrait.avgWeeklyXp * 0.8 ? '偏低' : '正常';
+    console.log(`  数据水平: ${level}${level === '空数据' || level === '低数据' ? ' ← 需要加强引导' : ''}`);
     console.log(`  四维: ${Object.values(analysis.portrait.fourDimensions).map(d => d.label + '=' + d.desc.slice(0, 15)).join(' | ')}`);
   }
 
