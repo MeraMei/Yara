@@ -277,12 +277,12 @@
         "id": "xpr_mtgwxiztjawn"
       },
       {
-        "name": "与父母沟通自己近期成长",
+        "id": "xpr_mtgwxiztfnjl",
+        "name": "与父母沟通自己近期成长/心情",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": "",
-        "id": "xpr_mtgwxiztfnjl"
+        "description": ""
       },
       {
         "name": "财务能力分析（复盘）",
@@ -432,12 +432,12 @@
       "id": "xpr_mtgwxiztjawn"
     },
     {
-      "name": "与父母沟通自己近期成长",
+      "id": "xpr_mtgwxiztfnjl",
+      "name": "与父母沟通自己近期成长/心情",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": "",
-      "id": "xpr_mtgwxiztfnjl"
+      "description": ""
     },
     {
       "name": "财务能力分析（复盘）",
