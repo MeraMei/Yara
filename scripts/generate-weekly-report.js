@@ -177,11 +177,11 @@ function growthAnalysis(ctx) {
     .filter(s => s.length > 0)
     .filter((v, i, a) => a.indexOf(v) === i); // 去重
 
-  // 3.5 家庭约定（来自最近一次家庭会议）
+  // 3.5 家庭约定（本周=本周报 weekNumber 对应的那一次家庭会议；不是"最新会议"）
   const fmList = ctx.familyMeetings || [];
   let currentCommitment = null;
   for (const fm of fmList) {
-    if (fm.commitments && fm.commitments.length) { currentCommitment = fm; break; }
+    if (fm.weekNumber === week.weekNumber && fm.commitments && fm.commitments.length) { currentCommitment = fm; break; }
   }
   const commitmentSummary = currentCommitment
     ? currentCommitment.commitments.map(c => ({
@@ -234,6 +234,54 @@ function growthAnalysis(ctx) {
   };
 }
 
+/* ══════════════════ 3.7 游戏时间攒点（延迟满足 · 自由时间奖励） ══════════════════ */
+// GrowthAlgorithm 约束：
+//   - 只算【周一到周五】的真实成长打卡（当天完成 ≥1 项手动成长任务），周六日不攒
+//     （攒在工作日、花在周末，天然区隔，避免"游戏时间"与"上学日"冲突周二到四受影响）。
+//   - 每个打卡日 +12 分钟；每周新增封顶 +60 分钟（避免无限膨胀，保持稀缺感）。
+//   - 未用余额可结转，但总可用封顶 120 分钟（防积压成不可控的"游戏额度"）。
+//   - 定位是"自由时间奖励"，不是"把学习变成交易"；由家长在周末温和执行、按时回收。
+function computeGameTime(xpRecords, week, lastGameTime) {
+  const growthCats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
+  const earnPerDay = 12;   // 分钟/打卡日
+  const capWeek = 60;      // 每周新增封顶（分钟）
+  const balanceCap = 120;  // 结转可用封顶（分钟）
+
+  function isAutoOrSpend(r) {
+    const n = String(r.title || r.taskName || '');
+    const d = String(r.description || '');
+    const cat = String(r.taskCategory || r.xpCategory || '');
+    const isSpend = /财务能力分析|财务|值得/.test(n + cat) && /买|花|元|值得|支出/.test(n + d);
+    const isAuto = /作业·/.test(n) || /认真投入/.test(n)
+      || n.indexOf('财务能力分析') >= 0 || /写日记/.test(n) || /自动发放/.test(d);
+    return isAuto || isSpend;
+  }
+
+  // 工作日判定：周一..周五
+  function isWeekday(iso) {
+    const day = new Date(iso + 'T00:00:00').getDay(); // 0=周日
+    return day >= 1 && day <= 5;
+  }
+
+  const daySet = new Set();
+  (xpRecords || []).forEach(r => {
+    const d = String(r.date || r.datetime || '').slice(0, 10);
+    if (!(d >= week.start && d <= week.end)) return;
+    if (isAutoOrSpend(r)) return;
+    if (!isWeekday(d)) return;
+    const cat = String(r.taskCategory || r.xpCategory || '');
+    if (growthCats.indexOf(cat) < 0) return;   // 只认真实成长分类里的手动打卡
+    daySet.add(d);
+  });
+
+  const checkedDays = daySet.size;
+  const earnedMin = Math.min(checkedDays * earnPerDay, capWeek);
+  const carryMin = Math.min(Number((lastGameTime && lastGameTime.balance) || 0), balanceCap);
+  const balance = Math.min(carryMin + earnedMin, balanceCap);
+
+  return { checkedDays, earnedMin, capWeek, balance, balanceCap, carryMin };
+}
+
 /* ══════════════════ 4. 组装数据上下文 ══════════════════ */
 function buildContext(week) {
   const child = readJSON('child.json') || {};
@@ -246,6 +294,10 @@ function buildContext(week) {
 
   const ctx = { xpRecords, diaries, finance, study, familyMeetings };
   const analysis = growthAnalysis({ ...ctx, homework: study.allHomework || [], week });
+
+  // 游戏时间攒点（延迟满足 · 自由时间奖励；结转自上期周报，防无限累积）
+  const lastGameTime = (prevReports.length ? prevReports[prevReports.length - 1].gameTime : null);
+  analysis.gameTime = computeGameTime(xpRecords, week, lastGameTime);
 
   // 上周周报（用于趋势，取最后一个）
   const lastReport = prevReports.length ? prevReports[prevReports.length - 1] : null;
@@ -283,12 +335,18 @@ const GROWTH_SYSTEM = `
 
 "最棒的时刻"(behavior.effortStories) 必须只放真正出自四维的成长高光（坚持、主动、完成作业、遵守约定、助人），严禁放消费流水/买了什么值不值。
 
+## 游戏时间攒点（若 analysis.gameTime 提供，必须自然带一句）
+- 数据字段：gameTime.checkedDays(本周打卡天数)、earnedMin(本周攒下分钟)、balance(当前累计可用分钟)、capWeek(每周封顶=60)、balanceCap(结转封顶=120)。
+- 只在 earnedMin>0 时提它；把它定位成"你用工作日踏实打卡，攒来的周末自由时间"，体现"延迟满足"的意志力高光，可以在 summary 或 improve 里轻轻带一句（例如"你靠**坚持打卡**攒下了**X分钟**周末游戏时间"）。**严禁**做成"做了某事=换游戏时间"的交易感，也不要把游戏当成唯一奖励。
+- 同步提醒一句："游戏时间是用来放松的，玩完按时放下就好"，语气温和不训诫。
+
 ## 语气与表达要求
 - 全程第二人称「你」，口语化，像大朋友。
 - 先肯定后引导；表扬要落到具体行为（"你遵守了和爸爸妈妈的约定"）而非空话（"你真棒"）。
 - 建议是邀约"你可以试试…"，不是命令。
 - 支撑四维均衡：若孩子本周在意志力/关系上有表现，导语和"综合建议"应纳入；若某维缺失，用一句"下周可以试着…"轻轻补位，而不是回避。
-- 挑战(suggestions.challenge)应呼应本周未达成的约定/弱维度：例如本周"主动做家务"未完成，挑战就建议主动做一件具体家务。
+- 若家庭约定里有未达成的，challenge 应呼应本周未达成的约定/弱维度；例如"主动做家务"未完成，挑战就建议主动做一件具体家务。
+- 关系维度若"主动做家务"未完成，不要用鼓励性 hack；诚实呈现"这周还没主动承担家务"，作为下周小目标。
 - **challenge 的 +XP 必须可验证**：只能使用上面数据里"家庭约定(commitments)"中该任务配置的真实单次 XP（如"主动做家务"=+5XP、"每天阅读30分钟"=+5XP）。若挑战设定连续 N 天，则总额 = 单次XP × 天数（例如每天做家务+5XP，坚持3天=+15XP），并在末尾明确写出"每天+5XP，坚持N天共+N*5XP"。严禁凭空编造+50XP这类与规则无关的数字。
 - 用 1 个 emoji 点缀即可，不要堆砌。
 
@@ -460,6 +518,8 @@ async function main() {
       if (!parsed.academic) parsed.academic = {};
       if (!parsed.academic.homework) parsed.academic.homework = {};
       parsed.academic.homework.subjects = (analysis.hwSubjects || []).slice();
+      // 覆写游戏时间攒点（以本次真实打卡计算为准，防模型编造）
+      parsed.gameTime = analysis.gameTime || { checkedDays: 0, earnedMin: 0, capWeek: 60, balance: 0, balanceCap: 120, carryMin: 0 };
       // 严格校验：作业数务必与真实值一致
       if (parsed.stats && parsed.stats.study) {
         parsed.stats.study.value = analysis.hwDoneCount;

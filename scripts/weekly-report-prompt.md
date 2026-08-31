@@ -54,6 +54,14 @@
     ],
     "badge": { "earned": true|false, "type": "small_perseverance|big_perseverance", "days": <连续天数>, "name": "<徽章名>" }
   },
+  "gameTime": {
+    "checkedDays": <本周打卡天数>,
+    "earnedMin": <本周攒下分钟>,
+    "capWeek": 60,
+    "balance": <累计可用分钟>,
+    "balanceCap": 120,
+    "carryMin": <上期结转分钟>
+  },
   "emotion": {
     "diaryTrend": "low|normal|high",
     "diaryCount": <本周日记篇数>,

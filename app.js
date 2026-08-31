@@ -843,6 +843,34 @@ async function addDiaryEntry(entry) {
 // ── 家庭会议记录存取 ──
 
 // 读取家庭会议列表（优先缓存，缓存为空时从 GitHub 拉取）
+/* ═══════════ 本周约定统一口径 ═══════════
+   本周 = 今天所在的 ISO 周号（与 scripts/generate-weekly-report.js 的 weekNumber 同源）。
+   约定只认"周号 == 本周"的那次家庭会议；不是本周的一律不算"本周约定"。 */
+function isoWeekNumber(dateStr) {
+  var t = new Date(dateStr + 'T00:00:00');
+  t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
+  var w1 = new Date(t.getFullYear(), 0, 4);
+  return 1 + Math.round(((t - w1) / 86400000 - 3 + ((w1.getDay() + 6) % 7)) / 7);
+}
+function currentWeekNumber() {
+  var now = new Date();
+  var m = String(now.getMonth() + 1).padStart(2, '0');
+  var d = String(now.getDate()).padStart(2, '0');
+  return isoWeekNumber(now.getFullYear() + '-' + m + '-' + d);
+}
+function meetingByWeek(fmList, wn) {
+  var list = fmList || [];
+  for (var i = 0; i < list.length; i++) {
+    var mt = list[i];
+    if (mt.weekNumber === wn && mt.commitments && mt.commitments.length) return mt;
+  }
+  return null;
+}
+// 本周约定会议：严格取"周号==本周"的会议，否则返回 null（展示"去定一个约定"）
+function currentWeekMeeting(fmList) { return meetingByWeek(fmList, currentWeekNumber()); }
+// 上周约定会议：周号 == 本周-1（用于周会"上周约定"回顾）
+function prevWeekMeeting(fmList) { return meetingByWeek(fmList, currentWeekNumber() - 1); }
+
 async function loadFamilyMeetings() {
   if (cachedData && Array.isArray(cachedData.familyMeetings) && cachedData.familyMeetings.length > 0) {
     return cachedData.familyMeetings;
@@ -2216,9 +2244,8 @@ if (typeof window !== "undefined") {
       const cfg = await loadAppData();
       const xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
       const categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
-      // 获取本周约定
-      const meetings = (cfg.familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
-      const meeting = meetings.length > 0 ? meetings[0] : null;
+      // 获取本周约定（严格取"周号==本周"的会议，而不是最新会议）
+      const meeting = currentWeekMeeting(cfg.familyMeetings);
       const activeCommitments = meeting ? meeting.commitments.filter(function(c) { return !c.completed; }) : [];
       // 分类：关联任务池的约定（linked） vs 自由填写（非linked）
       const linkedCommitments = activeCommitments.filter(c => c.linked);
@@ -2243,26 +2270,18 @@ if (typeof window !== "undefined") {
           commitmentGroup.innerHTML = `<option value="" disabled>${linkedCommitments.length > 0 ? '🎉 本周约定全部完成！' : '还没有约定，去家庭会议定一个'}</option>`;
         }
       }
-      // ── 每个分类：先显示本周约定关联的任务（🔗 排最前），再显示任务池其他任务 ──
+      // ── 每个分类：只渲染任务池任务（约定不在此置顶，避免脏数据把普通任务带偏成"约定"） ──
       categories.forEach(cat => {
         const groupEl = document.getElementById("xpGroupPage-" + cat);
         if (!groupEl) return;
-        const linked = linkedByCat[cat] || [];
-        const linkedNames = new Set(linked.map(c => c.taskName || c.text));
-        // 任务池任务：排除自动发放、排除手动新增（单独分组）、排除已被约定关联的任务（避免重复）
+        // 任务池任务：排除自动发放、排除手动新增（单独分组）
         const tasks = (xpRules[cat] || []).filter(t =>
-          !isAutoTask(t) && !t._manual && !linkedNames.has(t.name)
+          !isAutoTask(t) && !t._manual
         );
-        // 关联约定任务排最前
-        const linkedHtml = linked.map(c => {
-          const xp = c.xp || 5;
-          const taskName = c.taskName || c.text;
-          return `<option value="${taskName}" data-xp="${xp}" data-category="${cat}" data-commitment="1" data-linked="1" data-taskname="${taskName}">🔗 ${c.text} (+${xp}XP)</option>`;
-        }).join("");
         const otherHtml = tasks.map(t =>
           `<option value="${t.name}" data-xp="${t.xp}" data-category="${cat}">${t.name} (+${t.xp}XP)</option>`
         ).join("");
-        groupEl.innerHTML = linkedHtml + otherHtml;
+        groupEl.innerHTML = otherHtml || `<option value="" disabled>还没有该分类的任务</option>`;
       });
       // ── 手动新增分组：所有手动新增的任务单独放一起 ──
       const manualGroup = document.getElementById("xpGroupPage-手动新增");
@@ -2296,9 +2315,8 @@ if (typeof window !== "undefined") {
       if (!checked) { hint.style.display = "none"; return; }
       // 从家庭会议中获取本周约定
       var cfg = window.__lastCfg || {};
-      var meetings = (cfg.familyMeetings || []).filter(function(m) { return m.commitments && m.commitments.length > 0; });
-      if (meetings.length > 0) {
-        var meeting = meetings[0];
+      var meeting = currentWeekMeeting(cfg.familyMeetings);
+      if (meeting) {
         var texts = meeting.commitments.map(function(c) { return c.text; });
         var linkedTexts = meeting.commitments.filter(function(c) { return c.linked; }).map(function(c) { return c.text; });
         var extra = linkedTexts.length > 0
@@ -2524,14 +2542,8 @@ if (typeof window !== "undefined") {
         // 2. 自由填写的约定：通过 text 匹配（从本周约定选的）
         try {
           const cfgNow = window.__lastCfg || {};
-          const meetings = cfgNow.familyMeetings || [];
           const linkedTaskName = selectedOpt?.dataset?.taskname || taskName;
-          const meeting = meetings.find(m => m.commitments && m.commitments.some(c => {
-            if (c.completed) return false;
-            if (c.linked && c.taskName === linkedTaskName) return true;
-            if (isCommitmentTask && !c.linked && c.text === taskName) return true;
-            return false;
-          }));
+          const meeting = currentWeekMeeting(cfgNow.familyMeetings);
           if (meeting) {
             let changed = false;
             meeting.commitments.forEach(c => {
@@ -4057,12 +4069,8 @@ async function renderHome() {
   // ═══ ① 行为卡片列表（图3：挑战 / 记录 / 日记 / 约定 / 作业统计） ═══
   const cards = [];
 
-  // 1. 本周挑战（引导去家庭例会，直到在例会上填好「明确约定」）
-  // 挑战不再由孩子单独"自己选"，而是来自家庭庆祝会与爸爸妈妈一起定下的「明确约定」。
-  // 还没填约定 → 引导去开家庭例会；填了 → 显示约定完成状态。
-  var fmList = cfg.familyMeetings || [];
-  var lastFm = null;
-  for (var fi = 0; fi < fmList.length; fi++) { if (fmList[fi].commitments && fmList[fi].commitments.length > 0) { lastFm = fmList[fi]; break; } }
+  // 本周挑战：取"周号==本周"的家庭会议，展示本周约定的完成状态
+  var lastFm = currentWeekMeeting(cfg.familyMeetings);
   if (lastFm) {
     var commDone = lastFm.commitments.filter(function(c) { return c.completed; });
     var commUndone = lastFm.commitments.filter(function(c) { return !c.completed; });
@@ -4346,6 +4354,35 @@ function buildWrStatsHtml(stats) {
   }).join("");
 }
 
+// 实时计算"游戏时间攒点"（与 scripts/generate-weekly-report.js 的 computeGameTime 同规则）
+// 只算周一~周五的真实成长打卡（剔除自动/消费流水），每天+12分钟，周封顶60，结转可用封顶120。
+function buildRealtimeGameTime(recs, fromISO, toISO, carryMin) {
+  var growthCats = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
+  var earnPerDay = 12, capWeek = 60, balanceCap = 120;
+  function isAutoOrSpend(r) {
+    var n = String(r.title || r.taskName || ""), d = String(r.description || ""), cat = String(r.taskCategory || r.xpCategory || "");
+    var isSpend = /财务能力分析|财务|值得/.test(n + cat) && /买|花|元|值得|支出/.test(n + d);
+    var isAuto = /作业·/.test(n) || /认真投入/.test(n) || n.indexOf("财务能力分析") >= 0 || /写日记/.test(n) || /自动发放/.test(d);
+    return isAuto || isSpend;
+  }
+  function isWeekday(iso) { var day = new Date(iso + "T00:00:00").getDay(); return day >= 1 && day <= 5; }
+  var daySet = {};
+  (recs || []).forEach(function(r) {
+    var d = getDateStr(r).slice(0, 10);
+    if (!(d >= fromISO && d <= toISO)) return;
+    if (isAutoOrSpend(r)) return;
+    if (!isWeekday(d)) return;
+    var cat = String(r.taskCategory || r.xpCategory || "");
+    if (growthCats.indexOf(cat) < 0) return;
+    daySet[d] = 1;
+  });
+  var days = Object.keys(daySet).length;
+  var earned = Math.min(days * earnPerDay, capWeek);
+  var carry = Math.min(Number(carryMin || 0), balanceCap);
+  var balance = Math.min(carry + earned, balanceCap);
+  return { checkedDays: days, earnedMin: earned, capWeek: capWeek, balance: balance, balanceCap: balanceCap, carryMin: carry };
+}
+
 function renderAiWeeklyReport(cfg) {
   const section = document.getElementById("weeklyReportSection");
   if (!section) return;
@@ -4415,6 +4452,10 @@ function renderAiWeeklyReport(cfg) {
     realtimeStats.energy = Object.assign({}, realtimeStats.energy, { value: weekTotalXp });
   }
   enhancedReport.stats = realtimeStats;
+
+  // 游戏时间攒点（实时，与生成器同规则；结转取本期报告记录的 carryMin）
+  var gtCarry = (currentReport.gameTime || {}).carryMin || 0;
+  enhancedReport.gameTime = buildRealtimeGameTime(weekXpRecs, weekStartStr, todayStrVal, gtCarry);
 
   var childName = (cfg.child && cfg.child.name) || "Yara";
   document.getElementById("wrHero").innerHTML = renderWrHero(enhancedReport, childName);
@@ -4582,6 +4623,21 @@ function renderWrData(report) {
   if (badge.earned) {
     var badgeText = badge.type === "small_perseverance" ? "🏅 小坚持" : "🏆 大毅力";
     html += '<div class="wr-badge-row"><span class="wr-badge">' + badgeText + ' · 连续 ' + badge.days + ' 天</span></div>';
+  }
+
+  // ═══ 板块 D：游戏时间攒点 ═══
+  var gt = report.gameTime || {};
+  var gtEarned = gt.earnedMin || 0;
+  var gtBalance = gt.balance || 0;
+  if (gtEarned > 0 || gtBalance > 0) {
+    html += '<div class="wr-data-section">';
+    html += '<div class="wr-data-label-v2">🎮 你的游戏时间</div>';
+    html += '<div class="wr-act-list">';
+    html += '<div class="wr-act-row"><span class="wr-act-icon">✅</span><span class="wr-act-text">本周靠工作日踏实打卡，攒下 <b>' + gtEarned + '</b> 分钟</span></div>';
+    html += '<div class="wr-act-row"><span class="wr-act-icon">⏳</span><span class="wr-act-text">现在能玩的累计余额 <b>' + gtBalance + '</b> 分钟</span></div>';
+    html += '</div>';
+    html += '<div style="font-size:12px;color:var(--neutral-400);margin-top:8px;line-height:1.6">游戏时间是用来放松的，玩完按时放下就好～</div>';
+    html += '</div>';
   }
 
   if (!html) html = '<div class="wr-empty-hint">还没有记录，快去打卡吧</div>';
@@ -4940,12 +4996,11 @@ function openFamilyMeeting() {
   var reports = cfg.aiWeeklyReports || [];
   var currentReport = reports.length > 0 ? reports[reports.length - 1] : null;
   if (!currentReport) { showToast("还没有成长周报，请先等待周报生成", false); return; }
-  document.getElementById("fmWeekNumber").textContent = currentReport.weekNumber;
+  document.getElementById("fmWeekNumber").textContent = currentWeekNumber();
   var previewEl = document.getElementById("fmPreviewContent");
   if (previewEl) previewEl.textContent = currentReport.summary || "暂无";
-  // 检查上周承诺
-  var meetings = cfg.familyMeetings || [];
-  var lastMeeting = meetings.length > 0 ? meetings[0] : null;
+  // 检查上周承诺（严格取"周号==本周-1"的会议）
+  var lastMeeting = prevWeekMeeting(cfg.familyMeetings);
   var hintEl = document.getElementById("fmPreviousGoalHint");
   if (hintEl) {
     if (lastMeeting && lastMeeting.commitments && lastMeeting.commitments.length > 0) {
@@ -5003,14 +5058,13 @@ async function submitFamilyMeeting() {
       }
     }
   });
-  var meetings = cfg.familyMeetings || [];
-  var lastMeeting = meetings.length > 0 ? meetings[0] : null;
+  var lastMeeting = prevWeekMeeting(cfg.familyMeetings);
   var btn = document.querySelector("#familyMeetingModal .btn-confirm");
   btn.disabled = true;
   btn.textContent = "保存中…";
   try {
     await window.DataStore.addFamilyMeeting({
-      weekNumber: currentReport.weekNumber,
+      weekNumber: currentWeekNumber(),
       year: currentReport.year || new Date().getFullYear(),
       date: new Date().toISOString().slice(0, 10),
       summary: summary,
@@ -5526,8 +5580,7 @@ window.approveXpRecord = async function(btn, recordId, recordEl) {
     // 检查是否为承诺兑现记录，如果是则同步标记家庭会议约定完成
     const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === recordId);
     if (record && record.commitmentBonus) {
-      const meetings = (cachedData && cachedData.familyMeetings || []);
-      const meeting = meetings.find(m => m.commitments && m.commitments.length > 0);
+      const meeting = currentWeekMeeting(cachedData && cachedData.familyMeetings);
       if (meeting && meeting.commitments) {
         const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
         if (targetText) {
@@ -5649,8 +5702,7 @@ async function confirmApproveWithComment() {
     // 注意：linked（任务池关联）约定在打卡提交时已自动标记完成，这里只处理 free（自由填写）约定
     const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === id);
     if (record && record.commitmentBonus) {
-      const meetings = (cachedData && cachedData.familyMeetings || []);
-      const meeting = meetings.find(m => m.commitments && m.commitments.length > 0);
+      const meeting = currentWeekMeeting(cachedData && cachedData.familyMeetings);
       if (meeting && meeting.commitments) {
         const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
         if (targetText) {
