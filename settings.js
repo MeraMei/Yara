@@ -350,6 +350,7 @@ function recalcXp(mode) {
 
 /* ════════ 任务规则 · 动态渲染 & 编辑 ════════ */
 var _ruleData = null; // 缓存 config.json 的 xpRules
+var _fullConfig = null; // 缓存完整 config.json（增删改时直接基于内存修改写入，不走网络避免 CDN 返回旧数据）
 
 // 分类 → 颜色/图标映射
 var _ruleMeta = {
@@ -392,7 +393,47 @@ function guessIcon(name) {
   return '⭐';
 }
 
-// 渲染规则网格
+// 从 _ruleData 内存数据渲染规则网格（不发起网络请求）
+function _renderRuleGridFromData() {
+  var grid = document.getElementById('ruleGrid');
+  if (!grid) return;
+  if (!_ruleData) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-neutral-500);font-size:13px">暂无任务规则配置</div>';
+    return;
+  }
+  var cats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
+  var html = '';
+  cats.forEach(function(cat) {
+    var rules = _ruleData[cat] || [];
+    var isAutoTask = function(t) {
+      var d = String(t.description || "");
+      var n = String(t.name || "");
+      var m = String(t.method || "");
+      return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
+        || n.indexOf("认真投入") >= 0 || n.indexOf("财务能力分析") >= 0 || n.indexOf("写日记") >= 0;
+    };
+    var visibleRules = rules.map(function(t, i) { return { t: t, i: i }; }).filter(function(x) { return !isAutoTask(x.t); });
+    var meta = _ruleMeta[cat] || { dot: '#888', ic: 'ic-learn', icon: '📖' };
+    var dotColor = meta.dot;
+    html += '<div class="rule-card">';
+    html += '<div class="rule-head"><span class="r-dot" style="background:' + dotColor + '"></span><b>' + cat + '</b><span class="r-n">' + visibleRules.length + ' 条</span></div>';
+    html += '<div class="rule-list">';
+    visibleRules.forEach(function(x) {
+      var item = x.t;
+      var idx = x.i;
+      var desc = item.description || '';
+      html += '<div class="rule-item" data-cat="' + cat + '" data-idx="' + idx + '">';
+      html += '<div class="ri-t"><b>' + item.name + '</b>' + (desc ? '<span>' + desc + '</span>' : '') + '</div>';
+      html += '<span class="ri-xp">+' + item.xp + '<small>XP</small></span>';
+      html += '<span class="ri-ops"><button class="btn ghost mini" onclick="openEditRuleModal(\'' + cat + '\',' + idx + ')">编辑</button><button class="btn ghost mini" onclick="deleteRule(\'' + cat + '\',' + idx + ')">删除</button></span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  grid.innerHTML = html;
+}
+
+// 渲染规则网格（从服务器拉取最新数据）
 function renderRuleGrid() {
   var grid = document.getElementById('ruleGrid');
   if (!grid) return;
@@ -404,37 +445,8 @@ function renderRuleGrid() {
       return;
     }
     _ruleData = config.xpRules;
-    var cats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
-    var html = '';
-    cats.forEach(function(cat) {
-      var rules = _ruleData[cat] || [];
-      // 过滤自动发放任务：统一显示在上方"默认记录·自动发放"区，不再在手动分组重复出现
-      var isAutoTask = function(t) {
-        var d = String(t.description || "");
-        var n = String(t.name || "");
-        var m = String(t.method || "");
-        return m.indexOf("自动") >= 0 || d.indexOf("自动发放") >= 0 || n.indexOf("作业·") === 0
-          || n.indexOf("认真投入") >= 0 || n.indexOf("财务能力分析") >= 0 || n.indexOf("写日记") >= 0;
-      };
-      var visibleRules = rules.map(function(t, i) { return { t: t, i: i }; }).filter(function(x) { return !isAutoTask(x.t); });
-      var meta = _ruleMeta[cat] || { dot: '#888', ic: 'ic-learn', icon: '📖' };
-      var dotColor = meta.dot;
-      html += '<div class="rule-card">';
-      html += '<div class="rule-head"><span class="r-dot" style="background:' + dotColor + '"></span><b>' + cat + '</b><span class="r-n">' + visibleRules.length + ' 条</span></div>';
-      html += '<div class="rule-list">';
-      visibleRules.forEach(function(x) {
-        var item = x.t;
-        var idx = x.i;
-        var desc = item.description || '';
-        html += '<div class="rule-item" data-cat="' + cat + '" data-idx="' + idx + '">';
-        html += '<div class="ri-t"><b>' + item.name + '</b>' + (desc ? '<span>' + desc + '</span>' : '') + '</div>';
-        html += '<span class="ri-xp">+' + item.xp + '<small>XP</small></span>';
-        html += '<span class="ri-ops"><button class="btn ghost mini" onclick="openEditRuleModal(\'' + cat + '\',' + idx + ')">编辑</button><button class="btn ghost mini" onclick="deleteRule(\'' + cat + '\',' + idx + ')">删除</button></span>';
-        html += '</div>';
-      });
-      html += '</div></div>';
-    });
-    grid.innerHTML = html;
+    _fullConfig = config; // 缓存完整 config，供后续增删改直接使用
+    _renderRuleGridFromData();
   }).catch(function() {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-sunny-coral-500);font-size:13px">⚠️ 加载失败，请检查网络</div>';
   });
@@ -499,26 +511,28 @@ function saveRule() {
 
   resultEl.style.display = 'none';
 
-  // 先加载完整 config 再修改
-  // 强制跳过缓存读取，确保保存/编辑/删除后拿到的都是最新数据（不会因缓存显示旧列表）
-  fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
+  // 生成唯一 id 的辅助函数
+  function genRuleId(idxBase) {
+    return 'xpr_' + Date.now().toString(36) + (idxBase !== undefined ? '_' + idxBase : '') + Math.random().toString(36).slice(2, 6);
+  }
+  function ensureId(item, fallbackIdx) {
+    var it = item || {};
+    if (!it.id) it.id = genRuleId(fallbackIdx);
+    if (!it.method) it.method = '按次';
+    if (it.description === undefined) it.description = '';
+    return it;
+  }
+
+  // 直接使用内存中的 _fullConfig（避免从 CDN 拉取到旧数据覆盖修改）
+  // 如果 _fullConfig 尚未初始化，则先拉取一次
+  var configPromise = _fullConfig
+    ? Promise.resolve(_fullConfig)
+    : fetchRawJSON('config.json', { cache: 'no-store' }).then(function(c) { _fullConfig = c; return c; });
+
+  configPromise.then(function(config) {
     if (!config) { showToast('无法加载配置', false); return; }
     if (!config.xpRules) config.xpRules = {};
     if (!config.xpRules[cat]) config.xpRules[cat] = [];
-
-    // 生成唯一 id 的辅助函数
-    function genRuleId(idxBase) {
-      return 'xpr_' + Date.now().toString(36) + (idxBase !== undefined ? '_' + idxBase : '') + Math.random().toString(36).slice(2, 6);
-    }
-    // 供历史任务/整表同步时使用：只补 id，不改 _manual 语义
-    // （历史内置任务保持无 _manual，留在分类分组；由 settings 面板新建的任务单独标 _manual）
-    function ensureId(item, fallbackIdx) {
-      var it = item || {};
-      if (!it.id) it.id = genRuleId(fallbackIdx);
-      if (!it.method) it.method = '按次';
-      if (it.description === undefined) it.description = '';
-      return it;
-    }
 
     if (isEdit) {
       // 如果改了分类，需要从旧分类移除
@@ -537,6 +551,9 @@ function saveRule() {
       config.xpRules[cat].push({ id: genRuleId(config.xpRules[cat].length), name: name, category: cat, xp: xp, method: method, description: desc, _manual: true });
     }
 
+    // 同步内存中的 _ruleData
+    _ruleData = config.xpRules;
+
     // 同步 xpRuleList（每次重算；历史任务补 id，保留原有 _manual 标签）
     config.xpRuleList = [];
     var cats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
@@ -546,12 +563,13 @@ function saveRule() {
       });
     });
 
+    // 立即从内存渲染（不等网络，确保编辑结果即时可见）
+    _renderRuleGridFromData();
+
     return DR.writeDataFile('config.json', config, isEdit ? '编辑任务: ' + name : '新增任务: ' + name);
   }).then(function() {
     showToast(isEdit ? '✅ 任务已更新' : '✅ 任务已添加');
     closeRuleModal();
-    // 重新渲染
-    setTimeout(renderRuleGrid, 500);
     // 同步刷新首页/app 侧的数据缓存，让打卡弹窗与能量星球读到最新任务（含 _manual 标记）
     if (window.DataStore && window.DataStore.refreshData) {
       window.DataStore.refreshData().catch(function() {});
@@ -584,8 +602,7 @@ function showConfirm(title, message, onConfirm) {
 
 // 删除规则
 function deleteRule(cat, idx) {
-  var config = _ruleData;
-  var item = config && config[cat] && config[cat][idx];
+  var item = _ruleData && _ruleData[cat] && _ruleData[cat][idx];
   if (!item) { showToast('数据异常', false); return; }
   var name = item.name;
   showConfirm('确认删除', '确定要删除任务「' + name + '」吗？删除后不可恢复。', function() {
@@ -597,28 +614,32 @@ function deleteRule(cat, idx) {
       el.style.transform = 'translateX(20px)';
       setTimeout(function() { el.remove(); }, 200);
     }
-    // 后台写入
-    fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
-      if (!config || !config.xpRules || !config.xpRules[cat]) { showToast('数据异常', false); return; }
-      config.xpRules[cat].splice(idx, 1);
-      if (config.xpRules[cat].length === 0) delete config.xpRules[cat];
-      config.xpRuleList = [];
-      ['学习成长', '能力成长', '身体成长', '兴趣爱好'].forEach(function(c) {
-        (config.xpRules[c] || []).forEach(function(item) {
-          config.xpRuleList.push(item);
-        });
+    // 直接从内存 _ruleData 修改，不走网络重新拉取（避免 CDN 缓存拿到旧数据覆盖修改）
+    if (!_ruleData[cat]) { showToast('数据异常', false); return; }
+    _ruleData[cat].splice(idx, 1);
+    if (_ruleData[cat].length === 0) delete _ruleData[cat];
+
+    // 直接使用内存中的 _fullConfig 更新写入（不走网络，避免 CDN 返回旧数据）
+    var config = _fullConfig || {};
+    config.xpRules = _ruleData;
+    config.xpRuleList = [];
+    ['学习成长', '能力成长', '身体成长', '兴趣爱好'].forEach(function(c) {
+      (_ruleData[c] || []).forEach(function(item) {
+        config.xpRuleList.push(item);
       });
-      return DR.writeDataFile('config.json', config, '删除任务: ' + name);
-    }).then(function() {
+    });
+    DR.writeDataFile('config.json', config, '删除任务: ' + name).then(function() {
       showToast('✅ 已删除');
+      // 从内存重新渲染，确保界面与数据一致
+      _renderRuleGridFromData();
       // 同步刷新首页/app 侧的数据缓存
       if (window.DataStore && window.DataStore.refreshData) {
         window.DataStore.refreshData().catch(function() {});
       }
     }).catch(function(err) {
       showToast('删除失败: ' + (err.message || '未知错误'), false);
-      // 失败时重新渲染恢复
-      setTimeout(renderRuleGrid, 300);
+      // 失败时从内存恢复渲染
+      _renderRuleGridFromData();
     });
   });
 }
