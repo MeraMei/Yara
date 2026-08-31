@@ -90,7 +90,7 @@
     });
   }
 
-  function writeFileRemote(path, content, msg) {
+  function writeFileRemote(path, content, msg, retryCount) {
     var token = getToken();
     if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
     return getFileSHA(path).then(function (sha) {
@@ -106,7 +106,19 @@
         body: JSON.stringify(body),
       });
     }).then(function (r) {
-      if (!r.ok) return r.json().then(function (e) { throw new Error(e.message || 'GitHub API 错误: ' + r.status); });
+      if (!r.ok) {
+        return r.json().then(function (e) {
+          var errMsg = e.message || 'GitHub API 错误: ' + r.status;
+          // SHA 冲突时自动重试（最多 2 次），避免并发写入失败
+          if ((errMsg.indexOf('does not match') >= 0 || errMsg.indexOf('conflict') >= 0) && (retryCount || 0) < 2) {
+            var wait = 600 + (retryCount || 0) * 400;
+            return new Promise(function (resolve) { setTimeout(resolve, wait); }).then(function () {
+              return writeFileRemote(path, content, msg, (retryCount || 0) + 1);
+            });
+          }
+          throw new Error(errMsg);
+        });
+      }
       return r.json();
     });
   }

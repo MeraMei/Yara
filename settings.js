@@ -398,7 +398,7 @@ function renderRuleGrid() {
   if (!grid) return;
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-neutral-400);font-size:13px">正在加载任务规则…</div>';
 
-  fetchRawJSON('config.json').then(function(config) {
+  fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
     if (!config || !config.xpRules) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--colourful-neutral-500);font-size:13px">暂无任务规则配置</div>';
       return;
