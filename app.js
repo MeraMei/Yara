@@ -76,17 +76,19 @@ function setGithubToken(token) {
 }
 
 // 从 GitHub raw 读取 JSON 文件
-function fetchRawJSON(filename) {
+function fetchRawJSON(filename, opts) {
   // 优先从 data/ 目录读取（GitHub Pages 上 data/ 也在仓库中，同域访问更快）
   // 失败时回退到 raw.githubusercontent.com
-  return fetch(`data/${filename}`)
+  // opts 支持: { cache: 'no-store' } 强制跳过缓存（增删改后必须这么做）
+  const options = opts || {};
+  return fetch(`data/${filename}`, options)
     .then(resp => {
       if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for data/${filename}`);
       return resp.json();
     })
     .catch(() => {
       const url = `${GITHUB_RAW_BASE}/${filename}`;
-      return fetch(url).then(resp => {
+      return fetch(url, options).then(resp => {
         if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText} for ${url}`);
         return resp.json();
       });
@@ -250,6 +252,18 @@ async function _fetchAllData() {
     const resp = await fetch('data/all.json?_=' + Date.now());
     if (resp.ok) {
       const all = await resp.json();
+      // ⚠️ all.json 是上传时生成的合并快照；任务规则若在运行中用 settings 面板新增/编辑/删除，
+      //   只写进了权威的 config.json，all.json 不会实时更新。
+      //   因此这里用 config.json 覆盖 all.json 中的 config 片段，保证打卡弹窗/能量星球读到最新任务规则。
+      try {
+        const cfgResp = await fetch('data/config.json?_=' + Date.now(), { cache: 'no-store' });
+        if (cfgResp.ok) {
+          const cfgData = await cfgResp.json();
+          if (cfgData && typeof cfgData === 'object' && cfgData.xpRules !== undefined) {
+            all.config = cfgData;
+          }
+        }
+      } catch (e) { /* 覆盖失败则沿用 all.json 的 config，不影响主流程 */ }
       const dashboard = buildDashboard(
         all.child || {}, all.calendar || [], all.levels || [],
         all.xpRecords || [], all.finance || null, all.study || null,
@@ -377,6 +391,9 @@ function refreshData(localOnly) {
   }
   cachedData = null;
   loadPromise = null;
+  // 清除 localStorage 缓存，使下次 loadData 强制走网络加载 _fetchAllData
+  //（_fetchAllData 中会用权威 config.json 覆盖 all.json 快照，保证打卡弹窗读到最新任务规则）
+  try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
   return loadData();
 }
 

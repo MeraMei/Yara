@@ -502,31 +502,49 @@ function saveRule() {
   resultEl.style.display = 'none';
 
   // 先加载完整 config 再修改
-  fetchRawJSON('config.json').then(function(config) {
+  // 强制跳过缓存读取，确保保存/编辑/删除后拿到的都是最新数据（不会因缓存显示旧列表）
+  fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
     if (!config) { showToast('无法加载配置', false); return; }
     if (!config.xpRules) config.xpRules = {};
     if (!config.xpRules[cat]) config.xpRules[cat] = [];
+
+    // 生成唯一 id 的辅助函数
+    function genRuleId(idxBase) {
+      return 'xpr_' + Date.now().toString(36) + (idxBase !== undefined ? '_' + idxBase : '') + Math.random().toString(36).slice(2, 6);
+    }
+    // 供历史任务/整表同步时使用：只补 id，不改 _manual 语义
+    // （历史内置任务保持无 _manual，留在分类分组；由 settings 面板新建的任务单独标 _manual）
+    function ensureId(item, fallbackIdx) {
+      var it = item || {};
+      if (!it.id) it.id = genRuleId(fallbackIdx);
+      if (!it.method) it.method = '按次';
+      if (it.description === undefined) it.description = '';
+      return it;
+    }
 
     if (isEdit) {
       // 如果改了分类，需要从旧分类移除
       if (oldCat !== cat) {
         if (config.xpRules[oldCat]) {
           var removed = config.xpRules[oldCat].splice(idx, 1);
-          config.xpRules[cat].push({ name: name, category: cat, xp: xp, method: method, description: desc });
+          var preserved = removed[0] || {};
+          config.xpRules[cat].push({ id: preserved.id, name: name, category: cat, xp: xp, method: method, description: desc, _manual: preserved._manual });
         }
       } else {
-        config.xpRules[cat][idx] = { name: name, category: cat, xp: xp, method: method, description: desc };
+        var prev = config.xpRules[cat][idx] || {};
+        config.xpRules[cat][idx] = { id: prev.id, name: name, category: cat, xp: xp, method: method, description: desc, _manual: prev._manual };
       }
     } else {
-      config.xpRules[cat].push({ name: name, category: cat, xp: xp, method: method, description: desc });
+      // settings 面板新增 → 标 _manual:true（进打卡弹窗"手动新增"分组）
+      config.xpRules[cat].push({ id: genRuleId(config.xpRules[cat].length), name: name, category: cat, xp: xp, method: method, description: desc, _manual: true });
     }
 
-    // 同步 xpRuleList
+    // 同步 xpRuleList（每次重算；历史任务补 id，保留原有 _manual 标签）
     config.xpRuleList = [];
     var cats = ['学习成长', '能力成长', '身体成长', '兴趣爱好'];
     cats.forEach(function(c) {
       (config.xpRules[c] || []).forEach(function(item) {
-        config.xpRuleList.push(item);
+        config.xpRuleList.push(ensureId(item));
       });
     });
 
@@ -536,6 +554,10 @@ function saveRule() {
     closeRuleModal();
     // 重新渲染
     setTimeout(renderRuleGrid, 500);
+    // 同步刷新首页/app 侧的数据缓存，让打卡弹窗与能量星球读到最新任务（含 _manual 标记）
+    if (window.DataStore && window.DataStore.refreshData) {
+      window.DataStore.refreshData().catch(function() {});
+    }
   }).catch(function(err) {
     resultEl.style.display = '';
     resultEl.innerHTML = '❌ 保存失败: ' + (err.message || '未知错误');
@@ -547,7 +569,7 @@ function saveRule() {
 // 删除规则
 function deleteRule(cat, idx) {
   if (!confirm('确定要删除此任务规则吗？')) return;
-  fetchRawJSON('config.json').then(function(config) {
+  fetchRawJSON('config.json', { cache: 'no-store' }).then(function(config) {
     if (!config || !config.xpRules || !config.xpRules[cat]) { showToast('数据异常', false); return; }
     var name = config.xpRules[cat][idx] && config.xpRules[cat][idx].name;
     config.xpRules[cat].splice(idx, 1);
@@ -564,6 +586,10 @@ function deleteRule(cat, idx) {
   }).then(function() {
     showToast('✅ 已删除');
     setTimeout(renderRuleGrid, 500);
+    // 同步刷新首页/app 侧的数据缓存
+    if (window.DataStore && window.DataStore.refreshData) {
+      window.DataStore.refreshData().catch(function() {});
+    }
   }).catch(function(err) {
     showToast('删除失败: ' + (err.message || '未知错误'), false);
   });
