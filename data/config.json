@@ -99,84 +99,96 @@
         "category": "学习成长",
         "xp": 6,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizt6yey"
       },
       {
         "name": "学习进步 - 金牌学生",
         "category": "学习成长",
         "xp": 15,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizttctn"
       },
       {
         "name": "每天阅读30分钟",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztzeyq"
       },
       {
         "name": "做语数英科的额外练习",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizt2118"
       },
       {
         "name": "练字 20分钟以上",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztxeim"
       },
       {
         "name": "作业·日常预习",
         "category": "学习成长",
         "xp": 2,
         "method": "按次",
-        "description": "完成作业自动发放"
+        "description": "完成作业自动发放",
+        "id": "xpr_mtgwxizt02k8"
       },
       {
         "name": "作业·日常复习",
         "category": "学习成长",
         "xp": 2,
         "method": "按次",
-        "description": "完成作业自动发放"
+        "description": "完成作业自动发放",
+        "id": "xpr_mtgwxiztnyou"
       },
       {
         "name": "作业·假期作业",
         "category": "学习成长",
         "xp": 2,
         "method": "按次",
-        "description": "完成作业自动发放"
+        "description": "完成作业自动发放",
+        "id": "xpr_mtgwxiztq0lm"
       },
       {
         "name": "作业·特色作业",
         "category": "学习成长",
         "xp": 4,
         "method": "按次",
-        "description": "完成作业自动发放"
+        "description": "完成作业自动发放",
+        "id": "xpr_mtgwxizt6k2b"
       },
       {
         "name": "认真投入 - 遇到难题没有马上放弃",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": "主动认领，家长确认后发放"
+        "description": "主动认领，家长确认后发放",
+        "id": "xpr_mtgwxizt3tu0"
       },
       {
         "name": "认真投入 - 独立完成以前不会的题",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": "主动认领，家长确认后发放"
+        "description": "主动认领，家长确认后发放",
+        "id": "xpr_mtgwxizt7wa7"
       },
       {
         "name": "认真投入 - 主动复盘错题",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": "主动认领，家长确认后发放"
+        "description": "主动认领，家长确认后发放",
+        "id": "xpr_mtgwxiztwzgd"
       }
     ],
     "兴趣爱好": [
@@ -185,14 +197,16 @@
         "category": "兴趣爱好",
         "xp": 10,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztrzin"
       },
       {
         "name": "画画、手工作品",
         "category": "兴趣爱好",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizt35uw"
       }
     ],
     "身体成长": [
@@ -201,28 +215,32 @@
         "category": "身体成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizt4zlr"
       },
       {
         "name": "每天跳绳 200个或3分钟",
         "category": "身体成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztt581"
       },
       {
         "name": "每天10点前关灯睡觉",
         "category": "身体成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztt8at"
       },
       {
         "name": "做锻炼身体/户外 30分钟",
         "category": "身体成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizt4lbz"
       }
     ],
     "能力成长": [
@@ -231,52 +249,60 @@
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztev1d"
       },
       {
         "name": "收拾自己的卧室（床和书桌）",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizthkol"
       },
       {
         "name": "洗自己的小内裤或袜子",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxizt2bmy"
       },
       {
         "name": "独立完成洗澡和吹头发",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztjawn"
       },
       {
         "name": "与父母沟通自己近期成长",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztfnjl"
       },
       {
         "name": "财务能力分析（复盘）",
         "category": "能力成长",
         "xp": 5,
         "method": "自动发放",
-        "description": "每笔支出分析自动复盘，当日累计封顶 +10"
+        "description": "每笔支出分析自动复盘，当日累计封顶 +10",
+        "id": "xpr_mtgwxiztj66y"
       },
       {
         "name": "写日记：写作四要素+感受",
         "category": "能力成长",
         "xp": 8,
         "method": "按次",
-        "description": ""
+        "description": "",
+        "id": "xpr_mtgwxiztfjh8"
       },
       {
-        "name": "21点开始洗漱，20点关灯睡觉",
+        "id": "xpr_mtgwxiztp8ic",
+        "name": "21点开始洗漱，22点关灯睡觉",
         "category": "能力成长",
         "xp": 5,
         "method": "按次",
@@ -290,136 +316,156 @@
       "category": "学习成长",
       "xp": 6,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizt6yey"
     },
     {
       "name": "学习进步 - 金牌学生",
       "category": "学习成长",
       "xp": 15,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizttctn"
     },
     {
       "name": "每天阅读30分钟",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztzeyq"
     },
     {
       "name": "做语数英科的额外练习",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizt2118"
     },
     {
       "name": "练字 20分钟以上",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztxeim"
     },
     {
       "name": "作业·日常预习",
       "category": "学习成长",
       "xp": 2,
       "method": "按次",
-      "description": "完成作业自动发放"
+      "description": "完成作业自动发放",
+      "id": "xpr_mtgwxizt02k8"
     },
     {
       "name": "作业·日常复习",
       "category": "学习成长",
       "xp": 2,
       "method": "按次",
-      "description": "完成作业自动发放"
+      "description": "完成作业自动发放",
+      "id": "xpr_mtgwxiztnyou"
     },
     {
       "name": "作业·假期作业",
       "category": "学习成长",
       "xp": 2,
       "method": "按次",
-      "description": "完成作业自动发放"
+      "description": "完成作业自动发放",
+      "id": "xpr_mtgwxiztq0lm"
     },
     {
       "name": "作业·特色作业",
       "category": "学习成长",
       "xp": 4,
       "method": "按次",
-      "description": "完成作业自动发放"
+      "description": "完成作业自动发放",
+      "id": "xpr_mtgwxizt6k2b"
     },
     {
       "name": "认真投入 - 遇到难题没有马上放弃",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": "主动认领，家长确认后发放"
+      "description": "主动认领，家长确认后发放",
+      "id": "xpr_mtgwxizt3tu0"
     },
     {
       "name": "认真投入 - 独立完成以前不会的题",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": "主动认领，家长确认后发放"
+      "description": "主动认领，家长确认后发放",
+      "id": "xpr_mtgwxizt7wa7"
     },
     {
       "name": "认真投入 - 主动复盘错题",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": "主动认领，家长确认后发放"
+      "description": "主动认领，家长确认后发放",
+      "id": "xpr_mtgwxiztwzgd"
     },
     {
       "name": "主动做家务（力所能及）",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztev1d"
     },
     {
       "name": "收拾自己的卧室（床和书桌）",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizthkol"
     },
     {
       "name": "洗自己的小内裤或袜子",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizt2bmy"
     },
     {
       "name": "独立完成洗澡和吹头发",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztjawn"
     },
     {
       "name": "与父母沟通自己近期成长",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztfnjl"
     },
     {
       "name": "财务能力分析（复盘）",
       "category": "能力成长",
       "xp": 5,
       "method": "自动发放",
-      "description": "每笔支出分析自动复盘，当日累计封顶 +10"
+      "description": "每笔支出分析自动复盘，当日累计封顶 +10",
+      "id": "xpr_mtgwxiztj66y"
     },
     {
       "name": "写日记：写作四要素+感受",
       "category": "能力成长",
       "xp": 8,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztfjh8"
     },
     {
-      "name": "21点开始洗漱，20点关灯睡觉",
+      "id": "xpr_mtgwxiztp8ic",
+      "name": "21点开始洗漱，22点关灯睡觉",
       "category": "能力成长",
       "xp": 5,
       "method": "按次",
@@ -430,42 +476,48 @@
       "category": "身体成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizt4zlr"
     },
     {
       "name": "每天跳绳 200个或3分钟",
       "category": "身体成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztt581"
     },
     {
       "name": "每天10点前关灯睡觉",
       "category": "身体成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztt8at"
     },
     {
       "name": "做锻炼身体/户外 30分钟",
       "category": "身体成长",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizt4lbz"
     },
     {
       "name": "将自己的精美作品发布至线上",
       "category": "兴趣爱好",
       "xp": 10,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxiztrzin"
     },
     {
       "name": "画画、手工作品",
       "category": "兴趣爱好",
       "xp": 5,
       "method": "按次",
-      "description": ""
+      "description": "",
+      "id": "xpr_mtgwxizt35uw"
     }
   ],
   "abilityModules": {
