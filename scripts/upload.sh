@@ -186,8 +186,11 @@ echo " 步骤 3.5/4：提交并推送"
 echo "════════════════════════════════════════"
 if [ "$WITH_DATA" = "1" ]; then
   echo "  ✓ 本次将同时上传代码和 data/（--with-data）"
-  # 重新生成 all.json（精简版：去掉首页不需要的重型字段，如 examRecords 等）
-  echo "  → 重新生成 data/all.json（精简版）..."
+  # 重新生成 all.json（精简快照，仅首页必需字段）
+  # ⚠️ 成绩/期末评价/学期汇总等重型数据不放进 all.json（受 80KB 预算约束），
+  #    前端 app.js 在运行时用权威的 study.json / xpRecords.json 覆盖 all.study/all.xpRecords，
+  #    因此成绩分析页与期末成绩页动态数据实时可见，首页不因下载重型字段变慢。
+  echo "  → 重新生成 data/all.json（精简快照）..."
   node -e "
     const fs = require('fs');
     const path = require('path');
@@ -197,7 +200,7 @@ if [ "$WITH_DATA" = "1" ]; then
     for (const f of files) {
       try { combined[f.replace('.json', '')] = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf-8')); } catch (e) {}
     }
-    // 精简 study：首页不需要 examRecords/semesterAnalysis/strengthsAnalysis
+    // 精简 study：all.json 只保留首页/学习总览需要的最小字段，重型数据交给 app.js 运行时覆盖
     var study = combined.study || null;
     if (study) {
       study = Object.assign({}, study);

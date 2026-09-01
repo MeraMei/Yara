@@ -264,6 +264,23 @@ async function _fetchAllData() {
           }
         }
       } catch (e) { /* 覆盖失败则沿用 all.json 的 config，不影响主流程 */ }
+      // ⚠️ 同理：运行期新增/通过 XP 记录、录入成绩/期末评价，都只写入权威的
+      //   xpRecords.json / study.json，all.json 快照不会实时更新。
+      //   因此这里也用权威文件覆盖 all.json 中对应片段，保证成绩/期末成绩/最新待通过记录实时可见。
+      try {
+        const [stResp, xpResp] = await Promise.all([
+          fetch('data/study.json?_=' + Date.now(), { cache: 'no-store' }),
+          fetch('data/xpRecords.json?_=' + Date.now(), { cache: 'no-store' })
+        ]);
+        if (stResp.ok) {
+          const studyData = await stResp.json();
+          if (studyData && typeof studyData === 'object') all.study = studyData;
+        }
+        if (xpResp.ok) {
+          const xpData = await xpResp.json();
+          if (Array.isArray(xpData)) all.xpRecords = xpData;
+        }
+      } catch (e) { /* 覆盖失败则沿用 all.json 的快照，不影响主流程 */ }
       const dashboard = buildDashboard(
         all.child || {}, all.calendar || [], all.levels || [],
         all.xpRecords || [], all.finance || null, all.study || null,
