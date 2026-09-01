@@ -4677,10 +4677,16 @@ function renderWrData(report) {
     var willOn = willDays > 0;
     dims.push({ key: "wil", name: "意志力", icon: "🔥", tone: "butter", ok: !!willOn,
       txt: willOn ? "坚持打卡 <b>" + willDays + "</b> 天" : "等待重新出发" });
-    // 关系 · 家庭协作/沟通
-    var relHas = (report.gameTime && report.gameTime.checkedDays > 0) || (stories && stories.length > 0);
-    dims.push({ key: "rel", name: "关系", icon: "🤝", tone: "mint", ok: !!relHas,
-      txt: relHas ? "有家庭协作与分享" : "可试着和家人开启协作" });
+    // 关系 · 家庭协作/沟通（仅基于真实关系类记录：沟通/家务/助人/整理/家人互动，
+    // 不再用游戏时间打卡天数或自律类故事推断，避免“阅读即关系”的误归因）
+    var relKs = ["家务","沟通","帮忙","帮助","助人","收拾","整理","合作","协作","陪伴","照顾","父母","家人","分享给"];
+    var relStory = (stories || []).filter(function (s) {
+      var t = (s.subject || "") + (s.story || "");
+      return relKs.some(function (k) { return t.indexOf(k) >= 0; });
+    });
+    var relOn = relStory.length > 0;
+    dims.push({ key: "rel", name: "关系", icon: "🤝", tone: "mint", ok: relOn,
+      txt: relOn ? "有 <b>" + relStory.length + "</b> 次家庭协作" : "可试着和家人开启协作" });
 
     var grid = dims.map(function (d) {
       var st = d.ok ? " on" : "";
