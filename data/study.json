@@ -554,17 +554,15 @@
   },
   "recentAssignments": [
     {
-      "id": "hw_mtigfwpujrp9hq",
+      "id": "hw_mtighaznh5i89w",
       "subject": "语文",
-      "title": "熟读背诵3-4自然段",
-      "cleanTitle": "熟读背诵3-4自然段",
-      "shortTitle": "熟读背诵3-4自然段",
-      "description": "熟读背诵3-4自然段",
-      "homeworkType": "日常复习",
-      "module": "阅读",
-      "modules": [
-        "阅读"
-      ],
+      "title": "预习第一课",
+      "cleanTitle": "预习第一课",
+      "shortTitle": "预习第一课",
+      "description": "预习第一课",
+      "homeworkType": "日常预习",
+      "module": "",
+      "modules": [],
       "status": "pending",
       "submitted": false,
       "dueDate": "2026-09-01",
@@ -654,17 +652,15 @@
       "date": "2026-09-01",
       "items": [
         {
-          "id": "hw_mtigfwpujrp9hq",
+          "id": "hw_mtighaznh5i89w",
           "subject": "语文",
-          "title": "熟读背诵3-4自然段",
-          "cleanTitle": "熟读背诵3-4自然段",
-          "shortTitle": "熟读背诵3-4自然段",
-          "description": "熟读背诵3-4自然段",
-          "homeworkType": "日常复习",
-          "module": "阅读",
-          "modules": [
-            "阅读"
-          ],
+          "title": "预习第一课",
+          "cleanTitle": "预习第一课",
+          "shortTitle": "预习第一课",
+          "description": "预习第一课",
+          "homeworkType": "日常预习",
+          "module": "",
+          "modules": [],
           "status": "pending",
           "submitted": false,
           "dueDate": "2026-09-01",
