@@ -2358,6 +2358,14 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--neutral-700);
     }
     .sem-foot-text strong { color: #7a3fd6; font-weight: 800; }
+    .sem-mid-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin: 6px 0 2px;
+    }
+    .sem-mid-row .sem-mid-icon i { color: #7a3fd6; }
     .sem-box {
       display: flex;
       align-items: center;
@@ -4184,6 +4192,20 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       color: var(--colourful-sky-blue-800);
     }
     .hw-submit-btn:active { transform: translateY(0); }
+    /* 标记未完成：次级操作，柔和灰紫浅底，弱化但可点 */
+    .hw-btn-soft {
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      height: 24px; padding: 0 12px;
+      font-size: 11px; font-weight: 600; line-height: 1;
+      border-radius: 999px; white-space: nowrap;
+      transition: all .16s ease;
+      background: var(--colourful-neutral-100); color: var(--colourful-neutral-500);
+    }
+    .hw-btn-soft i { width: 12px; height: 12px; }
+    .hw-btn-soft:hover {
+      background: var(--colourful-neutral-200); color: var(--colourful-neutral-700);
+    }
     /* 已提交：收敛为静谧的薄荷浅底，弱化不再强调 */
     .hw-submit-btn.submitted {
       background: linear-gradient(135deg, var(--colourful-mint-green-100) 0%, var(--colourful-mint-green-200) 100%);

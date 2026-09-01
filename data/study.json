@@ -646,7 +646,8 @@
       "unitName": null,
       "duration": "30-60分钟",
       "wrongCount": 0,
-      "submittedAt": "2026-08-19T10:01:04.776Z"
+      "submittedAt": "2026-08-19T10:01:04.776Z",
+      "term": "夏季假期"
     },
     {
       "date": "2026-07-15",
@@ -677,7 +678,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         },
         {
           "id": "recvrd7AIv0ER4",
@@ -702,7 +704,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -735,7 +738,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -769,7 +773,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -802,7 +807,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -829,7 +835,8 @@
           "description": "阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，每天半小时。 ",
           "details": [],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "term": "夏季假期"
         },
         {
           "id": "recvrd7AIvVC5l",
@@ -855,7 +862,8 @@
           "duration": "30-60分钟",
           "wrongCount": 0,
           "unitIndex": -1,
-          "unitName": null
+          "unitName": null,
+          "term": "夏季假期"
         },
         {
           "id": "recvrd7AIvO6n0",
@@ -883,7 +891,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -916,7 +925,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -949,7 +959,8 @@
           "wrongCount": 0,
           "unitIndex": -1,
           "unitName": null,
-          "submittedAt": "2026-08-19T12:48:04.424Z"
+          "submittedAt": "2026-08-19T12:48:04.424Z",
+          "term": "夏季假期"
         }
       ]
     },
@@ -982,7 +993,8 @@
               "type": "good"
             }
           ],
-          "progress": 100
+          "progress": 100,
+          "term": "夏季假期"
         }
       ]
     },
@@ -1016,7 +1028,8 @@
           ],
           "progress": 0,
           "unitIndex": -1,
-          "unitName": null
+          "unitName": null,
+          "term": "夏季假期"
         }
       ]
     },
@@ -1052,7 +1065,8 @@
           "duration": "15-30分钟",
           "wrongCount": 0,
           "unitIndex": -1,
-          "unitName": null
+          "unitName": null,
+          "term": "夏季假期"
         },
         {
           "id": "recvrd7AIvjQKm",
@@ -1079,7 +1093,8 @@
             }
           ],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "term": "夏季假期"
         }
       ]
     },
@@ -1107,7 +1122,8 @@
           "description": "背诵并默写四上古诗和日积月累。",
           "details": [],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "term": "夏季假期"
         },
         {
           "id": "recvrd7AIvfMRT",
@@ -1129,7 +1145,8 @@
           "description": "坚持每天练字，内容：四上的 课后词语",
           "details": [],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "term": "夏季假期"
         },
         {
           "id": "recvrd7AIv0her",
@@ -1151,7 +1168,8 @@
           "description": "每天坚持阅读四上必读书目《中国神话传说》《世界经典神话与传说故事》《希腊神话故事》，不少于30分钟： 圈画批注。（完成一份阅读笔记，见图）",
           "details": [],
           "tags": [],
-          "progress": 0
+          "progress": 0,
+          "term": "夏季假期"
         }
       ]
     }
