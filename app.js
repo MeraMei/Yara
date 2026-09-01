@@ -4447,13 +4447,17 @@ function renderAiWeeklyReport(cfg) {
   setDateRange(currentReport);
 
   // ── 实时计算本周行为数据（打卡后立即更新到周记） ──
-  var today = new Date();
-  var weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - 6);
-  var weekStartStr = formatDate(weekStart);
-  var todayStrVal = todayStr();
+  // 周窗口必须锁死到【该周报自己的日期那周】，与 setDateRange 同口径（report.date 为周末，往前推6天）。
+  // ⚠ 不能用"今天往前滚6天"：那会把不属于本周、甚至下一周的记录混进来。
+  var _repDate = currentReport.date || currentReport.generatedAt || "";
+  var _weekEnd = _repDate ? new Date(_repDate.slice(0, 10) + 'T00:00:00') : new Date();
+  if (isNaN(_weekEnd.getTime())) _weekEnd = new Date();
+  var _weekStart = new Date(_weekEnd); _weekStart.setDate(_weekStart.getDate() - 6);
+  var weekStartStr = formatDate(_weekStart);
+  var weekEndStr = formatDate(_weekEnd);
   var weekXpRecs = (cfg.xpRecords || []).filter(function(r) {
     var d = getDateStr(r);
-    return d >= weekStartStr && d <= todayStrVal;
+    return d >= weekStartStr && d <= weekEndStr;
   });
   var catMap = {};
   var catOrder = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
@@ -4493,7 +4497,7 @@ function renderAiWeeklyReport(cfg) {
 
   // 游戏时间攒点（实时，与生成器同规则；结转取本期报告记录的 carryMin）
   var gtCarry = (currentReport.gameTime || {}).carryMin || 0;
-  enhancedReport.gameTime = buildRealtimeGameTime(weekXpRecs, weekStartStr, todayStrVal, gtCarry);
+  enhancedReport.gameTime = buildRealtimeGameTime(weekXpRecs, weekStartStr, weekEndStr, gtCarry);
 
   var childName = (cfg.child && cfg.child.name) || "Yara";
   document.getElementById("wrHero").innerHTML = renderWrHero(enhancedReport, childName);
