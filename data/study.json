@@ -589,8 +589,10 @@
       "shortTitle": "读《希腊童话故事》10一30页并做批注",
       "description": "读《希腊童话故事》10一30页并做批注",
       "homeworkType": "日常预习",
-      "module": "",
-      "modules": [],
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
       "status": "pending",
       "submitted": false,
       "dueDate": "2026-09-01",
@@ -602,7 +604,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtighaznh5i89w",
@@ -612,8 +616,11 @@
       "shortTitle": "预习第一课",
       "description": "预习第一课",
       "homeworkType": "日常预习",
-      "module": "",
-      "modules": [],
+      "module": "汉字",
+      "modules": [
+        "汉字",
+        "组词"
+      ],
       "status": "pending",
       "submitted": false,
       "dueDate": "2026-09-01",
@@ -625,7 +632,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtigfwpujrp9hq",
@@ -760,8 +769,10 @@
       "shortTitle": "读《希腊童话故事》10一30页并做批注",
       "description": "读《希腊童话故事》10一30页并做批注",
       "homeworkType": "日常预习",
-      "module": "",
-      "modules": [],
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
       "status": "pending",
       "submitted": false,
       "dueDate": "2026-09-01",
@@ -773,7 +784,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtighaznh5i89w",
@@ -783,8 +796,11 @@
       "shortTitle": "预习第一课",
       "description": "预习第一课",
       "homeworkType": "日常预习",
-      "module": "",
-      "modules": [],
+      "module": "汉字",
+      "modules": [
+        "汉字",
+        "组词"
+      ],
       "status": "pending",
       "submitted": false,
       "dueDate": "2026-09-01",
@@ -796,7 +812,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtigfwpujrp9hq",
