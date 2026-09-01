@@ -2569,7 +2569,7 @@ if (typeof window !== "undefined") {
               else if (isCommitmentTask && !c.linked && c.text === taskName) { c.completed = true; changed = true; }
             });
             if (changed) {
-              await window.DataStore.saveFamilyMeetings(meetings);
+              await window.DataStore.saveFamilyMeetings(cachedData && cachedData.familyMeetings || []);
               showToast("🎯 完成了一项约定！继续加油", true);
             }
           }
@@ -4078,7 +4078,7 @@ async function renderHome() {
 
   const allHw = collectAssignments(cfg.study?.allHomework);
   const todayDue = allHw.filter(a => (a.dueDate || "") === todayStr);
-  const overdueHw = allHw.filter(a => (a.dueDate || "") !== "" && a.dueDate < todayStr && !(a.status === "done") && !a.submitted);
+  const overdueHw = allHw.filter(a => (a.dueDate || "") !== "" && a.dueDate < todayStr && !(a.status === "done") && a.status !== "expired" && !a.submitted);
   const hwDone = todayDue.filter(a => (a.status === "done") || !!a.submitted).length;
   const hwTotal = todayDue.length;
   const overdueTotal = overdueHw.length;
@@ -4170,7 +4170,7 @@ async function renderHome() {
   }
 
   // 4. 作业进度卡（未完成 / 逾期 / 今日）
-  const hwNotDone = allHw.filter(a => !(a.status === "done") && !a.submitted).length;
+  const hwNotDone = allHw.filter(a => !(a.status === "done") && a.status !== "expired" && !a.submitted).length;
   cards.push({
     type: "hw",
     icon: "📚",
@@ -4208,7 +4208,7 @@ async function renderHome() {
   }
 
   // ═══ ② 进度卡：统计当前可办的事 ═══
-  const allTodo = allHw.filter(a => !(a.status === "done") && !a.submitted);
+  const allTodo = allHw.filter(a => !(a.status === "done") && a.status !== "expired" && !a.submitted);
   const totalCount = todayDue.length + overdueTotal + (pendingCount > 0 ? 1 : 0);
   const doneCount = hwDone;
   const todoCount = totalCount - doneCount;
@@ -5607,7 +5607,7 @@ window.approveXpRecord = async function(btn, recordId, recordEl) {
               break;
             }
           }
-          await window.DataStore.saveFamilyMeetings(meetings);
+          await window.DataStore.saveFamilyMeetings(cachedData && cachedData.familyMeetings || []);
         }
       }
     }
@@ -5730,7 +5730,7 @@ async function confirmApproveWithComment() {
               break;
             }
           }
-          await window.DataStore.saveFamilyMeetings(meetings);
+          await window.DataStore.saveFamilyMeetings(cachedData && cachedData.familyMeetings || []);
         }
       }
     }
@@ -5919,6 +5919,7 @@ function renderHwRow(a, hidden, index, earnedXp) {
   const KNOWN = { "语文": "cn", "数学": "math", "英语": "en" };
   const subjClass = KNOWN[a.subject] || "other";
   const isDone = a.status === "done";
+  const isExpired = a.status === "expired";
   const isSubmitted = a.submitted === true;
   const showSubmitted = isDone || isSubmitted;
   const hiddenClass = hidden ? " hw-hidden" : "";
@@ -5957,7 +5958,9 @@ function renderHwRow(a, hidden, index, earnedXp) {
   let dueClass = "";
   let dueIcon = "calendar";
   let dueText = a.dueDate ? `截止 ${a.dueDate}` : "";
-  if (!showSubmitted && a.dueDate) {
+  if (isExpired) {
+    dueClass = " hw-due-expired"; dueIcon = "calendar-x"; dueText = "已到期";
+  } else if (!showSubmitted && a.dueDate) {
     const today = new Date(); today.setHours(0,0,0,0);
     const due = new Date(a.dueDate); due.setHours(0,0,0,0);
     const daysLeft = Math.ceil((due - today) / (1000*60*60*24));
@@ -5971,22 +5974,27 @@ function renderHwRow(a, hidden, index, earnedXp) {
   const metaBit = dueText ? `<span class="hw-meta${dueClass}"><i data-lucide="${dueIcon}"></i>${dueText}</span>` : "";
 
   // 右侧操作：提交 + 编辑（始终垂直居中）
-  // 已完成状态自动显示"已提交"，保持UI一致
+  // 已完成状态自动显示"已提交"，保持UI一致；已到期仅保留"编辑"，方便之后重新启用
   const actions = `
     <div class="hw-actions">
-      <button class="hw-submit-btn${showSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${showSubmitted ? "已提交" : "提交作业"}">
-        <i data-lucide="${showSubmitted ? "check" : "send"}"></i>${showSubmitted ? "已提交" : "提交"}
-      </button>
+      ${isExpired
+        ? `<span class="hw-expired-tag"><i data-lucide="calendar-x"></i>已结束</span>`
+        : `<button class="hw-submit-btn${showSubmitted ? " submitted" : ""}" data-toggle-submit="${itemId}" title="${showSubmitted ? "已提交" : "提交作业"}">
+             <i data-lucide="${showSubmitted ? "check" : "send"}"></i>${showSubmitted ? "已提交" : "提交"}
+           </button>`}
       <button class="hw-edit-btn" data-edit="${itemId}" title="编辑作业">
         <i data-lucide="pencil"></i>编辑
       </button>
     </div>`;
 
-  return `<div class="hw-row${subjClass === "cn" ? " cn" : ""}${subjClass === "math" ? " math" : ""}${subjClass === "en" ? " en" : ""}${hiddenClass}${showSubmitted ? " hw-done" : ""}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
+  const rowStateCls = isDone ? " hw-done" : (isExpired ? " hw-expired" : "");
+  return `<div class="hw-row${subjClass === "cn" ? " cn" : ""}${subjClass === "math" ? " math" : ""}${subjClass === "en" ? " en" : ""}${hiddenClass}${rowStateCls}" data-idx="${index != null ? index : ""}" data-id="${itemId}">
     <div class="hw-check-col">
-      <button class="hw-check-btn${showSubmitted ? " checked" : ""}" data-toggle-status="${itemId}" title="${showSubmitted ? "标记为待完成" : "标记为已完成"}">
-        <i data-lucide="${showSubmitted ? "check-circle-2" : "circle"}"></i>
-      </button>
+      ${isExpired
+        ? `<span class="hw-check-btn closed" title="已到期结束"><i data-lucide="calendar-x"></i></span>`
+        : `<button class="hw-check-btn${showSubmitted ? " checked" : ""}" data-toggle-status="${itemId}" title="${showSubmitted ? "标记为待完成" : "标记为已完成"}">
+             <i data-lucide="${showSubmitted ? "check-circle-2" : "circle"}"></i>
+           </button>`}
     </div>
     <div class="hw-subj ${subjClass}">${shortSubj}</div>
     <div class="hw-content">
@@ -6011,20 +6019,17 @@ function updateStudyStatsDisplay(cfg) {
   const doneCount = document.querySelectorAll(".hw-row.hw-done").length;
   const pendingCount = total - doneCount;
   const donePct = pct(doneCount, total);
-  // 逾期：待完成且 dueDate 已过
+  // 已到期：状态为 expired 的数量
   const todayStr = new Date().toISOString().slice(0, 10);
-  let overdue = 0;
+  let expired = 0;
   if (cfg && cfg.study) {
     const asm = getAllAssignments(cfg);
-    overdue = asm.filter(a => {
-      if (!a.dueDate) return false;
-      return a.dueDate < todayStr && a.status !== "done";
-    }).length;
+    expired = asm.filter(a => a.status === "expired").length;
   }
   valEls[0].textContent = pendingCount;   // 待完成
   valEls[1].textContent = doneCount;      // 已完成
   valEls[2].textContent = donePct + "%";  // 完成率
-  valEls[3].textContent = overdue;        // 逾期
+  valEls[3].textContent = expired;        // 已到期
   const subEls = statsRow.querySelectorAll(".hsi-sub");
   if (subEls.length >= 2) {
     subEls[1].textContent = pendingCount > 0 ? "需尽快完成" : "全部完成";
@@ -6076,8 +6081,9 @@ async function renderStudy() {
   const allGroups = study.allHomework || [];
   const allAssignments = collectAssignments(allGroups);
   const total = allAssignments.length;
-  const pendingList = allAssignments.filter(a => a.status !== "done");
+  const pendingList = allAssignments.filter(a => a.status !== "done" && a.status !== "expired");
   const doneList = allAssignments.filter(a => a.status === "done");
+  const expiredList = allAssignments.filter(a => a.status === "expired");
   const donePct = pct(doneList.length, total);
 
   // ════════ 2. 学习总览（科目完成率雷达 + 最新成绩） ════════
@@ -6169,12 +6175,16 @@ async function renderStudy() {
   let hwExpanded = false;
 
   function getFilteredList(filter) {
-    if (filter === "pending") return [...pendingList].sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""));
-    if (filter === "done") return [...doneList].sort((a, b) => (b.dueDate || "").localeCompare(a.dueDate || ""));
-    // all：待完成在前（按截止日期正序），已完成在后（按截止日期倒序）
-    const pendingSorted = [...pendingList].sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || ""));
-    const doneSorted = [...doneList].sort((a, b) => (b.dueDate || "").localeCompare(a.dueDate || ""));
-    return [...pendingSorted, ...doneSorted];
+    const asc = (a, b) => (a.dueDate || "").localeCompare(b.dueDate || "");
+    const desc = (a, b) => (b.dueDate || "").localeCompare(a.dueDate || "");
+    if (filter === "pending") return [...pendingList].sort(asc);
+    // 已完结 = 已完成 + 已到期（兼容旧值 done）
+    if (filter === "finished" || filter === "done") {
+      return [...doneList].sort(desc).concat([...expiredList].sort(asc));
+    }
+    // all：待完成在前（正序），已到期其次（正序），已完成在后（倒序）
+    return [...pendingList].sort(asc)
+      .concat([...expiredList].sort(asc), [...doneList].sort(desc));
   }
 
   function getHwXp(item) {
@@ -6197,7 +6207,7 @@ async function renderStudy() {
       let emptyIcon = "inbox";
       let emptyText = "暂无作业";
       if (filter === "pending") { emptyIcon = "party-popper"; emptyText = "太棒了，当前没有待办作业！"; }
-      else if (filter === "done") { emptyIcon = "list-checks"; emptyText = "还没有已完成的作业记录"; }
+      else if (filter === "finished" || filter === "done") { emptyIcon = "list-checks"; emptyText = "还没有已完结的作业记录"; }
       listEl.innerHTML = `<div class="hw-empty">${emptyStateHTML(emptyIcon, emptyText)}</div>`;
       if (showMoreBtn) showMoreBtn.style.display = "none";
       // 隐藏统计行中的无效提示
@@ -6238,11 +6248,8 @@ async function renderStudy() {
     const total = allAssignments.length;
     const done = doneList.length;
     const pending = pendingList.length;
+    const expired = expiredList.length;
     const rate = total > 0 ? Math.round((done / total) * 100) : 0;
-    const overdue = pendingList.filter(a => {
-      if (!a.dueDate) return false;
-      return a.dueDate < todayStr && a.status !== "done";
-    }).length;
     // 计算已完成作业获得的总 XP
     const doneXpTotal = doneList.reduce(function(sum, a) {
       const xp = getHwXp(a);
@@ -6266,9 +6273,9 @@ async function renderStudy() {
         <div class="hsi-sub">共 ${total} 项作业</div>
       </div>
       <div class="hw-stat-item total">
-        <div class="hsi-label">逾期</div>
-        <div class="hsi-value">${overdue}</div>
-        <div class="hsi-sub">项需补交</div>
+        <div class="hsi-label">已到期</div>
+        <div class="hsi-value">${expired}</div>
+        <div class="hsi-sub">项已到期末完成</div>
       </div>
     `;
   }

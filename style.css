@@ -4123,6 +4123,23 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .hw-due-overdue { color: #e11d48; background: #fff1f2; }
     .hw-due-today { color: #c2410c; background: #fff7ed; }
     .hw-due-soon { color: #b45309; background: #fffbeb; }
+    .hw-due-expired { color: #64748b; background: #f1f5f9; }
+    /* 已到期(已结束)作业：整体收敛为中性灰，弱化 */
+    .hw-row.hw-expired .hw-title { color: var(--neutral-400); }
+    .hw-row.hw-expired .hw-subj { opacity: .45; }
+    .hw-row.hw-expired .hw-chips .hw-mod-tag,
+    .hw-row.hw-expired .hw-type-tag { opacity: .6; }
+    .hw-check-btn.closed {
+      cursor: default; color: var(--neutral-300);
+    }
+    .hw-check-btn.closed:hover { background: transparent; transform: none; color: var(--neutral-300); }
+    .hw-expired-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      height: 24px; padding: 0 12px; font-size: 11px; font-weight: 600;
+      border-radius: 999px; white-space: nowrap;
+      background: var(--colourful-neutral-100); color: var(--colourful-neutral-500);
+    }
+    .hw-expired-tag i { width: 12px; height: 12px; }
     /* 操作区 */
     .hw-actions {
       display: flex;
