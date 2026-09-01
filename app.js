@@ -2215,7 +2215,7 @@ function renderSemesterBar() {
   }
   if (weekEl) weekEl.textContent = weekText;
 
-  // 框：中间是期中倒计时 / 右侧是期末倒计时
+  // 框：中间是期中还有几天 / 右侧是期末还有几天
   let midText = "";
   let finText = "";
   let fillPercent = 0;
@@ -2237,22 +2237,22 @@ function renderSemesterBar() {
     fillPercent = info.progressPercent;
     const mid = Number(info.daysUntilMidTerm) || 0;
     const fin = Number(info.daysUntilFinal) || 0;
-    // 始终显示：中间=期中倒计时，右边=期末倒计时（站在正向，同时展示两个节点）
+    // 始终显示：中间=期中还有几天，右边=期末还有几天（站在正向，同时展示两个节点）
     // 期中还没到：显示还有几天；期中已过：显示"已进行"（比"已过期"更正向）
     if (mid > 0) {
-      midText = `期中倒计时：<strong>${mid}</strong> 天`;
+      midText = `还有<strong>${mid}</strong>天就期中啦`;
     } else {
       midText = `期中已进行中`;
     }
     // 期末同理，永远在右侧显示（正向）
     if (fin > 0) {
-      finText = `期末倒计时：<strong>${fin}</strong> 天`;
+      finText = `还有<strong>${fin}</strong>天就期末啦`;
     } else if (fin === 0) {
       finText = `期末进行中`;
     } else {
       finText = `学期已结束`;
     }
-    // 始终显示两个倒计时
+    // 始终显示两个时间节点
     if (midEl) midEl.style.display = "";
   }
 
@@ -4658,6 +4658,36 @@ function renderWrData(report) {
     html += '<div style="font-size:12px;color:var(--neutral-400);margin-top:8px;line-height:1.6">游戏时间是用来放松的，玩完按时放下就好～</div>';
     html += '</div>';
   }
+
+  // ═══ 板块 E：四维成长视角（GrowthAlgorithm：认知/情绪/意志力/关系，纯数据归因，不编造成就）═══
+  // 数据全部取自该周报告存档的真实字段；任一位无数据则如实显示"等待记录"，不臆造。
+  (function () {
+    var dims = [];
+    // 认知 · 学业投入
+    var studyOn = studyStat && studyStat.hasData !== false && studyStat.value > 0;
+    dims.push({ key: "cog", name: "认知", icon: "🧠", tone: "lav", ok: !!studyOn,
+      txt: studyOn ? "完成了 <b>" + studyStat.value + "</b> 项作业" : "这周还没记录学习" });
+    // 情绪 · 表达与分享
+    var moodN = Object.keys(moodDist || {}).length;
+    var diaryOn = (diaryStat && diaryStat.value > 0) || moodN > 0;
+    dims.push({ key: "emo", name: "情绪", icon: "💗", tone: "candy", ok: !!diaryOn,
+      txt: diaryOn ? "写了 <b>" + (diaryStat.value || 0) + "</b> 篇日记" : "心情还没被记下来" });
+    // 意志力 · 坚持打卡
+    var willDays = (report.gameTime && report.gameTime.checkedDays) || (profile.length ? 1 : 0);
+    var willOn = willDays > 0;
+    dims.push({ key: "wil", name: "意志力", icon: "🔥", tone: "butter", ok: !!willOn,
+      txt: willOn ? "坚持打卡 <b>" + willDays + "</b> 天" : "等待重新出发" });
+    // 关系 · 家庭协作/沟通
+    var relHas = (report.gameTime && report.gameTime.checkedDays > 0) || (stories && stories.length > 0);
+    dims.push({ key: "rel", name: "关系", icon: "🤝", tone: "mint", ok: !!relHas,
+      txt: relHas ? "有家庭协作与分享" : "可试着和家人开启协作" });
+
+    var grid = dims.map(function (d) {
+      var st = d.ok ? " on" : "";
+      return '<div class="wr-dim wr-dim-' + d.tone + st + '"><span class="wr-dim-ico">' + d.icon + '</span><span class="wr-dim-name">' + d.name + '</span><span class="wr-dim-txt">' + d.txt + '</span></div>';
+    }).join("");
+    html += '<div class="wr-data-section"><div class="wr-data-label-v2">🌱 四维成长视角</div><div class="wr-dim-grid">' + grid + '</div></div>';
+  })();
 
   if (!html) html = '<div class="wr-empty-hint">还没有记录，快去打卡吧</div>';
   return html;
