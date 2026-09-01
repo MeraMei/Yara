@@ -8963,6 +8963,10 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       border-radius: 14px;
       font-weight: 900;
       font-size: 13px;
+      /* 宽度随内容自适应，避免中文提示被压缩成一字宽的竖向竖条 */
+      width: fit-content;
+      max-width: 90vw;
+      white-space: normal;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
