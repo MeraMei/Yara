@@ -1,20 +1,20 @@
 [
   {
-    "id": "xp_mthyaze0n5apr2",
+    "id": "xp_mti0pky02idhp5",
     "domain": "XP",
     "type": "XP获得",
     "title": "主动做家务（力所能及）",
     "taskName": "主动做家务（力所能及）",
     "taskCategory": "",
     "date": "2026-09-01",
-    "datetime": "2026-09-01 00:50:42",
+    "datetime": "2026-09-01 01:58:02",
     "xp": 5,
     "baseXp": 5,
     "commitmentBonus": false,
     "xpCategory": "",
     "reviewStatus": "待确认",
     "returnReason": "",
-    "description": "早餐吃完主动洗碗",
+    "description": "吃完早餐主动洗碗",
     "_hasValidName": true
   },
   {
