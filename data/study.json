@@ -547,12 +547,35 @@
     }
   ],
   "homework": {
-    "total": 18,
+    "total": 19,
     "done": 8,
-    "todayTotal": 2,
+    "todayTotal": 3,
     "todayDone": 2
   },
   "recentAssignments": [
+    {
+      "id": "hw_mtihr6hi2oqi3t",
+      "subject": "数学",
+      "title": "预习课本第4-5页。",
+      "cleanTitle": "预习课本第4-5页。",
+      "shortTitle": "预习课本第4-5页。",
+      "description": "预习课本第4-5页。",
+      "homeworkType": "日常预习",
+      "module": "",
+      "modules": [],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-01",
+      "deadline": "2026-09-01",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
     {
       "id": "hw_mtigkt4voencql",
       "subject": "英语",
@@ -733,6 +756,34 @@
     }
   ],
   "allHomework": [
+    {
+      "date": "2026-09-01",
+      "items": [
+        {
+          "id": "hw_mtihr6hi2oqi3t",
+          "subject": "数学",
+          "title": "预习课本第4-5页。",
+          "cleanTitle": "预习课本第4-5页。",
+          "shortTitle": "预习课本第4-5页。",
+          "description": "预习课本第4-5页。",
+          "homeworkType": "日常预习",
+          "module": "",
+          "modules": [],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-01",
+          "deadline": "2026-09-01",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        }
+      ]
+    },
     {
       "id": "hw_mtigkt4voencql",
       "subject": "英语",
