@@ -65,9 +65,10 @@
     return global.fetch(API_BASE + '/contents/' + path + '?ref=' + BRANCH, {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json' },
     }).then(function (r) {
-      if (r.status === 404) return null;
+      if (r.status === 404) return null; // 文件不存在 → 允许按"新建"写入
+      if (!r.ok) throw makeWriteError('读取文件SHA失败(HTTP ' + r.status + ')', r.status);
       return r.json().then(function (d) { return d && d.sha ? d.sha : null; });
-    }).catch(function () { return null; });
+    });
   }
 
   function writeFile(path, content, msg) {
@@ -90,37 +91,59 @@
     });
   }
 
-  function writeFileRemote(path, content, msg, retryCount) {
+  // 可重试写入上限：1 次原文 + MAX 次退避重试
+  var MAX_WRITE_ATTEMPT = 4;
+
+  function makeWriteError(msg, status) {
+    var err = new Error(msg);
+    err.status = status;
+    return err;
+  }
+
+  function isTransientError(err) {
+    var m = String((err && err.message) || '');
+    var s = err && err.status;
+    // 永久性错误：鉴权失效、无写权限、路径不存在 → 不重试
+    if (/unauthorized|bad credentials|must have push access|not found/i.test(m)) return false;
+    if (s === 429 || s === 403 || (s !== undefined && s >= 500)) return true;
+    return /does not match|conflict|rate limit|abuse rate|连接中断|fetch failed|network/i.test(m);
+  }
+
+  function tryPut(path, content, msg, token, sha) {
+    var body = {
+      message: msg || ('更新数据: ' + path),
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+      branch: BRANCH,
+    };
+    if (sha) body.sha = sha;
+    return global.fetch(API_BASE + '/contents/' + path, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(function (r) {
+      if (r.ok) return r.json();
+      return r.json().then(function (e) {
+        var errMsg = e && e.message ? e.message : ('GitHub API 错误: ' + r.status);
+        // 文件已存在但写入内容一致（幂等）→ 视为成功，避免误报"失败"
+        if (r.status === 422 && /already exists/i.test(errMsg)) return { ok: true, sha: sha };
+        throw makeWriteError(errMsg, r.status);
+      });
+    });
+  }
+
+  // 一体化写入：取最新 SHA → PUT；SHA 竞态/限流/5xx 自动退避重试（重试会重新读取最新 SHA）
+  function writeFileRemote(path, content, msg, attempt) {
+    attempt = attempt || 0;
     var token = getToken();
     if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
-    return getFileSHA(path).then(function (sha) {
-      var body = {
-        message: msg || '更新数据: ' + path,
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
-        branch: BRANCH,
-      };
-      if (sha) body.sha = sha;
-      return global.fetch(API_BASE + '/contents/' + path, {
-        method: 'PUT',
-        headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+    return getFileSHA(path)
+      .then(function (sha) { return tryPut(path, content, msg, token, sha); })
+      .catch(function (err) {
+        if (attempt >= MAX_WRITE_ATTEMPT || !isTransientError(err)) throw err;
+        var wait = 500 + attempt * 700; // 0.5s / 1.2s / 1.9s / 2.6s
+        return new Promise(function (resolve) { setTimeout(resolve, wait); })
+          .then(function () { return writeFileRemote(path, content, msg, attempt + 1); });
       });
-    }).then(function (r) {
-      if (!r.ok) {
-        return r.json().then(function (e) {
-          var errMsg = e.message || 'GitHub API 错误: ' + r.status;
-          // SHA 冲突时自动重试（最多 2 次），避免并发写入失败
-          if ((errMsg.indexOf('does not match') >= 0 || errMsg.indexOf('conflict') >= 0) && (retryCount || 0) < 2) {
-            var wait = 600 + (retryCount || 0) * 400;
-            return new Promise(function (resolve) { setTimeout(resolve, wait); }).then(function () {
-              return writeFileRemote(path, content, msg, (retryCount || 0) + 1);
-            });
-          }
-          throw new Error(errMsg);
-        });
-      }
-      return r.json();
-    });
   }
 
   function num(v) { var n = Number(v); return isNaN(n) ? 0 : n; }

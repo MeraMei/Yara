@@ -8968,7 +8968,16 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       pointer-events: none;
       transition: opacity .2s ease, visibility .2s ease;
     }
-    .toast.show { opacity: 1; visibility: visible; pointer-events: auto; display: inline-flex; align-items: center; gap: 7px; }
+    .toast.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
     .toast.ok { background: var(--mint-100); color: var(--mint-700); }
     .toast.err { background: var(--coral-100); color: var(--coral-700); }
     #toast {
@@ -8978,6 +8987,8 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       transform: translateX(-50%);
       z-index: 9999;
       box-shadow: 0 8px 30px rgba(0,0,0,.14);
+      /* 用 fit-content 让提示随内容横向撑开，避免被压缩成一字宽的"红色竖条" */
+      width: fit-content;
       max-width: 90vw;
       white-space: normal;
       text-align: center;
