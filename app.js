@@ -2176,12 +2176,16 @@ function renderSemesterBar() {
   // 进度条轨道必须始终可见
   if (trackEl) trackEl.style.display = "";
 
-  // 框1：学期：几年级·（暑假/寒假/秋季/春季）
+  // 框1：学期：几年级·（上/下），与成绩分析学期口径保持一致
+  // （原用"秋季/春季"季节叫法，现统一为"上/下"制）
   let season = "";
   if (info.isBreak) {
     season = info.breakName || (info.breakType === "winter" ? "寒假" : "暑假");
   } else {
-    season = info.semester === 1 ? "秋季" : "春季";
+    // 优先使用校历短名（上/下），回退到数字映射
+    season = (info.semesterShortName === "上" || info.semesterShortName === "下")
+      ? info.semesterShortName
+      : (info.semester === 1 ? "上" : "下");
   }
   if (titleEl) {
     titleEl.innerHTML = `学期：${info.grade}·${season}`;
