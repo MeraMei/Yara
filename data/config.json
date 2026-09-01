@@ -111,12 +111,12 @@
         "id": "xpr_mtgwxizttctn"
       },
       {
-        "name": "每天阅读30分钟",
+        "id": "xpr_mtgwxiztzeyq",
+        "name": "阅读20分钟并圈出好词好句",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": "",
-        "id": "xpr_mtgwxiztzeyq"
+        "description": ""
       },
       {
         "name": "做语数英科的额外练习",
@@ -320,12 +320,12 @@
       "id": "xpr_mtgwxizttctn"
     },
     {
-      "name": "每天阅读30分钟",
+      "id": "xpr_mtgwxiztzeyq",
+      "name": "阅读20分钟并圈出好词好句",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": "",
-      "id": "xpr_mtgwxiztzeyq"
+      "description": ""
     },
     {
       "name": "做语数英科的额外练习",
