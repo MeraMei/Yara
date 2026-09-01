@@ -127,12 +127,12 @@
         "id": "xpr_mtgwxizt2118"
       },
       {
-        "name": "练字 20分钟以上",
+        "id": "xpr_mtgwxiztxeim",
+        "name": "练字 1页纸 / 4个AI练字",
         "category": "学习成长",
         "xp": 5,
         "method": "按次",
-        "description": "",
-        "id": "xpr_mtgwxiztxeim"
+        "description": ""
       },
       {
         "name": "作业·日常预习",
@@ -336,12 +336,12 @@
       "id": "xpr_mtgwxizt2118"
     },
     {
-      "name": "练字 20分钟以上",
+      "id": "xpr_mtgwxiztxeim",
+      "name": "练字 1页纸 / 4个AI练字",
       "category": "学习成长",
       "xp": 5,
       "method": "按次",
-      "description": "",
-      "id": "xpr_mtgwxiztxeim"
+      "description": ""
     },
     {
       "name": "作业·日常预习",
