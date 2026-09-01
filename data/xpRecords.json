@@ -12,10 +12,11 @@
     "baseXp": 5,
     "commitmentBonus": false,
     "xpCategory": "",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "吃完早餐主动洗碗",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mt1jqsi7",
