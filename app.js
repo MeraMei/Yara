@@ -2631,13 +2631,23 @@ if (typeof window !== "undefined") {
 
     function openXpModal() {
       populateXpTaskSelectPage().then(() => {
-        document.getElementById("addXpModalPage").classList.add("active");
-        // 恢复按钮状态（防止上次提交成功后未重置导致"提交中..."卡住）
+        // 进入"能量打卡/新增"前，彻底重置为新增语义：标题、按钮、清空编辑态与表单残留
+        // 防止上次点卡片编辑后，标题停留在"修改记录"、备注残留上一张卡的内容
+        const titleEl = document.querySelector("#addXpModalPage .modal-title");
+        if (titleEl) titleEl.innerHTML = '<i data-lucide="sparkles"></i>获得 XP';
         const btn = document.querySelector("#addXpModalPage .btn-confirm");
         if (btn) { btn.textContent = "添加 XP"; btn.disabled = false; }
+        document.getElementById("addXpModalPage").classList.add("active");
+        // 清除编辑态，恢复任务下拉为可改
+        window.closeXpEdit && window.closeXpEdit();
         // 重置承诺复选框
         document.getElementById("xpCommitmentCheck").checked = false;
         document.getElementById("xpCommitmentHint").style.display = "none";
+        // 清空表单字段残留
+        document.getElementById("xpTaskSelectPage").value = "";
+        document.getElementById("xpValuePage").value = "";
+        document.getElementById("xpCategoryPage").value = "";
+        document.getElementById("xpDescPage").value = "";
         // 如果有预选任务（从家庭约定卡点击进入），自动选中该任务
         if (_xpModalPreSelectTask) {
           var sel = document.getElementById("xpTaskSelectPage");
@@ -2669,6 +2679,9 @@ if (typeof window !== "undefined") {
       document.getElementById("addXpModalPage").classList.remove("active");
       // 关闭弹窗时清掉编辑态，恢复任务下拉为可改
       window.closeXpEdit && window.closeXpEdit();
+      // 关闭弹窗时同样恢复"获得 XP"标题，避免下次从卡片进入编辑后标题残留
+      const titleEl = document.querySelector("#addXpModalPage .modal-title");
+      if (titleEl) titleEl.innerHTML = '<i data-lucide="sparkles"></i>获得 XP';
     }
 
     // ════════ 我的挑战（孩子自己选每周目标） ════════
