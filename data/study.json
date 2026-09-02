@@ -869,8 +869,8 @@
         "汉字",
         "组词"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-01",
       "deadline": "2026-09-01",
       "reviewStatus": "",
@@ -884,7 +884,8 @@
       "unitIndex": 0,
       "unitName": "第一单元·自然之美",
       "duration": "≤15分钟",
-      "wrongCount": 0
+      "wrongCount": 0,
+      "submittedAt": "2026-09-02T00:46:08.975Z"
     },
     {
       "id": "hw_mtigfwpujrp9hq",
@@ -896,7 +897,8 @@
       "homeworkType": "日常复习",
       "module": "阅读",
       "modules": [
-        "阅读"
+        "阅读",
+        "作文"
       ],
       "status": "pending",
       "submitted": false,
@@ -909,7 +911,11 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "duration": "≤15分钟",
+      "wrongCount": 0,
+      "unitIndex": 0,
+      "unitName": "第一单元·自然之美"
     },
     {
       "id": "hw_mslv9a7m9uniba",
