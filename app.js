@@ -6156,6 +6156,8 @@ window.submitEditXpPage = async function() {
       commitmentBonus: willCommit,
       xp: newXp,
       baseXp: baseXp,
+      // 编辑保存即自动通过并加 XP，避免停留在待确认状态
+      status: "verified",
     });
 
     // 补勾承诺时，同步标记本周同名约定完成
