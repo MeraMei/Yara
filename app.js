@@ -2855,6 +2855,9 @@ if (typeof window !== "undefined") {
         commitmentBonus: isCommitment,
         description: isCommitment ? description + " [承诺兑现]" : description,
         status: "pending",
+        // 带上选中任务的分类（onXpTaskChangePage 已填入 xpCategoryPage，优先取它）
+        xpCategory: selectedOpt?.dataset?.category || (document.getElementById("xpCategoryPage")?.value || ""),
+        type: selectedOpt?.dataset?.category || (document.getElementById("xpCategoryPage")?.value || ""),
       }).then(async () => {
         // 打卡即完成约定：如果该任务是本周约定，自动标记完成
         // 1. 关联任务池的约定：通过 taskName 匹配
@@ -5532,6 +5535,24 @@ async function renderXp() {
     return pa - pb;
   });
   const stripEl = document.getElementById("xpRecordsStrip");
+  // 按任务名在任务池反查分类，兜底历史/新增时未存分类的记录（taskCategory/xpCategory 为空时使用）
+  const xpRulesCfgMap = (cfg && cfg.config && cfg.config.xpRules) || {};
+  const taskCategoryLookup = (() => {
+    const map = {};
+    Object.keys(xpRulesCfgMap).forEach(function (cat) {
+      (xpRulesCfgMap[cat] || []).forEach(function (t) {
+        if (t && t.name && !map[t.name]) map[t.name] = cat;
+      });
+    });
+    return map;
+  })();
+  const resolveEnergyCategory = (record) => {
+    const direct = (record.xpCategory || record.taskCategory || "");
+    if (direct) return direct;
+    const taskName = record.taskName || record.title;
+    if (taskName && taskCategoryLookup[taskName]) return taskCategoryLookup[taskName];
+    return (record.type && record.type !== "XP获得") ? record.type : "";
+  };
   const recExpand = window.__xpRecordsExpanded || false;
   if (stripEl) {
     if (allRecords.length === 0) {
@@ -5558,7 +5579,9 @@ async function renderXp() {
         const status = statusMap[record.status]
           || (record.reviewStatus ? { text: record.reviewStatus, cls: statusClsOfReview(record.reviewStatus), icon: statusIconOfReview(record.reviewStatus) } : null)
           || { text: "待确认", cls: "pending", icon: "clock" };
-        const category = record.type || record.taskCategory || "";
+        // 分类取值：优先存于 xpCategory/taskCategory；缺失时按任务名反查任务池；
+        // 兜底才用非"XP获得"的 type。杜绝标签丢失、颜色回落默认紫。
+        const category = resolveEnergyCategory(record);
         const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#9255f5";
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
         // 待确认判断兼容两套字段：status==="pending" 或 reviewStatus==="待确认"，
@@ -6055,9 +6078,11 @@ window.openXpEditModal = async function(recordId, ev) {
   // 分值锁定（编辑态不可改）
   const valEl = document.getElementById("xpValuePage");
   if (valEl) valEl.value = record.baseXp != null ? record.baseXp : (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0);
-  // 分类回填：优先用记录里已存的分类；若历史记录缺分类，则保留 onXpTaskChangePage 从任务池推导出的分类，避免显示为空
+  // 分类回填：优先用记录里已存的分类字段（排除非分类的"XP获得"），若缺则保留 onXpTaskChangePage 推导出的分类
   const catEl = document.getElementById("xpCategoryPage");
-  const recCat = record.type || record.taskCategory || record.xpCategory || "";
+  const recCat = (record.taskCategory || record.xpCategory || "")
+    || (record.type && record.type !== "XP获得" ? record.type : "")
+    || "";
   if (catEl && recCat) catEl.value = recCat;
 
   // 预填承诺勾选
