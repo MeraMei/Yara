@@ -5548,7 +5548,9 @@ async function renderXp() {
         const category = record.type || record.taskCategory || "";
         const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#9255f5";
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
-        const isPending = record.status === "pending";
+        // 待确认判断兼容两套字段：status==="pending" 或 reviewStatus==="待确认"，
+        // 否则历史数据只有 reviewStatus 时会被当成已处理，不渲染 通过/退回 按钮。
+        const isPending = record.status === "pending" || record.reviewStatus === "待确认";
         const isCommitment = !!record.commitmentBonus;
         return `
         <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}" style="--cat-color:${catColor}" onclick="openXpEditModal('${record.id}', this)" title="点击修改这条记录">
