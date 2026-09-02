@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtjh1ymqym3wb1",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "阅读20分钟并圈出好词好句",
+    "taskName": "阅读20分钟并圈出好词好句",
+    "taskCategory": "",
+    "date": "2026-09-02",
+    "datetime": "2026-09-02 02:23:20",
+    "xp": 5,
+    "baseXp": 5,
+    "commitmentBonus": false,
+    "xpCategory": "",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "完成阅读《希腊神话故事》",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtjdmsxpjn23qf",
     "domain": "XP",
     "type": "XP获得",
