@@ -6033,6 +6033,21 @@ window.rejectXpRecord = async function(btn, recordId, reason) {
 window.__xpEditRecordId = null;
 
 // 打开「修改记录」弹窗：复用录入弹窗，预填已可编辑字段，锁定不可改字段。
+// 从设置（config.xpRules 分类结构 / config.xpRuleList 扁平结构）中按任务名查基础分；未配置返回 null
+function lookupBaseXpFromConfig(cfg, taskName) {
+  if (!cfg || !taskName) return null;
+  const xpRules = (cfg.config && cfg.config.xpRules) || {};
+  for (const cat of Object.keys(xpRules)) {
+    const f = (xpRules[cat] || []).find(function(r) { return r && r.name === taskName && r.xp != null; });
+    if (f) return Number(f.xp) || null;
+  }
+  const list = (cfg.config && cfg.config.xpRuleList) || [];
+  const f2 = list.find(function(r) { return r && r.name === taskName && r.xp != null; });
+  if (f2) return Number(f2.xp) || null;
+  return null;
+}
+
+// 编辑态打开：锁定基础分（并回填设置中该任务的值），只允许改「备注/承诺」
 window.openXpEditModal = async function(recordId, ev) {
   if (ev && ev.stopPropagation) ev.stopPropagation();
   if (ev && ev.preventDefault) ev.preventDefault();
@@ -6079,9 +6094,17 @@ window.openXpEditModal = async function(recordId, ev) {
     // 编辑态：任务不可改（只保留当前项的展示效果）
     taskSel.disabled = true;
   }
-  // 分值锁定（编辑态不可改）
+  // 分值：锁定不可改，统一从设置（xpRules/xpRuleList）按任务名取值；设置里没有才回退到记录原基础分
+  const _cfgTaskName = record.taskName || record.title || "";
+  const _cfgTaskBase = lookupBaseXpFromConfig(cfg, _cfgTaskName);
+  const baseToShow = (_cfgTaskBase != null && _cfgTaskBase > 0)
+    ? _cfgTaskBase
+    : (record.baseXp != null ? record.baseXp : (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0));
   const valEl = document.getElementById("xpValuePage");
-  if (valEl) valEl.value = record.baseXp != null ? record.baseXp : (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0);
+  if (valEl) {
+    valEl.readOnly = true;
+    valEl.value = baseToShow;
+  }
   // 分类回填：优先用记录里已存的分类字段（排除非分类的"XP获得"），若缺则保留 onXpTaskChangePage 推导出的分类
   const catEl = document.getElementById("xpCategoryPage");
   const recCat = (record.taskCategory || record.xpCategory || "")
@@ -6106,9 +6129,11 @@ window.closeXpEdit = function() {
   window.__xpEditRecordId = null;
   const taskSel = document.getElementById("xpTaskSelectPage");
   if (taskSel) taskSel.disabled = false;
+  const valEl = document.getElementById("xpValuePage");
+  if (valEl) valEl.readOnly = true;
 };
 
-// 编辑态保存：只允许修改「备注/承诺」，任务与分值锁定不变；走并发安全合并写。
+// 编辑态保存：任务名锁定不变，备注/承诺/分值可改；自动通过并加（或减）XP；走并发安全合并写。
 window.submitEditXpPage = async function() {
   const editId = window.__xpEditRecordId;
   if (!editId) return;
@@ -6127,16 +6152,18 @@ window.submitEditXpPage = async function() {
   // 校验备注非空（与新增一致）
   if (!desc) { alert("请填写备注说明"); return; }
 
-  // 锁定任务名（不可改）与基础分值
-  const baseXp = (record.baseXp != null && Number(record.baseXp) > 0)
+  // 任务名锁定不可改；基础分一律从设置取值（改设置分值才会变），保存后自动通过并按设置值结算
+  const taskName = record.taskName || record.title || "";
+  const settingsBase = lookupBaseXpFromConfig(cfg, taskName);
+  const recFallback = (record.baseXp != null && Number(record.baseXp) > 0)
     ? Number(record.baseXp)
     : Math.max(0, (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0));
+  const baseXp = (settingsBase != null && settingsBase > 0) ? settingsBase : recFallback;
+  // 新总分 = 设置基础分 + 承诺加成（勾承诺 +2，未勾不加）
+  // 设置分值上调→总能量加，下调→总能量减；取消承诺→自动 -2。加/减都按实际新值结算。
+  const newXp = baseXp + (willCommit ? 2 : 0);
   const wasCommit = !!record.commitmentBonus;
-
-  // 计算新的 XP：承诺态变化才调整 +2；仅改备注不变动分值
-  let newXp = Number(record.xp) || 0;
-  if (!wasCommit && willCommit) newXp = baseXp + 2;
-  // 取消承诺：不扣回（历史已计入）——保持分值不变
+  const xpDelta = newXp - (Number(record.xp) || 0);
 
   const btn = document.querySelector("#addXpModalPage .btn-confirm");
   const originalText = btn.textContent;
@@ -6187,7 +6214,11 @@ window.submitEditXpPage = async function() {
     if (hint) hint.style.display = "none";
     await renderXp();
     refreshIcons(50);
-    showToast("✅ 已保存修改" + (willCommit && !wasCommit ? "（承诺 +2 XP 已到账）" : ""), true);
+    // 保存后按差值提示能量是加还是减，交给用户核对
+    let _toastMsg = "✅ 已保存修改";
+    if (xpDelta > 0) _toastMsg += `（能量 +${xpDelta}）`;
+    else if (xpDelta < 0) _toastMsg += `（能量 ${xpDelta}）`;
+    showToast(_toastMsg, true);
   } catch (e) {
     console.error("保存编辑失败:", e);
     btn.textContent = originalText;
