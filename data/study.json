@@ -808,8 +808,8 @@
         "听说",
         "单词"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-01",
       "deadline": "2026-09-01",
       "reviewStatus": "",
@@ -823,7 +823,8 @@
       "unitIndex": 0,
       "unitName": "Module1·Getting to know you",
       "duration": "≤15分钟",
-      "wrongCount": 0
+      "wrongCount": 0,
+      "submittedAt": "2026-09-02T00:44:02.758Z"
     },
     {
       "id": "hw_mtigixt9xeiuni",
@@ -850,7 +851,9 @@
       "errorModule": "",
       "errorModules": [],
       "unitIndex": -1,
-      "unitName": null
+      "unitName": null,
+      "duration": "60分钟以上",
+      "wrongCount": 0
     },
     {
       "id": "hw_mtighaznh5i89w",
