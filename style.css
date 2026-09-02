@@ -6300,6 +6300,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       transition: transform .2s ease, box-shadow .2s ease;
       position: relative;
       min-height: 118px;
+      cursor: pointer;
     }
     .recent-card::before {
       content: "";

@@ -2667,6 +2667,8 @@ if (typeof window !== "undefined") {
     }
     function closeXpModal() {
       document.getElementById("addXpModalPage").classList.remove("active");
+      // 关闭弹窗时清掉编辑态，恢复任务下拉为可改
+      window.closeXpEdit && window.closeXpEdit();
     }
 
     // ════════ 我的挑战（孩子自己选每周目标） ════════
@@ -2787,6 +2789,11 @@ if (typeof window !== "undefined") {
     }
 
     async function submitAddXpPage() {
+      const editId = window.__xpEditRecordId || null;
+      if (editId) {
+        await submitEditXpPage();
+        return;
+      }
       const selectEl = document.getElementById("xpTaskSelectPage");
       const taskName = selectEl.value;
       const selectedOpt = selectEl.options[selectEl.selectedIndex];
@@ -5487,6 +5494,19 @@ async function renderXp() {
     verified: { text: "已通过", cls: "verified", icon: "sparkle" },
     returned: { text: "已退回", cls: "returned", icon: "rotate-ccw" },
   };
+  // reviewStatus 中文 → 卡片状态样式/图标 的兼容映射（兼容旧数据只有 reviewStatus 无 status 的情况）
+  function statusClsOfReview(v) {
+    const t = String(v || "");
+    if (t.indexOf("已通过") >= 0) return "verified";
+    if (t.indexOf("已退回") >= 0) return "returned";
+    return "pending";
+  }
+  function statusIconOfReview(v) {
+    const t = String(v || "");
+    if (t.indexOf("已通过") >= 0) return "sparkle";
+    if (t.indexOf("已退回") >= 0) return "rotate-ccw";
+    return "clock";
+  }
   // 能量页只展示本页操作的记录（日记 + 手动打分任务），排除知识页"作业·"自动积分与财务页"财务/花销"自动积分
   const allRecords = (cfg.recentRecords || []).filter(r => _isEnergyTask(r));
   // 按时间倒序（最新在前），审批/退回后卡片停留原位、只变状态，不会跳走
@@ -5520,14 +5540,18 @@ async function renderXp() {
       }
       const hasMore = allRecords.length > visibleRecords.length;
       const cardHtml = (record) => {
-        const status = statusMap[record.status] || { text: record.status, cls: "pending", icon: "clock" };
+        // 状态取值兼容两套字段：优先 status（pending/verified/returned），否则退回 reviewStatus 中文，
+        // 再兜底为"待确认"，杜绝显示 undefined。
+        const status = statusMap[record.status]
+          || (record.reviewStatus ? { text: record.reviewStatus, cls: statusClsOfReview(record.reviewStatus), icon: statusIconOfReview(record.reviewStatus) } : null)
+          || { text: "待确认", cls: "pending", icon: "clock" };
         const category = record.type || record.taskCategory || "";
         const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#9255f5";
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
         const isPending = record.status === "pending";
         const isCommitment = !!record.commitmentBonus;
         return `
-        <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}" style="--cat-color:${catColor}">
+        <div class="recent-card${isPending ? " pending-card" : ""}" data-record-id="${record.id}" style="--cat-color:${catColor}" onclick="openXpEditModal('${record.id}', this)" title="点击修改这条记录">
           <div class="rc-top">
             <div class="rc-icon" style="background:${catColor}18;color:${catColor}">
               <i data-lucide="${status.icon}"></i>
@@ -5958,6 +5982,166 @@ window.rejectXpRecord = async function(btn, recordId, reason) {
     }
   } finally {
     if (btn) { btn.disabled = false; btn.classList.remove("busy"); }
+  }
+};
+
+// 事后补勾 / 解除「我承诺的事」：允许对已提交（含已审批通过）的记录修正承诺标记，
+// 避免"提交后再也改不了"。与新增时的承诺语义保持一致（+2 XP 加成、描述带 [承诺兑现]）。
+// 编辑状态的记录 ID（点击卡片打开录入弹窗进行修改时使用；null 表示全新录入）
+window.__xpEditRecordId = null;
+
+// 打开「修改记录」弹窗：复用录入弹窗，预填已可编辑字段，锁定不可改字段。
+window.openXpEditModal = async function(recordId, ev) {
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (ev && ev.preventDefault) ev.preventDefault();
+  // 用最新数据查找到该记录
+  const cfg = (typeof loadAppData === "function") ? await loadAppData() : (window.__lastCfg || {});
+  const record = (cfg.familyMeetings ? (cfg.recentRecords || cfg.xpRecords || []) : (cfg.recentRecords || cfg.xpRecords || []))
+    .find(r => r.id === recordId)
+    || (cfg.xpRecords || cfg.recentRecords || []).find(r => r.id === recordId);
+  if (!record) { showToast("⚠️ 未找到这条记录", false); return; }
+
+  window.__xpEditRecordId = recordId;
+
+  // 打开弹窗并预填
+  await populateXpTaskSelectPage();
+  const modal = document.getElementById("addXpModalPage");
+  modal.classList.add("active");
+
+  // 标题与按钮切换为「编辑」语义
+  const titleEl = modal.querySelector(".modal-title");
+  if (titleEl) titleEl.innerHTML = '<i data-lucide="pencil"></i>修改记录';
+  const btn = modal.querySelector(".btn-confirm");
+  if (btn) { btn.textContent = "保存修改"; btn.disabled = false; }
+  const cancelBtn = modal.querySelector(".btn-cancel");
+  if (cancelBtn) cancelBtn.textContent = "取消";
+
+  // 预填备注
+  let showDesc = (record.description || "").replace(/\s*\[承诺兑现\]\s*$/g, "").trim();
+  const descEl = document.getElementById("xpDescPage");
+  if (descEl) descEl.value = showDesc;
+
+  // 预填任务（选中对应项），并锁定任务/分值/分类为只读
+  const taskSel = document.getElementById("xpTaskSelectPage");
+  const taskName = record.taskName || record.title || "";
+  if (taskSel) {
+    let idx = -1;
+    for (let i = 0; i < taskSel.options.length; i++) {
+      if (taskSel.options[i].value === taskName) { idx = i; break; }
+    }
+    if (idx >= 0) { taskSel.selectedIndex = idx; }
+    // 编辑态：任务不可改（只保留当前项的展示效果）
+    taskSel.disabled = true;
+    onXpTaskChangePage();
+  }
+  // 分值 / 分类锁定（编辑态不可改）
+  const valEl = document.getElementById("xpValuePage");
+  if (valEl) valEl.value = record.baseXp != null ? record.baseXp : (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0);
+  const catEl = document.getElementById("xpCategoryPage");
+  if (catEl) catEl.value = record.type || record.taskCategory || record.xpCategory || "";
+
+  // 预填承诺勾选
+  const chk = document.getElementById("xpCommitmentCheck");
+  if (chk) {
+    chk.checked = !!record.commitmentBonus;
+    chk.disabled = false;
+  }
+  const hint = document.getElementById("xpCommitmentHint");
+  if (hint) hint.style.display = "none";
+
+  refreshIcons(50);
+};
+
+// 关闭编辑状态
+window.closeXpEdit = function() {
+  window.__xpEditRecordId = null;
+  const taskSel = document.getElementById("xpTaskSelectPage");
+  if (taskSel) taskSel.disabled = false;
+};
+
+// 编辑态保存：只允许修改「备注/承诺」，任务与分值锁定不变；走并发安全合并写。
+window.submitEditXpPage = async function() {
+  const editId = window.__xpEditRecordId;
+  if (!editId) return;
+
+  const cfg = (typeof loadAppData === "function") ? await loadAppData() : (window.__lastCfg || {});
+  const allRecs = (cfg.recentRecords || cfg.xpRecords || []);
+  const record = allRecs.find(r => r.id === editId);
+  if (!record) { showToast("⚠️ 未找到这条记录", false); return; }
+
+  // 收集可编辑字段
+  const descEl = document.getElementById("xpDescPage");
+  const desc = descEl ? descEl.value.trim() : (record.description || "");
+  const chk = document.getElementById("xpCommitmentCheck");
+  const willCommit = chk ? chk.checked : !!record.commitmentBonus;
+
+  // 校验备注非空（与新增一致）
+  if (!desc) { alert("请填写备注说明"); return; }
+
+  // 锁定任务名（不可改）与基础分值
+  const baseXp = (record.baseXp != null && Number(record.baseXp) > 0)
+    ? Number(record.baseXp)
+    : Math.max(0, (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0));
+  const wasCommit = !!record.commitmentBonus;
+
+  // 计算新的 XP：承诺态变化才调整 +2；仅改备注不变动分值
+  let newXp = Number(record.xp) || 0;
+  if (!wasCommit && willCommit) newXp = baseXp + 2;
+  // 取消承诺：不扣回（历史已计入）——保持分值不变
+
+  const btn = document.querySelector("#addXpModalPage .btn-confirm");
+  const originalText = btn.textContent;
+  btn.textContent = "保存中...";
+  btn.disabled = true;
+
+  try {
+    let newDesc = desc;
+    if (willCommit) {
+      if (newDesc.indexOf("[承诺兑现]") < 0) newDesc = (newDesc ? newDesc + " " : "") + "[承诺兑现]";
+    } else {
+      newDesc = newDesc.replace(/\s*\[承诺兑现\]\s*$/g, "").trim();
+    }
+
+    await window.DataStore.updateXpRecord(editId, {
+      description: newDesc,
+      commitmentBonus: willCommit,
+      xp: newXp,
+      baseXp: baseXp,
+    });
+
+    // 补勾承诺时，同步标记本周同名约定完成
+    if (willCommit && !wasCommit) {
+      try {
+        const meeting = currentWeekMeeting(cfg.familyMeetings);
+        if (meeting && meeting.commitments) {
+          const taskName = record.taskName || record.title || desc.replace("[承诺兑现]", "").trim();
+          let changed = false;
+          meeting.commitments.forEach(c => {
+            if (c.completed) return;
+            if ((c.taskName && c.taskName === taskName) || (c.text && c.text === taskName)) { c.completed = true; changed = true; }
+          });
+          if (changed) await window.DataStore.saveFamilyMeetings(cfg.familyMeetings || []);
+        }
+      } catch (e) { console.error("编辑同步约定完成失败:", e); }
+    }
+
+    await window.DataStore.refreshData(true);
+    closeXpModal();
+    window.closeXpEdit();
+    // 复用新增保存后的字段清理
+    const resetIds = ["xpDescPage", "xpValuePage", "xpCategoryPage"];
+    resetIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    document.getElementById("xpCommitmentCheck").checked = false;
+    const hint = document.getElementById("xpCommitmentHint");
+    if (hint) hint.style.display = "none";
+    await renderXp();
+    refreshIcons(50);
+    showToast("✅ 已保存修改" + (willCommit && !wasCommit ? "（承诺 +2 XP 已到账）" : ""), true);
+  } catch (e) {
+    console.error("保存编辑失败:", e);
+    btn.textContent = originalText;
+    btn.disabled = false;
+    handleWriteError(e, "保存失败: " + ((e && e.message) || "未知错误"));
   }
 };
 
@@ -9978,6 +10162,29 @@ function initSidebarToggle() {
 
 async function boot(page) {
   window.__currentView = page;
+  // ★ 自动版本检测：若线上有新版本代码，自动刷新加载最新版，避免用户一直用旧缓存。
+  //   一屏一个页面，只做一次检查；本地模式(localhost)跳过，避免误触发。
+  try {
+    const isLocalHost = /^https?:/.test(location.href) && (location.hostname === "localhost" || location.hostname === "127.0.0.1");
+    if (!isLocalHost && !sessionStorage.getItem("__yaraVersionReloaded")) {
+      const cur = window.__APP_VERSION__ || "";
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 5000);
+      const res = await global.fetch("app-version.txt?ts=" + Date.now(), { cache: "no-store", signal: ctrl.signal });
+      clearTimeout(timer);
+      if (res && res.ok) {
+        const remote = (await res.text() || "").trim();
+        if (remote && remote !== cur) {
+          sessionStorage.setItem("__yaraVersionReloaded", "1");
+          location.reload();
+          return;
+        }
+      }
+    }
+  } catch (e) {
+    // 版本探测失败不阻断启动（CDN 暂不可达等场景）
+    console.warn("版本检测跳过:", e.message);
+  }
   // 自动重连成功后，用最新数据重渲染当前视图
   if (!window.__dataRefreshBound) {
     window.__dataRefreshBound = true;
