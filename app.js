@@ -1477,6 +1477,75 @@ async function addStudyRecord(record) {
   return recordId;
 }
 
+// 批量新增作业（一次读取→批量追加→单次写回）。避免逐条 fetch+write 导致本地/远端
+// 第二次读到旧文件而互相覆盖（修复“拆分多条只录入1条”）。
+async function addStudyRecords(records) {
+  _dataGen++;
+  if (!Array.isArray(records) || records.length === 0) return [];
+  const entryDate = records[0].date || todayStr();
+  const newRecords = [];
+  for (const record of records) {
+    const recordId = generateId('hw_');
+    const dueDate = record.dueDate || entryDate;
+    const isDone = record.status === 'done';
+    newRecords.push({
+      id: recordId,
+      subject: record.subject,
+      title: record.title || record.description || '',
+      cleanTitle: record.title || record.description || '',
+      shortTitle: record.title || record.description || '',
+      description: record.description || record.title || '',
+      homeworkType: record.homeworkType || '假期作业',
+      module: record.module || '',
+      modules: (Array.isArray(record.modules) ? record.modules : (record.modules ? [record.modules] : [])).slice(),
+      status: record.status || 'pending',
+      submitted: !!record.submitted,
+      dueDate: dueDate,
+      deadline: dueDate,
+      reviewStatus: isDone ? '已通过' : '',
+      returnReason: '',
+      details: [],
+      tags: isDone ? [{ text: '已完成', type: 'good' }] : [],
+      progress: isDone ? 100 : 0,
+      xp: record.xp || 0,
+      errorModule: record.errorModule || '',
+      errorModules: record.errorModules || [],
+    });
+  }
+  const study = await fetchRawJSON('study.json', { cache: 'no-store' }).catch(() => ({ allHomework: [], recentAssignments: [], homework: { total: 0, done: 0, todayTotal: 0, todayDone: 0 } }));
+  if (!study.allHomework) study.allHomework = [];
+  // 按“录入日期”分组写入
+  let group = null;
+  for (let gi = 0; gi < study.allHomework.length; gi++) {
+    if (study.allHomework[gi] && study.allHomework[gi].date === entryDate) { group = study.allHomework[gi]; break; }
+  }
+  if (!group) {
+    group = { date: entryDate, items: [] };
+    study.allHomework.unshift(group);
+  }
+  group.items = (group.items || []).slice();
+  newRecords.forEach(r => group.items.push(r));
+  if (!study.recentAssignments) study.recentAssignments = [];
+  newRecords.forEach(r => study.recentAssignments.unshift(r));
+  // 更新作业统计
+  if (!study.homework) study.homework = { total: 0, done: 0, todayTotal: 0, todayDone: 0 };
+  study.homework.total = (study.homework.total || 0) + newRecords.length;
+  const doneCount = newRecords.filter(r => r.status === 'done').length;
+  if (doneCount > 0) study.homework.done = (study.homework.done || 0) + doneCount;
+  const today = todayStr();
+  const todayAdded = newRecords.filter(r => (r.dueDate || '').startsWith(today.slice(0, 10))).length;
+  if (todayAdded > 0) study.homework.todayTotal = (study.homework.todayTotal || 0) + todayAdded;
+  const todayDoneAdded = newRecords.filter(r => r.status === 'done' && (r.dueDate || '').startsWith(today.slice(0, 10))).length;
+  if (todayDoneAdded > 0) study.homework.todayDone = (study.homework.todayDone || 0) + todayDoneAdded;
+  await writeGithubFile('study.json', study, '批量新增作业记录');
+  newRecords.forEach(r => {
+    _addToCache('study.allHomework', r);
+    _addToCache('study.recentAssignments', r);
+  });
+  _persistCache();
+  return newRecords.map(r => r.id);
+}
+
 // 新增成绩记录
 async function addScoreRecord(record) {
   _dataGen++;
@@ -1708,6 +1777,148 @@ async function updateFinanceRecord(recordId, fields) {
   }
 }
 
+// 保存作业后只刷新「作业列表」区块，避免整页全量重绘（renderStudy）造成的卡顿。
+// 复算数据 → 更新顶部完成率 / 统计卡 / 作业列表，保持当前筛选与展开状态。
+async function refreshHomeworkSection() {
+  const cfg = await loadAppData();
+  const study = cfg.study || {};
+  const allGroups = study.allHomework || [];
+  const allAssignments = collectAssignments(allGroups);
+  const isArchived = (a) => !!(a && a.term && String(a.term).trim());
+  const currentTermAssignments = allAssignments.filter(a => !isArchived(a));
+  const archivedAssignments = allAssignments.filter(isArchived);
+  const pendingList = currentTermAssignments.filter(a => a.status !== "done" && a.status !== "expired");
+  const doneList = currentTermAssignments.filter(a => a.status === "done");
+  const expiredList = currentTermAssignments.filter(a => a.status === "expired");
+  const total = currentTermAssignments.length;
+  const donePct = pct(doneList.length, total);
+
+  window.__studyHW = window.__studyHW || {};
+  window.__studyHW.pendingList = pendingList;
+  window.__studyHW.doneList = doneList;
+  window.__studyHW.expiredList = expiredList;
+  window.__studyHW.archivedList = archivedAssignments;
+  const currentFilter = (typeof window.__studyHW.filter === "string") ? window.__studyHW.filter : "pending";
+  const expanded = window.__studyHW.expanded === true;
+
+  // 顶部完成率
+  const pctEl = document.getElementById("studyHeroPct");
+  if (pctEl) pctEl.textContent = `作业完成率：${donePct.toFixed(2)}%`;
+  const fillEl = document.getElementById("studyHeroFill");
+  if (fillEl) fillEl.style.width = `${donePct}%`;
+
+  // 作业统计卡
+  const hwStatsEl = document.getElementById("hwStatsRow");
+  if (hwStatsEl) {
+    const doneXpTotal = doneList.reduce(function(sum, a) {
+      const xp = getHwXpLocal(cfg, a);
+      return sum + (xp != null ? xp : 0);
+    }, 0);
+    hwStatsEl.innerHTML = `
+      <div class="hw-stat-item todo">
+        <div class="hsi-label">待完成</div>
+        <div class="hsi-value">${pendingList.length}</div>
+        <div class="hsi-sub">待完成中</div>
+      </div>
+      <div class="hw-stat-item done">
+        <div class="hsi-label">已完成</div>
+        <div class="hsi-value">${doneList.length}</div>
+        <div class="hsi-sub">${doneXpTotal > 0 ? '共获得 +' + doneXpTotal + ' XP' : '真棒，继续保持'}</div>
+      </div>
+      <div class="hw-stat-item rate">
+        <div class="hsi-label">完成率</div>
+        <div class="hsi-value">${donePct}%</div>
+        <div class="hsi-sub">共 ${total} 项作业</div>
+      </div>
+      <div class="hw-stat-item total">
+        <div class="hsi-label">已到期</div>
+        <div class="hsi-value">${expiredList.length}</div>
+        <div class="hsi-sub">项已到期末完成</div>
+      </div>
+    `;
+  }
+
+  // 重新绑定筛选 Tab 到独立渲染（保持当前筛选激活态）
+  initTabGroup("#hwFilterTabs .hw-filter-btn", "filter", function(f) {
+    window.__studyHW.filter = f;
+    renderHomeworkListSection(cfg, window.__studyHW);
+  }, "pending");
+
+  // 作业列表
+  renderHomeworkListSection(cfg, window.__studyHW);
+
+  return { pendingList, doneList, expiredList, archivedAssignments, total };
+}
+
+function getHwXpLocal(cfg, item) {
+  if (!item) return null;
+  const hwType = item.homeworkType || "假期作业";
+  const ruleName = "作业·" + hwType;
+  const xpRules = (cfg.config && cfg.config.xpRules) || {};
+  for (const cat of Object.keys(xpRules)) {
+    const found = (xpRules[cat] || []).find(function(r) { return r.name === ruleName; });
+    if (found && found.xp) return Number(found.xp) || null;
+  }
+  return null;
+}
+
+// 渲染作业列表区块（独立于 renderStudy，供保存后局部刷新）
+function renderHomeworkListSection(cfg, hwState) {
+  const listEl = document.getElementById("assignmentList");
+  if (!listEl) return;
+  const showMoreBtn = document.getElementById("showMoreAssignments");
+  const filter = (hwState && typeof hwState.filter === "string") ? hwState.filter : "pending";
+  const expanded = (hwState && hwState.expanded === true);
+  const getList = (hwState && typeof hwState.getFilteredList === "function") ? hwState.getFilteredList : fallbackFilteredList;
+
+  const list = (typeof getList === "function") ? getList(filter) : fallbackFilteredList(filter);
+  listEl.innerHTML = "";
+
+  if (!list || list.length === 0) {
+    let emptyIcon = "inbox";
+    let emptyText = "暂无作业";
+    if (filter === "pending") { emptyIcon = "party-popper"; emptyText = "太棒了，当前没有待办作业！"; }
+    else if (filter === "finished" || filter === "done") { emptyIcon = "list-checks"; emptyText = "还没有已完结的作业记录"; }
+    listEl.innerHTML = `<div class="hw-empty">${emptyStateHTML(emptyIcon, emptyText)}</div>`;
+    if (showMoreBtn) showMoreBtn.style.display = "none";
+    refreshIcons(0);
+    return;
+  }
+
+  const visibleCount = 6;
+  const visible = list.slice(0, visibleCount);
+  const hidden = list.slice(visibleCount);
+  let html = visible.map((a, i) => renderHwRow(a, false, "a-" + i, getHwXpLocal(cfg, a))).join("");
+  html += hidden.map((a, i) => renderHwRow(a, !expanded, "a-" + (i + visibleCount), getHwXpLocal(cfg, a))).join("");
+  listEl.innerHTML = html;
+  if (hidden.length > 0) {
+    if (showMoreBtn) {
+      showMoreBtn.style.display = "block";
+      showMoreBtn.textContent = expanded ? "收回" : `展开更多（还有 ${hidden.length} 条）`;
+      showMoreBtn.onclick = function() {
+        hwState.expanded = !hwState.expanded;
+        renderHomeworkListSection(cfg, hwState);
+      };
+    }
+  } else if (showMoreBtn) {
+    showMoreBtn.style.display = "none";
+  }
+  refreshIcons(0);
+}
+
+function fallbackFilteredList(filter) {
+  const hw = window.__studyHW || {};
+  const asc = (a, b) => (a.dueDate || "").localeCompare(b.dueDate || "");
+  const desc = (a, b) => (b.dueDate || "").localeCompare(a.dueDate || "");
+  const pend = hw.pendingList || [];
+  const done = hw.doneList || [];
+  const exp = hw.expiredList || [];
+  const arch = hw.archivedList || [];
+  if (filter === "pending") return [...pend].sort(asc);
+  if (filter === "finished" || filter === "done") return [...done].sort(desc).concat([...exp].sort(asc), [...arch].sort(desc));
+  return [...pend].sort(asc).concat([...exp].sort(asc), [...done].sort(desc), [...arch].sort(desc));
+}
+
 async function updateScoreRecord(recordId, fields) {
   _dataGen++;
   const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ examRecords: [] }));
@@ -1830,6 +2041,7 @@ if (typeof window !== 'undefined') {
     addXpRecord,
     addXpRule,
     addStudyRecord,
+    addStudyRecords,
     addScoreRecord,
     addFinanceRecord,
     addEvaluationRecord,
@@ -6136,6 +6348,13 @@ async function renderStudy() {
   const doneList = currentTermAssignments.filter(a => a.status === "done");
   const expiredList = currentTermAssignments.filter(a => a.status === "expired");
   const donePct = pct(doneList.length, total);
+  // 同步作业列表数据到全局，供保存后的局部刷新（refreshHomeworkSection）重算作业区块
+  if (window.__studyHW) {
+    window.__studyHW.pendingList = pendingList;
+    window.__studyHW.doneList = doneList;
+    window.__studyHW.expiredList = expiredList;
+    window.__studyHW.archivedList = archivedAssignments;
+  }
 
   // ════════ 2. 学习总览（科目完成率雷达 + 最新成绩） ════════
   const subjRadarEl = document.getElementById("subjectRadarContainer");
@@ -6222,8 +6441,25 @@ async function renderStudy() {
   // ════════ 3. 作业列表（整合版 + 筛选） ════════
   const listEl = document.getElementById("assignmentList");
   const showMoreBtn = document.getElementById("showMoreAssignments");
-  let currentHwFilter = "pending"; // pending / done / all
-  let hwExpanded = false;
+  // 筛选/展开状态存到全局，供保存后的局部刷新（refreshHomeworkSection）保持一致
+  window.__studyHW = window.__studyHW || {};
+  let currentHwFilter = (typeof window.__studyHW.filter === "string") ? window.__studyHW.filter : "pending";
+  let hwExpanded = window.__studyHW.expanded === true;
+  window.__studyHW.getFilteredList = function(f) {
+    const asc2 = (a, b) => (a.dueDate || "").localeCompare(b.dueDate || "");
+    const desc2 = (a, b) => (b.dueDate || "").localeCompare(a.dueDate || "");
+    const pend = window.__studyHW.pendingList || [];
+    const done = window.__studyHW.doneList || [];
+    const exp = window.__studyHW.expiredList || [];
+    const arch = window.__studyHW.archivedList || [];
+    if (f === "pending") return [...pend].sort(asc2);
+    if (f === "finished" || f === "done") return [...done].sort(desc2).concat([...exp].sort(asc2), [...arch].sort(desc2));
+    return [...pend].sort(asc2).concat([...exp].sort(asc2), [...done].sort(desc2), [...arch].sort(desc2));
+  };
+  window.__studyHW.setState = function(filter, expanded) {
+    window.__studyHW.filter = filter;
+    window.__studyHW.expanded = expanded === true;
+  };
 
   function getFilteredList(filter) {
     const asc = (a, b) => (a.dueDate || "").localeCompare(b.dueDate || "");
@@ -6279,6 +6515,7 @@ async function renderStudy() {
         showMoreBtn.textContent = hwExpanded ? "收回" : `展开更多（还有 ${hidden.length} 条）`;
         showMoreBtn.onclick = function() {
           hwExpanded = !hwExpanded;
+          if (window.__studyHW && window.__studyHW.setState) window.__studyHW.setState(currentHwFilter, hwExpanded);
           renderAssignmentList(filter);
         };
       }
@@ -6291,9 +6528,11 @@ async function renderStudy() {
   // 绑定筛选 Tab
   initTabGroup("#hwFilterTabs .hw-filter-btn", "filter", filter => {
     currentHwFilter = filter;
+    if (window.__studyHW && window.__studyHW.setState) window.__studyHW.setState(filter, hwExpanded);
     renderAssignmentList(filter);
   }, "pending");
-  renderAssignmentList("pending");
+  if (window.__studyHW && window.__studyHW.setState) window.__studyHW.setState(currentHwFilter, hwExpanded);
+  renderAssignmentList(currentHwFilter);
 
   // ════════ 4. 作业统计卡片 ════════
   const hwStatsEl = document.getElementById("hwStatsRow");
@@ -7855,9 +8094,19 @@ function parseHomeworkText(text) {
 
     const numMatch = trimmed.match(/^(?:第[一二三四五六七八九十]+[、．\.]\s*|\d+[\.、．)\s]\s*|[①②③④⑤⑥⑦⑧⑨⑩][、.,，\s]*|[一二三四五六七八九十]+[、．]\s*)(.+)$/);
     if (numMatch) {
-      const itemText = numMatch[1] ? numMatch[1].trim() : trimmed;
-      const mod = inferModule(currentSubject, itemText, "");
-      items.push({ subject: currentSubject || "未识别", text: itemText, module: mod, type: inferHomeworkType(itemText) });
+      // 支持“同一行内多条编号”的写法：先按编号标记把整行切成多片
+      // 例：“1.熟读背诵3-4自然段 2.预习第一课 3.读希腊童话…” → 拆成三条
+      const segments = trimmed
+        .split(/(?:第[一二三四五六七八九十]+[、．\.]\s*|\d+[\.、．)\s]\s*|[①②③④⑤⑥⑦⑧⑨⑩][、.,，\s]*|[一二三四五六七八九十]+[、．]\s*)/)
+        .map(s => s.replace(/(?:^[。．,，、;；]+|[。．,，、;；]+$)/g, "").trim())
+        .filter(s => s.length > 0);
+      const pieces = segments.length > 0
+        ? segments
+        : [numMatch[1] ? numMatch[1].trim() : trimmed];
+      for (const p of pieces) {
+        const mod = inferModule(currentSubject, p, "");
+        items.push({ subject: currentSubject || "未识别", text: p, module: mod, type: inferHomeworkType(p) });
+      }
       continue;
     }
 
@@ -8615,38 +8864,44 @@ async function saveAddHomework() {
         const idx = parseInt(cb.dataset.idx, 10);
         if (!isNaN(idx) && items[idx]) selected.push(items[idx]);
       });
-      let ok = 0, fail = 0;
-      for (const it of selected) {
-        try {
-          await DataStore.addStudyRecord({
-            subject: it.subject || subject,
-            title: it.text || it.title,
-            description: it.text || it.title,
-            homeworkType: it.type || getRadioValue("addTypeGroup") || "假期作业",
-            modules: it.module ? [it.module] : [],
-            module: it.module || "",
-            status: "pending",
-            submitted: false,
-            date: today,
-            dueDate: dueDate,
-            unitIndex: -1,
-            hasTest: false,
-            testScope: null,
-            isFullScore: null,
-            wrongCount: 0,
-            errorModules: [],
-          });
-          ok++;
-        } catch (e) { fail++; }
+      // 批量录入：一次读取→批量追加→单次写回，避免逐条 fetch+write 互相覆盖
+      const batchRecords = selected.map(it => ({
+        subject: it.subject || subject,
+        title: it.text || it.title,
+        description: it.text || it.title,
+        homeworkType: it.type || getRadioValue("addTypeGroup") || "假期作业",
+        modules: it.module ? [it.module] : [],
+        module: it.module || "",
+        status: "pending",
+        submitted: false,
+        date: today,
+        dueDate: dueDate,
+        unitIndex: -1,
+        hasTest: false,
+        testScope: null,
+        isFullScore: null,
+        wrongCount: 0,
+        errorModules: [],
+      }));
+      if (batchRecords.length === 0) {
+        btn.textContent = original; btn.disabled = false;
+        showToast("未找到要保存的作业", false);
+        return;
       }
-      if (fail > 0) {
-        showToast(`成功 ${ok} 条，失败 ${fail} 条`, fail > 0 ? false : true);
+      let okCount = 0, failCount = 0;
+      try {
+        const inserted = await DataStore.addStudyRecords(batchRecords);
+        okCount = (inserted && inserted.length) || 0;
+      } catch (e) { failCount = batchRecords.length; }
+      if (failCount > 0 || okCount < batchRecords.length) {
+        showToast(`成功 ${okCount} 条，失败 ${failCount} 条`, false);
       } else {
-        showToast(`✅ 已录入 ${ok} 条作业，提交后可补充详细信息`, true);
+        showToast(`✅ 已录入 ${okCount} 条作业，提交后可补充详细信息`, true);
       }
       closeAddHomeworkModal();
       await DataStore.refreshData(true);
-      await renderStudy();
+      // 保存后只刷新作业列表区块，避免整页全量重绘造成的卡顿
+      if (typeof refreshHomeworkSection === "function") await refreshHomeworkSection();
       refreshIcons(50);
       return;
     }
@@ -8675,7 +8930,8 @@ async function saveAddHomework() {
     });
     closeAddHomeworkModal();
     await DataStore.refreshData(true);
-    await renderStudy();
+    // 保存后只刷新作业列表区块，避免整页全量重绘造成的卡顿
+    if (typeof refreshHomeworkSection === "function") await refreshHomeworkSection();
     refreshIcons(50);
     showToast("✅ 作业已添加，提交后可补充详细信息", true);
   } catch (e) {
@@ -9013,7 +9269,8 @@ async function saveSubmitHomework() {
     if (window.DataStore && window.DataStore.refreshData) {
       await window.DataStore.refreshData(true).catch(() => {});
     }
-    if (typeof renderStudy === "function") await renderStudy();
+    // 保存后只刷新作业列表区块，避免整页全量重绘造成的卡顿
+    if (typeof refreshHomeworkSection === "function") await refreshHomeworkSection();
     refreshIcons(50);
   } catch (e) {
     console.error("补充信息保存失败:", e);
@@ -9417,7 +9674,8 @@ async function saveEdit() {
 
   closeEditModal();
   window.DataStore && window.DataStore.refreshData(true);
-  await renderStudy();
+  // 保存后只刷新作业列表区块，避免整页全量重绘造成的卡顿
+  if (typeof refreshHomeworkSection === "function") await refreshHomeworkSection();
   refreshIcons(50);
   showToast("✅ 作业已更新", true);
 }
