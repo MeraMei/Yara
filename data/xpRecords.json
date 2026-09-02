@@ -12,10 +12,11 @@
     "baseXp": 5,
     "commitmentBonus": false,
     "xpCategory": "",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "第一天开学，新朋友新老师感觉都不错",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mtjik54d0dw9cf",
