@@ -92,7 +92,17 @@
   }
 
   // 可重试写入上限：1 次原文 + MAX 次退避重试
-  var MAX_WRITE_ATTEMPT = 4;
+  // 家庭系统多端并发写同一文件（GitHub SHA does not match）时，需要更长、更密的退避窗口才能收敛，
+  // 否则会把"可自动合并的临时冲突"误判成失败。上限提升到 7 次、窗口拉长到 ~30s。
+  var MAX_WRITE_ATTEMPT = 7;
+
+  // 计算灾难性写入退避：冲突/限流需指数式拉长等待，避免高频对撞抢不赢另一端。
+  // 抖动(±20%)避免多端同时退避后同步重试再次对撞。
+  function backoffMs(isConflict, attempt) {
+    var base = isConflict ? (600 + Math.pow(1.6, attempt) * 700) : (400 + attempt * 500);
+    var jitter = 0.8 + Math.random() * 0.4; // 0.8 ~ 1.2
+    return Math.min(Math.round(base * jitter), 12000); // 单次最长 12s
+  }
 
   function makeWriteError(msg, status) {
     var err = new Error(msg);
@@ -107,6 +117,11 @@
     if (/unauthorized|bad credentials|must have push access|not found/i.test(m)) return false;
     if (s === 429 || s === 403 || (s !== undefined && s >= 500)) return true;
     return /does not match|conflict|rate limit|abuse rate|连接中断|fetch failed|network/i.test(m);
+  }
+
+  // 是否为"并发落空(SHA 冲突)"：这类错误是另端先写导致，重试前退避需更长
+  function isConflictError(err) {
+    return /does not match|conflict/i.test(String((err && err.message) || ''));
   }
 
   function tryPut(path, content, msg, token, sha) {
@@ -140,7 +155,7 @@
       .then(function (sha) { return tryPut(path, content, msg, token, sha); })
       .catch(function (err) {
         if (attempt >= MAX_WRITE_ATTEMPT || !isTransientError(err)) throw err;
-        var wait = 500 + attempt * 700; // 0.5s / 1.2s / 1.9s / 2.6s
+        var wait = backoffMs(isConflictError(err), attempt); // 冲突指数退避+抖动，避免对撞
         return new Promise(function (resolve) { setTimeout(resolve, wait); })
           .then(function () { return writeFileRemote(path, content, msg, attempt + 1); });
       });
@@ -192,7 +207,7 @@
       })
       .catch(function (err) {
         if (attempt >= MAX_WRITE_ATTEMPT || !isTransientError(err)) throw err;
-        var wait = 400 + attempt * 600; // 0.4s / 1s / 1.6s / 2.2s
+        var wait = backoffMs(isConflictError(err), attempt); // 冲突指数退避+抖动，避免对撞
         return new Promise(function (resolve) { setTimeout(resolve, wait); })
           .then(function () { return writeMerged(path, msg, mergeFn, attempt + 1); });
       });
