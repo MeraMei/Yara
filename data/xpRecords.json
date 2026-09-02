@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtjjf17mnoek3p",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "与父母沟通自己近期成长/心情",
+    "taskName": "与父母沟通自己近期成长/心情",
+    "taskCategory": "",
+    "date": "2026-09-02",
+    "datetime": "2026-09-02 03:29:29",
+    "xp": 5,
+    "baseXp": 5,
+    "commitmentBonus": false,
+    "xpCategory": "",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "第一天开学，新朋友新老师感觉都不错",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtjik54d0dw9cf",
     "domain": "XP",
     "type": "XP获得",
