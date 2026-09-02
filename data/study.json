@@ -566,8 +566,8 @@
         "概念",
         "计算"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-01",
       "deadline": "2026-09-01",
       "reviewStatus": "",
@@ -581,7 +581,8 @@
       "duration": "≤15分钟",
       "wrongCount": 0,
       "unitIndex": 0,
-      "unitName": "第一单元·认识更大的数"
+      "unitName": "第一单元·认识更大的数",
+      "submittedAt": "2026-09-02T00:42:00.725Z"
     },
     {
       "id": "hw_mtigkt4voencql",
@@ -776,8 +777,8 @@
         "概念",
         "计算"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-01",
       "deadline": "2026-09-01",
       "reviewStatus": "",
@@ -791,7 +792,8 @@
       "duration": "≤15分钟",
       "wrongCount": 0,
       "unitIndex": 0,
-      "unitName": "第一单元·认识更大的数"
+      "unitName": "第一单元·认识更大的数",
+      "submittedAt": "2026-09-02T00:42:00.725Z"
     },
     {
       "id": "hw_mtigkt4voencql",
@@ -818,8 +820,10 @@
       "xp": 0,
       "errorModule": "",
       "errorModules": [],
-      "unitIndex": -1,
-      "unitName": null
+      "unitIndex": 0,
+      "unitName": "Module1·Getting to know you",
+      "duration": "≤15分钟",
+      "wrongCount": 0
     },
     {
       "id": "hw_mtigixt9xeiuni",
