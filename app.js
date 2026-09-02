@@ -6031,16 +6031,21 @@ window.openXpEditModal = async function(recordId, ev) {
     for (let i = 0; i < taskSel.options.length; i++) {
       if (taskSel.options[i].value === taskName) { idx = i; break; }
     }
-    if (idx >= 0) { taskSel.selectedIndex = idx; }
+    if (idx >= 0) {
+      taskSel.selectedIndex = idx;
+      // 编辑态：任务不可改，但保留从任务池推导出的分类/分值（无匹配时不触发，避免污染）
+      onXpTaskChangePage();
+    }
     // 编辑态：任务不可改（只保留当前项的展示效果）
     taskSel.disabled = true;
-    onXpTaskChangePage();
   }
-  // 分值 / 分类锁定（编辑态不可改）
+  // 分值锁定（编辑态不可改）
   const valEl = document.getElementById("xpValuePage");
   if (valEl) valEl.value = record.baseXp != null ? record.baseXp : (Number(record.xp) || 0) - (record.commitmentBonus ? 2 : 0);
+  // 分类回填：优先用记录里已存的分类；若历史记录缺分类，则保留 onXpTaskChangePage 从任务池推导出的分类，避免显示为空
   const catEl = document.getElementById("xpCategoryPage");
-  if (catEl) catEl.value = record.type || record.taskCategory || record.xpCategory || "";
+  const recCat = record.type || record.taskCategory || record.xpCategory || "";
+  if (catEl && recCat) catEl.value = recCat;
 
   // 预填承诺勾选
   const chk = document.getElementById("xpCommitmentCheck");
