@@ -765,6 +765,40 @@ function loadCalendarData() {
 
 // ── 写入操作（通过 GitHub API） ──
 
+// 并发安全的 XP 记录合并写：以线上最新为基准，按 id 去重插入新记录。
+// 优先走 data-relations.js 的 writeMerged（读-改-写 merge-on-conflict），
+// 未加载时回退到旧的整文件覆盖写（仅极端兜底，不保证并发安全）。
+function writeXpMerged(newRecord) {
+  return writeXpMergedBase(function (latest) {
+    // latest 为线上最新 xpRecords 数组（可能为 null/非数组）
+    var base = Array.isArray(latest) ? latest.slice() : [];
+    // 若同 id 已存在（理论上极难发生，id 为时间戳+随机数），用新记录替换
+    var idx = base.findIndex(function (r) { return r && r.id === newRecord.id; });
+    if (idx >= 0) base.splice(idx, 1);
+    return [newRecord].concat(base);
+  }, '新增 XP 记录');
+}
+
+// 并发安全的 XP 记录单条更新：以线上最新为基准，只修改指定 id 的记录，避免整包覆盖丢失他人新增。
+function writeXpMergedRecord(recordId, updateData) {
+  return writeXpMergedBase(function (latest) {
+    var base = Array.isArray(latest) ? latest.slice() : [];
+    var idx = base.findIndex(function (r) { return r && r.id === recordId; });
+    if (idx >= 0) base[idx] = Object.assign({}, base[idx], updateData);
+    return base; // 未找到则原样返回，不做无谓写入
+  }, '更新 XP 记录');
+}
+
+// 共用 DR.writeMerged 入口（本地模式 / 串行队列由 DR 内部处理）
+function writeXpMergedBase(mergeFn, msg) {
+  if (typeof window !== 'undefined' && window.DataRelations && typeof window.DataRelations.writeMerged === 'function') {
+    return window.DataRelations.writeMerged('xpRecords.json', msg, mergeFn);
+  }
+  // 兜底：DR 未加载时回退到覆盖写（以当前缓存为基准）
+  const currentRecords = Array.isArray(cachedData && cachedData.xpRecords) ? cachedData.xpRecords : [];
+  return writeGithubFile('xpRecords.json', mergeFn(currentRecords), msg);
+}
+
 // 新增 XP 获得记录
 async function addXpRecord(record) {
   _dataGen++;
@@ -787,12 +821,9 @@ async function addXpRecord(record) {
     description: record.description || '',
     _hasValidName: true,
   };
-  // 读取当前数据并追加（优先使用本地缓存，避免 CDN 缓存延迟）
-  const currentRecords = Array.isArray(cachedData && cachedData.xpRecords)
-    ? cachedData.xpRecords
-    : await fetchRawJSON('xpRecords.json').catch(() => []);
-  const updated = [newRecord, ...currentRecords];
-  await writeGithubFile('xpRecords.json', updated, '新增 XP 记录');
+  // ★ 并发安全写入：以「线上最新」为基准，按 id 去重把新记录合并进去。
+  //   避免整文件覆盖导致多端并发时互相覆盖 / GitHub SHA does not match。
+  await writeXpMerged(newRecord);
   // 增量更新缓存
   _addToCache('xpRecords', newRecord);
   _addToCache('recentRecords', {
@@ -1747,22 +1778,15 @@ function _getCachedRaw(key) {
 
 async function updateXpRecord(recordId, fields) {
   _dataGen++;
-  const records = (cachedData && cachedData.xpRecords) ? cachedData.xpRecords : await fetchRawJSON('xpRecords.json').catch(() => []);
-  if (!Array.isArray(records)) return;
-  const idx = records.findIndex(r => r.id === recordId);
-  if (idx >= 0) {
-    const updateData = { ...fields };
-    if (fields.status) {
-      updateData.reviewStatus = fields.status === 'verified' ? '已通过' : fields.status === 'returned' ? '已退回' : '待确认';
-    }
-    Object.assign(records[idx], updateData);
-    await writeGithubFile('xpRecords.json', records, '更新 XP 记录');
-    _updateCacheRecord('xpRecords', recordId, updateData);
-    _updateCacheRecord('recentRecords', recordId, { ...fields, status: fields.status, reviewStatus: updateData.reviewStatus });
-    _persistCache();
-  } else {
-    console.warn('updateXpRecord: 未找到记录', recordId);
+  const updateData = { ...fields };
+  if (fields.status) {
+    updateData.reviewStatus = fields.status === 'verified' ? '已通过' : fields.status === 'returned' ? '已退回' : '待确认';
   }
+  // ★ 并发安全更新：以线上最新为基准，只 merge 这一条，避免覆盖他人并发新增的记录。
+  await writeXpMergedRecord(recordId, updateData);
+  _updateCacheRecord('xpRecords', recordId, updateData);
+  _updateCacheRecord('recentRecords', recordId, { ...fields, status: fields.status, reviewStatus: updateData.reviewStatus });
+  _persistCache();
 }
 
 async function updateFinanceRecord(recordId, fields) {

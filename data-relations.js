@@ -146,6 +146,67 @@
       });
   }
 
+  /* ── 读-改-写 合并写原语（read-modify-write / merge-on-conflict） ──
+   *
+   * ⚠️ 为什么要单独做这一套：
+   *   整文件覆盖写(writeFileRemote)在并发时是危险操作——它基于页内可能过期的
+   *   快照，冲突重试时若拿到新 SHA 会用旧 content 覆盖，出现"静默丢数据"。
+   *
+   *   writeMerged 不做"覆盖"，而是：
+   *     1) 每次写入前强制从 GitHub 读【线上最新】内容作为基准（不用页内缓存，
+   *        避免 CDN/本地快照过期）；
+   *     2) 由调用方 mergeFn(latest) 把本次增量合并且按 id 去重；
+   *     3) 带最新 SHA 写入；若 does not match(并发落空)，退避后【基于最新内容
+   *        重新 merge 再写】，绝不沿用旧 content 覆盖。
+   *   效果：多端并发各写各的，谁都不覆盖谁，都会合并进对方的最新版。
+   */
+
+  // 读取"写入基准"：GitHub 线上最新内容 + SHA（v3+json 才返回 sha，故不用 raw）
+  function readWriteBase(path) {
+    var token = getToken();
+    if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
+    return global.fetch(API_BASE + '/contents/' + path + '?ref=' + BRANCH, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json' },
+    }).then(function (r) {
+      if (r.status === 404) return { content: null, sha: null }; // 文件不存在 → 按"新建"合并
+      if (!r.ok) throw makeWriteError('读取最新数据失败(HTTP ' + r.status + ')', r.status);
+      return r.json().then(function (d) {
+        var parsed = null;
+        try {
+          if (d.content) parsed = JSON.parse(decodeURIComponent(escape(atob(d.content.replace(/\s+/g, '')))));
+        } catch (e) { parsed = null; }
+        return { content: parsed, sha: d.sha || null };
+      });
+    });
+  }
+
+  // 合并写：mergeFn(latest) 返回新的完整数据；冲突/限流/5xx 退避重试，重试重新读最新并重新 merge
+  function writeMerged(path, msg, mergeFn, attempt) {
+    attempt = attempt || 0;
+    var token = getToken();
+    if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
+    return readWriteBase(path)
+      .then(function (base) {
+        var target = (typeof mergeFn === 'function') ? mergeFn(base.content) : base.content;
+        return tryPut(path, target, msg, token, base.sha);
+      })
+      .catch(function (err) {
+        if (attempt >= MAX_WRITE_ATTEMPT || !isTransientError(err)) throw err;
+        var wait = 400 + attempt * 600; // 0.4s / 1s / 1.6s / 2.2s
+        return new Promise(function (resolve) { setTimeout(resolve, wait); })
+          .then(function () { return writeMerged(path, msg, mergeFn, attempt + 1); });
+      });
+  }
+
+  // 同页写串行队列：避免同一页面多个异步写并发踩同一份文件（Git SHA 竞态）
+  var _writeQueue = Promise.resolve();
+  function enqueueWrite(path, msg, mergeFn) {
+    var run = _writeQueue.then(function () { return writeMerged(path, msg, mergeFn); });
+    // 队列失败不应阻断后续任务
+    _writeQueue = run.catch(function () {});
+    return run;
+  }
+
   function num(v) { var n = Number(v); return isNaN(n) ? 0 : n; }
   function todayStr() {
     var d = new Date();
@@ -765,6 +826,27 @@
       if (!path) return Promise.reject(new Error('缺少文件路径'));
       var p = String(path).indexOf('data/') === 0 ? path : ('data/' + path);
       return writeFile(p, content, msg || ('更新数据: ' + path));
+    },
+
+    // 读-改-写 合并写（并发安全）：mergeFn(latest) 返回新的完整数据，冲突时基于最新内容重新 merge
+    // 推荐用于"追加/更新数组记录"等并发敏感写入（如新增 XP 记录），避免整文件覆盖丢失数据。
+    writeMerged: function (path, msg, mergeFn) {
+      if (!path) return Promise.reject(new Error('缺少文件路径'));
+      var p = String(path).indexOf('data/') === 0 ? path : ('data/' + path);
+      var m = msg || ('合并更新数据: ' + path);
+      return isLocalMode().then(function (local) {
+        if (local) {
+          // 本地模式：read-modify-write 也一次性落到本地（本地并发风险低，直接以 latest 为基础合并）
+          return global.fetch('data/' + String(p).replace(/^data\//, '')).then(function (r) {
+            if (!r.ok) return null;
+            return r.json();
+          }).catch(function () { return null; }).then(function (latest) {
+            var target = (typeof mergeFn === 'function') ? mergeFn(latest) : latest;
+            return writeFile(p, target, m);
+          });
+        }
+        return enqueueWrite(p, m, mergeFn);
+      });
     },
 
     // 一键重算所有关联的派生数据并写回（用于统一校准）
