@@ -6310,7 +6310,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       bottom: 0;
       width: 4px;
       border-radius: 14px 0 0 14px;
-      background: var(--cat-color, #9255f5);
+      background: var(--cat-color, #8c8c8c);
     }
     .recent-card .rc-top {
       display: flex;
@@ -7048,7 +7048,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, var(--cat-color, #9255f5), transparent 80%);
+      background: linear-gradient(90deg, var(--cat-color, #8c8c8c), transparent 80%);
     }
     .earn-xp-card .exc-head {
       display: flex;

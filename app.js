@@ -4814,12 +4814,14 @@ function renderWrData(report) {
     if (profile.length > 0) {
       var maxXp = 1;
       profile.forEach(function(p) { if (p.xp > maxXp) maxXp = p.xp; });
-      var palette = ["#7bb8f7", "#f28daf", "#b88af5", "#7cd4b0", "#fba07a", "#fee680"];
+      var palette = ["#82d632", "#fdd832", "#36b98b", "#f96024", "#7bb8f7", "#f28daf"];
       var icons = ["🌟", "💪", "🎨", "🏃", "🔥", "⭐"];
       html += '<div class="wr-energy-bars">';
       profile.forEach(function(p, i) {
         var w = Math.max(15, Math.round((p.xp / maxXp) * 100));
-        var c = palette[i % palette.length];
+        // 颜色优先按分类取系统定义色；分类未知时再回落中性灰，杜绝"未定义紫"
+        var defined = WCPALETTE[p.category] ? WCPALETTE[p.category].dot : "";
+        var c = defined || palette[i % palette.length];
         html += '<div class="wr-energy-row"><span class="wr-energy-name">' + icons[i % icons.length] + p.category + '</span><span class="wr-energy-track"><span class="wr-energy-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="wr-energy-meta">+' + p.xp + '</span></div>';
       });
       html += '</div>';
@@ -5025,7 +5027,7 @@ function renderChapter(id, title, content) {
   div.className = "wr-chapter";
   div.id = id;
   var dotMap = { chapterAcademic: "#7bb8f7", chapterBehavior: "#7cd4b0", chapterEmotion: "#f28daf", chapterSuggestions: "#d4a843" };
-  var dot = dotMap[id] || "#b88af5";
+  var dot = dotMap[id] || "#8c8c8c";
   // 默认全部展开（不再加 collapsed）
   div.innerHTML = '<div class="wr-chapter-head" onclick="toggleChapter(this)"><span><span class="ch-dot" style="background:' + dot + '"></span>' + title + '</span><span class="ch-arrow">▼</span></div><div class="wr-chapter-body">' + content + '</div>';
   container.appendChild(div);
@@ -5083,12 +5085,14 @@ function renderBehaviorContent(report) {
   var html = "";
   var maxXp = 1;
   profile.forEach(function (p) { if (p.xp > maxXp) maxXp = p.xp; });
-  var palette = ["#7bb8f7", "#f28daf", "#b88af5", "#7cd4b0", "#fba07a", "#fee680"];
+  var palette = ["#82d632", "#fdd832", "#36b98b", "#f96024", "#7bb8f7", "#f28daf"];
   if (profile.length > 0) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#b88af5"></span>本周能量条</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#82d632"></span>本周能量条</div>';
     profile.forEach(function (p, i) {
       var w = Math.max(15, Math.round((p.xp / maxXp) * 100));
-      var c = palette[i % palette.length];
+      // 颜色优先按分类取系统定义色；分类未知时再回落中性灰，杜绝"未定义紫"
+      var defined = WCPALETTE[p.category] ? WCPALETTE[p.category].dot : "";
+      var c = defined || palette[i % palette.length];
       var icons = ["🌟", "💪", "🎨", "🏃", "🔥", "⭐"];
       html += '<div class="wr-beh-row"><span class="wr-beh-name">' + icons[i % icons.length] + p.category + '</span><span class="wr-beh-track"><span class="wr-beh-fill" style="width:' + w + '%;background:' + c + '"></span></span><span class="wr-beh-meta">+' + p.xp + 'XP</span></div>';
     });
@@ -5128,7 +5132,7 @@ function renderEmotionContent(report) {
   }
   var best = emo.bestDiary || {};
   if (best.snippet) {
-    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#b88af5"></span>本周最佳日记</div>';
+    html += '<div class="wr-sub"><span class="wr-sub-dot" style="background:#f28daf"></span>本周最佳日记</div>';
     html += '<div class="wr-quote">"' + best.snippet + '"<div class="wr-quote-meta">· ' + (best.date || "") + ' · 四要素 ' + (best.elements || 0) + '/5</div></div>';
   }
   if (emo.financeStatus) {
