@@ -5476,7 +5476,7 @@ async function renderXp() {
     name: cat,
     count: catAgg[cat]?.count || 0,
     xp: catAgg[cat]?.xp || 0,
-    color: CAT_COLORS[cat] || "#9255f5",
+    color: CAT_COLORS[cat] || "#8c8c8c",
     icon: CAT_ICONS[cat] || "📚",
   }));
 
@@ -5582,7 +5582,7 @@ async function renderXp() {
         // 分类取值：优先存于 xpCategory/taskCategory；缺失时按任务名反查任务池；
         // 兜底才用非"XP获得"的 type。杜绝标签丢失、颜色回落默认紫。
         const category = resolveEnergyCategory(record);
-        const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#9255f5";
+        const catColor = CAT_COLORS[category] || WCPALETTE[category]?.dot || "#8c8c8c";
         const dateShort = record.time ? record.time.replace(/^\d{4}-/, "").replace(/-/g, "/") : "";
         // 待确认判断兼容两套字段：status==="pending" 或 reviewStatus==="待确认"，
         // 否则历史数据只有 reviewStatus 时会被当成已处理，不渲染 通过/退回 按钮。
@@ -8900,8 +8900,19 @@ async function renderRecords(kind) {
     val: r.grade || "—", sub: r.semesterLabel || "",
   }));
   const xp = (data.recentRecords || data.xpRecords || []).map(r => {
-    const xc = r.xpCategory || r.type || "";
-    const xcc = CAT_COLORS[xc] || WCPALETTE[xc]?.dot || "#9255f5";
+    // 分类优先取记录的已存字段；缺失时按任务名反查任务池，杜绝回落到未定义的紫色
+    const _rulesMap = (data.config && data.config.xpRules) || {};
+    let xc = r.xpCategory || r.taskCategory || "";
+    const xcTaskName = r.taskName || r.title || "";
+    if (!xc && xcTaskName) {
+      Object.keys(_rulesMap).some(function (cat) {
+        const hit = (_rulesMap[cat] || []).some(function (t) { return t && t.name === xcTaskName; });
+        if (hit) { xc = cat; return true; }
+        return false;
+      });
+    }
+    if (!xc && r.type && r.type !== "XP获得") xc = r.type;
+    const xcc = CAT_COLORS[xc] || WCPALETTE[xc]?.dot || "#8c8c8c";
     return {
       kind: "xp", icon: "sparkles", color: xcc, valColor: xcc,
       title: r.taskName || r.title || "XP 记录",
