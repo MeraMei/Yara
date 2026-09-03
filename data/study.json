@@ -967,10 +967,11 @@
           "cleanTitle": "抄写第一课的生字词",
           "shortTitle": "抄写第一课的生字词",
           "description": "抄写第一课的生字词",
-          "homeworkType": "假期作业",
+          "homeworkType": "日常复习",
           "module": "汉字",
           "modules": [
-            "汉字"
+            "汉字",
+            "组词"
           ],
           "status": "pending",
           "submitted": false,
@@ -983,7 +984,11 @@
           "progress": 0,
           "xp": 0,
           "errorModule": "",
-          "errorModules": []
+          "errorModules": [],
+          "duration": "15-30分钟",
+          "wrongCount": 0,
+          "unitIndex": 0,
+          "unitName": "第一单元·自然之美"
         },
         {
           "id": "hw_mtktj0rk60iv80",
