@@ -1354,8 +1354,8 @@
           "modules": [
             "阅读"
           ],
-          "status": "pending",
-          "submitted": false,
+          "status": "done",
+          "submitted": true,
           "dueDate": "2026-09-03",
           "deadline": "2026-09-03",
           "reviewStatus": "",
@@ -1365,7 +1365,8 @@
           "progress": 0,
           "xp": 0,
           "errorModule": "",
-          "errorModules": []
+          "errorModules": [],
+          "wasIncomplete": false
         },
         {
           "id": "hw_mtlbpcfzh3j288",
