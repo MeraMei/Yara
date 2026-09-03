@@ -560,10 +560,10 @@
       "cleanTitle": "听录音，读会课本4-5页",
       "shortTitle": "听录音，读会课本4-5页",
       "description": "听录音，读会课本4-5页",
-      "homeworkType": "假期作业",
-      "module": "单词",
+      "homeworkType": "日常预习",
+      "module": "听说",
       "modules": [
-        "单词",
+        "听说",
         "语感"
       ],
       "status": "pending",
@@ -578,8 +578,10 @@
       "xp": 0,
       "errorModule": "",
       "errorModules": [],
-      "unitIndex": -1,
-      "unitName": null
+      "unitIndex": 0,
+      "unitName": "Module1·Getting to know you",
+      "duration": "≤15分钟",
+      "wrongCount": 0
     },
     {
       "id": "hw_mtkv7tvxndwv4k",
@@ -900,10 +902,10 @@
       "cleanTitle": "听录音，读会课本4-5页",
       "shortTitle": "听录音，读会课本4-5页",
       "description": "听录音，读会课本4-5页",
-      "homeworkType": "假期作业",
-      "module": "单词",
+      "homeworkType": "日常预习",
+      "module": "听说",
       "modules": [
-        "单词",
+        "听说",
         "语感"
       ],
       "status": "pending",
@@ -918,8 +920,10 @@
       "xp": 0,
       "errorModule": "",
       "errorModules": [],
-      "unitIndex": -1,
-      "unitName": null
+      "unitIndex": 0,
+      "unitName": "Module1·Getting to know you",
+      "duration": "≤15分钟",
+      "wrongCount": 0
     },
     {
       "id": "hw_mtkv7tvxndwv4k",
