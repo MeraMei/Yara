@@ -610,15 +610,15 @@
     },
     {
       "id": "hw_mtl9o9ar77v81f",
-      "subject": "语文",
+      "subject": "英语",
       "title": "听写没有全对的同学重新听写过关",
       "cleanTitle": "听写没有全对的同学重新听写过关",
       "shortTitle": "听写没有全对的同学重新听写过关",
       "description": "听写没有全对的同学重新听写过关",
-      "homeworkType": "假期作业",
-      "module": "阅读",
+      "homeworkType": "日常复习",
+      "module": "单词",
       "modules": [
-        "阅读"
+        "单词"
       ],
       "status": "pending",
       "submitted": false,
@@ -631,7 +631,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtkv7tvxo7il3s",
@@ -1032,15 +1034,15 @@
     },
     {
       "id": "hw_mtl9o9ar77v81f",
-      "subject": "语文",
+      "subject": "英语",
       "title": "听写没有全对的同学重新听写过关",
       "cleanTitle": "听写没有全对的同学重新听写过关",
       "shortTitle": "听写没有全对的同学重新听写过关",
       "description": "听写没有全对的同学重新听写过关",
-      "homeworkType": "假期作业",
-      "module": "阅读",
+      "homeworkType": "日常复习",
+      "module": "单词",
       "modules": [
-        "阅读"
+        "单词"
       ],
       "status": "pending",
       "submitted": false,
@@ -1053,7 +1055,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtkv7tvxo7il3s",
