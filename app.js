@@ -1962,7 +1962,26 @@ async function updateScoreRecord(recordId, fields) {
     await writeGithubFile('study.json', study, '更新成绩记录');
     _updateCacheRecord('study.examRecords', recordId, fields);
     _persistCache();
+    return true;
   }
+  return false;
+}
+
+// 删除成绩记录（同步清理内存缓存，避免删除后旧数据还在列表里）
+async function deleteScoreRecord(recordId) {
+  _dataGen++;
+  const study = (cachedData && cachedData.study) ? cachedData.study : await fetchRawJSON('study.json').catch(() => ({ examRecords: [] }));
+  const list = study.examRecords || [];
+  const idx = list.findIndex(r => r.id === recordId);
+  if (idx < 0) return false;
+  list.splice(idx, 1);
+  study.examRecords = list;
+  await writeGithubFile('study.json', study, '删除成绩记录');
+  if (cachedData && cachedData.study && Array.isArray(cachedData.study.examRecords)) {
+    cachedData.study.examRecords = cachedData.study.examRecords.filter(r => r.id !== recordId);
+  }
+  _persistCache();
+  return true;
 }
 
 async function updateXpRule(recordId, fields) {
@@ -2084,6 +2103,7 @@ if (typeof window !== 'undefined') {
     updateXpRecord,
     updateFinanceRecord,
     updateScoreRecord,
+    deleteScoreRecord,
     updateXpRule,
     updateEvaluationRecord,
     todayStr,
@@ -6061,6 +6081,11 @@ function lookupBaseXpFromConfig(cfg, taskName) {
 window.openXpEditModal = async function(recordId, ev) {
   if (ev && ev.stopPropagation) ev.stopPropagation();
   if (ev && ev.preventDefault) ev.preventDefault();
+  // 防线：若点击来源是 通过/退回 等操作按钮或其容器（偶发的 stopPropagation 竞态/点到按钮边缘空白），
+  // 一律不打开"修改记录"弹窗，交给各自的审批流程处理，避免出现"点通过却弹出编辑"。
+  if (ev && ev.target && ev.target.closest) {
+    if (ev.target.closest('.rc-approve-btn, .rc-reject-btn, .rc-actions')) return;
+  }
   // 用最新数据查找到该记录
   const cfg = (typeof loadAppData === "function") ? await loadAppData() : (window.__lastCfg || {});
   const record = (cfg.familyMeetings ? (cfg.recentRecords || cfg.xpRecords || []) : (cfg.recentRecords || cfg.xpRecords || []))
@@ -7420,26 +7445,45 @@ async function renderStudy() {
     const subjOrder = { "语文": 1, "数学": 2, "英语": 3, "科学": 4 };
     const bySubj = groupBy(semRecords, "subject");
     const subjects = Object.keys(bySubj).sort((a, b) => (subjOrder[a] || 99) - (subjOrder[b] || 99));
+    const typeCn = { "单元测试": "单元", "日常测验": "日常", "月考": "月考", "期中": "期中" };
+    const safe = (s) => (typeof escapeHtmlReason === "function" ? escapeHtmlReason(String(s == null ? "" : s)) : String(s == null ? "" : s));
 
     panel.innerHTML = subjects.map(sub => {
       const records = [...bySubj[sub]].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-      const typeCn = { "单元测试": "单元", "日常测验": "日常", "月考": "月考", "期中": "期中" };
-      const chips = records.map(r => `
-        <span class="sl-chip ${getGradeCls(r.grade)}" title="${r.title || r.examType || ""}">
-          ${typeCn[r.examType] || r.examType || "成绩"}
-          <b>${r.grade}</b>${r.score != null ? `<i>${r.score}分</i>` : ""}
-        </span>
-      `).join("");
+      const rows = records.map(r => {
+        const shortDate = (r.date || "").slice(5);
+        const titleStr = r.title || "";
+        return `
+        <div class="sl-row" data-score-id="${r.id}" title="点击修改或删除">
+          <div class="sl-date">${shortDate ? `<i data-lucide="calendar-days"></i>${shortDate}` : ""}</div>
+          <div class="sl-info">
+            <span class="sl-type">${typeCn[r.examType] || r.examType || "成绩"}</span>
+            ${titleStr ? `<span class="sl-title">${safe(titleStr)}</span>` : ""}
+            ${(r.errorModules && r.errorModules.length) ? `<span class="sl-err"><i data-lucide="cloud-lightning"></i>${safe((r.errorModules||[]).join("、"))}</span>` : ""}
+          </div>
+          <div class="sl-right">
+            <span class="sl-grade ${getGradeCls(r.grade)}">${r.grade}</span>
+            ${r.score != null && r.score !== "" ? `<span class="sl-pt">${r.score}<em>分</em></span>` : ""}
+            <button class="sl-del" data-del-score="${r.id}" title="删除这条成绩"><i data-lucide="trash-2"></i></button>
+          </div>
+        </div>`;
+      }).join("");
+      const avg = records.filter(x => x.score != null && x.score !== "").length
+        ? Math.round(records.filter(x => x.score != null && x.score !== "").reduce((s, x) => s + Number(x.score), 0) / records.filter(x => x.score != null && x.score !== "").length)
+        : null;
       return `
         <div class="sl-subject">
           <div class="sl-head">
             <span class="subj-dot ${getSubjCfg(sub).cls}"></span>
             <span class="sl-name">${sub}</span>
-            <span class="sl-count">${records.length} 次</span>
+            <span class="sl-count">${records.length} 次记录</span>
+            ${avg != null ? `<span class="sl-avg"><i data-lucide="sigma"></i>均分 ${avg}</span>` : ""}
           </div>
-          <div class="sl-chips">${chips}</div>
+          <div class="sl-rows">${rows}</div>
         </div>`;
-    }).join("");
+    }).join("") + `
+      <div class="sl-hint"><i data-lucide="mouse-pointer-click"></i>点击某条成绩可修改，右侧垃圾桶可删除</div>`;
+    refreshIcons(0);
   }
 
   // ════════ 7.5.2 平时成绩汇总（本学期 · 顶部概览，含各科速览） ════════
@@ -8734,38 +8778,6 @@ function initDataEntry() {
     }
   });
 
-  // ── 成绩录入 ──
-  document.getElementById("submitScore")?.addEventListener("click", async () => {
-    const grade = document.getElementById("scoreGrade").value;
-    if (!grade) { deShowToast("scoreToast", "请选择等级", false); return; }
-    const subject = getRadioValue("scoreSubjectGroup");
-    const errorModules = Array.from(document.querySelectorAll(".err-module-cb:checked")).map(cb => cb.value);
-    const scoreVal = document.getElementById("scoreNumber")?.value;
-    const semesterVal = document.getElementById("scoreSemester")?.value;
-    deSetLoading("submitScore", true, "录入中…");
-    try {
-      await DataStore.addScoreRecord({
-        subject,
-        grade,
-        examType: getRadioValue("scoreTypeGroup"),
-        title: document.getElementById("scoreTitle").value,
-        date: document.getElementById("scoreDate").value,
-        errorModule: errorModules.join("、"),
-        score: scoreVal ? Number(scoreVal) : null,
-        semesterLabel: semesterVal || "",
-      });
-      deShowToast("scoreToast", `已录入 ${subject} ${grade}`, true);
-      document.getElementById("scoreTitle").value = "";
-      if (document.getElementById("scoreNumber")) document.getElementById("scoreNumber").value = "";
-      document.querySelectorAll(".err-module-cb").forEach(cb => cb.checked = false);
-      await DataStore.refreshData(true);
-    } catch (err) {
-      deShowToast("scoreToast", "录入失败：" + err.message, false);
-    } finally {
-      deSetLoading("submitScore", false);
-    }
-  });
-
   // ── 期末评语录入 ──
   document.getElementById("submitEvaluation")?.addEventListener("click", async () => {
     const teacher = document.getElementById("evalTeacherComment").value.trim();
@@ -9715,9 +9727,36 @@ function renderErrorModulesFor(subject) {
   });
 }
 
+// 当前正在修改的成绩 id；null 表示"新增"模式
+let __editScoreId = null;
+
+function getScoreRecordById(id) {
+  const data = cachedData && cachedData.study ? cachedData.study : null;
+  const list = (data && Array.isArray(data.examRecords)) ? data.examRecords : [];
+  return list.find(r => r.id === id) || null;
+}
+
+function setScoreModalEditMode(editing) {
+  const modal = document.getElementById("addScoreModal");
+  if (modal) {
+    const titleEl = modal.querySelector(".edit-modal-title");
+    if (titleEl) {
+      titleEl.innerHTML = editing
+        ? '<i data-lucide="award" style="width:18px;height:18px"></i>修改成绩'
+        : '<i data-lucide="award" style="width:18px;height:18px"></i>录入成绩';
+    }
+    const xpHint = modal.querySelector(".xp-hint");
+    if (xpHint) xpHint.style.display = editing ? "none" : "";
+  }
+  const delBtn = document.getElementById("scoreDelBtn");
+  if (delBtn) delBtn.style.display = editing && __editScoreId ? "inline-flex" : "none";
+  refreshIcons(0);
+}
+
 function openAddScoreModal() {
   const modal = document.getElementById("addScoreModal");
   if (!modal) return;
+  __editScoreId = null;
   setRadioValue("scoreSubjectGroup", "语文");
   setRadioValue("scoreTypeGroup", "单元测试");
   document.getElementById("scoreGrade").value = "A";
@@ -9726,13 +9765,72 @@ function openAddScoreModal() {
   document.getElementById("scoreDate").value = getTodayVal();
   populateScoreSemesterOptions(document.getElementById("scoreSemester"));
   renderErrorModulesFor("语文");
+  setScoreModalEditMode(false);
   modal.classList.add("show");
   refreshIcons(0);
+}
+
+// 打开成绩修改：预填原记录 + 删除按钮
+function openScoreEditModal(id) {
+  const rec = getScoreRecordById(id);
+  if (!rec) { showToast("未找到这条成绩记录", false); return; }
+  __editScoreId = id;
+  const modal = document.getElementById("addScoreModal");
+  if (!modal) return;
+
+  setRadioValue("scoreSubjectGroup", rec.subject || "语文");
+  setRadioValue("scoreTypeGroup", rec.examType || "单元测试");
+  const sg = document.getElementById("scoreGrade"); if (sg) sg.value = rec.grade || "A";
+  const sn = document.getElementById("scoreNumber"); if (sn) sn.value = (rec.score != null && rec.score !== "" ? rec.score : "");
+  const st = document.getElementById("scoreTitle"); if (st) st.value = rec.title || "";
+  const sd = document.getElementById("scoreDate"); if (sd) sd.value = rec.date || getTodayVal();
+  const ss = document.getElementById("scoreSemester");
+  if (ss) { populateScoreSemesterOptions(ss); if (rec.semesterLabel) ss.value = rec.semesterLabel; }
+
+  // 失分模块按科目渲染 + 回填已选
+  const subj = rec.subject || "语文";
+  renderErrorModulesFor(subj);
+  const em = Array.isArray(rec.errorModules) ? rec.errorModules
+    : (rec.errorModule ? String(rec.errorModule).split(/[、,，]/).map(s => s.trim()).filter(Boolean) : []);
+  em.forEach(m => {
+    const cb = document.querySelector('#errorModuleCheckboxes input[value="' + (window.CSS && CSS.escape ? CSS.escape(m) : m) + '"]');
+    if (cb) { cb.checked = true; const pill = cb.closest(".choice-pill"); if (pill) pill.classList.add("checked"); }
+  });
+
+  setScoreModalEditMode(true);
+  modal.classList.add("show");
+  refreshIcons(0);
+}
+
+// 删除成绩（带二次确认）
+async function scoreDelete(id) {
+  const rec = getScoreRecordById(id);
+  if (!rec) return;
+  const label = (rec.subject || "") + (rec.grade ? " " + rec.grade : "");
+  if (!confirm("确定删除这条成绩吗？" + (label ? "（" + label + "）" : "") + "\n删除后不可恢复。")) return;
+  const btn = document.getElementById("scoreDelBtn");
+  try {
+    if (btn) { btn.disabled = true; btn.textContent = ""; btn.innerHTML = '<i data-lucide="loader-2">删除中…</i>'; }
+    await DataStore.deleteScoreRecord(id);
+    closeAddScoreModal();
+    if (__editScoreId === id) __editScoreId = null;
+    await DataStore.refreshData(true);
+    if (typeof renderStudy === "function") await renderStudy();
+    if (typeof renderScoreAnalysis === "function") await renderScoreAnalysis();
+    refreshIcons(50);
+    showToast("✅ 已删除该成绩", true);
+  } catch (e) {
+    console.error("删除成绩失败:", e);
+    showToast("✖ 删除失败，请重试", false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i data-lucide="trash-2"></i>删除'; }
+  }
 }
 
 function closeAddScoreModal() {
   const modal = document.getElementById("addScoreModal");
   if (modal) modal.classList.remove("show");
+  if (__editScoreId) setScoreModalEditMode(true);
 }
 
 function openAddEvalModal() {
@@ -9764,39 +9862,47 @@ async function submitScore() {
   const btn = document.getElementById("submitScore");
   const original = btn.textContent;
   btn.textContent = "保存中…"; btn.disabled = true;
+  const isEdit = !!__editScoreId;
+  const payload = {
+    subject,
+    grade,
+    examType,
+    title,
+    date,
+    errorModules,
+    errorModule: errorModules.join("、"),
+    score: scoreVal ? Number(scoreVal) : null,
+    semesterLabel: semesterVal || "",
+  };
   try {
-    await DataStore.addScoreRecord({
-      subject,
-      grade,
-      examType,
-      title,
-      date,
-      errorModules,
-      errorModule: errorModules.join("、"),
-      score: scoreVal ? Number(scoreVal) : null,
-      semesterLabel: semesterVal || "",
-    });
-    // 成绩录入 XP：从系统配置读取（config.json xpRuleList 中"成绩录入"的 xp），勾选失分模块再 +1
-    const cfgNow = await DataStore.loadData();
-    const scoreRule = ((cfgNow.config && cfgNow.config.xpRuleList) || []).find(r => r.name === "成绩录入");
-    const baseXp = scoreRule && Number(scoreRule.xp) ? Number(scoreRule.xp) : 2;
-    const extraXp = errorModules.length > 0 ? 1 : 0;
-    await DataStore.addXpRecord({
-      taskName: "成绩录入",
-      description: `录入${subject}成绩（${examType}）${errorModules.length ? "，并复盘失分模块" : ""}`,
-      date: getTodayVal(),
-      status: "verified",
-      xp: baseXp + extraXp,
-      xpCategory: "学习成长",
-    });
+    if (isEdit) {
+      await DataStore.updateScoreRecord(__editScoreId, payload);
+      showToast(`✅ 已更新${subject}${grade}成绩`, true);
+    } else {
+      await DataStore.addScoreRecord(payload);
+      // 成绩录入 XP：从系统配置读取（config.json xpRuleList 中"成绩录入"的 xp），勾选失分模块再 +1
+      const cfgNow = await DataStore.loadData();
+      const scoreRule = ((cfgNow.config && cfgNow.config.xpRuleList) || []).find(r => r.name === "成绩录入");
+      const baseXp = scoreRule && Number(scoreRule.xp) ? Number(scoreRule.xp) : 2;
+      const extraXp = errorModules.length > 0 ? 1 : 0;
+      await DataStore.addXpRecord({
+        taskName: "成绩录入",
+        description: `录入${subject}成绩（${examType}）${errorModules.length ? "，并复盘失分模块" : ""}`,
+        date: getTodayVal(),
+        status: "verified",
+        xp: baseXp + extraXp,
+        xpCategory: "学习成长",
+      });
+      showToast(`✅ 已录入${subject}${grade}成绩，获得 +${baseXp + extraXp} XP`, true);
+    }
     closeAddScoreModal();
+    __editScoreId = null;
     await DataStore.refreshData(true);
     if (typeof renderStudy === "function") await renderStudy();
     if (typeof renderScoreAnalysis === "function") await renderScoreAnalysis();
     refreshIcons(50);
-    showToast(`✅ 已录入${subject}${grade}成绩，获得 +${baseXp + extraXp} XP`, true);
   } catch (e) {
-    console.error("录入成绩失败:", e);
+    console.error("保存成绩失败:", e);
     const errMsg = (e && e.message) || "";
     if (errMsg.indexOf("Token") >= 0 || errMsg.indexOf("token") >= 0) showTokenRequiredToast();
     else showToast("✖ 保存失败，请重试", false);
@@ -9846,6 +9952,21 @@ function initScoreEvalModals() {
   document.querySelectorAll("#scoreSubjectGroup input").forEach(radio => {
     radio.addEventListener("change", function() { renderErrorModulesFor(this.value); });
   });
+  // 各科成绩列表：点击行 → 修改；点删除 → 删除
+  const slPanel = document.getElementById("scoreListPanel");
+  if (slPanel && !slPanel.__scoreDelegated) {
+    slPanel.__scoreDelegated = true;
+    slPanel.addEventListener("click", function(e) {
+      const delBtn = e.target.closest("[data-del-score]");
+      if (delBtn) {
+        e.stopPropagation();
+        scoreDelete(delBtn.dataset.delScore);
+        return;
+      }
+      const row = e.target.closest("[data-score-id]");
+      if (row) openScoreEditModal(row.dataset.scoreId);
+    });
+  }
   // 期末评价弹窗
   const eModal = document.getElementById("addEvalModal");
   if (eModal) eModal.addEventListener("click", function(e) { if (e.target === eModal) closeAddEvalModal(); });

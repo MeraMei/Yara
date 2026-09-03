@@ -5782,6 +5782,157 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .sl-chip.grade-b-plus { background: #fef3c7; color: #92400e; }
     .sl-chip.grade-b { background: #fee2e2; color: #991b1b; }
 
+    /* —— 各科成绩列表 · 新版可交互行（点击卡片可改/删） —— */
+    .sl-rows { display: flex; flex-direction: column; gap: 6px; }
+    .sl-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid var(--neutral-100);
+      box-shadow: 0 1px 2px rgba(16,24,40,.03);
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, background .12s ease;
+      cursor: pointer;
+    }
+    .sl-row:hover {
+      border-color: var(--neutral-300);
+      box-shadow: 0 4px 14px rgba(16,24,40,.08);
+      transform: translateY(-1px);
+    }
+    .sl-row:active { transform: translateY(0); }
+    .sl-date {
+      flex-shrink: 0;
+      min-width: 58px;
+      font-size: 11px;
+      color: var(--neutral-500);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sl-date i { width: 13px; height: 13px; }
+    .sl-info {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      min-width: 0;
+    }
+    .sl-type {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--neutral-700);
+      background: var(--neutral-100);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .sl-title {
+      font-size: 12px;
+      color: var(--neutral-700);
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 220px;
+    }
+    .sl-err {
+      font-size: 11px;
+      color: var(--coral-600);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .sl-err i { width: 13px; height: 13px; }
+    .sl-right {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sl-grade {
+      min-width: 30px;
+      height: 24px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sl-grade.grade-a-plus { background: #d1fae5; color: #065f46; }
+    .sl-grade.grade-a { background: #dbeafe; color: #1e40af; }
+    .sl-grade.grade-b-plus { background: #fef3c7; color: #92400e; }
+    .sl-grade.grade-b { background: #fee2e2; color: #991b1b; }
+    .sl-pt {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--neutral-800);
+      font-variant-numeric: tabular-nums;
+    }
+    .sl-pt em { font-size: 10px; font-style: normal; font-weight: 600; opacity: .65; margin-left: 1px; }
+    .sl-del {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--neutral-400);
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background .12s ease, color .12s ease;
+    }
+    .sl-del:hover { background: var(--coral-50); color: var(--coral-600); }
+    .sl-del i { width: 15px; height: 15px; }
+    .sl-avg {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--neutral-600);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--neutral-100);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .sl-avg i { width: 13px; height: 13px; }
+    .sl-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--neutral-500);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sl-hint i { width: 13px; height: 13px; }
+
+    /* 危险操作按钮（成绩删除等） */
+    .btn-danger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #b91c1c;
+      transition: all .15s ease;
+    }
+    .btn-danger:hover { background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%); }
+    .btn-danger:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-danger i { width: 15px; height: 15px; }
+
     /* 平时成绩汇总（本学期） */
     .score-summary-section {
       padding: 8px 20px 16px;

@@ -848,6 +848,8 @@
         ✨ 主动录入成绩 <b>+2 XP</b>，勾选失分模块再 <b>+1 XP</b>
       </div>
       <div class="edit-modal-actions">
+        <button class="btn-danger" id="scoreDelBtn" onclick="scoreDelete(__editScoreId)" style="display:none"><i data-lucide="trash-2"></i>删除</button>
+        <div style="flex:1"></div>
         <button class="btn-secondary" onclick="closeAddScoreModal()">取消</button>
         <button class="btn-primary" id="submitScore">保存</button>
       </div>
