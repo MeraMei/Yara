@@ -998,7 +998,7 @@
           "cleanTitle": "阅读~54页",
           "shortTitle": "阅读~54页",
           "description": "阅读~54页",
-          "homeworkType": "假期作业",
+          "homeworkType": "日常预习",
           "module": "阅读",
           "modules": [
             "阅读"
@@ -1014,7 +1014,11 @@
           "progress": 0,
           "xp": 0,
           "errorModule": "",
-          "errorModules": []
+          "errorModules": [],
+          "duration": "30-60分钟",
+          "wrongCount": 0,
+          "unitIndex": -1,
+          "unitName": null
         },
         {
           "id": "hw_mtktuz2fgtqd8q",
