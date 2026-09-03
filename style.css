@@ -987,31 +987,34 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
 .choice-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 8px 14px;
-  border-radius: 10px;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 11px;
   border: 1px solid var(--colourful-neutral-200);
-  background: var(--colourful-neutral-50);
+  background: #fff;
   font-size: 13px;
   font-weight: 600;
   color: var(--colourful-neutral-700);
   cursor: pointer;
-  transition: all .15s ease;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.choice-pill:hover { border-color: var(--colourful-butter-yellow-300); background: var(--colourful-butter-yellow-50); }
+.choice-pill:hover { border-color: var(--colourful-lavender-300); background: var(--colourful-lavender-50); box-shadow: 0 1px 3px rgba(146,85,245,.10); }
 .choice-pill input { display: none; }
 .choice-pill.checked {
-  background: var(--colourful-butter-yellow-50);
-  border-color: var(--colourful-butter-yellow-400);
-  color: var(--colourful-butter-yellow-800);
-  font-weight: 700;
+  background: var(--colourful-lavender-50);
+  border-color: var(--colourful-lavender-400);
+  color: var(--colourful-lavender-800);
+  font-weight: 800;
+  box-shadow: 0 1px 3px rgba(146,85,245,.12);
 }
 .choice-pill.checked::before {
   content: "";
-  width: 8px; height: 8px;
+  width: 9px; height: 9px;
   border-radius: 50%;
-  background: var(--colourful-butter-yellow-500);
+  background: var(--colourful-lavender-500);
+  box-shadow: 0 0 0 3px var(--colourful-lavender-100);
   flex-shrink: 0;
 }
 .choice-group.sm .choice-pill {
@@ -9433,4 +9436,65 @@ input[type="date"]:focus::-webkit-datetime-edit {
       margin-top: 16px; font-size: 14px; font-weight: 600; color: var(--neutral-500);
       animation: bootPulse 1.2s ease-in-out infinite;
     }
+
+/* ════════ 作业录入/提交弹窗 · 品牌紫统一（新增 2026-09-03）════════ */
+/* 主按钮：由中性黑/黄油黄改为知识星球品牌紫渐变，聚焦醒目又不失优雅 */
+#addHomeworkModal .btn-primary,
+#submitHomeworkModal .btn-primary {
+  background: linear-gradient(135deg, var(--lav-500, #9255f5), var(--lav-600, #7e34e0));
+  color: #fff;
+  min-width: 118px;
+  justify-content: center;
+  box-shadow: 0 4px 12px -4px rgba(126,52,224,.38);
+}
+#addHomeworkModal .btn-primary:hover,
+#submitHomeworkModal .btn-primary:hover {
+  background: linear-gradient(135deg, var(--lav-600, #7e34e0), var(--lav-700, #6928ba));
+  box-shadow: 0 6px 16px -6px rgba(126,52,224,.55);
+}
+#addHomeworkModal .btn-primary:disabled,
+#submitHomeworkModal .btn-primary:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+/* 次按钮：白底细边框，取代半透明灰，边缘更干净 */
+#addHomeworkModal .btn-secondary,
+#submitHomeworkModal .btn-secondary {
+  background: rgba(255,255,255,.92);
+  border: 1px solid var(--neutral-200);
+  color: var(--neutral-700);
+}
+#addHomeworkModal .btn-secondary:hover,
+#submitHomeworkModal .btn-secondary:hover {
+  background: #fff;
+  border-color: var(--neutral-300);
+}
+/* 弹窗标题：加一条品牌紫的强调小竖条，提升标题层级 */
+#addHomeworkModal .edit-modal-title,
+#submitHomeworkModal .edit-modal-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#addHomeworkModal .edit-modal-title::before,
+#submitHomeworkModal .edit-modal-title::before {
+  content: "";
+  width: 4px;
+  height: 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--lav-500, #9255f5), var(--lav-600, #7e34e0));
+}
+/* 弹窗内日期/输入框聚焦态用紫，与品牌一致 */
+#addHomeworkModal .edit-field input:focus,
+#addHomeworkModal .edit-field textarea:focus,
+#submitHomeworkModal .edit-field textarea:focus {
+  border-color: var(--lav-400, #ac87ff);
+  box-shadow: 0 0 0 3px rgba(146,85,245,.10);
+}
+#addHomeworkModal .due-hint,
+#submitHomeworkModal .due-hint {
+  color: var(--neutral-400);
+}
   

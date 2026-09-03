@@ -1448,6 +1448,16 @@ async function addXpRule(rule) {
 }
 
 // 新增学习/作业记录
+// 优先使用本地内存缓存中的 study（含用户刚录入的数据）：
+// 1）省去每次保存前的额外网络读取（保存更快）；2）避免 CDN raw 旧缓存把新数据覆盖。
+// 内存缓存不可用时才回退到网络读取。
+async function _readStudyBase() {
+  if (cachedData && cachedData.study) {
+    try { return JSON.parse(JSON.stringify(cachedData.study)); } catch (e) {}
+  }
+  return fetchRawJSON('study.json', { cache: 'no-store' }).catch(() => ({ allHomework: [], recentAssignments: [], homework: { total: 0, done: 0, todayTotal: 0, todayDone: 0 } }));
+}
+
 async function addStudyRecord(record) {
   _dataGen++;
   const recordId = generateId('hw_');
@@ -1477,7 +1487,7 @@ async function addStudyRecord(record) {
     errorModule: record.errorModule || '',
     errorModules: record.errorModules || [],
   };
-  const study = await fetchRawJSON('study.json').catch(() => ({ allHomework: [], recentAssignments: [], homework: { total: 0, done: 0, todayTotal: 0, todayDone: 0 } }));
+  const study = await _readStudyBase();
   if (!study.allHomework) study.allHomework = [];
   // 按“录入日期”分组写入（与 data-store.js 的 addStudyRecord 保持一致），新作业才能在列表中正常显示
   let group = null;
@@ -1543,7 +1553,7 @@ async function addStudyRecords(records) {
       errorModules: record.errorModules || [],
     });
   }
-  const study = await fetchRawJSON('study.json', { cache: 'no-store' }).catch(() => ({ allHomework: [], recentAssignments: [], homework: { total: 0, done: 0, todayTotal: 0, todayDone: 0 } }));
+  const study = await _readStudyBase();
   if (!study.allHomework) study.allHomework = [];
   // 按“录入日期”分组写入
   let group = null;
@@ -1593,7 +1603,7 @@ async function addScoreRecord(record) {
     semesterLabel: record.semesterLabel || '',
     errorModules: record.errorModules || [],
   };
-  const study = await fetchRawJSON('study.json').catch(() => ({ examRecords: [] }));
+  const study = await _readStudyBase();
   if (!study.examRecords) study.examRecords = [];
   study.examRecords.unshift(newRecord);
   await writeGithubFile('study.json', study, '新增成绩记录');
