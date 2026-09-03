@@ -1016,8 +1016,8 @@
             "计算",
             "推理"
           ],
-          "status": "pending",
-          "submitted": false,
+          "status": "done",
+          "submitted": true,
           "dueDate": "2026-09-02",
           "deadline": "2026-09-02",
           "reviewStatus": "",
@@ -1031,7 +1031,8 @@
           "duration": "",
           "wrongCount": 0,
           "unitIndex": 0,
-          "unitName": "第一单元·认识更大的数"
+          "unitName": "第一单元·认识更大的数",
+          "submittedAt": "2026-09-03T01:50:43.587Z"
         }
       ]
     },
