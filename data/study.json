@@ -973,8 +973,8 @@
             "汉字",
             "组词"
           ],
-          "status": "pending",
-          "submitted": false,
+          "status": "done",
+          "submitted": true,
           "dueDate": "2026-09-02",
           "deadline": "2026-09-02",
           "reviewStatus": "",
@@ -988,7 +988,8 @@
           "duration": "15-30分钟",
           "wrongCount": 0,
           "unitIndex": 0,
-          "unitName": "第一单元·自然之美"
+          "unitName": "第一单元·自然之美",
+          "submittedAt": "2026-09-03T05:45:12.904Z"
         },
         {
           "id": "hw_mtktj0rk60iv80",
