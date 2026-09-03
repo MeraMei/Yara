@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtlc5a7lgj0eb9",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "照顾好自己（营养均衡、午休）",
+    "taskName": "照顾好自己（营养均衡、午休）",
+    "taskCategory": "身体成长",
+    "date": "2026-09-03",
+    "datetime": "2026-09-03 09:41:29",
+    "xp": 7,
+    "baseXp": 5,
+    "commitmentBonus": true,
+    "xpCategory": "身体成长",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "今天中午也有好好吃饭，好好午休 [承诺兑现]",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtlc2nsnbiyn8i",
     "domain": "XP",
     "type": "XP获得",
