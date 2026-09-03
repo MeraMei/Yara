@@ -1760,6 +1760,20 @@
   ],
   "examRecords": [
     {
+      "id": "score_mtl3y9vtc3wlcm",
+      "subject": "英语",
+      "grade": "B+",
+      "examType": "单元测试",
+      "errorModule": "单词",
+      "date": "2026-09-03",
+      "description": "",
+      "score": 85,
+      "semesterLabel": "四年级(上)",
+      "errorModules": [
+        "单词"
+      ]
+    },
+    {
       "id": "recvrpvnZIZnEh",
       "subject": "语文",
       "grade": "A",
