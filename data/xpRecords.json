@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtlc2nsnbiyn8i",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "与父母沟通自己近期成长/心情",
+    "taskName": "与父母沟通自己近期成长/心情",
+    "taskCategory": "能力成长",
+    "date": "2026-09-03",
+    "datetime": "2026-09-03 09:39:27",
+    "xp": 5,
+    "baseXp": 5,
+    "commitmentBonus": false,
+    "xpCategory": "能力成长",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "在学校被班主任老师表扬了好久，因为我阅读认真，他还给全班展示了哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtl3yca1m0jday",
     "domain": "XP",
     "type": "XP获得",
