@@ -900,8 +900,8 @@
         "阅读",
         "作文"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-01",
       "deadline": "2026-09-01",
       "reviewStatus": "",
@@ -915,7 +915,8 @@
       "duration": "≤15分钟",
       "wrongCount": 0,
       "unitIndex": -1,
-      "unitName": null
+      "unitName": null,
+      "submittedAt": "2026-09-03T00:57:16.722Z"
     },
     {
       "id": "hw_mslv9a7m9uniba",
