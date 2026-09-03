@@ -939,8 +939,8 @@
         "单词",
         "语感"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-02",
       "deadline": "2026-09-02",
       "reviewStatus": "",
@@ -954,7 +954,8 @@
       "unitIndex": 0,
       "unitName": "Module1·Getting to know you",
       "duration": "15-30分钟",
-      "wrongCount": 0
+      "wrongCount": 0,
+      "submittedAt": "2026-09-03T04:08:20.362Z"
     },
     {
       "date": "2026-09-03",
