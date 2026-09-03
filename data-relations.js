@@ -59,16 +59,26 @@
       });
   }
 
+  // 文件 SHA 缓存：把上次读写成功拿到的 blob SHA 记下来，下次写入直接带着它
+  // 一次 PUT 完成（省掉一次 GET 往返）；遇冲突(别端改过)时清掉缓存走标准路径。
+  var __shaCache = {};
+
   function getFileSHA(path) {
     var token = getToken();
     if (!token) return Promise.resolve(null);
     return global.fetch(API_BASE + '/contents/' + path + '?ref=' + BRANCH, {
       headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.v3+json' },
     }).then(function (r) {
-      if (r.status === 404) return null; // 文件不存在 → 允许按"新建"写入
+      if (r.status === 404) { __shaCache[path] = null; return null; } // 文件不存在 → 允许按"新建"写入
       if (!r.ok) throw makeWriteError('读取文件SHA失败(HTTP ' + r.status + ')', r.status);
-      return r.json().then(function (d) { return d && d.sha ? d.sha : null; });
+      return r.json().then(function (d) { var sha = d && d.sha ? d.sha : null; __shaCache[path] = sha; return sha; });
     });
+  }
+
+  // 写入用 SHA：已缓存则直接用（快速路径，1 次 PUT 即可），否则先 GET 一次取最新
+  function fileShaForWrite(path) {
+    if (__shaCache.hasOwnProperty(path)) return Promise.resolve(__shaCache[path]);
+    return getFileSHA(path).then(function (sha) { return sha; });
   }
 
   function writeFile(path, content, msg) {
@@ -151,10 +161,17 @@
     attempt = attempt || 0;
     var token = getToken();
     if (!token) return Promise.reject(new Error('请先设置 GitHub Token'));
-    return getFileSHA(path)
+    return fileShaForWrite(path)
       .then(function (sha) { return tryPut(path, content, msg, token, sha); })
+      .then(function (res) {
+        // 写成功后记下新 blob SHA，让下一次写入也走 1 次 PUT 快速路径
+        if (res && res.content && res.content.sha) __shaCache[path] = res.content.sha;
+        return res;
+      })
       .catch(function (err) {
         if (attempt >= MAX_WRITE_ATTEMPT || !isTransientError(err)) throw err;
+        // 缓存 SHA 过期(冲突)时清掉，让重试改为先 GET 最新 SHA 再写
+        if (isConflictError(err)) delete __shaCache[path];
         var wait = backoffMs(isConflictError(err), attempt); // 冲突指数退避+抖动，避免对撞
         return new Promise(function (resolve) { setTimeout(resolve, wait); })
           .then(function () { return writeFileRemote(path, content, msg, attempt + 1); });
@@ -841,6 +858,18 @@
       if (!path) return Promise.reject(new Error('缺少文件路径'));
       var p = String(path).indexOf('data/') === 0 ? path : ('data/' + path);
       return writeFile(p, content, msg || ('更新数据: ' + path));
+    },
+
+    // 预热写入 SHA 缓存：应用启动时在后台把待写文件的 SHA 取好缓存，
+    // 让用户第一次保存就直接走 1 次 PUT 快速路径（不必再等一次 GET + PUT）。
+    prefetchWritePath: function (path) {
+      var p = String(path).indexOf('data/') === 0 ? path : ('data/' + path);
+      return isLocalMode().then(function (local) {
+        if (local) return; // 本地模式写入本就瞬时，无需预热
+        var token = getToken();
+        if (!token) return;
+        return fileShaForWrite(p).catch(function () { /* 预热失败静默 */ });
+      });
     },
 
     // 读-改-写 合并写（并发安全）：mergeFn(latest) 返回新的完整数据，冲突时基于最新内容重新 merge

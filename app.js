@@ -10360,6 +10360,9 @@ async function boot(page) {
   }
   // 每周五自动发放零花钱（+18 到自由基金），启动时检查一次
   checkAndAddWeeklyAllowance();
+  // ★ 预热写入 SHA 缓存：后台把常用待写文件的 blob SHA 取好缓存，
+  //   让用户第一次保存作业等也直接走 1 次 PUT 快速路径（不再多等一次 GET 往返）
+  warmWriteShaCache();
   if (window.lucide) refreshIcons(20);
   // 隐藏启动加载动画
   const loader = document.getElementById("bootLoader");
@@ -10374,6 +10377,19 @@ async function boot(page) {
 
 
 /* ===== Script block 8 (original lines 8485-8485) ===== */
+
+// 预热常用待写文件的 blob SHA 到 DR 的缓存，让首次保存也直连 1 次 PUT（后台执行，不阻塞界面）
+function warmWriteShaCache() {
+  try {
+    const dataRelations = window.DataRelations || null;
+    if (!dataRelations || typeof dataRelations.prefetchWritePath !== "function") return;
+    // 家里各模块常写的文件；并行预热，任一失败静默忽略
+    const writable = ["study.json", "xpRecords.json", "finance.json", "diaryEntries.json", "familyMeetings.json", "levels.json"];
+    writable.forEach(function (f) {
+      try { dataRelations.prefetchWritePath(f).catch(function () {}); } catch (e) {}
+    });
+  } catch (e) {}
+}
 
 /* ════════ 单页应用：视图切换 (SPA) ════════ */
 
