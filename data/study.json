@@ -583,15 +583,16 @@
     },
     {
       "id": "hw_mtkv7tvxndwv4k",
-      "subject": "语文",
+      "subject": "英语",
       "title": "课本1-3页句子和单词每个两遍并默写一遍",
       "cleanTitle": "课本1-3页句子和单词每个两遍并默写一遍",
       "shortTitle": "课本1-3页句子和单词每个两遍并默写一遍",
       "description": "课本1-3页句子和单词每个两遍并默写一遍",
       "homeworkType": "日常复习",
-      "module": "阅读",
+      "module": "单词",
       "modules": [
-        "阅读"
+        "单词",
+        "语感"
       ],
       "status": "pending",
       "submitted": false,
@@ -604,7 +605,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtktuz2fgtqd8q",
@@ -920,15 +923,16 @@
     },
     {
       "id": "hw_mtkv7tvxndwv4k",
-      "subject": "语文",
+      "subject": "英语",
       "title": "课本1-3页句子和单词每个两遍并默写一遍",
       "cleanTitle": "课本1-3页句子和单词每个两遍并默写一遍",
       "shortTitle": "课本1-3页句子和单词每个两遍并默写一遍",
       "description": "课本1-3页句子和单词每个两遍并默写一遍",
       "homeworkType": "日常复习",
-      "module": "阅读",
+      "module": "单词",
       "modules": [
-        "阅读"
+        "单词",
+        "语感"
       ],
       "status": "pending",
       "submitted": false,
@@ -941,7 +945,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "date": "2026-09-03",
