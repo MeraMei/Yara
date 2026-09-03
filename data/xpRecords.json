@@ -12,10 +12,11 @@
     "baseXp": 5,
     "commitmentBonus": false,
     "xpCategory": "能力成长",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "在学校被班主任老师表扬了好久，因为我阅读认真，他还给全班展示了哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mtl3yca1m0jday",
