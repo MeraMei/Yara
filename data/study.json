@@ -1010,8 +1010,12 @@
           "shortTitle": "预习课本6-7页，巩固知训错题。",
           "description": "预习课本6-7页，巩固知训错题。",
           "homeworkType": "日常预习",
-          "module": "",
-          "modules": [],
+          "module": "概念",
+          "modules": [
+            "概念",
+            "计算",
+            "推理"
+          ],
           "status": "pending",
           "submitted": false,
           "dueDate": "2026-09-02",
@@ -1023,7 +1027,11 @@
           "progress": 0,
           "xp": 0,
           "errorModule": "",
-          "errorModules": []
+          "errorModules": [],
+          "duration": "",
+          "wrongCount": 0,
+          "unitIndex": 0,
+          "unitName": "第一单元·认识更大的数"
         }
       ]
     },
