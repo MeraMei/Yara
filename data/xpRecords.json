@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtl3tk2uxpejxv",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "作业·日常预习",
+    "taskName": "作业·日常预习",
+    "taskCategory": "学习成长",
+    "date": "2026-09-03",
+    "datetime": "2026-09-03 05:48:25",
+    "xp": 2,
+    "baseXp": 2,
+    "commitmentBonus": false,
+    "xpCategory": "学习成长",
+    "reviewStatus": "已通过",
+    "returnReason": "",
+    "description": "日常预习完成",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtl3qv6px2tal5",
     "domain": "XP",
     "type": "XP获得",
