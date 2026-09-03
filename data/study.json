@@ -547,12 +547,87 @@
     }
   ],
   "homework": {
-    "total": 21,
+    "total": 24,
     "done": 8,
-    "todayTotal": 2,
+    "todayTotal": 5,
     "todayDone": 2
   },
   "recentAssignments": [
+    {
+      "id": "hw_mtl9o9aroytklp",
+      "subject": "语文",
+      "title": "默写第4-5页两组问答句",
+      "cleanTitle": "默写第4-5页两组问答句",
+      "shortTitle": "默写第4-5页两组问答句",
+      "description": "默写第4-5页两组问答句",
+      "homeworkType": "日常复习",
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-03",
+      "deadline": "2026-09-03",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
+    {
+      "id": "hw_mtl9o9arbbxagx",
+      "subject": "语文",
+      "title": "熟读并背诵课本4-5页",
+      "cleanTitle": "熟读并背诵课本4-5页",
+      "shortTitle": "熟读并背诵课本4-5页",
+      "description": "熟读并背诵课本4-5页",
+      "homeworkType": "日常复习",
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-03",
+      "deadline": "2026-09-03",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
+    {
+      "id": "hw_mtl9o9ar77v81f",
+      "subject": "语文",
+      "title": "听写没有全对的同学重新听写过关",
+      "cleanTitle": "听写没有全对的同学重新听写过关",
+      "shortTitle": "听写没有全对的同学重新听写过关",
+      "description": "听写没有全对的同学重新听写过关",
+      "homeworkType": "假期作业",
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-03",
+      "deadline": "2026-09-03",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
     {
       "id": "hw_mtkv7tvxo7il3s",
       "subject": "英语",
@@ -1052,6 +1127,81 @@
           "unitIndex": 0,
           "unitName": "第一单元·认识更大的数",
           "submittedAt": "2026-09-03T01:50:43.587Z"
+        },
+        {
+          "id": "hw_mtl9o9ar77v81f",
+          "subject": "语文",
+          "title": "听写没有全对的同学重新听写过关",
+          "cleanTitle": "听写没有全对的同学重新听写过关",
+          "shortTitle": "听写没有全对的同学重新听写过关",
+          "description": "听写没有全对的同学重新听写过关",
+          "homeworkType": "假期作业",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-03",
+          "deadline": "2026-09-03",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        },
+        {
+          "id": "hw_mtl9o9arbbxagx",
+          "subject": "语文",
+          "title": "熟读并背诵课本4-5页",
+          "cleanTitle": "熟读并背诵课本4-5页",
+          "shortTitle": "熟读并背诵课本4-5页",
+          "description": "熟读并背诵课本4-5页",
+          "homeworkType": "日常复习",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-03",
+          "deadline": "2026-09-03",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        },
+        {
+          "id": "hw_mtl9o9aroytklp",
+          "subject": "语文",
+          "title": "默写第4-5页两组问答句",
+          "cleanTitle": "默写第4-5页两组问答句",
+          "shortTitle": "默写第4-5页两组问答句",
+          "description": "默写第4-5页两组问答句",
+          "homeworkType": "日常复习",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-03",
+          "deadline": "2026-09-03",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
         }
       ]
     },
