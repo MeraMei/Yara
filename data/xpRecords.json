@@ -12,10 +12,11 @@
     "baseXp": 5,
     "commitmentBonus": true,
     "xpCategory": "身体成长",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "今天中午也有好好吃饭，好好午休 [承诺兑现]",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mtlc2nsnbiyn8i",
