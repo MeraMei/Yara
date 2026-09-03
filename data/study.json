@@ -547,12 +547,62 @@
     }
   ],
   "homework": {
-    "total": 18,
+    "total": 20,
     "done": 8,
     "todayTotal": 2,
     "todayDone": 2
   },
   "recentAssignments": [
+    {
+      "id": "hw_mtktj0rk60iv80",
+      "subject": "语文",
+      "title": "阅读~54页",
+      "cleanTitle": "阅读~54页",
+      "shortTitle": "阅读~54页",
+      "description": "阅读~54页",
+      "homeworkType": "假期作业",
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-02",
+      "deadline": "2026-09-02",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
+    {
+      "id": "hw_mtktj0rkwhvtvg",
+      "subject": "语文",
+      "title": "抄写第一课的生字词",
+      "cleanTitle": "抄写第一课的生字词",
+      "shortTitle": "抄写第一课的生字词",
+      "description": "抄写第一课的生字词",
+      "homeworkType": "假期作业",
+      "module": "汉字",
+      "modules": [
+        "汉字"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-02",
+      "deadline": "2026-09-02",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
     {
       "id": "hw_mtihr6hi2oqi3t",
       "subject": "数学",
@@ -764,6 +814,61 @@
     }
   ],
   "allHomework": [
+    {
+      "date": "2026-09-03",
+      "items": [
+        {
+          "id": "hw_mtktj0rkwhvtvg",
+          "subject": "语文",
+          "title": "抄写第一课的生字词",
+          "cleanTitle": "抄写第一课的生字词",
+          "shortTitle": "抄写第一课的生字词",
+          "description": "抄写第一课的生字词",
+          "homeworkType": "假期作业",
+          "module": "汉字",
+          "modules": [
+            "汉字"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-02",
+          "deadline": "2026-09-02",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        },
+        {
+          "id": "hw_mtktj0rk60iv80",
+          "subject": "语文",
+          "title": "阅读~54页",
+          "cleanTitle": "阅读~54页",
+          "shortTitle": "阅读~54页",
+          "description": "阅读~54页",
+          "homeworkType": "假期作业",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-02",
+          "deadline": "2026-09-02",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        }
+      ]
+    },
     {
       "id": "hw_mtihr6hi2oqi3t",
       "subject": "数学",
