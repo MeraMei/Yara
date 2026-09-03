@@ -547,12 +547,62 @@
     }
   ],
   "homework": {
-    "total": 20,
+    "total": 22,
     "done": 8,
     "todayTotal": 2,
     "todayDone": 2
   },
   "recentAssignments": [
+    {
+      "id": "hw_mtktua8zib9vt1",
+      "subject": "语文",
+      "title": "听录音，读会课本4-5页",
+      "cleanTitle": "听录音，读会课本4-5页",
+      "shortTitle": "听录音，读会课本4-5页",
+      "description": "听录音，读会课本4-5页",
+      "homeworkType": "假期作业",
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-02",
+      "deadline": "2026-09-02",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
+    {
+      "id": "hw_mtktua8z23af8r",
+      "subject": "语文",
+      "title": "课本1-3页句子和单词每个两遍并默写一遍",
+      "cleanTitle": "课本1-3页句子和单词每个两遍并默写一遍",
+      "shortTitle": "课本1-3页句子和单词每个两遍并默写一遍",
+      "description": "课本1-3页句子和单词每个两遍并默写一遍",
+      "homeworkType": "日常复习",
+      "module": "阅读",
+      "modules": [
+        "阅读"
+      ],
+      "status": "pending",
+      "submitted": false,
+      "dueDate": "2026-09-02",
+      "deadline": "2026-09-02",
+      "reviewStatus": "",
+      "returnReason": "",
+      "details": [],
+      "tags": [],
+      "progress": 0,
+      "xp": 0,
+      "errorModule": "",
+      "errorModules": []
+    },
     {
       "id": "hw_mtktj0rk60iv80",
       "subject": "语文",
@@ -849,6 +899,56 @@
           "cleanTitle": "阅读~54页",
           "shortTitle": "阅读~54页",
           "description": "阅读~54页",
+          "homeworkType": "假期作业",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-02",
+          "deadline": "2026-09-02",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        },
+        {
+          "id": "hw_mtktua8z23af8r",
+          "subject": "语文",
+          "title": "课本1-3页句子和单词每个两遍并默写一遍",
+          "cleanTitle": "课本1-3页句子和单词每个两遍并默写一遍",
+          "shortTitle": "课本1-3页句子和单词每个两遍并默写一遍",
+          "description": "课本1-3页句子和单词每个两遍并默写一遍",
+          "homeworkType": "日常复习",
+          "module": "阅读",
+          "modules": [
+            "阅读"
+          ],
+          "status": "pending",
+          "submitted": false,
+          "dueDate": "2026-09-02",
+          "deadline": "2026-09-02",
+          "reviewStatus": "",
+          "returnReason": "",
+          "details": [],
+          "tags": [],
+          "progress": 0,
+          "xp": 0,
+          "errorModule": "",
+          "errorModules": []
+        },
+        {
+          "id": "hw_mtktua8zib9vt1",
+          "subject": "语文",
+          "title": "听录音，读会课本4-5页",
+          "cleanTitle": "听录音，读会课本4-5页",
+          "shortTitle": "听录音，读会课本4-5页",
+          "description": "听录音，读会课本4-5页",
           "homeworkType": "假期作业",
           "module": "阅读",
           "modules": [
