@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Yara的小宇宙中心 🌌</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23fdd832'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="style.css?v=20260903-shafast">
+  <link rel="stylesheet" href="style.css?v=20260903-scoreview">
   <!-- 启动加载动画 -->
   <div id="bootLoader">
     <div class="bootLoader-cat">🐱</div>
@@ -389,6 +389,12 @@
             </div>
           </div>
 
+          <div class="score-summary-section top-overview">
+            <div class="section-subtitle">汇总概览</div>
+            <div id="scoreSummaryPanel" class="score-summary-panel">
+            </div>
+          </div>
+
           <div class="score-trend-section">
             <div class="section-subtitle">成绩趋势</div>
             <div id="scoreTrendChart" class="score-trend-chart">
@@ -417,12 +423,6 @@
           <div class="score-list-section">
             <div class="section-subtitle">各科成绩列表</div>
             <div id="scoreListPanel" class="score-list-panel">
-            </div>
-          </div>
-
-          <div class="score-summary-section">
-            <div class="section-subtitle">平时成绩汇总</div>
-            <div id="scoreSummaryPanel" class="score-summary-panel">
             </div>
           </div>
 
@@ -1334,10 +1334,10 @@
   
   
 
-  <script>window.__APP_VERSION__ = "20260903-shafast";</script>
+  <script>window.__APP_VERSION__ = "20260903-scoreview";</script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="data-relations.js?v=20260903-shafast"></script>
     <script src="settings.js?v=20260901-fixcrud"></script>
-    <script src="app.js?v=20260903-shafast"></script>
+    <script src="app.js?v=20260903-scoreview"></script>
 </body>
 </html>

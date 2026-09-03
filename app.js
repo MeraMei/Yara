@@ -7442,7 +7442,7 @@ async function renderStudy() {
     }).join("");
   }
 
-  // ════════ 7.5.2 平时成绩汇总（本学期） ════════
+  // ════════ 7.5.2 平时成绩汇总（本学期 · 顶部概览，含各科速览） ════════
   function renderScoreSummary(semesterLabel) {
     const panel = document.getElementById("scoreSummaryPanel");
     if (!panel) return;
@@ -7458,11 +7458,35 @@ async function renderStudy() {
 
     const gradeOrder = ["A+", "A", "B+", "B", "C+", "C", "D+", "D"];
     const gradeColors = { "A+": "#10b981", "A": "#6366f1", "B+": "#f59e0b", "B": "#ef4444" };
+    const chipColor = { "A+": "#10b981", "A": "#6366f1", "B+": "#f59e0b", "B": "#ef4444", "C+": "#f97316", "C": "#dc2626", "D+": "#94a3b8", "D": "#94a3b8" };
     const counts = {};
     semRecords.forEach(r => { if (r.grade) counts[r.grade] = (counts[r.grade] || 0) + 1; });
     const total = semRecords.length;
     const goodCount = (counts["A+"] || 0) + (counts["A"] || 0);
     const goodRate = Math.round((goodCount / total) * 100);
+    // 平均分（仅统计带分数记录）
+    const scoredAll = semRecords.filter(r => r.score != null);
+    const avgScore = scoredAll.length
+      ? Math.round(scoredAll.reduce((s, r) => s + Number(r.score), 0) / scoredAll.length)
+      : null;
+
+    // 各科概览：每科最新等级 + 次数 + A及以上数
+    const subjOrder = { "语文": 1, "数学": 2, "英语": 3, "科学": 4 };
+    const bySubj = groupBy(semRecords, "subject");
+    const subjects = Object.keys(bySubj).sort((a, b) => (subjOrder[a] || 99) - (subjOrder[b] || 99));
+    const subjectOverview = subjects.map(sub => {
+      const records = bySubj[sub];
+      const latest = [...records].sort((a, b) => (b.date || "").localeCompare(a.date || ""))[0];
+      const latestGrade = latest && latest.grade ? latest.grade : "—";
+      const aCount = records.filter(x => x.grade === "A+" || x.grade === "A").length;
+      return `
+        <div class="ss-subj-item">
+          <span class="subj-dot ${getSubjCfg(sub).cls}"></span>
+          <span class="ss-subj-name">${sub}</span>
+          <span class="ss-subj-latest" style="background:${chipColor[latestGrade] || "#94a3b8"}">${latestGrade}</span>
+          <span class="ss-subj-meta">${records.length} 次${aCount ? ` · A以上 ${aCount}` : ""}</span>
+        </div>`;
+    }).join("");
 
     const dist = gradeOrder.filter(g => counts[g]).map(g => `
       <div class="ss-dist-item">
@@ -7473,19 +7497,12 @@ async function renderStudy() {
 
     panel.innerHTML = `
       <div class="ss-grid">
-        <div class="ss-stat">
-          <div class="ss-num">${total}</div>
-          <div class="ss-label">平时成绩</div>
-        </div>
-        <div class="ss-stat">
-          <div class="ss-num">${goodCount}</div>
-          <div class="ss-label">A及以上</div>
-        </div>
-        <div class="ss-stat">
-          <div class="ss-num">${goodRate}%</div>
-          <div class="ss-label">优良率</div>
-        </div>
+        <div class="ss-stat"><div class="ss-num">${total}</div><div class="ss-label">平时成绩</div></div>
+        <div class="ss-stat"><div class="ss-num">${goodCount}</div><div class="ss-label">A及以上</div></div>
+        <div class="ss-stat"><div class="ss-num">${goodRate}%</div><div class="ss-label">优良率</div></div>
+        ${avgScore != null ? `<div class="ss-stat"><div class="ss-num">${avgScore}</div><div class="ss-label">平均分</div></div>` : ""}
       </div>
+      <div class="ss-subj-overview">${subjectOverview}</div>
       <div class="ss-dist">${dist}</div>`;
   }
 
@@ -8103,7 +8120,11 @@ function deRenderSubjectGroups(subjects) {
       inp.addEventListener("change", (e) => {
         if (id === "studySubjectGroup") updateHomeworkModules(e.target.value);
         if (id === "scoreSubjectGroup") updateErrorModules(e.target.value);
-        if (id === "editSubjectGroup") updateModuleCheckboxes(e.target.value, []);
+        // 编辑弹窗：切科目 → 同时刷新能力模块 + 关联单元（单元目录随科目切换）
+        if (id === "editSubjectGroup") {
+          updateModuleCheckboxes(e.target.value, []);
+          reloadEditUnitGroup(e.target.value);
+        }
       });
     });
   });
@@ -9173,16 +9194,22 @@ async function saveAddHomework() {
       const selected = [];
       checks.forEach(cb => {
         const idx = parseInt(cb.dataset.idx, 10);
-        if (!isNaN(idx) && items[idx]) selected.push(items[idx]);
+        if (isNaN(idx) || !items[idx]) return;
+        // 读取该行用户在下拉里改过的"作业类型"（此前只存解析器默认值，改动被忽略）
+        const rowSel = parsedList.querySelector('.add-parse-type[data-idx="' + idx + '"]');
+        const rowType = rowSel ? rowSel.value : "";
+        selected.push({ src: items[idx], rowType: rowType || items[idx].type || "" });
       });
       // 批量录入：一次读取→批量追加→单次写回，避免逐条 fetch+write 互相覆盖
-      const batchRecords = selected.map(it => ({
-        subject: it.subject || subject,
-        title: it.text || it.title,
-        description: it.text || it.title,
-        homeworkType: it.type || getRadioValue("addTypeGroup") || "假期作业",
-        modules: it.module ? [it.module] : [],
-        module: it.module || "",
+      const batchRecords = selected.map(el => ({
+        // 科目一律以弹窗中选择的科目为准，避免解析器误判覆盖用户的选择
+        subject: subject,
+        title: el.src.text || el.src.title,
+        description: el.src.text || el.src.title,
+        // 类型：优先该行下拉值，其次解析器默认，最后弹窗热门默认
+        homeworkType: el.rowType || getRadioValue("addTypeGroup") || "假期作业",
+        modules: el.src.module ? [el.src.module] : [],
+        module: el.src.module || "",
         status: "pending",
         submitted: false,
         date: today,
@@ -9277,6 +9304,8 @@ function initAddHomeworkModal() {
     const items = parseHomeworkText(raw);
     if (items.length === 0) { showToast("未能识别作业内容，请检查格式", false); return; }
     addParsedItems.current = items;
+    // 批量添加以弹窗中选择的科目为准（解析器识别仅作显示提示，不覆盖用户选择）
+    const mbSubj = getRadioValue("addSubjectGroup") || "语文";
     const wrap = document.getElementById("addParsedWrap");
     const list = document.getElementById("addParsedList");
     if (wrap) wrap.style.display = "block";
@@ -9285,7 +9314,7 @@ function initAddHomeworkModal() {
         <div class="parse-card" style="display:flex;flex-direction:column;gap:6px;padding:9px 10px;background:var(--neutral-50);border:1px solid var(--neutral-200);border-radius:10px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <input type="checkbox" checked class="add-parse-check" data-idx="${i}" style="accent-color:var(--lav-600);flex-shrink:0;" />
-            <span class="hw-subject ${it.subject === "语文" ? "hw-sub-cn" : it.subject === "数学" ? "hw-sub-math" : it.subject === "英语" ? "hw-sub-en" : ""}" style="font-size:10px;padding:2px 7px;flex-shrink:0;">${it.subject || "未识别"}</span>
+            <span class="hw-subject ${mbSubj === "语文" ? "hw-sub-cn" : mbSubj === "数学" ? "hw-sub-math" : mbSubj === "英语" ? "hw-sub-en" : ""}" style="font-size:10px;padding:2px 7px;flex-shrink:0;">${mbSubj}</span>
             ${it.module ? `<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:var(--mint-100);color:var(--mint-700);flex-shrink:0;font-weight:700;">${it.module}</span>` : ""}
           </div>
           <div style="display:flex;align-items:center;gap:6px;">
@@ -9403,6 +9432,23 @@ function populateUnitGroup(groupId, units, selectedIndex, hintEl) {
   const sel = (selectedIndex !== undefined && selectedIndex !== null && Number(selectedIndex) >= 0 && uList[Number(selectedIndex)])
     ? String(Number(selectedIndex)) : "other";
   setRadioValue(groupId, sel);
+}
+
+// 编辑弹窗：切换科目后按新科目重载"关联单元"目录与提示（不保留旧科目的单元）
+async function reloadEditUnitGroup(subject) {
+  const hintEl = document.getElementById("editUnitHint");
+  const titleEl = document.getElementById("editTitle");
+  const units = await getTeachingUnits(subject);
+  let selIndex = -1;
+  if (hintEl) hintEl.textContent = "";
+  if (units.length > 0 && titleEl && titleEl.value) {
+    const guessed = guessUnitFromTitle(subject, titleEl.value, units);
+    if (guessed >= 0) { selIndex = guessed; if (hintEl) hintEl.textContent = "✅ 已自动匹配到：" + units[guessed].name; }
+  }
+  if (hintEl && !hintEl.textContent && units.length) {
+    hintEl.textContent = "已切换到「" + subject + "」的单元目录，请重新选择";
+  }
+  populateUnitGroup("editUnitGroup", units, selIndex, hintEl);
 }
 
 // 填充能力模块复选框

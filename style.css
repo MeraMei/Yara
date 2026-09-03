@@ -5795,7 +5795,7 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .ss-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -5835,6 +5835,38 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
       height: 8px;
       border-radius: 50%;
     }
+    /* 顶部「汇总概览」：各科速览行 */
+    .score-summary-section.top-overview { margin-bottom: 4px; }
+    .ss-subj-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .ss-subj-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--neutral-50);
+      border: 1px solid var(--neutral-100);
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+    .ss-subj-name { font-size: 13px; font-weight: 700; color: var(--neutral-800); }
+    .ss-subj-latest {
+      min-width: 24px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      margin-left: auto;
+    }
+    .ss-subj-meta { font-size: 11px; color: var(--neutral-500); font-weight: 600; white-space: nowrap; }
 
     @media (max-width: 640px) {
       .score-analysis-header { padding: 12px 14px 10px; }
