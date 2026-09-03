@@ -951,8 +951,10 @@
       "xp": 0,
       "errorModule": "",
       "errorModules": [],
-      "unitIndex": -1,
-      "unitName": null
+      "unitIndex": 0,
+      "unitName": "Module1·Getting to know you",
+      "duration": "15-30分钟",
+      "wrongCount": 0
     },
     {
       "date": "2026-09-03",
