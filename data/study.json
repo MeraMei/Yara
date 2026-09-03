@@ -583,15 +583,15 @@
     },
     {
       "id": "hw_mtl9o9arbbxagx",
-      "subject": "语文",
+      "subject": "英语",
       "title": "熟读并背诵课本4-5页",
       "cleanTitle": "熟读并背诵课本4-5页",
       "shortTitle": "熟读并背诵课本4-5页",
       "description": "熟读并背诵课本4-5页",
       "homeworkType": "日常复习",
-      "module": "阅读",
+      "module": "听说",
       "modules": [
-        "阅读"
+        "听说"
       ],
       "status": "pending",
       "submitted": false,
@@ -604,7 +604,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtl9o9ar77v81f",
@@ -1003,15 +1005,15 @@
     },
     {
       "id": "hw_mtl9o9arbbxagx",
-      "subject": "语文",
+      "subject": "英语",
       "title": "熟读并背诵课本4-5页",
       "cleanTitle": "熟读并背诵课本4-5页",
       "shortTitle": "熟读并背诵课本4-5页",
       "description": "熟读并背诵课本4-5页",
       "homeworkType": "日常复习",
-      "module": "阅读",
+      "module": "听说",
       "modules": [
-        "阅读"
+        "听说"
       ],
       "status": "pending",
       "submitted": false,
@@ -1024,7 +1026,9 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtl9o9ar77v81f",
