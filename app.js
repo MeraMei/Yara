@@ -9520,13 +9520,20 @@ async function saveSubmitHomework() {
   try {
     let saved = false;
     try {
-      const resp = await fetch(`/api/homework/${__shmCurrentItem.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const result = await resp.json();
-      if (result.ok) saved = true;
+      // 仅本地开发(带 /api 后端)才尝试 API；GitHub Pages 无后端，
+      // 直接走统一写入，省去每次保存都多打出的一次注定失败的 API 请求（这是编辑慢的主因）
+      if (await isLocalMode()) {
+        const resp = await fetch(`/api/homework/${__shmCurrentItem.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await resp.json();
+        if (result.ok) saved = true;
+      } else if (window.DataStore && window.DataStore.updateStudyRecord) {
+        await window.DataStore.updateStudyRecord(__shmCurrentItem.id, payload);
+        saved = true;
+      }
     } catch (apiErr) {
       console.warn("补充信息保存 API 失败，使用本地回退:", apiErr.message);
     }
@@ -9954,17 +9961,24 @@ async function saveEdit() {
 
   let saved = false;
   try {
-    const resp = await fetch(`/api/homework/${currentEditItem.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const result = await resp.json();
-    if (result.ok) { saved = true; }
-    else { throw new Error(result.error || "保存失败"); }
+    // 仅本地开发(带 /api 后端)才尝试 API；GitHub Pages 无后端，直接走统一写入，
+    // 省去每次保存白打的失败 API 请求（编辑慢的主因，与提交作业同源）
+    if (await isLocalMode()) {
+      const resp = await fetch(`/api/homework/${currentEditItem.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await resp.json();
+      if (result.ok) { saved = true; }
+      else { throw new Error(result.error || "保存失败"); }
+    } else if (window.DataStore && window.DataStore.updateStudyRecord) {
+      await window.DataStore.updateStudyRecord(currentEditItem.id, payload);
+      saved = true;
+    }
   } catch (apiErr) {
     console.warn("API 保存失败，尝试本地更新:", apiErr.message);
-    if (window.DataStore && window.DataStore.updateStudyRecord) {
+    if (!saved && window.DataStore && window.DataStore.updateStudyRecord) {
       try {
         await window.DataStore.updateStudyRecord(currentEditItem.id, payload);
         saved = true;
@@ -10074,18 +10088,23 @@ function initEditModal() {
       if (newDone) payloadStatus.wasIncomplete = wasExpired || item.wasIncomplete === true ? true : false;
       let toggled = false;
       try {
-        // 设置超时，避免 API 响应缓慢/卡住时界面无响应
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 8000);
-        const resp = await fetch(`/api/homework/${item.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payloadStatus),
-          signal: ctrl.signal,
-        });
-        clearTimeout(timer);
-        const result = await resp.json();
-        if (result.ok) toggled = true;
+        if (await isLocalMode()) {
+          // 设置超时，避免 API 响应缓慢/卡住时界面无响应
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 8000);
+          const resp = await fetch(`/api/homework/${item.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payloadStatus),
+            signal: ctrl.signal,
+          });
+          clearTimeout(timer);
+          const result = await resp.json();
+          if (result.ok) toggled = true;
+        } else if (window.DataStore && window.DataStore.updateStudyRecord) {
+          await window.DataStore.updateStudyRecord(item.id, payloadStatus);
+          toggled = true;
+        }
       } catch (apiErr) {
         console.warn("切换状态 API 失败，使用本地回退:", apiErr.message);
       }
@@ -10166,17 +10185,22 @@ function initEditModal() {
       const payload = { status: "expired", submitted: false, wasIncomplete: true };
       let marked = false;
       try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 8000);
-        const resp = await fetch(`/api/homework/${item.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          signal: ctrl.signal,
-        });
-        clearTimeout(timer);
-        const result = await resp.json();
-        if (result.ok) marked = true;
+        if (await isLocalMode()) {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 8000);
+          const resp = await fetch(`/api/homework/${item.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            signal: ctrl.signal,
+          });
+          clearTimeout(timer);
+          const result = await resp.json();
+          if (result.ok) marked = true;
+        } else if (window.DataStore && window.DataStore.updateStudyRecord) {
+          await window.DataStore.updateStudyRecord(item.id, payload);
+          marked = true;
+        }
       } catch (apiErr) {
         console.warn("标记未完成 API 失败，使用本地回退:", apiErr.message);
       }
