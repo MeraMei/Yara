@@ -1222,8 +1222,8 @@
       "modules": [
         "单词"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-03",
       "deadline": "2026-09-03",
       "reviewStatus": "",
@@ -1237,7 +1237,8 @@
       "unitIndex": 0,
       "unitName": "Module1·Getting to know you",
       "duration": "15-30分钟",
-      "wrongCount": 0
+      "wrongCount": 0,
+      "submittedAt": "2026-09-04T00:38:30.816Z"
     },
     {
       "id": "hw_mtkv7tvxo7il3s",
