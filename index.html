@@ -382,11 +382,7 @@
           <div class="score-analysis-header">
             <select class="semester-select" id="scoreSemesterSelect">
             </select>
-            <div class="subject-tabs" id="scoreSubjectTabs">
-              <button class="subject-tab active" data-subject="语文">语文</button>
-              <button class="subject-tab" data-subject="数学">数学</button>
-              <button class="subject-tab" data-subject="英语">英语</button>
-            </div>
+            <span class="score-analysis-desc">按科目看「失分在哪 · 优势在哪」</span>
           </div>
 
           <div class="score-summary-section top-overview">
@@ -395,40 +391,9 @@
             </div>
           </div>
 
-          <div class="score-trend-section">
-            <div class="section-subtitle">成绩趋势</div>
-            <div id="scoreTrendChart" class="score-trend-chart">
-            </div>
-            <div class="score-trend-empty" id="scoreTrendEmpty" style="display:none">
-              <div class="empty-state small">
-                <i data-lucide="bar-chart-2"></i>
-                <div>本学期暂无平时成绩记录</div>
-                <div class="empty-sub">期末成绩请切换到"按科目"或"按学期"视图</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="error-modules-section">
-            <div class="section-subtitle">失分模块分析</div>
-            <div id="errorModulesList" class="error-modules-list">
-            </div>
-            <div class="error-modules-empty" id="errorModulesEmpty" style="display:none">
-              <div class="empty-state small">
-                <i data-lucide="check-circle"></i>
-                <div>满分表现！暂无失分模块</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="score-list-section">
-            <div class="section-subtitle">各科成绩列表</div>
-            <div id="scoreListPanel" class="score-list-panel">
-            </div>
-          </div>
-
-          <div class="practice-suggestion-section">
-            <div class="section-subtitle">分析建议</div>
-            <div id="practiceSuggestionList" class="practice-suggestion-list">
+          <div class="score-subject-section">
+            <div class="section-subtitle">各科分析</div>
+            <div id="scoreSubjectBlocks" class="score-subject-blocks">
             </div>
           </div>
         </div>
@@ -766,25 +731,33 @@
       </div>
       <div class="edit-field">
         <label>科目</label>
-        <div class="choice-group" id="scoreSubjectGroup">
+        <div class="choice-group score-subject-group" id="scoreSubjectGroup">
           <label class="choice-pill kn"><input type="radio" name="scoreSubject" value="语文" checked>语文</label>
-          <label class="choice-pill kn"><input type="radio" name="scoreSubject" value="数学">数学</label>
-          <label class="choice-pill kn"><input type="radio" name="scoreSubject" value="英语">英语</label>
         </div>
       </div>
       <div class="edit-field">
-        <label>考试类型</label>
-        <div class="choice-group" id="scoreTypeGroup">
-          <label class="choice-pill kn"><input type="radio" name="scoreType" value="单元测试" checked>单元</label>
-          <label class="choice-pill kn"><input type="radio" name="scoreType" value="日常测验">日常</label>
-          <label class="choice-pill kn"><input type="radio" name="scoreType" value="月考">月考</label>
-          <label class="choice-pill kn"><input type="radio" name="scoreType" value="期中">期中</label>
-          <label class="choice-pill kn"><input type="radio" name="scoreType" value="期末">期末</label>
+        <label>类型<em class="field-note" style="font-style:normal;color:#94a3b8;font-size:12px;font-weight:400">（科目→类型→记分）</em></label>
+        <div class="choice-group score-type-category" id="scoreCatGroup">
+          <label class="choice-pill kn checked"><input type="radio" name="scoreCat" value="daily" checked>日常</label>
+          <label class="choice-pill kn"><input type="radio" name="scoreCat" value="exam">考试</label>
+        </div>
+        <div class="choice-group score-type-subgroup" id="scoreSubTypeGroup">
+          <label class="choice-pill kn checked"><input type="radio" name="scoreSubType" value="小测" checked>小测</label>
         </div>
       </div>
-      <div class="edit-field-row">
+      <div class="edit-field-row" id="scoreTaskScoringRow">
         <div class="edit-field">
-          <label>分数（选填）</label>
+          <label>共几题</label>
+          <input type="number" id="scoreTotalQuestions" placeholder="如 20" min="0" />
+        </div>
+        <div class="edit-field">
+          <label>对了几题</label>
+          <input type="number" id="scoreCorrectQuestions" placeholder="如 18" min="0" />
+        </div>
+      </div>
+      <div class="edit-field-row" id="scoreExamScoringRow" style="display:none">
+        <div class="edit-field">
+          <label>分数</label>
           <input type="number" id="scoreNumber" placeholder="如 95" min="0" max="100" />
         </div>
         <div class="edit-field">
@@ -801,12 +774,9 @@
           </select>
         </div>
       </div>
-      <div class="edit-field">
-        <label>学期</label>
-        <select class="semester-select" id="scoreSemester"></select>
-      </div>
-      <div class="edit-field">
-        <label>失分模块（可多选 · 主动复盘 +1 XP）</label>
+      <div class="edit-field" id="scoreErrorField">
+        <label id="scoreErrorLabel">错题类型（可多选 · 计入失分分析）</label>
+        <div id="scoreErrorTip" style="padding:10px 0;color:#6b7280;font-size:12px;line-height:1.5"></div>
         <div class="choice-group sm" id="errorModuleCheckboxes"></div>
       </div>
       <div class="edit-field">
@@ -816,9 +786,6 @@
       <div class="edit-field">
         <label>日期</label>
         <input type="date" id="scoreDate" />
-      </div>
-      <div class="xp-hint kn">
-        ✨ 主动录入成绩 <b>+2 XP</b>，勾选失分模块再 <b>+1 XP</b>
       </div>
       <div class="edit-modal-actions">
         <button class="btn-danger" id="scoreDelBtn" onclick="scoreDelete(__editScoreId)" style="display:none"><i data-lucide="trash-2"></i>删除</button>

@@ -7364,172 +7364,157 @@ async function renderStudy() {
     if (!panel) return;
 
     const semesterSelect = document.getElementById("scoreSemesterSelect");
-    const subjectTabs = document.getElementById("scoreSubjectTabs");
-
-    // 填充学期选择器
     if (semesterSelect) {
       const semLabels = getSemesterLabelList();
       semesterSelect.innerHTML = semLabels.map(label =>
         `<option value="${label}">${label}</option>`
       ).join("");
-      // 默认选当前学期（结合校历），没有则用有数据的最新学期
       if (semLabels.length > 0) {
         currentScoreSemester = getDefaultSemester();
         semesterSelect.value = currentScoreSemester;
       }
       semesterSelect.addEventListener("change", (e) => {
         currentScoreSemester = e.target.value;
-        renderScoreTrendChart(currentScoreSubject, currentScoreSemester);
-        renderErrorModules(currentScoreSubject);
-        renderPracticeSuggestions(currentScoreSubject);
-        renderScoreList(currentScoreSemester);
         renderScoreSummary(currentScoreSemester);
+        renderScoreSubjectBlocks(currentScoreSemester);
       });
     }
 
-    // 绑定科目 Tab
-    if (subjectTabs) {
-      subjectTabs.querySelectorAll(".subject-tab").forEach(tab => {
-        tab.addEventListener("click", () => {
-          subjectTabs.querySelectorAll(".subject-tab").forEach(t => t.classList.remove("active"));
-          tab.classList.add("active");
-          currentScoreSubject = tab.dataset.subject;
-          renderScoreTrendChart(currentScoreSubject, currentScoreSemester);
-          renderErrorModules(currentScoreSubject);
-          renderPracticeSuggestions(currentScoreSubject);
-        });
-      });
-    }
-
-    // 初始渲染
-    renderScoreTrendChart(currentScoreSubject, currentScoreSemester);
-    renderErrorModules(currentScoreSubject);
-    renderPracticeSuggestions(currentScoreSubject);
-    renderScoreList(currentScoreSemester);
+    // 初始渲染：汇总 + 各科分析（失分/优势）
     renderScoreSummary(currentScoreSemester);
+    renderScoreSubjectBlocks(currentScoreSemester);
   }
 
-  // ════════ 7.5.1 各科成绩列表（本学期平时成绩） ════════
-  function renderScoreList(semesterLabel) {
-    const panel = document.getElementById("scoreListPanel");
-    if (!panel) return;
-
-    // 本学期平时成绩（排除期末）
-    const semRecords = examRecords.filter(r =>
-      (r.semesterLabel === semesterLabel) && r.examType !== "期末"
-    );
-
-    if (semRecords.length === 0) {
-      panel.innerHTML = emptyStateHTML("clipboard-list", "本学期暂无平时成绩记录", 90);
-      return;
-    }
-
-    const subjOrder = { "语文": 1, "数学": 2, "英语": 3, "科学": 4 };
-    const bySubj = groupBy(semRecords, "subject");
-    const subjects = Object.keys(bySubj).sort((a, b) => (subjOrder[a] || 99) - (subjOrder[b] || 99));
-    const typeCn = { "单元测试": "单元", "日常测验": "日常", "月考": "月考", "期中": "期中" };
-    const safe = (s) => (typeof escapeHtmlReason === "function" ? escapeHtmlReason(String(s == null ? "" : s)) : String(s == null ? "" : s));
-
-    panel.innerHTML = subjects.map(sub => {
-      const records = [...bySubj[sub]].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-      const rows = records.map(r => {
-        const shortDate = (r.date || "").slice(5);
-        const titleStr = r.title || "";
-        return `
-        <div class="sl-row" data-score-id="${r.id}" title="点击修改或删除">
-          <div class="sl-date">${shortDate ? `<i data-lucide="calendar-days"></i>${shortDate}` : ""}</div>
-          <div class="sl-info">
-            <span class="sl-type">${typeCn[r.examType] || r.examType || "成绩"}</span>
-            ${titleStr ? `<span class="sl-title">${safe(titleStr)}</span>` : ""}
-            ${(r.errorModules && r.errorModules.length) ? `<span class="sl-err"><i data-lucide="cloud-lightning"></i>${safe((r.errorModules||[]).join("、"))}</span>` : ""}
-          </div>
-          <div class="sl-right">
-            <span class="sl-grade ${getGradeCls(r.grade)}">${r.grade}</span>
-            ${r.score != null && r.score !== "" ? `<span class="sl-pt">${r.score}<em>分</em></span>` : ""}
-            <button class="sl-del" data-del-score="${r.id}" title="删除这条成绩"><i data-lucide="trash-2"></i></button>
-          </div>
-        </div>`;
-      }).join("");
-      const avg = records.filter(x => x.score != null && x.score !== "").length
-        ? Math.round(records.filter(x => x.score != null && x.score !== "").reduce((s, x) => s + Number(x.score), 0) / records.filter(x => x.score != null && x.score !== "").length)
-        : null;
-      return `
-        <div class="sl-subject">
-          <div class="sl-head">
-            <span class="subj-dot ${getSubjCfg(sub).cls}"></span>
-            <span class="sl-name">${sub}</span>
-            <span class="sl-count">${records.length} 次记录</span>
-            ${avg != null ? `<span class="sl-avg"><i data-lucide="sigma"></i>均分 ${avg}</span>` : ""}
-          </div>
-          <div class="sl-rows">${rows}</div>
-        </div>`;
-    }).join("") + `
-      <div class="sl-hint"><i data-lucide="mouse-pointer-click"></i>点击某条成绩可修改，右侧垃圾桶可删除</div>`;
-    refreshIcons(0);
-  }
-
-  // ════════ 7.5.2 平时成绩汇总（本学期 · 顶部概览，含各科速览） ════════
+  // ════════ 7.5.1 成绩汇总（本学期 · 顶部概览，全部科目） ════════
   function renderScoreSummary(semesterLabel) {
     const panel = document.getElementById("scoreSummaryPanel");
     if (!panel) return;
 
-    const semRecords = examRecords.filter(r =>
-      (r.semesterLabel === semesterLabel) && r.examType !== "期末"
-    );
-
-    if (semRecords.length === 0) {
-      panel.innerHTML = emptyStateHTML("pie-chart", "暂无汇总数据", 90);
+    const records = examRecords.filter(r => r.semesterLabel === semesterLabel);
+    if (records.length === 0) {
+      panel.innerHTML = emptyStateHTML("pie-chart", "本学期暂无成绩记录", 90);
       return;
     }
 
-    const gradeOrder = ["A+", "A", "B+", "B", "C+", "C", "D+", "D"];
-    const gradeColors = { "A+": "#10b981", "A": "#6366f1", "B+": "#f59e0b", "B": "#ef4444" };
-    const chipColor = { "A+": "#10b981", "A": "#6366f1", "B+": "#f59e0b", "B": "#ef4444", "C+": "#f97316", "C": "#dc2626", "D+": "#94a3b8", "D": "#94a3b8" };
-    const counts = {};
-    semRecords.forEach(r => { if (r.grade) counts[r.grade] = (counts[r.grade] || 0) + 1; });
-    const total = semRecords.length;
-    const goodCount = (counts["A+"] || 0) + (counts["A"] || 0);
-    const goodRate = Math.round((goodCount / total) * 100);
-    // 平均分（仅统计带分数记录）
-    const scoredAll = semRecords.filter(r => r.score != null);
-    const avgScore = scoredAll.length
-      ? Math.round(scoredAll.reduce((s, r) => s + Number(r.score), 0) / scoredAll.length)
-      : null;
+    const daily = records.filter(r => isDailyScoreType(r.examType));
+    const exams = records.filter(r => !isDailyScoreType(r.examType));
 
-    // 各科概览：每科最新等级 + 次数 + A及以上数
-    const subjOrder = { "语文": 1, "数学": 2, "英语": 3, "科学": 4 };
-    const bySubj = groupBy(semRecords, "subject");
-    const subjects = Object.keys(bySubj).sort((a, b) => (subjOrder[a] || 99) - (subjOrder[b] || 99));
-    const subjectOverview = subjects.map(sub => {
-      const records = bySubj[sub];
-      const latest = [...records].sort((a, b) => (b.date || "").localeCompare(a.date || ""))[0];
-      const latestGrade = latest && latest.grade ? latest.grade : "—";
-      const aCount = records.filter(x => x.grade === "A+" || x.grade === "A").length;
-      return `
-        <div class="ss-subj-item">
-          <span class="subj-dot ${getSubjCfg(sub).cls}"></span>
-          <span class="ss-subj-name">${sub}</span>
-          <span class="ss-subj-latest" style="background:${chipColor[latestGrade] || "#94a3b8"}">${latestGrade}</span>
-          <span class="ss-subj-meta">${records.length} 次${aCount ? ` · A以上 ${aCount}` : ""}</span>
-        </div>`;
-    }).join("");
+    // 平均正确率（日常：对题 / 共题）
+    const ratioList = daily
+      .filter(r => r.totalQuestions && r.correctQuestions != null)
+      .map(r => r.correctQuestions / r.totalQuestions);
+    const avgRatio = ratioList.length ? Math.round((ratioList.reduce((s, x) => s + x, 0) / ratioList.length) * 100) : null;
+    // 优良率（考试：A+ / A）
+    const gradeList = exams.map(r => r.grade).filter(Boolean);
+    const goodN = gradeList.filter(g => g === "A+" || g === "A").length;
+    const goodRate = gradeList.length ? Math.round((goodN / gradeList.length) * 100) : null;
+    // 平均分（考试）
+    const scoredExams = exams.filter(r => r.score != null);
+    const avgScore = scoredExams.length ? Math.round(scoredExams.reduce((s, r) => s + Number(r.score), 0) / scoredExams.length) : null;
 
-    const dist = gradeOrder.filter(g => counts[g]).map(g => `
-      <div class="ss-dist-item">
-        <span class="ss-dist-dot" style="background:${gradeColors[g] || "#94a3b8"}"></span>
-        <span class="ss-dist-text">${g} · ${counts[g]}次</span>
-      </div>
-    `).join("");
-
+    const stat = (num, lab) => `<div class="ss-stat"><div class="ss-num">${num == null ? "—" : num}</div><div class="ss-label">${lab}</div></div>`;
     panel.innerHTML = `
       <div class="ss-grid">
-        <div class="ss-stat"><div class="ss-num">${total}</div><div class="ss-label">平时成绩</div></div>
-        <div class="ss-stat"><div class="ss-num">${goodCount}</div><div class="ss-label">A及以上</div></div>
-        <div class="ss-stat"><div class="ss-num">${goodRate}%</div><div class="ss-label">优良率</div></div>
-        ${avgScore != null ? `<div class="ss-stat"><div class="ss-num">${avgScore}</div><div class="ss-label">平均分</div></div>` : ""}
-      </div>
-      <div class="ss-subj-overview">${subjectOverview}</div>
-      <div class="ss-dist">${dist}</div>`;
+        ${stat(daily.length, "日常记录")}
+        ${stat(exams.length, "考试记录")}
+        ${stat(avgRatio != null ? avgRatio + "%" : null, "平均正确率")}
+        ${stat(goodRate != null ? goodRate + "%" : null, "考试优良率")}
+        ${avgScore != null ? stat(avgScore, "考试均分") : ""}
+      </div>`;
+  }
+
+  // ════════ 7.5.2 各科分析（按科目：失分模块排行 + 优势模块 + 记录列表） ════════
+  function renderScoreSubjectBlocks(semesterLabel) {
+    const panel = document.getElementById("scoreSubjectBlocks");
+    if (!panel) return;
+
+    const records = examRecords.filter(r => r.semesterLabel === semesterLabel);
+    if (records.length === 0) {
+      panel.innerHTML = emptyStateHTML("clipboard-list", "本学期暂无成绩记录", 90);
+      return;
+    }
+
+    const subjOrder = { "语文": 1, "数学": 2, "英语": 3, "科学": 4 };
+    const bySubj = groupBy(records, "subject");
+    const subjects = Object.keys(bySubj).sort((a, b) => (subjOrder[a] || 99) - (subjOrder[b] || 99));
+
+    panel.innerHTML = subjects.map(sub => {
+      const subjRecords = bySubj[sub];
+      const cfg = getSubjCfg(sub);
+
+      // 失分模块统计（日常"错题类型" + 考试"失分模块" 统一口径）
+      const errCount = {};
+      let recWithErr = 0;
+      subjRecords.forEach(r => {
+        const errs = Array.isArray(r.errorModules) ? r.errorModules
+          : (r.errorModule ? String(r.errorModule).split(/[、,，]/).map(s => s.trim()).filter(Boolean) : []);
+        if (errs.length) recWithErr++;
+        errs.forEach(m => { if (m) errCount[m] = (errCount[m] || 0) + 1; });
+      });
+      const errRank = Object.entries(errCount).sort((a, b) => b[1] - a[1]);
+      const maxErr = errRank.length ? errRank[0][1] : 0;
+
+      // 优势模块：该科目配置里从未失分的模块
+      const strengths = getModuleOptions(sub).filter(m => !errCount[m]);
+
+      // 平均正确率（日常）
+      const daily = subjRecords.filter(r => isDailyScoreType(r.examType));
+      const ratioList = daily.filter(r => r.totalQuestions && r.correctQuestions != null).map(r => r.correctQuestions / r.totalQuestions);
+      const avgRatio = ratioList.length ? Math.round((ratioList.reduce((s, x) => s + x, 0) / ratioList.length) * 100) : null;
+
+      const errHtml = errRank.length
+        ? `<div class="sa-weak-list">` + errRank.slice(0, 5).map(([m, c]) => `
+            <div class="sa-weak-row">
+              <span class="sa-weak-name">${m}</span>
+              <div class="sa-weak-bar"><div class="sa-weak-fill" style="width:${maxErr ? Math.round(c / maxErr * 100) : 0}%"></div></div>
+              <span class="sa-weak-count">${c}次</span>
+            </div>`).join("") + `</div>`
+        : `<div class="sa-clear-tip"><i data-lucide="check-circle"></i>全部掌握，暂无失分</div>`;
+
+      const strengthHtml = strengths.length
+        ? `<div class="sa-strong-chips">` + strengths.map(m => `<span class="sa-strong-chip">${m}</span>`).join("") + `</div>`
+        : `<span class="sa-dim">暂无足够数据</span>`;
+
+      // 记录列表（按日期倒序）
+      const rows = [...subjRecords].sort((a, b) => (b.date || "").localeCompare(a.date || "")).map(r => {
+        const shortDate = (r.date || "").slice(5);
+        const isDailyRec = isDailyScoreType(r.examType);
+        const scoreText = isDailyRec && r.totalQuestions && r.correctQuestions != null
+          ? `${r.correctQuestions}/${r.totalQuestions}题 `
+          : (r.score != null && r.score !== "" ? `${r.score}分 ` : "");
+        const errTxt = (Array.isArray(r.errorModules) ? r.errorModules : (r.errorModule ? String(r.errorModule).split(/[、,，]/).filter(Boolean) : [])).join("、");
+        return `
+        <div class="sa-rec-row" data-score-id="${r.id}" title="点击修改或删除">
+          <span class="sa-rec-date">${shortDate || ""}</span>
+          <span class="sa-rec-type">${r.examType || ""}</span>
+          <span class="sa-rec-score">${scoreText}<span class="sa-rec-grade ${getGradeCls(r.grade)}">${r.grade || ""}</span></span>
+          ${errTxt ? `<span class="sa-rec-err">${errTxt}</span>` : ""}
+          <button class="sl-del" data-del-score="${r.id}" title="删除"><i data-lucide="trash-2"></i></button>
+        </div>`;
+      }).join("");
+
+      return `
+        <div class="sa-block">
+          <div class="sa-head">
+            <span class="subj-dot ${cfg.cls}"></span>
+            <span class="sa-name">${sub}</span>
+            <span class="sa-meta">${subjRecords.length} 条记录${recWithErr ? ` · ${recWithErr} 条有失分` : ""}${avgRatio != null ? ` · 平均正确率 ${avgRatio}%` : ""}</span>
+          </div>
+          <div class="sa-cols">
+            <div class="sa-col sa-col-weak">
+              <div class="sa-col-title"><i data-lucide="cloud-lightning"></i>失分在哪</div>
+              ${errHtml}
+            </div>
+            <div class="sa-col sa-col-strong">
+              <div class="sa-col-title"><i data-lucide="sparkles"></i>优势在哪</div>
+              ${strengthHtml}
+            </div>
+          </div>
+          <div class="sa-records">${rows}</div>
+        </div>`;
+    }).join("") + `
+      <div class="sa-hint"><i data-lucide="mouse-pointer-click"></i>点击某条成绩可修改，右侧垃圾桶可删除</div>`;
+    refreshIcons(0);
   }
 
   // ════════ 8. 期末成绩 ════════
@@ -8101,27 +8086,37 @@ const DE_SUBJECT_MODULES = {
   "科学": ["观察", "实验", "思维", "表达", "探究"],
 };
 
-// 从 API 加载配置-能力模块表数据
+// 加载配置：能力模块表 + 权威科目表（优先直接读 config.json，保证科目选择器展示完整配置科目）
 async function deLoadAbilityModules() {
+  let cfg = null;
   try {
-    if (window.DataStore && typeof window.DataStore.loadData === "function") {
+    cfg = await fetchRawJSON("config.json").catch(() => null);
+  } catch (e) { cfg = null; }
+  if (!cfg && window.DataStore && typeof window.DataStore.loadData === "function") {
+    try {
       const data = await window.DataStore.loadData();
-      const cfgModules = data.config?.abilityModules;
-      if (cfgModules && Object.keys(cfgModules).length > 0) {
-        DE_LOADED_MODULES = {};
-        for (const [sub, mods] of Object.entries(cfgModules)) {
-          DE_LOADED_MODULES[sub] = mods.map(m => m.name);
-        }
-        console.log("✓ 能力模块已从 API 加载:", DE_LOADED_MODULES);
-        // 用配置科目动态填充科目选择器，使新增科目无需改代码
-        deRenderSubjectGroups(Object.keys(DE_LOADED_MODULES));
-        return;
-      }
-    }
-  } catch (e) {
-    console.warn("加载能力模块失败，使用硬编码兜底:", e.message);
+      cfg = (data && data.config) ? data.config : null;
+    } catch (e) { cfg = null; }
   }
-  DE_LOADED_MODULES = null;
+  if (cfg && cfg.abilityModules && Object.keys(cfg.abilityModules).length > 0) {
+    DE_LOADED_MODULES = {};
+    for (const [sub, mods] of Object.entries(cfg.abilityModules)) {
+      DE_LOADED_MODULES[sub] = (mods || []).map(m => (m && m.name) || m);
+    }
+    console.log("✓ 能力模块已从配置加载:", Object.keys(DE_LOADED_MODULES));
+  } else if (DE_LOADED_MODULES === null) {
+    DE_LOADED_MODULES = null;
+  }
+  const subjectsFromConfig = (cfg && Array.isArray(cfg.subjects) && cfg.subjects.length)
+    ? cfg.subjects.map(s => (s && s.name) || s)
+    : null;
+  // 科目选择器统一渲染：配置完整表 > 能力模块键 > 硬编码 key
+  const subjectList = (subjectsFromConfig && subjectsFromConfig.length)
+    ? subjectsFromConfig
+    : ((DE_LOADED_MODULES && Object.keys(DE_LOADED_MODULES).length)
+        ? Object.keys(DE_LOADED_MODULES)
+        : Object.keys(DE_SUBJECT_MODULES));
+  deRenderSubjectGroups(subjectList);
 }
 
 // 用配置中的科目列表动态渲染三个科目选择器（学习/成绩/编辑）
@@ -8240,14 +8235,8 @@ function getCheckedHomeworkModules() {
 }
 
 function updateErrorModules(subject) {
-  const box = document.getElementById("errorModuleCheckboxes");
-  if (!box) return;
-  const modules = deGetSubjectModules(subject);
-  box.innerHTML = modules.map(m => `
-    <label style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:10px;background:var(--neutral-50);border:1px solid var(--neutral-200);font-size:13px;cursor:pointer;">
-      <input type="checkbox" value="${m}" class="err-module-cb" style="accent-color:var(--lav-600);" /> ${m}
-    </label>
-  `).join("");
+  // 统一走 renderErrorModulesFor，保证成绩弹窗内错题类型/失分模块样式一致
+  if (typeof renderErrorModulesFor === "function") renderErrorModulesFor(subject);
 }
 
 // ── XP 任务选择 ──
@@ -9678,6 +9667,108 @@ function populateScoreSemesterOptions(sel) {
   }
 }
 
+// ════════ 成绩类型辅助（日常巩固类 vs 考试类 · 两级结构） ════════
+const EXAM_TYPE_LIST = ["单元测试", "月考", "期中考试", "期末考试"];
+function isExamType(t) { return EXAM_TYPE_LIST.indexOf(t) >= 0; }
+function isDailyScoreType(t) { return !isExamType(t); }
+function categoryOfType(t) { return isExamType(t) ? "exam" : "daily"; }
+function getScoreCategoryValue() { return getRadioValue("scoreCatGroup") || "daily"; }
+function getScoreType() { return getRadioValue("scoreSubTypeGroup") || ""; }
+// 按 科目+大类 返回具体类型清单（科目影响细分类）
+function getScoreTypeList(subject, category) {
+  const dailyBySubj = {
+    "语文": ["听写", "默写", "背诵", "小测", "课文朗读"],
+    "数学": ["口算", "竖式计算", "应用题", "小测"],
+    "英语": ["听写", "朗读", "小测"],
+  };
+  const defDaily = ["小测", "听写", "默写", "口算", "背诵"];
+  if (category === "exam") return EXAM_TYPE_LIST.slice();
+  return dailyBySubj[subject] || defDaily;
+}
+function normalizeScoreType(t) {
+  if (!t) return "小测";
+  const legacy = { "日常测验": "小测", "期中": "期中考试", "期末": "期末考试" };
+  return legacy[t] || t;
+}
+// 按"对了几题 / 共几题"换算等级（供日常记录显示，口径与分数换算一致）
+function deriveGradeFromRatio(ratio) {
+  if (ratio == null || isNaN(ratio)) return "";
+  const p = ratio * 100;
+  if (p >= 95) return "A+"; if (p >= 90) return "A"; if (p >= 85) return "B+";
+  if (p >= 80) return "B"; if (p >= 75) return "C+"; if (p >= 70) return "C";
+  if (p >= 60) return "D+"; return "D";
+}
+// 从日期自动推导学期标签（如 "四年级(上)"）
+function semesterLabelFromDate(dateStr) {
+  try {
+    const info = getCurrentSemesterInfo(dateStr || getTodayVal());
+    if (!info || !info.grade || !info.semester) return "";
+    const season = (info.semesterShortName === "上" || info.semesterShortName === "下")
+      ? info.semesterShortName
+      : (info.semester === 1 ? "上" : "下");
+    return `${info.grade}(${season})`;
+  } catch (e) { return ""; }
+}
+// 渲染大类下方的细分类单选组
+function renderScoreSubTypeGroup(subject, category) {
+  const group = document.getElementById("scoreSubTypeGroup");
+  if (!group) return;
+  const list = getScoreTypeList(subject, category);
+  group.innerHTML = list.map((t, i) =>
+    `<label class="choice-pill kn${i === 0 ? " checked" : ""}"><input type="radio" name="scoreSubType" value="${t}"${i === 0 ? " checked" : ""}>${t}</label>`
+  ).join("");
+  initChoicePills(group);
+}
+// 录入表单随类型切换：日常→"共几题/对几题"，考试→"分数/等级"
+function applyScoreTypeUI(type) {
+  const isDaily = isDailyScoreType(type);
+  const taskRow = document.getElementById("scoreTaskScoringRow");
+  const examRow = document.getElementById("scoreExamScoringRow");
+  if (taskRow) taskRow.style.display = isDaily ? "" : "none";
+  if (examRow) examRow.style.display = isDaily ? "none" : "";
+  // 大类高亮跟随所选的细分类
+  setRadioValue("scoreCatGroup", categoryOfType(type));
+  syncErrorField();
+}
+// 错题/失分模块：仅当确有失分时才出现（错题类型：对了几题 < 共几题）
+function syncErrorField() {
+  const field = document.getElementById("scoreErrorField");
+  if (!field) return;
+  const tip = document.getElementById("scoreErrorTip");
+  const boxes = document.getElementById("errorModuleCheckboxes");
+  const type = getScoreType();
+  const isDaily = !isExamType(type);
+  const tQ = Number((document.getElementById("scoreTotalQuestions") || {}).value || 0) || 0;
+  const cQ = Number((document.getElementById("scoreCorrectQuestions") || {}).value || 0) || 0;
+  if (isDaily) {
+    const showBoxes = tQ > 0 && cQ < tQ; // 有做错才可标错题类型
+    if (boxes) boxes.style.display = showBoxes ? "" : "none";
+    if (tip) {
+      tip.style.display = showBoxes ? "none" : "";
+      tip.innerHTML = tQ > 0 && cQ === tQ
+        ? '<i data-lucide="check-circle"></i>全部正确，无错题'
+        : '<i data-lucide="info"></i>填写「共几题/对了几题」，有做错时才会出现错题类型';
+      refreshIcons(0);
+    }
+  } else {
+    if (boxes) boxes.style.display = "";
+    if (tip) tip.style.display = "none";
+  }
+}
+// 设定科目+大类后，选中对应细分类并联动
+function setScoreTypeSelection(subject, type) {
+  const cat = categoryOfType(type);
+  setRadioValue("scoreCatGroup", cat);
+  renderScoreSubTypeGroup(subject, cat);
+  if (!document.querySelector(`#scoreSubTypeGroup input[value="${type}"]`)) {
+    type = getScoreTypeList(subject, cat)[0] || "小测";
+  }
+  setRadioValue("scoreSubTypeGroup", type);
+  initChoicePills(document.getElementById("scoreSubTypeGroup"));
+  applyScoreTypeUI(type);
+  return type;
+}
+
 function renderErrorModulesFor(subject) {
   const box = document.getElementById("errorModuleCheckboxes");
   if (!box) return;
@@ -9728,13 +9819,16 @@ function openAddScoreModal() {
   if (!modal) return;
   __editScoreId = null;
   setRadioValue("scoreSubjectGroup", "语文");
-  setRadioValue("scoreTypeGroup", "单元测试");
+  setScoreTypeSelection("语文", "小测"); // 默认日常-小测，联动大类+细分类+记分行
   document.getElementById("scoreGrade").value = "A";
   if (document.getElementById("scoreNumber")) document.getElementById("scoreNumber").value = "";
+  const stq = document.getElementById("scoreTotalQuestions"); if (stq) stq.value = "";
+  const scq = document.getElementById("scoreCorrectQuestions"); if (scq) scq.value = "";
   if (document.getElementById("scoreTitle")) document.getElementById("scoreTitle").value = "";
   document.getElementById("scoreDate").value = getTodayVal();
-  populateScoreSemesterOptions(document.getElementById("scoreSemester"));
+  // 学期由日期自动推导，不再手动选择
   renderErrorModulesFor("语文");
+  syncErrorField();
   setScoreModalEditMode(false);
   modal.classList.add("show");
   refreshIcons(0);
@@ -9748,17 +9842,19 @@ function openScoreEditModal(id) {
   const modal = document.getElementById("addScoreModal");
   if (!modal) return;
 
-  setRadioValue("scoreSubjectGroup", rec.subject || "语文");
-  setRadioValue("scoreTypeGroup", rec.examType || "单元测试");
+  const subj = rec.subject || "语文";
+  const type = normalizeScoreType(rec.examType || "小测");
+  setRadioValue("scoreSubjectGroup", subj);
+  const finalType = setScoreTypeSelection(subj, type); // 设大类+细分类+联动
   const sg = document.getElementById("scoreGrade"); if (sg) sg.value = rec.grade || "A";
   const sn = document.getElementById("scoreNumber"); if (sn) sn.value = (rec.score != null && rec.score !== "" ? rec.score : "");
+  const stq = document.getElementById("scoreTotalQuestions"); if (stq) stq.value = (rec.totalQuestions != null ? rec.totalQuestions : "");
+  const scq = document.getElementById("scoreCorrectQuestions"); if (scq) scq.value = (rec.correctQuestions != null ? rec.correctQuestions : "");
   const st = document.getElementById("scoreTitle"); if (st) st.value = rec.title || "";
   const sd = document.getElementById("scoreDate"); if (sd) sd.value = rec.date || getTodayVal();
-  const ss = document.getElementById("scoreSemester");
-  if (ss) { populateScoreSemesterOptions(ss); if (rec.semesterLabel) ss.value = rec.semesterLabel; }
+  // 学期由日期自动推导，不手动回填
 
-  // 失分模块按科目渲染 + 回填已选
-  const subj = rec.subject || "语文";
+  // 失分/错题模块按科目渲染 + 回填已选
   renderErrorModulesFor(subj);
   const em = Array.isArray(rec.errorModules) ? rec.errorModules
     : (rec.errorModule ? String(rec.errorModule).split(/[、,，]/).map(s => s.trim()).filter(Boolean) : []);
@@ -9766,6 +9862,15 @@ function openScoreEditModal(id) {
     const cb = document.querySelector('#errorModuleCheckboxes input[value="' + (window.CSS && CSS.escape ? CSS.escape(m) : m) + '"]');
     if (cb) { cb.checked = true; const pill = cb.closest(".choice-pill"); if (pill) pill.classList.add("checked"); }
   });
+
+  // 依据是否确有失分，决定错题/失分模块是否可见
+  if (document.getElementById("scoreTotalQuestions")) {
+    if (stq) stq.dispatchEvent(new Event("input", { bubbles: true }));
+  } else {
+    syncErrorField();
+  }
+  const _isDaily = !isExamType(finalType);
+  if (!_isDaily) { if (document.getElementById("errorModuleCheckboxes")) document.getElementById("errorModuleCheckboxes").style.display = ""; }
 
   setScoreModalEditMode(true);
   modal.classList.add("show");
@@ -9820,15 +9925,32 @@ function closeAddEvalModal() {
 }
 
 async function submitScore() {
-  const grade = document.getElementById("scoreGrade").value;
-  if (!grade) { showToast("请选择等级", false); return; }
   const subject = getRadioValue("scoreSubjectGroup") || "语文";
-  const errorModules = Array.from(document.querySelectorAll("#errorModuleCheckboxes input:checked")).map(cb => cb.value);
-  const scoreVal = document.getElementById("scoreNumber") ? document.getElementById("scoreNumber").value : "";
-  const semesterVal = document.getElementById("scoreSemester") ? document.getElementById("scoreSemester").value : "";
-  const examType = getRadioValue("scoreTypeGroup") || "单元测试";
+  const examType = getScoreType() || "小测";
+  const isDaily = isDailyScoreType(examType);
+  const errorModules = Array.from(document.querySelectorAll("#errorModuleCheckboxes input:checked:not(:disabled)")).map(cb => cb.value);
   const title = document.getElementById("scoreTitle") ? document.getElementById("scoreTitle").value.trim() : "";
   const date = document.getElementById("scoreDate").value || getTodayVal();
+
+  // 记分：日常巩固类按 共几题/对几题 并自动换算等级；考试类用 分数+等级
+  let grade, score = null, totalQuestions = null, correctQuestions = null;
+  if (isDaily) {
+    totalQuestions = document.getElementById("scoreTotalQuestions") ? Number(document.getElementById("scoreTotalQuestions").value) || null : null;
+    correctQuestions = document.getElementById("scoreCorrectQuestions") ? Number(document.getElementById("scoreCorrectQuestions").value) || null : null;
+    grade = (totalQuestions && correctQuestions != null)
+      ? deriveGradeFromRatio(correctQuestions / totalQuestions)
+      : (document.getElementById("scoreGrade") ? document.getElementById("scoreGrade").value : "");
+  } else {
+    grade = document.getElementById("scoreGrade") ? document.getElementById("scoreGrade").value : "";
+    const scoreVal = document.getElementById("scoreNumber") ? document.getElementById("scoreNumber").value : "";
+    score = scoreVal ? Number(scoreVal) : null;
+  }
+  if (!grade) { showToast("请完善记分信息", false); return; }
+
+  // 学期由日期自动推导；记录大类以便分析统一口径
+  const semesterLabel = semesterLabelFromDate(date);
+  const category = categoryOfType(examType);
+
   const btn = document.getElementById("submitScore");
   const original = btn.textContent;
   btn.textContent = "保存中…"; btn.disabled = true;
@@ -9837,12 +9959,15 @@ async function submitScore() {
     subject,
     grade,
     examType,
+    category,
     title,
     date,
     errorModules,
     errorModule: errorModules.join("、"),
-    score: scoreVal ? Number(scoreVal) : null,
-    semesterLabel: semesterVal || "",
+    score,
+    totalQuestions,
+    correctQuestions,
+    semesterLabel,
   };
   try {
     if (isEdit) {
@@ -9850,20 +9975,7 @@ async function submitScore() {
       showToast(`✅ 已更新${subject}${grade}成绩`, true);
     } else {
       await DataStore.addScoreRecord(payload);
-      // 成绩录入 XP：从系统配置读取（config.json xpRuleList 中"成绩录入"的 xp），勾选失分模块再 +1
-      const cfgNow = await DataStore.loadData();
-      const scoreRule = ((cfgNow.config && cfgNow.config.xpRuleList) || []).find(r => r.name === "成绩录入");
-      const baseXp = scoreRule && Number(scoreRule.xp) ? Number(scoreRule.xp) : 2;
-      const extraXp = errorModules.length > 0 ? 1 : 0;
-      await DataStore.addXpRecord({
-        taskName: "成绩录入",
-        description: `录入${subject}成绩（${examType}）${errorModules.length ? "，并复盘失分模块" : ""}`,
-        date: getTodayVal(),
-        status: "verified",
-        xp: baseXp + extraXp,
-        xpCategory: "学习成长",
-      });
-      showToast(`✅ 已录入${subject}${grade}成绩，获得 +${baseXp + extraXp} XP`, true);
+      showToast(`✅ 已录入${subject}${grade}成绩`, true);
     }
     closeAddScoreModal();
     __editScoreId = null;
@@ -9917,16 +10029,32 @@ function initScoreEvalModals() {
   if (sModal) sModal.addEventListener("click", function(e) { if (e.target === sModal) closeAddScoreModal(); });
   const sSave = document.getElementById("submitScore");
   if (sSave) sSave.addEventListener("click", submitScore);
-  const sSel = document.getElementById("scoreSemester");
-  if (sSel) populateScoreSemesterOptions(sSel);
   document.querySelectorAll("#scoreSubjectGroup input").forEach(radio => {
     radio.addEventListener("change", function() { renderErrorModulesFor(this.value); });
   });
-  // 各科成绩列表：点击行 → 修改；点删除 → 删除
-  const slPanel = document.getElementById("scoreListPanel");
-  if (slPanel && !slPanel.__scoreDelegated) {
-    slPanel.__scoreDelegated = true;
-    slPanel.addEventListener("click", function(e) {
+  // 大类切换（日常/考试）→ 按其渲染细分类 + 联动记分行
+  document.querySelectorAll("#scoreCatGroup input").forEach(radio => {
+    radio.addEventListener("change", function() {
+      const subj = getRadioValue("scoreSubjectGroup") || "语文";
+      renderScoreSubTypeGroup(subj, this.value);
+      const type = getScoreType() || (this.value === "exam" ? "单元测试" : "小测");
+      applyScoreTypeUI(type);
+    });
+  });
+  // 细分类切换 → 联动记分行 + 错题模块可见性
+  document.querySelectorAll("#scoreSubTypeGroup input").forEach(radio => {
+    radio.addEventListener("change", function() { applyScoreTypeUI(this.value); });
+  });
+  // 共几题/对了几题 变化 → 实时控制错题模块是否出现
+  ["scoreTotalQuestions", "scoreCorrectQuestions"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", syncErrorField);
+  });
+  // 各科成绩分析：点击记录行 → 修改；点删除 → 删除
+  const sbPanel = document.getElementById("scoreSubjectBlocks");
+  if (sbPanel && !sbPanel.__scoreDelegated) {
+    sbPanel.__scoreDelegated = true;
+    sbPanel.addEventListener("click", function(e) {
       const delBtn = e.target.closest("[data-del-score]");
       if (delBtn) {
         e.stopPropagation();

@@ -6019,7 +6019,58 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     }
     .ss-subj-meta { font-size: 11px; color: var(--neutral-500); font-weight: 600; white-space: nowrap; }
 
+    /* ════════ 成绩分析：按科目分块（失分在哪 · 优势在哪） ════════ */
+    .score-analysis-desc { font-size: 12px; color: var(--neutral-500); font-weight: 600; margin-left: auto; white-space: nowrap; }
+    .score-subject-section { padding: 6px 20px 16px; }
+    .score-subject-blocks { display: flex; flex-direction: column; gap: 16px; }
+    .sa-block {
+      background: linear-gradient(135deg, rgba(255,255,255,.92) 0%, rgba(248,250,252,.75) 100%);
+      border: 1px solid var(--neutral-100);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .sa-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .sa-name { font-size: 15px; font-weight: 800; color: var(--neutral-800); }
+    .sa-meta { font-size: 11px; color: var(--neutral-500); font-weight: 600; }
+    .sa-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+    .sa-col { padding: 10px 12px; border-radius: 10px; }
+    .sa-col-weak { background: rgba(244,63,94,.05); border: 1px solid rgba(244,63,94,.12); }
+    .sa-col-strong { background: rgba(5,150,105,.05); border: 1px solid rgba(5,150,105,.12); }
+    .sa-col-title { font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .sa-col-weak .sa-col-title { color: #e11d48; }
+    .sa-col-strong .sa-col-title { color: #059669; }
+    .sa-weak-list { display: flex; flex-direction: column; gap: 6px; }
+    .sa-weak-row { display: flex; align-items: center; gap: 8px; }
+    .sa-weak-name { width: 74px; font-size: 12px; font-weight: 700; color: var(--neutral-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sa-weak-bar { flex: 1; height: 6px; background: var(--neutral-100); border-radius: 99px; overflow: hidden; }
+    .sa-weak-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #f43f5e, #fb7185); }
+    .sa-weak-count { font-size: 11px; color: var(--neutral-500); font-weight: 700; width: 30px; text-align: right; }
+    .sa-clear-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #059669; font-weight: 700; }
+    .sa-strong-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sa-strong-chip { padding: 4px 10px; border-radius: 99px; background: #ecfdf5; border: 1px solid #d1fae5; color: #047857; font-size: 12px; font-weight: 700; }
+    .sa-dim { font-size: 12px; color: var(--neutral-400); }
+    .sa-records { display: flex; flex-direction: column; border-top: 1px dashed var(--neutral-100); padding-top: 8px; }
+    .sa-rec-row { display: flex; align-items: center; gap: 10px; padding: 7px 4px; border-radius: 8px; cursor: pointer; }
+    .sa-rec-row:hover { background: var(--neutral-50); }
+    .sa-rec-date { font-size: 11px; color: var(--neutral-500); font-weight: 600; min-width: 52px; }
+    .sa-rec-type { font-size: 12px; color: var(--neutral-600); font-weight: 700; min-width: 44px; }
+    .sa-rec-score { font-size: 12px; color: var(--neutral-700); font-weight: 600; white-space: nowrap; }
+    .sa-rec-grade { font-size: 12px; font-weight: 800; }
+    .sa-rec-err { font-size: 11px; color: #e11d48; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45%; }
+    .sa-rec-row .sl-del { margin-left: auto; }
+    .sa-hint { font-size: 11px; color: var(--neutral-400); text-align: center; padding: 6px 0 2px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .type-sep { align-self: center; font-size: 11px; font-weight: 800; color: var(--neutral-400); padding: 0 2px; letter-spacing: .5px; }
+
+    /* ── 成绩录入：科目横向滚动 + 两级类型 ── */
+    .score-subject-group { display: flex; gap: 8px; overflow-x: auto; flex-wrap: nowrap; padding: 2px 0 6px; scrollbar-width: thin; scrollbar-color: var(--neutral-300) transparent; }
+    .score-subject-group::-webkit-scrollbar { height: 4px; }
+    .score-subject-group::-webkit-scrollbar-thumb { background-color: var(--neutral-300); border-radius: 4px; }
+    .score-subject-group .choice-pill { flex: 0 0 auto; }
+    .score-type-category { display: flex; gap: 8px; margin-bottom: 8px; }
+    .score-type-subgroup { display: flex; gap: 8px; flex-wrap: wrap; }
+
     @media (max-width: 640px) {
+      .sa-cols { grid-template-columns: 1fr; }
       .score-analysis-header { padding: 12px 14px 10px; }
       .score-trend-section { padding: 6px 14px 14px; }
       .error-modules-section { padding: 6px 14px 14px; }
