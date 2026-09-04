@@ -276,5 +276,125 @@
       "balanceCap": 120,
       "carryMin": 0
     }
+  },
+  {
+    "id": "wr_8f3a2b9c",
+    "weekNumber": 36,
+    "year": 2026,
+    "date": "2026-09-04",
+    "generatedAt": "2026-09-04T09:39:29.256Z",
+    "summary": "这周你攒了**59 XP**，开学第一周就火力全开，预习复习做得超勤快，还主动和爸妈分享被老师表扬的开心事，真棒！",
+    "stats": {
+      "energy": {
+        "value": 59,
+        "trend": "up",
+        "diff": 59
+      },
+      "study": {
+        "value": 10,
+        "trend": "up",
+        "diff": 10,
+        "hasData": true
+      },
+      "finance": {
+        "value": 18,
+        "trend": "up",
+        "diff": 18,
+        "hasData": true
+      },
+      "diary": {
+        "value": 0,
+        "trend": "down",
+        "diff": 0
+      }
+    },
+    "academic": {
+      "homework": {
+        "subjects": [
+          "英语",
+          "数学",
+          "语文"
+        ]
+      },
+      "trends": [],
+      "weakModules": [],
+      "hasData": true,
+      "emptyHint": "这周你完成了**10次**预习复习，真了不起！如果有些科目觉得难，可以试着多花点时间，慢慢来。"
+    },
+    "behavior": {
+      "profile": [
+        {
+          "category": "学习成长",
+          "count": 21,
+          "xp": 23
+        },
+        {
+          "category": "身体成长",
+          "count": 1,
+          "xp": 7
+        },
+        {
+          "category": "能力成长",
+          "count": 1,
+          "xp": 5
+        },
+        {
+          "category": "其他",
+          "count": 4,
+          "xp": 24
+        }
+      ],
+      "effortStories": [
+        {
+          "subject": "主动做家务",
+          "date": "2026-09-01",
+          "story": "吃完早餐你主动**洗碗**，真是个贴心的家庭小帮手！"
+        },
+        {
+          "subject": "与父母沟通",
+          "date": "2026-09-03",
+          "story": "你主动告诉爸妈，你因为阅读认真被老师**表扬**，还展示了，能分享开心事真棒！"
+        }
+      ],
+      "badge": {
+        "earned": false,
+        "type": "",
+        "days": 0,
+        "name": ""
+      }
+    },
+    "emotion": {
+      "diaryTrend": "low",
+      "diaryCount": 0,
+      "moodDistribution": {},
+      "bestDiary": null,
+      "financeStatus": "good",
+      "financeWorthIt": 100
+    },
+    "suggestions": {
+      "keep": "这周你展现了**独立小能手**和**阅读坚持者**的风采，预习复习、阅读、家务都做得井井有条，继续保持！",
+      "improve": "这周你还没写日记，其实把心情写下来会很有趣。另外，你和爸爸妈妈还没有一起开过**家庭会议**，下周可以试着开个小小的会，一起定个好玩的小目标哦！",
+      "challenge": "试试看：下周每天写一句**心情日记**，哪怕只有一句话，完成一次就能+5XP，坚持3天还能额外+5XP哦！"
+    },
+    "growth": {
+      "profileUpdate": {
+        "highlights": [
+          "开学第一周就**火力全开**，预习复习做得超勤快",
+          "主动和爸妈分享被老师表扬的**开心事**",
+          "阅读时能**圈出好词好句**，阅读习惯真棒",
+          "主动**洗碗**，成为家庭小帮手",
+          "本周攒下**12分钟**游戏时间，延迟满足做得好"
+        ],
+        "date": "2026-09-04"
+      }
+    },
+    "gameTime": {
+      "checkedDays": 1,
+      "earnedMin": 12,
+      "capWeek": 60,
+      "balance": 12,
+      "balanceCap": 120,
+      "carryMin": 0
+    }
   }
 ]

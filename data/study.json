@@ -2317,6 +2317,24 @@
   ],
   "examRecords": [
     {
+"id": "score_mtmoicvi78hp0x",
+      "subject": "语文",
+      "grade": "B",
+      "examType": "听写",
+      "errorModule": "汉字",
+      "date": "2026-09-04",
+      "description": "",
+      "score": null,
+      "semesterLabel": "四年级(上)",
+      "errorModules": [
+        "汉字"
+      ],
+      "totalQuestions": 12,
+      "correctQuestions": 10,
+      "title": "",
+      "category": "daily"
+    },
+    {
       "id": "score_mtmqyknjamcs6u",
       "subject": "英语",
       "grade": "B",
@@ -2338,15 +2356,19 @@
       "id": "score_mtl3y9vtc3wlcm",
       "subject": "英语",
       "grade": "B+",
-      "examType": "单元测试",
+      "examType": "听写",
       "errorModule": "单词",
       "date": "2026-09-03",
       "description": "",
-      "score": 85,
+      "score": null,
       "semesterLabel": "四年级(上)",
       "errorModules": [
         "单词"
-      ]
+      ],
+      "totalQuestions": 15,
+      "correctQuestions": 13,
+      "title": "",
+      "category": "daily"
     },
     {
       "id": "recvrpvnZIZnEh",
@@ -3368,7 +3390,7 @@
           "errorCount": 0
         },
         {
-          "module": "计算",
+          "module": "���算",
           "practiceCount": 8,
           "doneCount": 4,
           "completionRate": 50,

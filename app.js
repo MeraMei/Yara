@@ -10065,10 +10065,10 @@ async function submitScore() {
   try {
     if (isEdit) {
       await DataStore.updateScoreRecord(__editScoreId, payload);
-      showToast(`✅ 已更新${subject}${grade}成绩`, true);
+      showToast(`✅ 已更新${subject} · ${grade}级成绩`, true);
     } else {
       await DataStore.addScoreRecord(payload);
-      showToast(`✅ 已录入${subject}${grade}成绩`, true);
+      showToast(`✅ 已录入${subject} · ${grade}级成绩`, true);
     }
     closeAddScoreModal();
     __editScoreId = null;
