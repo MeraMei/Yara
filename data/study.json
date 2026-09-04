@@ -1524,9 +1524,10 @@
           "shortTitle": "预习第2课",
           "description": "预习第2课",
           "homeworkType": "日常预习",
-          "module": "阅读",
+          "module": "汉字",
           "modules": [
-            "阅读"
+            "汉字",
+            "组词"
           ],
           "status": "pending",
           "submitted": false,
@@ -1539,7 +1540,11 @@
           "progress": 0,
           "xp": 0,
           "errorModule": "",
-          "errorModules": []
+          "errorModules": [],
+          "duration": "15-30分钟",
+          "wrongCount": 0,
+          "unitIndex": 0,
+          "unitName": "第一单元·自然之美"
         },
         {
           "id": "hw_mtlce34gu383km",
