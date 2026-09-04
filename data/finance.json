@@ -1,5 +1,5 @@
 {
-  "totalAssets": 10882.97,
+  "totalAssets": 10900.97,
   "accounts": [
     {
       "key": "wealth",
@@ -11,12 +11,27 @@
     {
       "key": "free",
       "name": "自由基金账户",
-      "balance": 813.9,
+      "balance": 831.9,
       "goal": null,
       "goalTarget": null
     }
   ],
   "recentTransactions": [
+    {
+      "id": "fin_mtm8rl8sf6q0q8",
+      "date": "2026-09-04",
+      "type": "income",
+      "amount": 18,
+      "rawAmount": 18,
+      "category": "零花钱",
+      "account": "free",
+      "accountType": "自由基金账户",
+      "description": "每周零花钱",
+      "worthIt": "值得",
+      "reason": "系统每周五自动发放零花钱",
+      "suggestion": "",
+      "reviewStatus": "已通过"
+    },
     {
       "id": "fin_mt2ayjaoox7pgn",
       "date": "2026-08-21",
@@ -30,7 +45,7 @@
       "worthIt": "值得",
       "reason": "系统每周五自动发放零花钱",
       "suggestion": "",
-      "reviewStatus": "已通过"
+      "paymentMethod": ""
     },
     {
       "id": "fin_mt1jk8hi",
