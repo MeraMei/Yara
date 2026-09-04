@@ -1161,8 +1161,8 @@
         "听说",
         "单词"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-03",
       "deadline": "2026-09-03",
       "reviewStatus": "",
@@ -1176,7 +1176,8 @@
       "unitIndex": 0,
       "unitName": "Module1·Getting to know you",
       "duration": "≤15分钟",
-      "wrongCount": null
+      "wrongCount": null,
+      "submittedAt": "2026-09-04T00:37:01.819Z"
     },
     {
       "id": "hw_mtl9o9arbbxagx",
