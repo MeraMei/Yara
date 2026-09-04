@@ -428,7 +428,18 @@ function buildContext(week) {
   const analysis = growthAnalysis({ ...ctx, homework: study.allHomework || [], week });
 
   // 游戏时间攒点（延迟满足 · 自由时间奖励；结转自上期周报，防无限累积）
-  const lastGameTime = (prevReports.length ? prevReports[prevReports.length - 1].gameTime : null);
+  // ⚠ 结转必须取【本周之前最近一周】的余额，而非"数组最后一条"——否则重跑当前周时
+  //   会把本周自己的余额误当结转，导致 balance 每次重跑自我膨胀（12→24→36）。
+  function latestGameTimeBefore(weekNumber, year) {
+    let best = null, bestNo = -1;
+    (prevReports || []).forEach(function (r) {
+      if (r.year === year && r.weekNumber < weekNumber && r.weekNumber > bestNo) {
+        bestNo = r.weekNumber; best = r;
+      }
+    });
+    return best ? (best.gameTime || null) : null;
+  }
+  const lastGameTime = latestGameTimeBefore(week.weekNumber, week.year);
   analysis.gameTime = computeGameTime(xpRecords, week, lastGameTime);
 
   // 历史成长画像（GrowthAlgorithm 全面分析）
@@ -542,7 +553,7 @@ const GROWTH_SYSTEM = `
   "stats": {
     "energy": { "value": <本周XP总数>, "trend": "up|down|stable", "diff": <与上周差值的绝对值> },
     "study": { "value": <本周完成作业数>, "trend": "up|down|stable", "diff": <差值>, "hasData": <bool> },
-    "finance": { "value": <本周累计存入-支出金额绝对值>, "trend": "up|down|stable", "diff": <差值>, "hasData": <bool> },
+    "finance": { "value": <本周真实支出金额(仅统计支出/expense，无支出则为0)>, "income": <本周进账收入金额(收入/income，如每周零花钱)>, "trend": "up|down|stable", "diff": <差值>, "hasData": <本周是否有支出，布尔> },
     "diary": { "value": <本周日记篇数>, "trend": "up|down|stable", "diff": <差值> }
   },
   "academic": {

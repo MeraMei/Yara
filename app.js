@@ -4946,7 +4946,7 @@ function renderWrData(report) {
     html += '<div class="wr-act-row"><span class="wr-act-icon">✅</span><span class="wr-act-text">本周靠工作日踏实打卡，攒下 <b>' + gtEarned + '</b> 分钟</span></div>';
     html += '<div class="wr-act-row"><span class="wr-act-icon">⏳</span><span class="wr-act-text">现在能玩的累计余额 <b>' + gtBalance + '</b> 分钟</span></div>';
     html += '</div>';
-    html += '<div style="font-size:12px;color:var(--neutral-400);margin-top:8px;line-height:1.6">游戏时间是用来放松的，玩完按时放下就好～</div>';
+    html += '<div style="font-size:12px;color:var(--neutral-400);margin-top:8px;line-height:1.7">规则：每个工作日踏实打卡攒 12 分钟，每周封顶 60，未用完结转、总可用封顶 120。游戏时间是用来放松的，玩完按时放下就好～</div>';
     html += '</div>';
   }
 
