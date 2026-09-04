@@ -4895,12 +4895,14 @@ function renderWrData(report) {
       html += '<div class="wr-act-row wr-act-hint-row"><span class="wr-act-icon">✏️</span><span class="wr-act-text">这周还没写日记，写一篇+8XP哦</span></div>';
     }
 
-    // 花钱行
-    if (finStat.hasData !== false && finStat.value !== undefined) {
+    // 花钱/进账行：只呈现真实支出；本周只有收入（零花钱进账）时展示"进账 X 元"，两者都没有则不显示
+    if (finStat.hasData !== false && finStat.value != null && Number(finStat.value) > 0) {
       var worthRate = emo.financeWorthIt || 0;
       var finText = "花了 <b>" + finStat.value + "</b> 元";
       if (worthRate > 0) finText += " · " + worthRate + "% 觉得值得";
       html += '<div class="wr-act-row"><span class="wr-act-icon">💰</span><span class="wr-act-text">' + finText + '</span></div>';
+    } else if (finStat.income != null && Number(finStat.income) > 0) {
+      html += '<div class="wr-act-row"><span class="wr-act-icon">💰</span><span class="wr-act-text">存进 <b>' + finStat.income + '</b> 元零花钱</span></div>';
     }
 
     // 成绩趋势行（如有）

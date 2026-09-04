@@ -698,6 +698,13 @@ async function main() {
       parsed.generatedAt = new Date().toISOString();
       // 覆写财务值得率（以真实数据为准，防模型算错）
       if (parsed.emotion) parsed.emotion.financeWorthIt = financeTx.worthRate;
+      // 覆写财务：以真实流水为准（收入=存款/零花钱，支出=实际花销），
+      // 杜绝把"每周零花钱"这类收入误判成"花了X元"。
+      if (parsed.stats && parsed.stats.finance) {
+        parsed.stats.finance.value = financeTx.expense;      // 只呈现真实支出
+        parsed.stats.finance.income = financeTx.income;      // 进账单独存（供界面展示）
+        parsed.stats.finance.hasData = financeTx.expense > 0; // 本周没花钱则不显示"花了"
+      }
       // 覆写作业科目（以真实数据为准，防"未知"）
       if (!parsed.academic) parsed.academic = {};
       if (!parsed.academic.homework) parsed.academic.homework = {};
