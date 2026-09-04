@@ -2317,24 +2317,6 @@
   ],
   "examRecords": [
     {
-      "id": "score_mtmoicvi78hp0x",
-      "subject": "语文",
-      "grade": "B",
-      "examType": "听写",
-      "errorModule": "汉字",
-      "date": "2026-09-04",
-      "description": "",
-      "score": null,
-      "semesterLabel": "四年级(上)",
-      "errorModules": [
-        "汉字"
-      ],
-      "totalQuestions": 12,
-      "correctQuestions": 10,
-      "title": "",
-      "category": "daily"
-    },
-    {
       "id": "score_mtmqyknjamcs6u",
       "subject": "英语",
       "grade": "B",
