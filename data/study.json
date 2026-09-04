@@ -1156,10 +1156,10 @@
       "shortTitle": "默写第4-5页两组问答句",
       "description": "默写第4-5页两组问答句",
       "homeworkType": "日常复习",
-      "module": "单词",
+      "module": "听说",
       "modules": [
-        "单词",
-        "写作"
+        "听说",
+        "单词"
       ],
       "status": "pending",
       "submitted": false,
@@ -1173,8 +1173,10 @@
       "xp": 0,
       "errorModule": "",
       "errorModules": [],
-      "unitIndex": -1,
-      "unitName": null
+      "unitIndex": 0,
+      "unitName": "Module1·Getting to know you",
+      "duration": "≤15分钟",
+      "wrongCount": null
     },
     {
       "id": "hw_mtl9o9arbbxagx",
