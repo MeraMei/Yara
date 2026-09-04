@@ -1498,8 +1498,8 @@
           "modules": [
             "阅读"
           ],
-          "status": "pending",
-          "submitted": false,
+          "status": "done",
+          "submitted": true,
           "dueDate": "2026-09-03",
           "deadline": "2026-09-03",
           "reviewStatus": "",
@@ -1513,7 +1513,8 @@
           "duration": "30-60分钟",
           "wrongCount": 0,
           "unitIndex": -1,
-          "unitName": null
+          "unitName": null,
+          "submittedAt": "2026-09-04T00:42:05.341Z"
         },
         {
           "id": "hw_mtlbpcfzivnqkj",
