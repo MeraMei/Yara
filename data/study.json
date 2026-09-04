@@ -1529,8 +1529,8 @@
             "汉字",
             "组词"
           ],
-          "status": "pending",
-          "submitted": false,
+          "status": "done",
+          "submitted": true,
           "dueDate": "2026-09-03",
           "deadline": "2026-09-03",
           "reviewStatus": "",
@@ -1544,7 +1544,8 @@
           "duration": "15-30分钟",
           "wrongCount": 0,
           "unitIndex": 0,
-          "unitName": "第一单元·自然之美"
+          "unitName": "第一单元·自然之美",
+          "submittedAt": "2026-09-04T00:54:58.499Z"
         },
         {
           "id": "hw_mtlce34gu383km",
