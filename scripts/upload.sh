@@ -200,15 +200,29 @@ if [ "$WITH_DATA" = "1" ]; then
     for (const f of files) {
       try { combined[f.replace('.json', '')] = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf-8')); } catch (e) {}
     }
-    // 精简 study：all.json 只保留首页/学习总览需要的最小字段，重型数据交给 app.js 运行时覆盖
+    // 精简 study：all.json 只保留首页/学习总览需要的最小结构，
+    // 重型数据（allHomework/examRecords/semesterAnalysis/evaluations/subjects 等）
+    // 由 app.js 运行时用权威 study.json 覆盖，避免 all.json 超预算。
     var study = combined.study || null;
     if (study) {
       study = Object.assign({}, study);
+      delete study.allHomework;
       delete study.examRecords;
       delete study.semesterAnalysis;
       delete study.strengthsAnalysis;
+      delete study.evaluations;
+      delete study.subjects;
+      delete study.recentAssignments;
+      delete study.homework;
     }
-    const result = { child: combined.child || {}, calendar: combined.calendar || [], levels: combined.levels || [], xpRecords: combined.xpRecords || [], finance: combined.finance || null, study: study, config: combined.config || null, xpSources: combined.xpSources || [], redeemRecords: combined.redeemRecords || [], diaryEntries: combined.diaryEntries || [], aiWeeklyReports: combined.aiWeeklyReports || [], familyMeetings: combined.familyMeetings || [] };
+    // 精简 xpRecords：all.json 只保留能量看板最小字段，完整明细由 app.js 用权威 xpRecords.json 覆盖
+    var xpRecords = (combined.xpRecords || []).map(function (r) {
+      return { id: r.id, date: r.date, datetime: r.datetime, type: r.type,
+        taskName: r.taskName, title: r.title, xp: r.xp, baseXp: r.baseXp,
+        status: r.status, reviewStatus: r.reviewStatus, xpCategory: r.xpCategory,
+        description: r.description, _hasValidName: r._hasValidName };
+    });
+    const result = { child: combined.child || {}, calendar: combined.calendar || [], levels: combined.levels || [], xpRecords: xpRecords, finance: combined.finance || null, study: study, config: combined.config || null, xpSources: combined.xpSources || [], redeemRecords: combined.redeemRecords || [], diaryEntries: combined.diaryEntries || [], aiWeeklyReports: combined.aiWeeklyReports || [], familyMeetings: combined.familyMeetings || [] };
     fs.writeFileSync(path.join(dataDir, 'all.json'), JSON.stringify(result));
     const raw = Buffer.byteLength(JSON.stringify(result));
     const was = Buffer.byteLength(JSON.stringify(combined));

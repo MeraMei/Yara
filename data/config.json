@@ -137,7 +137,7 @@
       {
         "name": "作业·日常预习",
         "category": "学习成长",
-        "xp": 2,
+        "xp": 1,
         "method": "按次",
         "description": "完成作业自动发放",
         "id": "xpr_mtgwxizt02k8"
@@ -145,7 +145,7 @@
       {
         "name": "作业·日常复习",
         "category": "学习成长",
-        "xp": 2,
+        "xp": 1,
         "method": "按次",
         "description": "完成作业自动发放",
         "id": "xpr_mtgwxiztnyou"
@@ -153,7 +153,7 @@
       {
         "name": "作业·假期作业",
         "category": "学习成长",
-        "xp": 2,
+        "xp": 1,
         "method": "按次",
         "description": "完成作业自动发放",
         "id": "xpr_mtgwxiztq0lm"
@@ -161,7 +161,7 @@
       {
         "name": "作业·特色作业",
         "category": "学习成长",
-        "xp": 4,
+        "xp": 1,
         "method": "按次",
         "description": "完成作业自动发放",
         "id": "xpr_mtgwxizt6k2b"
@@ -346,7 +346,7 @@
     {
       "name": "作业·日常预习",
       "category": "学习成长",
-      "xp": 2,
+      "xp": 1,
       "method": "按次",
       "description": "完成作业自动发放",
       "id": "xpr_mtgwxizt02k8"
@@ -354,7 +354,7 @@
     {
       "name": "作业·日常复习",
       "category": "学习成长",
-      "xp": 2,
+      "xp": 1,
       "method": "按次",
       "description": "完成作业自动发放",
       "id": "xpr_mtgwxiztnyou"
@@ -362,7 +362,7 @@
     {
       "name": "作业·假期作业",
       "category": "学习成长",
-      "xp": 2,
+      "xp": 1,
       "method": "按次",
       "description": "完成作业自动发放",
       "id": "xpr_mtgwxiztq0lm"
@@ -370,7 +370,7 @@
     {
       "name": "作业·特色作业",
       "category": "学习成长",
-      "xp": 4,
+      "xp": 1,
       "method": "按次",
       "description": "完成作业自动发放",
       "id": "xpr_mtgwxizt6k2b"

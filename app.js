@@ -1885,15 +1885,8 @@ async function refreshHomeworkSection() {
 }
 
 function getHwXpLocal(cfg, item) {
-  if (!item) return null;
-  const hwType = item.homeworkType || "假期作业";
-  const ruleName = "作业·" + hwType;
-  const xpRules = (cfg.config && cfg.config.xpRules) || {};
-  for (const cat of Object.keys(xpRules)) {
-    const found = (xpRules[cat] || []).find(function(r) { return r.name === ruleName; });
-    if (found && found.xp) return Number(found.xp) || null;
-  }
-  return null;
+  // 已不再区分作业类型：作业完成统一 +1 XP
+  return item ? 1 : null;
 }
 
 // 渲染作业列表区块（独立于 renderStudy，供保存后局部刷新）
@@ -6525,10 +6518,6 @@ function renderHwRow(a, hidden, index, earnedXp) {
       + (extra > 0 ? `<span class="hw-mod-tag hw-mod-more">+${extra}</span>` : "");
   }
 
-  // 作业类型标签（与模块区分，浅色描边样式）
-  const typeName = a.homeworkType || "";
-  const typeTag = typeName ? `<span class="hw-type-tag">${typeName}</span>` : "";
-
   // 完成用时标签（有记录才展示）
   const durTag = a.duration ? `<span class="hw-dur-tag"><i data-lucide="timer"></i>${a.duration}</span>` : "";
 
@@ -6584,7 +6573,7 @@ function renderHwRow(a, hidden, index, earnedXp) {
     <div class="hw-content">
       <div class="hw-title">${safeTitle}${xpBadge}</div>
       <div class="hw-subline">
-        <span class="hw-chips">${typeTag}${modTag ? `<span class="hw-mod-group">${modTag}</span>` : ""}${durTag}</span>
+        <span class="hw-chips">${modTag ? `<span class="hw-mod-group">${modTag}</span>` : ""}${durTag}</span>
         ${metaBit}
       </div>
     </div>
@@ -6802,15 +6791,8 @@ async function renderStudy() {
   }
 
   function getHwXp(item) {
-    if (!item) return null;
-    const hwType = item.homeworkType || "假期作业";
-    const ruleName = "作业·" + hwType;
-    const xpRules = (cfg.config && cfg.config.xpRules) || {};
-    for (const cat of Object.keys(xpRules)) {
-      const found = (xpRules[cat] || []).find(function(r) { return r.name === ruleName; });
-      if (found && found.xp) return Number(found.xp) || null;
-    }
-    return null;
+    // 已不再区分作业类型：作业完成统一 +1 XP
+    return item ? 1 : null;
   }
 
   function renderAssignmentList(filter) {
@@ -9095,9 +9077,8 @@ async function openEditModal(item) {
   setRadioValue("editSubjectGroup", item.subject || "语文");
   document.getElementById("editDueDate").value = item.dueDate || "";
 
-  // 详情字段：作业类型/能力模块/关联单元
+  // 详情字段：能力模块/关联单元
   const subject = item.subject || "语文";
-  setRadioValue("editTypeGroup", item.homeworkType || "");
   populateChoiceGroup("editModuleGroup", getModuleOptions(subject), item.modules || []);
 
   const units = await getTeachingUnits(subject);
@@ -9161,8 +9142,6 @@ function openAddHomeworkModal() {
   document.getElementById("addHomeworkTitle").value = "";
   document.getElementById("addHomeworkDueDate").value = getTodayVal();
   setRadioValue("addSubjectGroup", "语文");
-  // 作业类型不做任何预选默认，由用户明确选择；避免每次默认成"假期作业"
-  document.querySelectorAll('#addTypeGroup input[name="addType"]').forEach(function(r) { r.checked = false; });
   syncAddHomeworkDue();
   // 重置拆分状态
   const parsedWrap = document.getElementById("addParsedWrap");
@@ -9208,10 +9187,7 @@ async function saveAddHomework() {
       checks.forEach(cb => {
         const idx = parseInt(cb.dataset.idx, 10);
         if (isNaN(idx) || !items[idx]) return;
-        // 读取该行用户在下拉里改过的"作业类型"（此前只存解析器默认值，改动被忽略）
-        const rowSel = parsedList.querySelector('.add-parse-type[data-idx="' + idx + '"]');
-        const rowType = rowSel ? rowSel.value : "";
-        selected.push({ src: items[idx], rowType: rowType || items[idx].type || "" });
+        selected.push({ src: items[idx] });
       });
       // 批量录入：一次读取→批量追加→单次写回，避免逐条 fetch+write 互相覆盖
       const batchRecords = selected.map(el => ({
@@ -9219,8 +9195,8 @@ async function saveAddHomework() {
         subject: subject,
         title: el.src.text || el.src.title,
         description: el.src.text || el.src.title,
-        // 类型：优先该行下拉值，其次弹窗中统一选择的类型；不再有任何内置"假期作业"兜底
-        homeworkType: el.rowType || getRadioValue("addTypeGroup") || "",
+        // 已不再区分作业类型，统一置空（历史记录保留原值仅供展示/统计）
+        homeworkType: "",
         modules: el.src.module ? [el.src.module] : [],
         module: el.src.module || "",
         status: "pending",
@@ -9237,11 +9213,6 @@ async function saveAddHomework() {
       if (batchRecords.length === 0) {
         btn.textContent = original; btn.disabled = false;
         showToast("未找到要保存的作业", false);
-        return;
-      }
-      // 任一作业未明确选择作业类型且无统一类型→提示补选，不静默落成"假期作业"
-      if (batchRecords.some(r => !r.homeworkType)) {
-        showToast("请先为作业选择作业类型（可统一选择或逐行选择）", false);
         return;
       }
       let okCount = 0, failCount = 0;
@@ -9264,13 +9235,12 @@ async function saveAddHomework() {
 
     // ── 场景二：单条录入 ──
     if (!title) { showToast("先写一下作业内容吧 ✏️", false); return; }
-    // 添加作业：存基础信息 + 作业类型；模块/单元/测验在提交时填写
-    const hwTypeNow = getRadioValue("addTypeGroup") || "";
-    if (!hwTypeNow) { showToast("请选择作业类型", false); return; }
+    const hwTypeNow = "";
     await DataStore.addStudyRecord({
       subject,
       title,
       description: title,
+      // 已不再区分作业类型，统一置空
       homeworkType: hwTypeNow,
       modules: [], // 能力模块在提交时填写
       module: "",
@@ -9335,12 +9305,6 @@ function initAddHomeworkModal() {
             <input type="checkbox" checked class="add-parse-check" data-idx="${i}" style="accent-color:var(--lav-600);flex-shrink:0;" />
             <span class="hw-subject ${mbSubj === "语文" ? "hw-sub-cn" : mbSubj === "数学" ? "hw-sub-math" : mbSubj === "英语" ? "hw-sub-en" : ""}" style="font-size:10px;padding:2px 7px;flex-shrink:0;">${mbSubj}</span>
             ${it.module ? `<span style="font-size:10px;padding:2px 7px;border-radius:6px;background:var(--mint-100);color:var(--mint-700);flex-shrink:0;font-weight:700;">${it.module}</span>` : ""}
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <label style="font-size:11px;color:var(--neutral-500);flex-shrink:0;">类型</label>
-            <select class="add-parse-type" data-idx="${i}" style="flex:1;font-size:12px;padding:3px 6px;border:1px solid var(--neutral-300);border-radius:8px;background:#fff;color:var(--neutral-800);">
-              ${["日常预习","日常复习","假期作业","特色作业"].map(t => `<option value="${t}" ${it.type === t ? "selected" : ""}>${t}</option>`).join("")}
-            </select>
           </div>
           <span style="font-size:12px;color:var(--neutral-700);line-height:1.4;">${it.text}</span>
         </div>
@@ -9514,9 +9478,6 @@ async function openSubmitHomeworkModal(item) {
       <span>${typeof escapeHtmlReason === "function" ? escapeHtmlReason(item.title || "") : (item.title || "")}</span>`;
   }
 
-  // 作业类型（预填已有值，无值则不预选，避免默认"假期作业"）
-  setRadioValue("shmTypeGroup", item.homeworkType || "");
-
   // 完成用时（预填已有值）
   setRadioValue("shmDurationGroup", item.duration || "");
 
@@ -9558,8 +9519,8 @@ function closeSubmitHomeworkModal() {
 // 保存补充信息
 async function saveSubmitHomework() {
   if (!__shmCurrentItem || !__shmCurrentItem.id) { showToast("未找到作业，请重试", false); return; }
-  const hwType = getRadioValue("shmTypeGroup") || "";
-  if (!hwType) { showToast("请选择作业类型", false); return; }
+  // 已不再区分作业类型，提交时补充的作业类型统一置空
+  const hwType = "";
   const duration = getRadioValue("shmDurationGroup") || "";
   const wrongCount = getRadioValue("shmWrongGroup") || "";
   const modules = getCheckedOfGroup("shmModuleGroup");
@@ -9623,25 +9584,21 @@ async function saveSubmitHomework() {
 
     // ── XP 发放（仅新提交时）──与作业写入并行：不同数据文件、互不干扰，减少串行等待 ──
     // 用户点「提交作业」即视为完成：只有未完成时才置 done 并发放一次 XP，避免重复提交重复加分。
-    let baseXp = 0;
+    // 已不再区分作业类型：每次作业完成统一 +1 XP（taskName 沿用"作业·X"，历史追溯也统一按 1 处理）
+    let baseXp = 1;
     let xpPromise = Promise.resolve();
     if (!wasDone) {
-      // 按作业类型发放 XP（作业类型现为 假期作业/特色作业；系统配置仍是
-      // 「作业·日常预习」等四类，精确名找不到时回退到任一「作业·」规则，避免发分失效）
-      const cfgXpData = await loadAppData();
-      const xpRulesMap = (cfgXpData.config && cfgXpData.config.xpRules) || {};
-      const hwRule = resolveHomeworkRule(xpRulesMap, hwType);
-      baseXp = (hwRule && hwRule.xp) ? Number(hwRule.xp) || 2 : 2;
-      const taskName = "作业·" + (hwType || "假期作业");
+      const subjectName = __shmCurrentItem.subject || "";
+      const hwTaskName = "作业·" + (__shmCurrentItem.homeworkType || "假期作业");
       xpPromise = window.DataStore.addXpRecord({
-        taskName,
+        taskName: hwTaskName,
         title: __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业",
         xpCategory: "学习成长",
         type: "作业完成",
-        xp: baseXp,
-        baseXp,
+        xp: 1,
+        baseXp: 1,
         status: "verified",
-        description: (hwType || "作业") + "完成",
+        description: (subjectName ? subjectName + "作业完成" : "作业完成"),
       }).catch(err => console.warn("提交作业-加分失败:", err.message));
     }
     await Promise.all([writePromise, xpPromise]);
@@ -10118,9 +10075,7 @@ async function saveEdit() {
   const newSubject = getRadioValue("editSubjectGroup");
   const newDueDate = document.getElementById("editDueDate").value;
 
-  // 详情字段：作业类型/能力模块/关联单元
-  const hwType = getRadioValue("editTypeGroup") || "";
-  if (!hwType) { showToast("请选择作业类型", false); return; }
+  // 详情字段：能力模块/关联单元
   const modules = getCheckedOfGroup("editModuleGroup");
   const module = modules[0] || "";
   const unitVal = getRadioValue("editUnitGroup") || "other";
@@ -10133,7 +10088,8 @@ async function saveEdit() {
     title: newTitle,
     subject: newSubject,
     dueDate: newDueDate,
-    homeworkType: hwType,
+    // 已不再区分作业类型，编辑时统一置空
+    homeworkType: "",
     modules,
     module,
     unitIndex,
@@ -10220,26 +10176,19 @@ function initEditModal() {
 
   // 作业完成能量累加（客户端兜底，防止 API 瞬时不可用导致能量丢失）
   async function grantHomeworkCompletionXp(item, cfg) {
-    const hwType = item.homeworkType || "假期作业";
-    const ruleList = (cfg && cfg.config && cfg.config.xpRules
-      ? cfg.config.xpRules
-      : ((cfg && cfg.config && cfg.config.xpRuleList) || {}));
-    // 优先从规则表精确名查找，其次回退到任一「作业·」规则（兼容假期作业新命名，不改系统配置四类）
-    const rule = resolveHomeworkRule(typeof ruleList === "object" && !Array.isArray(ruleList) ? ruleList : {}, hwType);
-    const _defaultMap = {'假期作业':2,'特色作业':4};
-    const xpValue = rule && Number(rule.xp) ? Number(rule.xp) : (_defaultMap[hwType] || 2);
+    // 已不再区分作业类型：作业完成统一 +1 XP
     const subject = item.subject || "其他";
     try {
       await window.DataStore.addXpRecord({
-        taskName: "作业·" + hwType,
-        description: `完成${subject}作业（${hwType}）`,
+        taskName: "作业·" + (item.homeworkType || "假期作业"),
+        description: `完成${subject}作业`,
         date: todayStr(),
         status: "verified",
-        xp: xpValue,
+        xp: 1,
         xpCategory: "学习成长",
         homeworkId: item.id,
       });
-      return xpValue;
+      return 1;
     } catch (err) {
       console.warn("作业能量发放失败:", err.message);
       return 0;
