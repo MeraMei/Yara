@@ -6045,6 +6045,11 @@ body[data-view="money"] .bottom-tab-item.active { color: var(--colourful-sunny-c
     .sa-weak-bar { flex: 1; height: 6px; background: var(--neutral-100); border-radius: 99px; overflow: hidden; }
     .sa-weak-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #f43f5e, #fb7185); }
     .sa-weak-count { font-size: 11px; color: var(--neutral-500); font-weight: 700; width: 30px; text-align: right; }
+    .sa-weak-base { margin-top: 8px; font-size: 11px; color: var(--neutral-500); }
+    .sa-weak-facts { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sa-fact-row { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: var(--neutral-100); font-size: 12px; }
+    .sa-fact-name { color: var(--neutral-700); font-weight: 600; }
+    .sa-fact-count { color: var(--accent, #f43f5e); font-weight: 700; }
     .sa-clear-tip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #059669; font-weight: 700; }
     .sa-strong-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .sa-strong-chip { padding: 4px 10px; border-radius: 99px; background: #ecfdf5; border: 1px solid #d1fae5; color: #047857; font-size: 12px; font-weight: 700; }

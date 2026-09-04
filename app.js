@@ -1602,6 +1602,11 @@ async function addScoreRecord(record) {
     score: record.score != null ? record.score : null,
     semesterLabel: record.semesterLabel || '',
     errorModules: record.errorModules || [],
+    // ★ 记分：共几题/对了几题（日常成绩按题数显示正确率），此前被遗漏导致录了不显示
+    totalQuestions: record.totalQuestions != null ? (Number(record.totalQuestions) || null) : null,
+    correctQuestions: record.correctQuestions != null ? (Number(record.correctQuestions) || null) : null,
+    title: record.title || '',
+    category: record.category || '',
   };
   const study = await _readStudyBase();
   if (!study.examRecords) study.examRecords = [];
@@ -6971,7 +6976,7 @@ async function renderStudy() {
     ).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
 
     // 如果只有期末成绩（或没有平时成绩），显示空状态
-    const regularExams = records.filter(r => r.examType && r.examType !== "期末");
+    const regularExams = records.filter(r => isDailyScoreType(r.examType));
     if (regularExams.length === 0 && records.length <= 1) {
       chartEl.style.display = "none";
       if (emptyEl) emptyEl.style.display = "block";
@@ -7390,9 +7395,10 @@ async function renderStudy() {
     const panel = document.getElementById("scoreSummaryPanel");
     if (!panel) return;
 
-    const records = examRecords.filter(r => r.semesterLabel === semesterLabel);
+    // 平时成绩视图：只统计"日常/平时"记录（听写、默写、小测等），期末归学期末汇总视图
+    const records = examRecords.filter(r => r.semesterLabel === semesterLabel && isDailyScoreType(r.examType));
     if (records.length === 0) {
-      panel.innerHTML = emptyStateHTML("pie-chart", "本学期暂无成绩记录", 90);
+      panel.innerHTML = emptyStateHTML("pie-chart", "本学期暂无平时成绩，去录入听写/默写/小测吧", 90);
       return;
     }
 
@@ -7417,7 +7423,7 @@ async function renderStudy() {
       <div class="ss-grid">
         ${stat(daily.length, "日常记录")}
         ${stat(exams.length, "考试记录")}
-        ${stat(avgRatio != null ? avgRatio + "%" : null, "平均正确率")}
+        ${stat(avgRatio != null ? avgRatio + "%" : null, ratioList.length > 1 ? "平均正确率" : "本次正确率")}
         ${stat(goodRate != null ? goodRate + "%" : null, "考试优良率")}
         ${avgScore != null ? stat(avgScore, "考试均分") : ""}
       </div>`;
@@ -7428,9 +7434,10 @@ async function renderStudy() {
     const panel = document.getElementById("scoreSubjectBlocks");
     if (!panel) return;
 
-    const records = examRecords.filter(r => r.semesterLabel === semesterLabel);
+    // 平时成绩视图：只展示"日常/平时"记录（听写、默写、小测等），期末归学期末汇总视图
+    const records = examRecords.filter(r => r.semesterLabel === semesterLabel && isDailyScoreType(r.examType));
     if (records.length === 0) {
-      panel.innerHTML = emptyStateHTML("clipboard-list", "本学期暂无成绩记录", 90);
+      panel.innerHTML = emptyStateHTML("clipboard-list", "本学期暂无平时成绩，去录入听写/默写/小测吧", 90);
       return;
     }
 
@@ -7454,40 +7461,60 @@ async function renderStudy() {
       const errRank = Object.entries(errCount).sort((a, b) => b[1] - a[1]);
       const maxErr = errRank.length ? errRank[0][1] : 0;
 
-      // 优势模块：该科目配置里从未失分的模块
-      const strengths = getModuleOptions(sub).filter(m => !errCount[m]);
+      // 优势（诚实口径）：只基于已录入的日常记录；样本太少时明确"待观察"，
+      // 绝不做"科目默认模块表减去失分模块"的减法推定（那会把没测过的东西说成优势）
+      const MIN_STR_SAMPLES = 2;
+      const obsCount = subjRecords.length;
+      const undetected = getModuleOptions(sub).filter(m => !errCount[m]);
 
       // 平均正确率（日常）
       const daily = subjRecords.filter(r => isDailyScoreType(r.examType));
       const ratioList = daily.filter(r => r.totalQuestions && r.correctQuestions != null).map(r => r.correctQuestions / r.totalQuestions);
       const avgRatio = ratioList.length ? Math.round((ratioList.reduce((s, x) => s + x, 0) / ratioList.length) * 100) : null;
 
+      // 失分展示（符合成长算法：不贴标签、只记事实）
+      // 样本 < WEAK_FACT_THRESHOLD 时，只作"本次/近N条记录"的事实陈述，不定性成"薄弱点"；
+      // 样本达标后才用统计框架呈现频次趋势。
+      const WEAK_FACT_THRESHOLD = 3;
+      const hasTrend = subjRecords.length >= WEAK_FACT_THRESHOLD;
       const errHtml = errRank.length
-        ? `<div class="sa-weak-list">` + errRank.slice(0, 5).map(([m, c]) => `
+        ? (hasTrend
+            ? `<div class="sa-weak-list">` + errRank.slice(0, 5).map(([m, c]) => `
             <div class="sa-weak-row">
               <span class="sa-weak-name">${m}</span>
               <div class="sa-weak-bar"><div class="sa-weak-fill" style="width:${maxErr ? Math.round(c / maxErr * 100) : 0}%"></div></div>
               <span class="sa-weak-count">${c}次</span>
-            </div>`).join("") + `</div>`
-        : `<div class="sa-clear-tip"><i data-lucide="check-circle"></i>全部掌握，暂无失分</div>`;
+            </div>`).join("") + `</div>
+          <div class="sa-weak-base">近 ${subjRecords.length} 条记录中，这些类型出现失分频率（持续积累再谈规律）</div>`
+            : `<div class="sa-weak-facts">` + errRank.map(([m, c]) => `
+            <div class="sa-fact-row">
+              <span class="sa-fact-name">${m}</span>
+              <span class="sa-fact-count">×${c}</span>
+            </div>`).join("") + `</div>
+          <div class="sa-weak-base">仅本次记录的事实（不足 ${WEAK_FACT_THRESHOLD} 条，暂不评判薄弱点）</div>`)
+        : `<div class="sa-clear-tip"><i data-lucide="check-circle"></i>近 ${subjRecords.length} 条记录均未失分</div>`;
 
-      const strengthHtml = strengths.length
-        ? `<div class="sa-strong-chips">` + strengths.map(m => `<span class="sa-strong-chip">${m}</span>`).join("") + `</div>`
-        : `<span class="sa-dim">暂无足够数据</span>`;
+      const strengthHtml = obsCount < MIN_STR_SAMPLES
+        ? `<span class="sa-dim">记录太少（${obsCount}条），暂不评判优势</span>`
+        : (undetected.length
+            ? `<div class="sa-strong-chips" title="基于近${obsCount}条记录：这些类型未出现失分">` + undetected.map(m => `<span class="sa-strong-chip">${m}</span>`).join("") + `</div>`
+            : `<span class="sa-dim">各类型均有失分，暂无明显未失分项</span>`);
 
       // 记录列表（按日期倒序）
       const rows = [...subjRecords].sort((a, b) => (b.date || "").localeCompare(a.date || "")).map(r => {
         const shortDate = (r.date || "").slice(5);
         const isDailyRec = isDailyScoreType(r.examType);
         const scoreText = isDailyRec && r.totalQuestions && r.correctQuestions != null
-          ? `${r.correctQuestions}/${r.totalQuestions}题 `
-          : (r.score != null && r.score !== "" ? `${r.score}分 ` : "");
+          ? `${r.correctQuestions}/${r.totalQuestions}题`
+          : (r.score != null && r.score !== "" ? `${r.score}分` : "");
+        // 日常记录不再自动给字母等级：只展示可核实的"对/总题数"，避免单次日常被定性
+        const gradeTag = isDailyRec ? "" : `<span class="sa-rec-grade ${getGradeCls(r.grade)}">${r.grade || ""}</span>`;
         const errTxt = (Array.isArray(r.errorModules) ? r.errorModules : (r.errorModule ? String(r.errorModule).split(/[、,，]/).filter(Boolean) : [])).join("、");
         return `
         <div class="sa-rec-row" data-score-id="${r.id}" title="点击修改或删除">
           <span class="sa-rec-date">${shortDate || ""}</span>
           <span class="sa-rec-type">${r.examType || ""}</span>
-          <span class="sa-rec-score">${scoreText}<span class="sa-rec-grade ${getGradeCls(r.grade)}">${r.grade || ""}</span></span>
+          <span class="sa-rec-score">${scoreText}${gradeTag}</span>
           ${errTxt ? `<span class="sa-rec-err">${errTxt}</span>` : ""}
           <button class="sl-del" data-del-score="${r.id}" title="删除"><i data-lucide="trash-2"></i></button>
         </div>`;
@@ -7498,7 +7525,7 @@ async function renderStudy() {
           <div class="sa-head">
             <span class="subj-dot ${cfg.cls}"></span>
             <span class="sa-name">${sub}</span>
-            <span class="sa-meta">${subjRecords.length} 条记录${recWithErr ? ` · ${recWithErr} 条有失分` : ""}${avgRatio != null ? ` · 平均正确率 ${avgRatio}%` : ""}</span>
+            <span class="sa-meta">${subjRecords.length} 条记录${recWithErr ? ` · ${recWithErr} 条有失分` : ""}${avgRatio != null ? ` · ${ratioList.length > 1 ? "平均正确率" : "本次正确率"} ${avgRatio}%` : ""}</span>
           </div>
           <div class="sa-cols">
             <div class="sa-col sa-col-weak">
@@ -7549,10 +7576,13 @@ async function renderStudy() {
         });
       }
 
-      const bySubj = groupBy(examRecords, "subject");
+      // 期末成绩视图：只统计"考试类"记录（期末/期中/月考/单元测试）。
+      // 日常听写、默写、小测等一律不混入期末成绩序列，避免小测被当成期末。
+      const examOnly = examRecords.filter(r => isExamType(r.examType));
+      const bySubj = groupBy(examOnly, "subject");
 
       const bySem = {};
-      examRecords.forEach(r => {
+      examOnly.forEach(r => {
         const k = r.semesterLabel || (r.year ? r.year + "_" + r.semester : "") || "未知学期";
         if (!bySem[k]) bySem[k] = { year: r.year, semester: r.semester, semesterLabel: r.semesterLabel || k, records: [] };
         bySem[k].records.push(r);
@@ -8086,6 +8116,16 @@ const DE_SUBJECT_MODULES = {
   "科学": ["观察", "实验", "思维", "表达", "探究"],
 };
 
+// ⭐ 系统科目表（与 config.json 的 subjects 保持一致，作为绝对权威兜底源）。
+//    成绩/作业/编辑等所有"科目"下拉/单选都必须以此为完整集合，
+//    任何情况下都不得退化为只显示语数英三门主科。
+const DE_FALLBACK_SUBJECTS = [
+  "语文", "数学", "英语",
+  "科学", "道德与法治", "信息科技",
+  "体育", "音乐", "美术", "书法",
+  "心理健康", "综合实践活动", "劳动"
+];
+
 // 加载配置：能力模块表 + 权威科目表（优先直接读 config.json，保证科目选择器展示完整配置科目）
 async function deLoadAbilityModules() {
   let cfg = null;
@@ -8110,12 +8150,12 @@ async function deLoadAbilityModules() {
   const subjectsFromConfig = (cfg && Array.isArray(cfg.subjects) && cfg.subjects.length)
     ? cfg.subjects.map(s => (s && s.name) || s)
     : null;
-  // 科目选择器统一渲染：配置完整表 > 能力模块键 > 硬编码 key
+  // 科目选择器统一渲染：以「系统科目表(config.subjects)」为唯一权威来源。
+  // 科目只认系统科目表；即使配置里的 subjects 暂未读到，也直接用内置完整科目表，
+  // 绝不以"能力模块键"或"少数主科"代替科目列表（那会退化成只剩语数英）。
   const subjectList = (subjectsFromConfig && subjectsFromConfig.length)
     ? subjectsFromConfig
-    : ((DE_LOADED_MODULES && Object.keys(DE_LOADED_MODULES).length)
-        ? Object.keys(DE_LOADED_MODULES)
-        : Object.keys(DE_SUBJECT_MODULES));
+    : DE_FALLBACK_SUBJECTS.slice();
   deRenderSubjectGroups(subjectList);
 }
 
@@ -9669,7 +9709,12 @@ function populateScoreSemesterOptions(sel) {
 
 // ════════ 成绩类型辅助（日常巩固类 vs 考试类 · 两级结构） ════════
 const EXAM_TYPE_LIST = ["单元测试", "月考", "期中考试", "期末考试"];
-function isExamType(t) { return EXAM_TYPE_LIST.indexOf(t) >= 0; }
+function isExamType(t) {
+  // 按关键词识别"考试类"，兼容历史记录里的旧类型名（如"期末"而非"期末考试"）。
+  // 避免期末/期中/月考/单元测试被误判成"日常"而混进平时成绩视图。
+  if (!t) return false;
+  return /期末|期中|月考|单元/.test(String(t));
+}
 function isDailyScoreType(t) { return !isExamType(t); }
 function categoryOfType(t) { return isExamType(t) ? "exam" : "daily"; }
 function getScoreCategoryValue() { return getRadioValue("scoreCatGroup") || "daily"; }
@@ -9877,12 +9922,60 @@ function openScoreEditModal(id) {
   refreshIcons(0);
 }
 
+// 应用内自定义确认弹层（替代原生 confirm，避免受控/预览浏览器拦截原生对话框导致"删除没反应/失败"）
+function confirmAsync(opts) {
+  const o = opts || {};
+  return new Promise(function (resolve) {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border-radius:16px;padding:24px;width:320px;max-width:86vw;box-shadow:0 24px 60px rgba(0,0,0,.25);text-align:center;font-family:inherit';
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:17px;font-weight:800;color:#0f172a;margin-bottom:8px';
+    title.textContent = o.title || '确认操作';
+    const desc = document.createElement('div');
+    desc.style.cssText = 'font-size:13px;color:#64748b;line-height:1.6;margin-bottom:18px;white-space:pre-line';
+    desc.textContent = o.desc || '';
+    const btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;gap:10px';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.style.cssText = 'flex:1;padding:10px 0;border:1px solid #e2e8f0;border-radius:12px;background:#fff;color:#475569;font-weight:700;cursor:pointer';
+    cancel.textContent = o.cancelText || '取消';
+    const ok = document.createElement('button');
+    ok.type = 'button';
+    ok.style.cssText = 'flex:1;padding:10px 0;border:none;border-radius:12px;color:#fff;font-weight:800;cursor:pointer;background:' + (o.danger ? '#ef4444' : '#6366f1');
+    ok.textContent = o.okText || '确定';
+    btns.appendChild(cancel);
+    btns.appendChild(ok);
+    box.appendChild(title);
+    box.appendChild(desc);
+    box.appendChild(btns);
+    wrap.appendChild(box);
+    document.body.appendChild(wrap);
+    const done = function (v) { try { wrap.remove(); } catch (e) { /* noop */ } resolve(v); };
+    cancel.onclick = function () { done(false); };
+    ok.onclick = function () { done(true); };
+    wrap.addEventListener('click', function (e) { if (e.target === wrap) done(false); });
+    const esc = function (e) { if (e.key === 'Escape') { document.removeEventListener('keydown', esc); done(false); } };
+    document.addEventListener('keydown', esc);
+    const oklucide = ok.querySelector('.lucide,svg'); if (globalThis.refreshIcons) globalThis.refreshIcons(0);
+  });
+}
+
 // 删除成绩（带二次确认）
 async function scoreDelete(id) {
   const rec = getScoreRecordById(id);
   if (!rec) return;
   const label = (rec.subject || "") + (rec.grade ? " " + rec.grade : "");
-  if (!confirm("确定删除这条成绩吗？" + (label ? "（" + label + "）" : "") + "\n删除后不可恢复。")) return;
+  const confirmed = await confirmAsync({
+    title: "删除这条成绩？",
+    desc: (label ? "（" + label + "）\n" : "") + "删除后不可恢复。",
+    okText: "删除",
+    cancelText: "取消",
+    danger: true,
+  });
+  if (!confirmed) return;
   const btn = document.getElementById("scoreDelBtn");
   try {
     if (btn) { btn.disabled = true; btn.textContent = ""; btn.innerHTML = '<i data-lucide="loader-2">删除中…</i>'; }
@@ -10615,6 +10708,9 @@ async function boot(page) {
     initAddHomeworkModal();
     if (typeof initSubmitHomeworkModal === "function") initSubmitHomeworkModal();
     if (typeof initScoreEvalModals === "function") initScoreEvalModals();
+    // ★ 科目初始化：把「系统科目表」渲染进成绩/作业/编辑的科目选择器。
+    //   必须主动调用（不依赖 initDataEntry），否则成绩弹窗科目永远停在内置默认1门。
+    if (typeof deLoadAbilityModules === "function") deLoadAbilityModules();
   }
   // 每周五自动发放零花钱（+18 到自由基金），启动时检查一次
   checkAndAddWeeklyAllowance();
