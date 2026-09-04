@@ -9583,57 +9583,57 @@ async function saveSubmitHomework() {
   const btn = document.getElementById("saveSubmitHomework");
   const original = btn.textContent;
   btn.textContent = "保存中..."; btn.disabled = true;
+  const wasDone = __shmCurrentItem.status === "done" || !!__shmCurrentItem.submitted;
+  // ★ 提速：单次写入作业记录。新提交时一次写入"已完成+完整补充信息"；已是完成态只写补充信息。
+  //   不再"先写 payload 再写 done"对同一 study.json 写两次（这是保存慢的主因之一，省一整次远程 PUT）。
+  const finalPayload = wasDone
+    ? payload
+    : Object.assign({ status: "done", submitted: true, submittedAt: new Date().toISOString() }, payload);
   try {
+    // ── 作业记录写入（GitHub Pages 走单次 PUT）──
     let saved = false;
-    try {
-      // 仅本地开发(带 /api 后端)才尝试 API；GitHub Pages 无后端，
-      // 直接走统一写入，省去每次保存都多打出的一次注定失败的 API 请求（这是编辑慢的主因）
-      if (await isLocalMode()) {
-        const resp = await fetch(`/api/homework/${__shmCurrentItem.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const result = await resp.json();
-        if (result.ok) saved = true;
-      } else if (window.DataStore && window.DataStore.updateStudyRecord) {
-        await window.DataStore.updateStudyRecord(__shmCurrentItem.id, payload);
-        saved = true;
-      }
-    } catch (apiErr) {
-      console.warn("补充信息保存 API 失败，使用本地回退:", apiErr.message);
-    }
-    if (!saved && window.DataStore && window.DataStore.updateStudyRecord) {
+    const writePromise = (async () => {
       try {
-        await window.DataStore.updateStudyRecord(__shmCurrentItem.id, payload);
-        saved = true;
-      } catch (dsErr) { console.warn("补充信息保存 DataStore 失败:", dsErr.message); }
-    }
-    if (!saved) {
-      await updateHomeworkLocally(__shmCurrentItem.id, payload);
-    }
+        // 仅本地开发(带 /api 后端)才尝试 API；GitHub Pages 无后端，直接统一写入
+        if (await isLocalMode()) {
+          const resp = await fetch(`/api/homework/${__shmCurrentItem.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(finalPayload),
+          });
+          const result = await resp.json();
+          if (result.ok) saved = true;
+        } else if (window.DataStore && window.DataStore.updateStudyRecord) {
+          await window.DataStore.updateStudyRecord(__shmCurrentItem.id, finalPayload);
+          saved = true;
+        }
+      } catch (apiErr) {
+        console.warn("补充信息保存 API 失败，使用本地回退:", apiErr.message);
+      }
+      if (!saved && window.DataStore && window.DataStore.updateStudyRecord) {
+        try {
+          await window.DataStore.updateStudyRecord(__shmCurrentItem.id, finalPayload);
+          saved = true;
+        } catch (dsErr) { console.warn("补充信息保存 DataStore 失败:", dsErr.message); }
+      }
+      if (!saved) {
+        await updateHomeworkLocally(__shmCurrentItem.id, finalPayload);
+      }
+    })();
 
-    // ── 提交作业 = 置为已完成 + 按类型加分 ──
-    // 用户点「提交作业」即视为完成：只有未完成时才置 done 并发放一次 XP，
-    // 避免重复提交导致重复加分。
-    const wasDone = __shmCurrentItem.status === "done" || !!__shmCurrentItem.submitted;
+    // ── XP 发放（仅新提交时）──与作业写入并行：不同数据文件、互不干扰，减少串行等待 ──
+    // 用户点「提交作业」即视为完成：只有未完成时才置 done 并发放一次 XP，避免重复提交重复加分。
+    let baseXp = 0;
+    let xpPromise = Promise.resolve();
     if (!wasDone) {
-      // 1. 将作业标记为已完成
-      const donePayload = Object.assign({ status: "done", submitted: true, submittedAt: new Date().toISOString() }, payload);
-      try {
-        await updateStudyRecord(__shmCurrentItem.id, donePayload);
-      } catch (err) {
-        console.warn("提交作业-置为完成失败(尝试直接写)", err.message);
-        await updateHomeworkLocally(__shmCurrentItem.id, donePayload);
-      }
-      // 2. 按作业类型发放 XP（作业类型现为 假期作业/特色作业；系统配置仍是
-      //    「作业·日常预习」等四类，精确名找不到时回退到任一「作业·」规则，避免发分失效）
+      // 按作业类型发放 XP（作业类型现为 假期作业/特色作业；系统配置仍是
+      // 「作业·日常预习」等四类，精确名找不到时回退到任一「作业·」规则，避免发分失效）
       const cfgXpData = await loadAppData();
       const xpRulesMap = (cfgXpData.config && cfgXpData.config.xpRules) || {};
       const hwRule = resolveHomeworkRule(xpRulesMap, hwType);
-      const baseXp = (hwRule && hwRule.xp) ? Number(hwRule.xp) || 2 : 2;
+      baseXp = (hwRule && hwRule.xp) ? Number(hwRule.xp) || 2 : 2;
       const taskName = "作业·" + (hwType || "假期作业");
-      await window.DataStore.addXpRecord({
+      xpPromise = window.DataStore.addXpRecord({
         taskName,
         title: __shmCurrentItem.title || __shmCurrentItem.cleanTitle || "作业",
         xpCategory: "学习成长",
@@ -9643,6 +9643,10 @@ async function saveSubmitHomework() {
         status: "verified",
         description: (hwType || "作业") + "完成",
       }).catch(err => console.warn("提交作业-加分失败:", err.message));
+    }
+    await Promise.all([writePromise, xpPromise]);
+
+    if (!wasDone) {
       showToast(`✅ 作业已提交，+${baseXp} XP`, true);
     } else {
       showToast("✅ 补充信息已保存", true);
@@ -9651,6 +9655,7 @@ async function saveSubmitHomework() {
     // 随堂测验的能量发放已合并到【录入成绩】，此处移除
     closeSubmitHomeworkModal();
     if (window.DataStore && window.DataStore.refreshData) {
+      // refreshData(true)=仅本地缓存刷新(写操作已更新内存缓存)，不走网络，避免卡顿
       await window.DataStore.refreshData(true).catch(() => {});
     }
     // 保存后只刷新作业列表区块，避免整页全量重绘造成的卡顿
