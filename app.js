@@ -8392,7 +8392,7 @@ async function refreshMoneyRecent() {
 
 // 根据作业内容判定作业类型：日常预习 / 日常复习 / 假期作业 / 特色作业
 function inferHomeworkType(text) {
-  if (!text) return "假期作业";
+  if (!text) return "";
   const t = String(text);
   // 特色作业：动手/实践/展示类
   if (/手抄报|手工作品|手工|画画|绘画|观察|实践|实验|日记|阅读打卡|打卡|书法|书法练习|演讲|朗诵|口才|小报|手绘|制作|剪贴|贴画|泥塑|折纸|种植|养|社会实践|研学/.test(t)) return "特色作业";
@@ -8400,8 +8400,8 @@ function inferHomeworkType(text) {
   if (/预习/.test(t)) return "日常预习";
   // 复习
   if (/复习|背诵|默写|整理笔记|错题|复盘/.test(t)) return "日常复习";
-  // 其余统一为假期作业
-  return "假期作业";
+  // 其余不再默认为"假期作业"，留空让用户明确选择
+  return "";
 }
 
 // 兼容查询作业分值规则：作业类型为「假期作业/特色作业」，
@@ -9097,7 +9097,7 @@ async function openEditModal(item) {
 
   // 详情字段：作业类型/能力模块/关联单元
   const subject = item.subject || "语文";
-  setRadioValue("editTypeGroup", item.homeworkType || "假期作业");
+  setRadioValue("editTypeGroup", item.homeworkType || "");
   populateChoiceGroup("editModuleGroup", getModuleOptions(subject), item.modules || []);
 
   const units = await getTeachingUnits(subject);
@@ -9161,7 +9161,8 @@ function openAddHomeworkModal() {
   document.getElementById("addHomeworkTitle").value = "";
   document.getElementById("addHomeworkDueDate").value = getTodayVal();
   setRadioValue("addSubjectGroup", "语文");
-  setRadioValue("addTypeGroup", "假期作业");
+  // 作业类型不做任何预选默认，由用户明确选择；避免每次默认成"假期作业"
+  document.querySelectorAll('#addTypeGroup input[name="addType"]').forEach(function(r) { r.checked = false; });
   syncAddHomeworkDue();
   // 重置拆分状态
   const parsedWrap = document.getElementById("addParsedWrap");
@@ -9218,8 +9219,8 @@ async function saveAddHomework() {
         subject: subject,
         title: el.src.text || el.src.title,
         description: el.src.text || el.src.title,
-        // 类型：优先该行下拉值，其次解析器默认，最后弹窗热门默认
-        homeworkType: el.rowType || getRadioValue("addTypeGroup") || "假期作业",
+        // 类型：优先该行下拉值，其次弹窗中统一选择的类型；不再有任何内置"假期作业"兜底
+        homeworkType: el.rowType || getRadioValue("addTypeGroup") || "",
         modules: el.src.module ? [el.src.module] : [],
         module: el.src.module || "",
         status: "pending",
@@ -9236,6 +9237,11 @@ async function saveAddHomework() {
       if (batchRecords.length === 0) {
         btn.textContent = original; btn.disabled = false;
         showToast("未找到要保存的作业", false);
+        return;
+      }
+      // 任一作业未明确选择作业类型且无统一类型→提示补选，不静默落成"假期作业"
+      if (batchRecords.some(r => !r.homeworkType)) {
+        showToast("请先为作业选择作业类型（可统一选择或逐行选择）", false);
         return;
       }
       let okCount = 0, failCount = 0;
@@ -9259,7 +9265,8 @@ async function saveAddHomework() {
     // ── 场景二：单条录入 ──
     if (!title) { showToast("先写一下作业内容吧 ✏️", false); return; }
     // 添加作业：存基础信息 + 作业类型；模块/单元/测验在提交时填写
-    const hwTypeNow = getRadioValue("addTypeGroup") || "假期作业";
+    const hwTypeNow = getRadioValue("addTypeGroup") || "";
+    if (!hwTypeNow) { showToast("请选择作业类型", false); return; }
     await DataStore.addStudyRecord({
       subject,
       title,
@@ -9507,8 +9514,8 @@ async function openSubmitHomeworkModal(item) {
       <span>${typeof escapeHtmlReason === "function" ? escapeHtmlReason(item.title || "") : (item.title || "")}</span>`;
   }
 
-  // 作业类型（预填已有值）
-  setRadioValue("shmTypeGroup", item.homeworkType || "假期作业");
+  // 作业类型（预填已有值，无值则不预选，避免默认"假期作业"）
+  setRadioValue("shmTypeGroup", item.homeworkType || "");
 
   // 完成用时（预填已有值）
   setRadioValue("shmDurationGroup", item.duration || "");
@@ -9551,7 +9558,8 @@ function closeSubmitHomeworkModal() {
 // 保存补充信息
 async function saveSubmitHomework() {
   if (!__shmCurrentItem || !__shmCurrentItem.id) { showToast("未找到作业，请重试", false); return; }
-  const hwType = getRadioValue("shmTypeGroup") || "假期作业";
+  const hwType = getRadioValue("shmTypeGroup") || "";
+  if (!hwType) { showToast("请选择作业类型", false); return; }
   const duration = getRadioValue("shmDurationGroup") || "";
   const wrongCount = getRadioValue("shmWrongGroup") || "";
   const modules = getCheckedOfGroup("shmModuleGroup");
@@ -10106,7 +10114,8 @@ async function saveEdit() {
   const newDueDate = document.getElementById("editDueDate").value;
 
   // 详情字段：作业类型/能力模块/关联单元
-  const hwType = getRadioValue("editTypeGroup") || "假期作业";
+  const hwType = getRadioValue("editTypeGroup") || "";
+  if (!hwType) { showToast("请选择作业类型", false); return; }
   const modules = getCheckedOfGroup("editModuleGroup");
   const module = modules[0] || "";
   const unitVal = getRadioValue("editUnitGroup") || "other";
