@@ -1341,13 +1341,14 @@
       "cleanTitle": "背诵第6页的资料袋",
       "shortTitle": "背诵第6页的资料袋",
       "description": "背诵第6页的资料袋",
-      "homeworkType": "假期作业",
+      "homeworkType": "",
       "module": "阅读",
       "modules": [
-        "阅读"
+        "阅读",
+        "作文"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-06",
       "deadline": "2026-09-06",
       "reviewStatus": "",
@@ -1357,7 +1358,12 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "submittedAt": "2026-09-07T03:48:40.243Z",
+      "duration": "15-30分钟",
+      "wrongCount": 0,
+      "unitIndex": 0,
+      "unitName": "第一单元·自然之美"
     },
     {
       "id": "hw_mtmrxr4f5tsnb3",
