@@ -5027,7 +5027,8 @@ function renderWrQuest(report, familyMeetings) {
   if (meetings.length > 0) {
     var currentWeek = report.weekNumber;
     var matched = meetings.filter(function(m) { return m.weekNumber === currentWeek; });
-    var meeting = matched.length > 0 ? matched[0] : meetings[0];
+    // 修复：只显示"与本周同周"的会议。该周没开会时如实留空，绝不拿别的周的约定冒充本周，避免出现"W36 显示 W37 内容"。
+    var meeting = matched.length > 0 ? matched[0] : null;
     if (meeting && meeting.commitments && meeting.commitments.length > 0) {
       var done = meeting.commitments.filter(function(c) { return c.completed; }).length;
       var total = meeting.commitments.length;
@@ -5189,7 +5190,7 @@ function renderSuggestionContent(report, familyMeetings) {
     // 找到与当前周报同周或最近一周的会议
     var currentWeek = report.weekNumber;
     var matched = meetings.filter(function(m) { return m.weekNumber === currentWeek; });
-    var meeting = matched.length > 0 ? matched[0] : meetings[0];
+    var meeting = matched.length > 0 ? matched[0] : null;
     if (meeting && meeting.commitments && meeting.commitments.length > 0) {
       var done = meeting.commitments.filter(function(c) { return c.completed; }).length;
       var total = meeting.commitments.length;
