@@ -1372,13 +1372,13 @@
       "cleanTitle": "抄写第2课的生字词",
       "shortTitle": "抄写第2课的生字词",
       "description": "抄写第2课的生字词",
-      "homeworkType": "假期作业",
+      "homeworkType": "",
       "module": "汉字",
       "modules": [
         "汉字"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-06",
       "deadline": "2026-09-06",
       "reviewStatus": "",
@@ -1388,7 +1388,12 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "submittedAt": "2026-09-07T03:49:28.601Z",
+      "duration": "15-30分钟",
+      "wrongCount": 0,
+      "unitIndex": 0,
+      "unitName": "第一单元·自然之美"
     },
     {
       "id": "hw_mtmrx4r9f7fh41",
