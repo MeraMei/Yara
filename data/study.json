@@ -1402,11 +1402,14 @@
       "cleanTitle": "数学：完成知训第5页。",
       "shortTitle": "数学：完成知训第5页。",
       "description": "数学：完成知训第5页。",
-      "homeworkType": "假期作业",
-      "module": "",
-      "modules": [],
-      "status": "pending",
-      "submitted": false,
+      "homeworkType": "",
+      "module": "概念",
+      "modules": [
+        "概念",
+        "计算"
+      ],
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-06",
       "deadline": "2026-09-06",
       "reviewStatus": "",
@@ -1416,7 +1419,12 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "submittedAt": "2026-09-07T03:50:23.542Z",
+      "duration": "15-30分钟",
+      "wrongCount": 0,
+      "unitIndex": 0,
+      "unitName": "第一单元·认识更大的数"
     },
     {
       "id": "hw_mtl9o9aroytklp",
