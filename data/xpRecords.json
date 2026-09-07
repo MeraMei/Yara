@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtqpi279h92p6k",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "主动做家务（力所能及）",
+    "taskName": "主动做家务（力所能及）",
+    "taskCategory": "能力成长",
+    "date": "2026-09-07",
+    "datetime": "2026-09-07 03:54:11",
+    "xp": 5,
+    "baseXp": 5,
+    "commitmentBonus": false,
+    "xpCategory": "能力成长",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "早起出门的时候顺便倒垃圾",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtqpgf98f7e9sd",
     "domain": "XP",
     "type": "XP获得",
