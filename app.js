@@ -401,6 +401,8 @@ let __dataVersion = 0;
 const __viewRendered = {};
 function refreshData(localOnly) {
   __dataVersion++;
+  // 顺手补发此前加分失败积压的待补 XP（队列为空则立即返回、无网络开销；非阻塞，写失败保留队列下次再补）
+  try { if (typeof flushPendingXpRecords === 'function') flushPendingXpRecords().catch(function () {}); } catch (e) {}
   if (localOnly && cachedData) {
     // 写操作已更新本地缓存，无需重新从 GitHub 拉取
     _persistCache();
@@ -799,6 +801,44 @@ function writeXpMergedBase(mergeFn, msg) {
   return writeGithubFile('xpRecords.json', mergeFn(currentRecords), msg);
 }
 
+// ── 待补发 XP 队列：加分因并发冲突/网络临时失败且重试仍未成功时，先落本地，
+//    绝不静默丢分；随后在任意一次写成功/刷新时自动补发（writeMerged 自带最新基准合并）。 ──
+function xpPendingKey() { return "__xpPendingRetry"; }
+function readPendingXp() {
+  try {
+    const s = localStorage.getItem(xpPendingKey());
+    const a = s ? JSON.parse(s) : [];
+    return Array.isArray(a) ? a : [];
+  } catch (e) { return []; }
+}
+function writePendingXp(list) {
+  try { localStorage.setItem(xpPendingKey(), JSON.stringify(list)); } catch (e) { /* 存储不可用时放弃本轮持久化，不阻塞主流程 */ }
+}
+function queuePendingXpRecord(rec) {
+  try {
+    if (!rec || !rec.id) return;
+    const l = readPendingXp();
+    if (!l.some(r => r && r.id === rec.id)) { l.push(rec); writePendingXp(l); }
+  } catch (e) { /* noop */ }
+}
+function flushPendingXpRecords() {
+  const pend = readPendingXp();
+  if (!pend.length) return Promise.resolve();
+  const failed = [];
+  let okCount = 0;
+  return pend.reduce(function (chain, rec) {
+    return chain.then(function () {
+      return writeXpMerged(rec).then(
+        function () { okCount++; },
+        function (err) { failed.push(rec); console.warn("待补XP补发仍失败(保留队列):", (err && err.message) || err); }
+      );
+    });
+  }, Promise.resolve()).then(function () {
+    if (okCount > 0) console.log("待补XP自动补发成功", okCount, "条，剩余", failed.length);
+    if (failed.length) { writePendingXp(failed); } else { try { localStorage.removeItem(xpPendingKey()); } catch (e) {} }
+  }).catch(function (e) { console.warn("待补XP队列处理异常:", e); });
+}
+
 // 新增 XP 获得记录
 async function addXpRecord(record) {
   _dataGen++;
@@ -823,7 +863,16 @@ async function addXpRecord(record) {
   };
   // ★ 并发安全写入：以「线上最新」为基准，按 id 去重把新记录合并进去。
   //   避免整文件覆盖导致多端并发时互相覆盖 / GitHub SHA does not match。
-  await writeXpMerged(newRecord);
+  //   若临时写入失败（并发冲突/网络且重试仍未成功），先把记录落本地待补队列，绝不静默丢分；
+  //   随后在写成功/刷新时自动补发，并把本次错误抛给调用方（由调用方决定是否提示，但数据不会丢）。
+  try {
+    await writeXpMerged(newRecord);
+  } catch (xpWriteErr) {
+    queuePendingXpRecord(newRecord);
+    throw xpWriteErr;
+  }
+  // 本条写成功后，顺手补发此前因临时失败积压的待补 XP（保证集体不漏分）
+  flushPendingXpRecords().catch(function () {});
   // 增量更新缓存
   _addToCache('xpRecords', newRecord);
   _addToCache('recentRecords', {
@@ -1807,7 +1856,18 @@ async function updateXpRecord(recordId, fields) {
     updateData.reviewStatus = fields.status === 'verified' ? '已通过' : fields.status === 'returned' ? '已退回' : '待确认';
   }
   // ★ 并发安全更新：以线上最新为基准，只 merge 这一条，避免覆盖他人并发新增的记录。
-  await writeXpMergedRecord(recordId, updateData);
+  //   若 writeMerged 多次退避重试后仍因并发冲突落空（另一端持续在写），再多等一段更长窗口整体重试一次，
+  //   （重试会重新读线上最新再 merge），尽量让保存一次成功，避免弹"保存失败"。
+  try {
+    await writeXpMergedRecord(recordId, updateData);
+  } catch (wrErr) {
+    if (/does not match|conflict/i.test(String((wrErr && wrErr.message) || ''))) {
+      await new Promise(function (res) { setTimeout(res, 1500); });
+      await writeXpMergedRecord(recordId, updateData);
+    } else {
+      throw wrErr;
+    }
+  }
   _updateCacheRecord('xpRecords', recordId, updateData);
   _updateCacheRecord('recentRecords', recordId, { ...fields, status: fields.status, reviewStatus: updateData.reviewStatus });
   _persistCache();
@@ -5352,6 +5412,36 @@ function addFreeCommitmentRow() {
 function removeCommitmentRow(btn) {
   var row = btn.closest(".fm-commitment-row");
   if (row) row.remove();
+}
+
+// 把已保存的家庭会议回填到编辑弹窗（修复"打开会议内容是空的"）
+function loadMeetingIntoEditor(m) {
+  var s = document.getElementById("fmSummary"); if (s) s.value = m.summary || "";
+  var d = document.getElementById("fmDiscussion"); if (d) d.value = m.discussion || "";
+  var list = document.getElementById("fmCommitmentList"); if (list) list.innerHTML = "";
+  var comms = (m.commitments || []).filter(function(c) { return c && (c.text || c.taskName); });
+  if (comms.length === 0) { addCommitmentRow("", true); addCommitmentRow("", false); refreshIcons(20); return; }
+  comms.forEach(function(c) {
+    var lastRow, sel, opt, xi;
+    if (c.linked && c.taskName) {
+      addCommitmentRow("", true);
+      lastRow = list.lastElementChild;
+      sel = lastRow.querySelector(".fm-commitment-select");
+      if (sel) {
+        opt = Array.prototype.find.call(sel.options, function(o) { return o.value === c.taskName; });
+        if (opt) { sel.value = c.taskName; refreshIcons(20); return; }
+        lastRow.remove(); // 任务池里没有该任务，退化为自由填写
+      }
+      addCommitmentRow(c.text || c.taskName, false);
+      lastRow = list.lastElementChild;
+      xi = lastRow.querySelector(".fm-free-xp"); if (xi) xi.value = c.xp || "";
+      refreshIcons(20); return;
+    }
+    addCommitmentRow(c.text || c.taskName, false);
+    lastRow = list.lastElementChild;
+    xi = lastRow.querySelector(".fm-free-xp"); if (xi) xi.value = c.xp || "";
+    refreshIcons(20);
+  });
 }
 
 // 家庭会议
@@ -8952,6 +9042,12 @@ function handleWriteError(err, fallbackMsg) {
     showTokenRequiredToast();
     return;
   }
+  // 并发写冲突（GitHub SHA does not match）：表示"数据刚被其他操作更新、当前保存版本已过期"，
+  // 用友好引导替代生硬的错误码，避免用户困惑。
+  if (/does not match|conflict/i.test(msg)) {
+    alert("本次改动未保存成功：数据刚被其他操作更新。\n请刷新页面后重新修改保存（你的内容不会被覆盖，刷新即可重填）。");
+    return;
+  }
   if (fallbackMsg) {
     alert(fallbackMsg || "操作失败，请稍后重试");
   }
@@ -9647,7 +9743,11 @@ async function saveSubmitHomework() {
         baseXp: 1,
         status: "verified",
         description: (subjectName ? subjectName + "作业完成" : "作业完成"),
-      }).catch(err => console.warn("提交作业-加分失败:", err.message));
+      }).catch(err => {
+        // 加分失败已由 addXpRecord 写入本地待补队列、稍后自动补发，此处明确提示避免用户以为丢分
+        console.warn("提交作业-加分失败，已进入待补队列:", err.message);
+        try { showToast("作业已保存，但加分未成功，已自动排队稍后补发", false); } catch (e) {}
+      });
     }
     await Promise.all([writePromise, xpPromise]);
 

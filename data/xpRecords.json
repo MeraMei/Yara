@@ -1,5 +1,24 @@
 [
   {
+    "id": "xp_71c9e5b2f0a4d17",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "作业·假期作业",
+    "taskName": "作业·假期作业",
+    "taskCategory": "学习成长",
+    "date": "2026-09-07",
+    "datetime": "2026-09-07 03:49:28",
+    "xp": 1,
+    "baseXp": 1,
+    "commitmentBonus": false,
+    "xpCategory": "学习成长",
+    "reviewStatus": "已通过",
+    "returnReason": "",
+    "description": "语文作业完成",
+    "_hasValidName": true,
+    "_backfilled": true
+  },
+  {
     "id": "xp_mtqt2dsmmo2e58",
     "domain": "XP",
     "type": "XP获得",

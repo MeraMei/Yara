@@ -324,11 +324,11 @@ function recalcXp(mode) {
           btns.forEach(function(b) { b.disabled = false; });
           return;
         }
-        // 写回 GitHub
+        // 写回 GitHub（用 writeMerged：带最新 SHA + 同页串行队列，避免整文件覆盖与正在进行的 XP 写入并发撞 SHA 触发 does not match）
         var msgParts = [];
         if (mappedCount > 0) msgParts.push('任务名映射 ' + mappedCount + ' 条');
         if (updated > 0) msgParts.push('更新分值 ' + updated + ' 条');
-        return DR.writeDataFile('xpRecords.json', records, '分值同步：' + msgParts.join('，'))
+        return DR.writeMerged('xpRecords.json', '分值同步：' + msgParts.join('，'), function () { return records; })
           .then(function() {
             var resHtml = '';
             if (mappedCount > 0) resHtml += '🔗 已应用 <b>' + mappedCount + '</b> 条任务名映射<br>';
