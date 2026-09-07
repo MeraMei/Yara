@@ -30,10 +30,11 @@
     "baseXp": 5,
     "commitmentBonus": true,
     "xpCategory": "学习成长",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "主动练字 [承诺兑现]",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mtqpfahpro6wce",
