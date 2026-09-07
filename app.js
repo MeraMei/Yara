@@ -933,6 +933,15 @@ function meetingByWeek(fmList, wn) {
 }
 // 本周约定会议：严格取"周号==本周"的会议，否则返回 null（展示"去定一个约定"）
 function currentWeekMeeting(fmList) { return meetingByWeek(fmList, currentWeekNumber()); }
+
+// 会议应归属的"周"：优先用"最新一份成长周报所在的周"（用户在报告周期里操作）。
+// 只有还没生成任何周报时，才回退到今天所在周。修复：用户在 W36 报告语境写会议，
+// 却被硬记到"今天"的 W37 的问题。
+function meetingTargetWeek(cfg) {
+  var reps = (cfg && cfg.aiWeeklyReports) || [];
+  var last = reps.length ? reps[reps.length - 1] : null;
+  return last && last.weekNumber ? last.weekNumber : currentWeekNumber();
+}
 // 上周约定会议：周号 == 本周-1（用于周会"上周约定"回顾）
 function prevWeekMeeting(fmList) { return meetingByWeek(fmList, currentWeekNumber() - 1); }
 
@@ -2572,7 +2581,7 @@ if (typeof window !== "undefined") {
       const xpRules = (cfg.config && cfg.config.xpRules) ? cfg.config.xpRules : {};
       const categories = ["学习成长", "能力成长", "身体成长", "兴趣爱好"];
       // 获取本周约定（严格取"周号==本周"的会议，而不是最新会议）
-      const meeting = currentWeekMeeting(cfg.familyMeetings);
+      const meeting = meetingByWeek(cfg.familyMeetings, meetingTargetWeek(cfg));
       const activeCommitments = meeting ? meeting.commitments.filter(function(c) { return !c.completed; }) : [];
       // 分类：关联任务池的约定（linked） vs 自由填写（非linked）
       const linkedCommitments = activeCommitments.filter(c => c.linked);
@@ -2642,7 +2651,7 @@ if (typeof window !== "undefined") {
       if (!checked) { hint.style.display = "none"; return; }
       // 从家庭会议中获取本周约定
       var cfg = window.__lastCfg || {};
-      var meeting = currentWeekMeeting(cfg.familyMeetings);
+      var meeting = meetingByWeek(cfg.familyMeetings, meetingTargetWeek(cfg));
       if (meeting) {
         var texts = meeting.commitments.map(function(c) { return c.text; });
         var linkedTexts = meeting.commitments.filter(function(c) { return c.linked; }).map(function(c) { return c.text; });
@@ -2893,7 +2902,7 @@ if (typeof window !== "undefined") {
         try {
           const cfgNow = window.__lastCfg || {};
           const linkedTaskName = selectedOpt?.dataset?.taskname || taskName;
-          const meeting = currentWeekMeeting(cfgNow.familyMeetings);
+          const meeting = meetingByWeek(cfgNow.familyMeetings, meetingTargetWeek(cfgNow));
           if (meeting) {
             let changed = false;
             meeting.commitments.forEach(c => {
@@ -4424,8 +4433,8 @@ async function renderHome() {
   // ═══ ① 行为卡片列表（图3：挑战 / 记录 / 日记 / 约定 / 作业统计） ═══
   const cards = [];
 
-  // 本周挑战：取"周号==本周"的家庭会议，展示本周约定的完成状态
-  var lastFm = currentWeekMeeting(cfg.familyMeetings);
+  // 本周挑战：取会议归属周的家庭会议，展示本周约定的完成状态
+  var lastFm = meetingByWeek(cfg.familyMeetings, meetingTargetWeek(cfg));
   if (lastFm) {
     var commDone = lastFm.commitments.filter(function(c) { return c.completed; });
     var commUndone = lastFm.commitments.filter(function(c) { return !c.completed; });
@@ -5346,16 +5355,20 @@ function removeCommitmentRow(btn) {
 }
 
 // 家庭会议
-function openFamilyMeeting() {
+// 记录本次会议应归属的周（默认取"最新周报所在周"，可被调用方指定）
+var _fmTargetWeek = null;
+function openFamilyMeeting(weekNum) {
   var cfg = window.__lastCfg || {};
   var reports = cfg.aiWeeklyReports || [];
   var currentReport = reports.length > 0 ? reports[reports.length - 1] : null;
   if (!currentReport) { showToast("还没有成长周报，请先等待周报生成", false); return; }
-  document.getElementById("fmWeekNumber").textContent = currentWeekNumber();
+  // 归属周：优先显式指定；否则用"最新周报所在的周"，不再硬按"今天所在的周"
+  _fmTargetWeek = (typeof weekNum === 'number' && weekNum > 0) ? weekNum : meetingTargetWeek(cfg);
+  document.getElementById("fmWeekNumber").textContent = _fmTargetWeek;
   var previewEl = document.getElementById("fmPreviewContent");
   if (previewEl) previewEl.textContent = currentReport.summary || "暂无";
-  // 检查上周承诺（严格取"周号==本周-1"的会议）
-  var lastMeeting = prevWeekMeeting(cfg.familyMeetings);
+  // 检查"上一周"约定（严格取：归属周 - 1）
+  var lastMeeting = meetingByWeek(cfg.familyMeetings, _fmTargetWeek - 1);
   var hintEl = document.getElementById("fmPreviousGoalHint");
   if (hintEl) {
     if (lastMeeting && lastMeeting.commitments && lastMeeting.commitments.length > 0) {
@@ -5413,13 +5426,13 @@ async function submitFamilyMeeting() {
       }
     }
   });
-  var lastMeeting = prevWeekMeeting(cfg.familyMeetings);
+  var lastMeeting = meetingByWeek(cfg.familyMeetings, (_fmTargetWeek || meetingTargetWeek(cfg)) - 1);
   var btn = document.querySelector("#familyMeetingModal .btn-confirm");
   btn.disabled = true;
   btn.textContent = "保存中…";
   try {
     await window.DataStore.addFamilyMeeting({
-      weekNumber: currentWeekNumber(),
+      weekNumber: _fmTargetWeek || meetingTargetWeek(cfg),
       year: currentReport.year || new Date().getFullYear(),
       date: new Date().toISOString().slice(0, 10),
       summary: summary,
@@ -5974,7 +5987,7 @@ window.approveXpRecord = async function(btn, recordId, recordEl) {
     // 检查是否为承诺兑现记录，如果是则同步标记家庭会议约定完成
     const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === recordId);
     if (record && record.commitmentBonus) {
-      const meeting = currentWeekMeeting(cachedData && cachedData.familyMeetings);
+      const meeting = meetingByWeek(cachedData && cachedData.familyMeetings, meetingTargetWeek(cachedData || {}));
       if (meeting && meeting.commitments) {
         const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
         if (targetText) {
@@ -6229,7 +6242,7 @@ window.submitEditXpPage = async function() {
     // 补勾承诺时，同步标记本周同名约定完成
     if (willCommit && !wasCommit) {
       try {
-        const meeting = currentWeekMeeting(cfg.familyMeetings);
+        const meeting = meetingByWeek(cfg.familyMeetings, meetingTargetWeek(cfg));
         if (meeting && meeting.commitments) {
           const taskName = record.taskName || record.title || desc.replace("[承诺兑现]", "").trim();
           let changed = false;
@@ -6301,7 +6314,7 @@ async function confirmApproveWithComment() {
     // 注意：linked（任务池关联）约定在打卡提交时已自动标记完成，这里只处理 free（自由填写）约定
     const record = (cachedData && cachedData.xpRecords || []).find(r => r.id === id);
     if (record && record.commitmentBonus) {
-      const meeting = currentWeekMeeting(cachedData && cachedData.familyMeetings);
+      const meeting = meetingByWeek(cachedData && cachedData.familyMeetings, meetingTargetWeek(cachedData || {}));
       if (meeting && meeting.commitments) {
         const targetText = record.description ? record.description.replace(" [承诺兑现]", "").trim() : "";
         if (targetText) {
