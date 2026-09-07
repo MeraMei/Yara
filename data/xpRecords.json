@@ -66,10 +66,11 @@
     "baseXp": 5,
     "commitmentBonus": false,
     "xpCategory": "兴趣爱好",
-    "reviewStatus": "待确认",
+    "reviewStatus": "已通过",
     "returnReason": "",
     "description": "做了好多教师节的小贺卡小书签，准备给老师",
-    "_hasValidName": true
+    "_hasValidName": true,
+    "status": "verified"
   },
   {
     "id": "xp_mtqpd6ba6j9uoo",
