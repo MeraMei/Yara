@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtqt2dsmmo2e58",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "阅读20分钟并圈出好词好句",
+    "taskName": "阅读20分钟并圈出好词好句",
+    "taskCategory": "学习成长",
+    "date": "2026-09-07",
+    "datetime": "2026-09-07 05:33:58",
+    "xp": 5,
+    "baseXp": 5,
+    "commitmentBonus": false,
+    "xpCategory": "学习成长",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "阅读《夏洛的网》第一篇，还做了阅读任务",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtqpi279h92p6k",
     "domain": "XP",
     "type": "XP获得",
