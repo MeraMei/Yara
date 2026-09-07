@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtqpgf98f7e9sd",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "练字 1页纸 / 4个AI练字",
+    "taskName": "练字 1页纸 / 4个AI练字",
+    "taskCategory": "学习成长",
+    "date": "2026-09-07",
+    "datetime": "2026-09-07 03:52:55",
+    "xp": 7,
+    "baseXp": 5,
+    "commitmentBonus": true,
+    "xpCategory": "学习成长",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "主动练字 [承诺兑现]",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtqpfahpro6wce",
     "domain": "XP",
     "type": "XP获得",
