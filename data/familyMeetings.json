@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "id": "fm_mtqt3bndvjceig",
+    "weekNumber": 37,
+    "year": 2026,
+    "date": "2026-09-07",
+    "summary": "阅读很棒，被老师表扬",
+    "discussion": "做的棒的事情，一定要坚持",
+    "goal": "",
+    "goalCompleted": false,
+    "previousGoal": "",
+    "previousGoalCompleted": false,
+    "commitments": [
+      {
+        "text": "阅读20分钟并圈出好词好句",
+        "taskName": "阅读20分钟并圈出好词好句",
+        "category": "学习成长",
+        "xp": 5,
+        "completed": false,
+        "linked": true
+      },
+      {
+        "text": "照顾好自己（营养均衡、午休）",
+        "taskName": "照顾好自己（营养均衡、午休）",
+        "category": "身体成长",
+        "xp": 5,
+        "completed": false,
+        "linked": true
+      }
+    ],
+    "previousCommitments": [],
+    "createdAt": "2026-09-07T05:34:42.361Z"
+  }
+]
