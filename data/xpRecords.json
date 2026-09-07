@@ -1,5 +1,23 @@
 [
   {
+    "id": "xp_mtqpdxwza3j64u",
+    "domain": "XP",
+    "type": "XP获得",
+    "title": "画画、手工作品",
+    "taskName": "画画、手工作品",
+    "taskCategory": "兴趣爱好",
+    "date": "2026-09-07",
+    "datetime": "2026-09-07 03:50:59",
+    "xp": 5,
+    "baseXp": 5,
+    "commitmentBonus": false,
+    "xpCategory": "兴趣爱好",
+    "reviewStatus": "待确认",
+    "returnReason": "",
+    "description": "做了好多教师节的小贺卡小书签，准备给老师",
+    "_hasValidName": true
+  },
+  {
     "id": "xp_mtqpd6ba6j9uoo",
     "domain": "XP",
     "type": "XP获得",
