@@ -1311,13 +1311,13 @@
       "cleanTitle": "阅读~99页",
       "shortTitle": "阅读~99页",
       "description": "阅读~99页",
-      "homeworkType": "假期作业",
+      "homeworkType": "",
       "module": "阅读",
       "modules": [
         "阅读"
       ],
-      "status": "pending",
-      "submitted": false,
+      "status": "done",
+      "submitted": true,
       "dueDate": "2026-09-06",
       "deadline": "2026-09-06",
       "reviewStatus": "",
@@ -1327,7 +1327,12 @@
       "progress": 0,
       "xp": 0,
       "errorModule": "",
-      "errorModules": []
+      "errorModules": [],
+      "submittedAt": "2026-09-07T03:47:41.740Z",
+      "duration": "30-60分钟",
+      "wrongCount": 0,
+      "unitIndex": -1,
+      "unitName": null
     },
     {
       "id": "hw_mtmrxr4f56phfa",
