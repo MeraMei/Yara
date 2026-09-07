@@ -2909,9 +2909,11 @@ if (typeof window !== "undefined") {
         } catch (e) {
           console.error("自动标记约定完成失败:", e);
         }
-        await DataStore.refreshData(true);
-        const cfg = await DataStore.loadData();
-        const pending = cfg.pendingCount || (cfg.recentRecords || []).filter(r => r.status === "pending").length;
+        // 优化：不再阻塞等全量刷新。缓存已由 addXpRecord 增量更新，先本地立即出结果，
+        // 渲染后再后台静默 refreshData 对齐线上，避免"第二笔提交"卡在整包重拉上。
+        const recent = (Array.isArray(cachedData && cachedData.recentRecords)) ? cachedData.recentRecords : [];
+        const pending = recent.filter(r => r && r.status === "pending").length;
+        const msg = isCommitment ? `✅ 已提交承诺任务，待确认 ${pending} 条（含承诺加成 +2 XP）` : `✅ 已提交，待确认 ${pending} 条`;
         closeXpModal();
         document.getElementById("xpTaskSelectPage").value = "";
         document.getElementById("xpValuePage").value = "";
@@ -2919,9 +2921,10 @@ if (typeof window !== "undefined") {
         document.getElementById("xpDescPage").value = "";
         document.getElementById("xpCommitmentCheck").checked = false;
         document.getElementById("xpCommitmentHint").style.display = "none";
-        const msg = isCommitment ? `✅ 已提交承诺任务，待确认 ${pending} 条（含承诺加成 +2 XP）` : `✅ 已提交，待确认 ${pending} 条`;
         showToast(msg, true);
-        return renderXp();
+        renderXp();
+        // 后台静默刷新 + 对齐线上（不阻塞上面的 UI 反馈）
+        try { await DataStore.refreshData(true); renderXp(); } catch (e) { console.error("后台刷新失败:", e); }
       }).then(() => {
         refreshIcons(50);
       }).catch(e => {

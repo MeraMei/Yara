@@ -109,9 +109,11 @@
   // 计算灾难性写入退避：冲突/限流需指数式拉长等待，避免高频对撞抢不赢另一端。
   // 抖动(±20%)避免多端同时退避后同步重试再次对撞。
   function backoffMs(isConflict, attempt) {
-    var base = isConflict ? (600 + Math.pow(1.6, attempt) * 700) : (400 + attempt * 500);
+    // 冲突/限流不再是"指数拉长到12s"，而是尽量短的间隔让两侧尽快重读最新完成合并。
+    // 冲突0.3s起、每次+0.15s、封顶2s；普通瞬时错误封顶2.5s。显著压低"第二个提交"卡顿。
+    var base = isConflict ? (300 + attempt * 150) : (350 + attempt * 200);
     var jitter = 0.8 + Math.random() * 0.4; // 0.8 ~ 1.2
-    return Math.min(Math.round(base * jitter), 12000); // 单次最长 12s
+    return Math.min(Math.round(base * jitter), isConflict ? 2000 : 2500);
   }
 
   function makeWriteError(msg, status) {
@@ -220,6 +222,10 @@
     return readWriteBase(path)
       .then(function (base) {
         var target = (typeof mergeFn === 'function') ? mergeFn(base.content) : base.content;
+        // 优化：merge 结果与线上最新内容一致时（本次无改动/幂等更新），跳过整包上传，直接视为成功。
+        if (target === base.content || JSON.stringify(target) === JSON.stringify(base.content)) {
+          return { ok: true, sha: (base && base.sha) || undefined, skipped: true };
+        }
         return tryPut(path, target, msg, token, base.sha);
       })
       .catch(function (err) {
